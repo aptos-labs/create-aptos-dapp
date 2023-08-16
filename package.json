@@ -1,7 +1,9 @@
 {
   "name": "create-apt-dapp",
   "version": "0.0.0",
-  "bin": "./dist/index.js",
+  "bin": {
+    "create-apt-dapp": "./dist/index.js"
+  },
   "type": "module",
   "dependencies": {
     "chalk": "^5.0.1",
