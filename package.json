@@ -6,12 +6,14 @@
   },
   "type": "module",
   "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.32.0",
     "chalk": "^5.0.1",
     "commander": "^10.0.1",
     "prompts": "^2.4.2",
-    "typescript": "^4.7.4",
-    "@types/node": "^18.6.4",
-    "@typescript-eslint/eslint-plugin": "^5.32.0",
-    "@typescript-eslint/parser": "^5.32.0"
+    "typescript": "^4.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.0"
   }
 }
