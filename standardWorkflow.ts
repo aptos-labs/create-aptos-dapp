@@ -22,31 +22,30 @@ export async function startStandardWorkflow() {
           message: "Choose how to start",
           choices: [
             {
-              title: "Boilerplates dapp",
+              title: "Boilerplate dapp",
               value: "new",
               message: "Start building your application from scratch",
             },
             {
-              title: "NFT Explorer (soon)",
-              value: "nft-explorer",
-              message: "A template to build NFTs explorers",
-              disabled: true,
+              title: "Todolist dapp",
+              value: "todolist",
+              message: "A template to build todo list dapp",
             },
             {
-              title: "NFT marketplace (soon)",
+              title: "NFT marketplace (coming soon)",
               value: "nft-marketplace",
               message: "A template to build NFTs marketplace",
               disabled: true,
             },
             {
-              title: "Defi (soon)",
+              title: "Defi (coming soon)",
               value: "defi",
-              message: "A template to build a defi dapp",
+              message: "A template to build defi dapp",
               disabled: true,
             },
           ],
           initial: 0,
-          hint: "- Create a default app ",
+          hint: "- Create a default dapp ",
         });
 
         step++;
