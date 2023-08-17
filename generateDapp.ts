@@ -13,13 +13,23 @@ const runCommand = (command) => {
 
 export const generateDapp = async (opts) => {
   const repoName = opts.projectPath || "my-aptos-dapp";
-  const repoAddr = "https://github.com/0xmaayan/aptos-todolist.git";
+  let repoAddr;
+  switch (opts.template) {
+    case "todolist":
+      repoAddr = "https://github.com/0xmaayan/aptos-todolist.git";
+      break;
+    case "new":
+      repoAddr = "https://github.com/0xmaayan/aptos-boilerplate.git";
+      break;
+    default:
+      repoAddr = "https://github.com/0xmaayan/aptos-boilerplate.git";
+  }
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
   const installDepsCommand = `cd ${repoName}/frontend && npm install`;
   const installRootDepsCommand = `cd ${repoName} && npm install`;
 
   // Clone the repo
-  console.log("Cloning the the create-apt-dapp repo...");
+  console.log("Cloning template repo...");
   const checkedOut = runCommand(gitCheckoutCommand);
   if (!checkedOut) {
     console.error("Failed to clone the repo");
@@ -63,5 +73,5 @@ export const generateDapp = async (opts) => {
     chalk.green(`4. run [npm run move:publish] to publish your contract.`) +
       "\n"
   );
-  console.log(chalk.green(`run [npm start] to run your dapp.`) + "\n");
+  console.log(chalk.green(`5. run [npm start] to run your dapp.`) + "\n");
 };
