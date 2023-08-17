@@ -1,12 +1,17 @@
 import { execSync } from "child_process";
 import chalk from "chalk";
-import { ARGUMENT_NAMES, Template, Network, PackageManager } from "./constants.js";
+import {
+  ARGUMENT_NAMES,
+  Template,
+  Network,
+  PackageManager,
+} from "./constants.js";
 
 const runCommand = (command) => {
   try {
     execSync(`${command}`, { stdio: "inherit" });
   } catch (e) {
-    console.error("Failed to execute ${command}, e");
+    console.error(`Failed to execute ${command}`, e);
     return false;
   }
   return true;
@@ -32,7 +37,6 @@ export const generateDapp = async (opts: {
   }
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
   const deleteDotGitCommand = `rm -rf ${repoName}/.git`;
-  const installDepsCommand = `cd ${repoName}/frontend && ${opts.packageManager} install`;
   const installRootDepsCommand = `cd ${repoName} && ${opts.packageManager} install`;
   const replaceNpmUsagesCommand = `cd ${repoName} && sed -i.bak 's/npm/${opts.packageManager}/g' package.json && rm package.json.bak`;
 
@@ -56,9 +60,8 @@ export const generateDapp = async (opts: {
   // Install dependencies
   console.log("Installing dependencies...");
   const replaceNpmUsages = runCommand(replaceNpmUsagesCommand);
-  const installedDeps = runCommand(installDepsCommand);
   const installedRootDeps = runCommand(installRootDepsCommand);
-  if (!replaceNpmUsages || !installedDeps || !installedRootDeps) {
+  if (!replaceNpmUsages || !installedRootDeps) {
     console.error("Failed to install dependencies");
     process.exit(-1);
   }
