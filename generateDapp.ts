@@ -31,6 +31,7 @@ export const generateDapp = async (opts: {
       repoAddr = "https://github.com/0xmaayan/aptos-boilerplate.git";
   }
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
+  const deleteDotGitCommand = `rm -rf ${repoName}/.git`;
   const installDepsCommand = `cd ${repoName}/frontend && ${opts.packageManager} install`;
   const installRootDepsCommand = `cd ${repoName} && ${opts.packageManager} install`;
   const replaceNpmUsagesCommand = `cd ${repoName} && sed -i 's/npm/${opts.packageManager}/g' package.json`;
@@ -38,7 +39,8 @@ export const generateDapp = async (opts: {
   // Clone the repo
   console.log("Cloning template repo...");
   const checkedOut = runCommand(gitCheckoutCommand);
-  if (!checkedOut) {
+  const deleteDotGit = runCommand(deleteDotGitCommand);
+  if (!checkedOut || !deleteDotGit) {
     console.error("Failed to clone the repo");
     process.exit(-1);
   } else {
