@@ -3,6 +3,7 @@ import prompts from "prompts";
 export async function startStandardWorkflow() {
   let step = 0;
   let quit = false;
+  let result = {};
 
   while (!quit) {
     switch (step) {
@@ -13,6 +14,7 @@ export async function startStandardWorkflow() {
           message: "Project name",
           initial: "my-aptos-dapp",
         });
+        result["projectPath"] = projectPath["projectPath"];
         step++;
         break;
       case 1:
@@ -47,22 +49,23 @@ export async function startStandardWorkflow() {
           initial: 0,
           hint: "- Create a default dapp ",
         });
-
+        result["template"] = template["template"];
         step++;
         break;
       case 2:
-        await prompts({
+        const network = await prompts({
           type: "select",
-          name: "chain",
-          message: "Choose your chain",
+          name: "network",
+          message: "Choose your network",
           choices: [
-            { title: "Mainnet", value: "MAINNET" },
-            { title: "Testnet", value: "TESTNET" },
-            { title: "Devnet", value: "DEVNET" },
+            { title: "Mainnet", value: "mainnet" },
+            { title: "Testnet", value: "testnet" },
+            { title: "Devnet", value: "devnet" },
           ],
           initial: 0,
           hint: "- You can change this later",
         });
+        result["network"] = network["network"];
         step++;
         break;
       case 3:
@@ -77,8 +80,11 @@ export async function startStandardWorkflow() {
           ],
           initial: 0,
         });
+        result["package-manager"] = "npm";
         quit = true;
         break;
     }
   }
+
+  return result;
 }

@@ -7,7 +7,7 @@ import { generateDapp } from "./generateDapp.js";
 
 const program = new Command();
 program
-  .option("-n, --name [value]", "specify a name for your dapp")
+  .option("-n, --app_name [value]", "specify a name for your dapp")
   .option(
     "-t, --template [value]",
     "specify a template to start your application from"
@@ -42,8 +42,8 @@ console.log(
 console.log("Welcome to the create-apt-dapp wizard 🔮");
 
 async function main() {
-  await startStandardWorkflow();
-  generateDapp();
+  const options = await startStandardWorkflow();
+  generateDapp(options);
 }
 
 main();

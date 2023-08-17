@@ -11,9 +11,8 @@ const runCommand = (command) => {
   return true;
 };
 
-export const generateDapp = async () => {
-  // TODO:Update repoName to dynamic name
-  const repoName = "my-aptos-dapp";
+export const generateDapp = async (opts) => {
+  const repoName = opts.projectPath || "my-aptos-dapp";
   const repoAddr = "https://github.com/0xmaayan/aptos-todolist.git";
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
   const installDepsCommand = `cd ${repoName}/frontend && npm install`;
@@ -31,8 +30,8 @@ export const generateDapp = async () => {
   // create .env file
   console.log("Creating .env file...");
   runCommand(`cd ${repoName} && touch .env`);
-  // TODO: Update network to dynamic network
-  runCommand(`echo "REACT_APP_NETWORK=testnet" > ${repoName}/.env`);
+  const network = opts.network || "testnet";
+  runCommand(`echo "REACT_APP_NETWORK=${network}" > ${repoName}/.env`);
 
   // Install dependencies
   console.log("Installing dependencies...");
@@ -42,17 +41,25 @@ export const generateDapp = async () => {
     process.exit(-1);
   }
 
+  // Log next steps
   console.log("Success! You're ready to start building your dapp on Aptos.");
 
   console.log(chalk.bold("\nNext steps:") + "\n");
-  console.log(chalk.green(`run [cd ${repoName}] to your dapp directory.`));
   console.log(
-    chalk.green(`run [npm run move:init] to initialize a new CLI Profile.`)
+    chalk.green(`run [cd ${repoName}] to your dapp directory.`) + "\n"
   );
   console.log(
-    chalk.green(`run [npm run move:compile] to compile your contract.`)
+    chalk.green(`run [npm install] to install dependencies for your dapp.`) +
+      "\n"
   );
   console.log(
-    chalk.green(`run [npm run move:publish] to publish your contract.`)
+    chalk.green(`run [npm run move:init] to initialize a new CLI Profile.`) +
+      "\n"
+  );
+  console.log(
+    chalk.green(`run [npm run move:compile] to compile your contract.`) + "\n"
+  );
+  console.log(
+    chalk.green(`run [npm run move:publish] to publish your contract.`) + "\n"
   );
 };
