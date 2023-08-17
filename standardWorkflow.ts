@@ -32,11 +32,11 @@ export async function startStandardWorkflow() {
     name: "template",
     message: "Choose how to start",
     choices: [
-      // {
-      //   title: "Boilerplate dapp",
-      //   value: "new",
-      //   message: "Start building your application from scratch",
-      // },
+      {
+        title: "Boilerplate dapp",
+        value: "new",
+        message: "Start building your application from scratch",
+      },
       {
         title: "Todolist dapp",
         value: "todolist",

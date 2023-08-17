@@ -33,6 +33,7 @@ export const generateDapp = async (opts: {
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
   const installDepsCommand = `cd ${repoName}/frontend && ${opts.packageManager} install`;
   const installRootDepsCommand = `cd ${repoName} && ${opts.packageManager} install`;
+  const replaceNpmUsagesCommand = `cd ${repoName} && sed -i 's/npm/${opts.packageManager}/g' package.json`;
 
   // Clone the repo
   console.log("Cloning template repo...");
@@ -52,9 +53,10 @@ export const generateDapp = async (opts: {
 
   // Install dependencies
   console.log("Installing dependencies...");
+  const replaceNpmUsages = runCommand(replaceNpmUsagesCommand);
   const installedDeps = runCommand(installDepsCommand);
   const installedRootDeps = runCommand(installRootDepsCommand);
-  if (!installedDeps || !installedRootDeps) {
+  if (!replaceNpmUsages || !installedDeps || !installedRootDeps) {
     console.error("Failed to install dependencies");
     process.exit(-1);
   }
