@@ -16,6 +16,7 @@ export const generateDapp = async (opts) => {
   const repoAddr = "https://github.com/0xmaayan/aptos-todolist.git";
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
   const installDepsCommand = `cd ${repoName}/frontend && npm install`;
+  const installRootDepsCommand = `cd ${repoName} && npm install`;
 
   // Clone the repo
   console.log("Cloning the the create-apt-dapp repo...");
@@ -36,7 +37,8 @@ export const generateDapp = async (opts) => {
   // Install dependencies
   console.log("Installing dependencies...");
   const installedDeps = runCommand(installDepsCommand);
-  if (!installedDeps) {
+  const installedRootDeps = runCommand(installRootDepsCommand);
+  if (!installedDeps || !installedRootDeps) {
     console.error("Failed to install dependencies");
     process.exit(-1);
   }
@@ -46,20 +48,20 @@ export const generateDapp = async (opts) => {
 
   console.log(chalk.bold("\nNext steps:") + "\n");
   console.log(
-    chalk.green(`run [cd ${repoName}] to your dapp directory.`) + "\n"
+    chalk.green(`1. run [cd ${repoName}] to your dapp directory.`) + "\n"
   );
   console.log(
-    chalk.green(`run [npm install] to install dependencies for your dapp.`) +
+    chalk.green(`2. run [npm run move:init] to initialize a new CLI Profile.`) +
       "\n"
   );
   console.log(
-    chalk.green(`run [npm run move:init] to initialize a new CLI Profile.`) +
+    chalk.green(
+      `3. run [npm run move:compile] to compile your move contract.`
+    ) + "\n"
+  );
+  console.log(
+    chalk.green(`4. run [npm run move:publish] to publish your contract.`) +
       "\n"
   );
-  console.log(
-    chalk.green(`run [npm run move:compile] to compile your contract.`) + "\n"
-  );
-  console.log(
-    chalk.green(`run [npm run move:publish] to publish your contract.`) + "\n"
-  );
+  console.log(chalk.green(`run [npm start] to run your dapp.`) + "\n");
 };
