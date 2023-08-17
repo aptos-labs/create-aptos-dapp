@@ -4,6 +4,13 @@
   "bin": {
     "create-apt-dapp": "./dist/index.js"
   },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "dev": "tsc && node dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.32.0",

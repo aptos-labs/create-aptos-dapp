@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import chalk from "chalk";
+import { Template, Network, PackageManager } from "./standardWorkflow";
 
 const runCommand = (command) => {
   try {
@@ -11,7 +12,12 @@ const runCommand = (command) => {
   return true;
 };
 
-export const generateDapp = async (opts) => {
+export const generateDapp = async (opts: {
+  projectPath: string;
+  template: Template;
+  network: Network;
+  packageManager: PackageManager;
+}) => {
   const repoName = opts.projectPath || "my-aptos-dapp";
   let repoAddr;
   switch (opts.template) {
@@ -25,8 +31,8 @@ export const generateDapp = async (opts) => {
       repoAddr = "https://github.com/0xmaayan/aptos-boilerplate.git";
   }
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
-  const installDepsCommand = `cd ${repoName}/frontend && npm install`;
-  const installRootDepsCommand = `cd ${repoName} && npm install`;
+  const installDepsCommand = `cd ${repoName}/frontend && ${opts.packageManager} install`;
+  const installRootDepsCommand = `cd ${repoName} && ${opts.packageManager} install`;
 
   // Clone the repo
   console.log("Cloning template repo...");
@@ -61,17 +67,22 @@ export const generateDapp = async (opts) => {
     chalk.green(`1. run [cd ${repoName}] to your dapp directory.`) + "\n"
   );
   console.log(
-    chalk.green(`2. run [npm run move:init] to initialize a new CLI Profile.`) +
-      "\n"
-  );
-  console.log(
     chalk.green(
-      `3. run [npm run move:compile] to compile your move contract.`
+      `2. run [${opts.packageManager} run move:init] to initialize a new CLI Profile.`
     ) + "\n"
   );
   console.log(
-    chalk.green(`4. run [npm run move:publish] to publish your contract.`) +
+    chalk.green(
+      `3. run [${opts.packageManager} run move:compile] to compile your move contract.`
+    ) + "\n"
+  );
+  console.log(
+    chalk.green(
+      `4. run [${opts.packageManager} run move:publish] to publish your contract.`
+    ) + "\n"
+  );
+  console.log(
+    chalk.green(`5. run [${opts.packageManager} start] to run your dapp.`) +
       "\n"
   );
-  console.log(chalk.green(`5. run [npm start] to run your dapp.`) + "\n");
 };
