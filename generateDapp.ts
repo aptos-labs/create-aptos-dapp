@@ -34,7 +34,7 @@ export const generateDapp = async (opts: {
   const deleteDotGitCommand = `rm -rf ${repoName}/.git`;
   const installDepsCommand = `cd ${repoName}/frontend && ${opts.packageManager} install`;
   const installRootDepsCommand = `cd ${repoName} && ${opts.packageManager} install`;
-  const replaceNpmUsagesCommand = `cd ${repoName} && sed -i 's/npm/${opts.packageManager}/g' package.json`;
+  const replaceNpmUsagesCommand = `cd ${repoName} && sed -i.bak 's/npm/${opts.packageManager}/g' package.json && rm package.json.bak`;
 
   // Clone the repo
   console.log("Cloning template repo...");
