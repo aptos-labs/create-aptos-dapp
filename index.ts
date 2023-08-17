@@ -4,23 +4,43 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { startStandardWorkflow } from "./standardWorkflow.js";
 import { generateDapp } from "./generateDapp.js";
+import { ARGUMENT_NAMES, ArgumentsKeys } from "./constants.js";
+
+type ArgumentOption = {
+  shorthand: string;
+  flag: ArgumentsKeys;
+  description: string;
+}
+const argumentOptions: ArgumentOption[] = [
+  {
+    shorthand: "n",
+    flag: "name",
+    description: "specify a name for your dapp"
+  },
+  {
+    shorthand: "t",
+    flag: "template",
+    description: "specify a template to start your application from"
+  },
+  {
+    shorthand: "c",
+    flag: "network",
+    description: "select the chain on which your application will run"
+  },
+  {
+    shorthand: "pm",
+    flag: "packageManager",
+    description: "specify the package manager your application will use"
+  },
+]
 
 const program = new Command();
-program
-  .option("-n, --app_name [value]", "specify a name for your dapp")
-  .option(
-    "-t, --template [value]",
-    "specify a template to start your application from"
+for (const option of argumentOptions) {
+  program.option(
+    `-${option.shorthand}, --${option.flag} [value]", "${option.description}`
   )
-  .option(
-    "-c, --chain [value]",
-    "select the chain on which your application will run"
-  )
-  .option(
-    "-pm, --package-manager [value]",
-    "specify the package manager your application will use"
-  )
-  .parse(process.argv);
+}
+program.parse(process.argv);
 
 console.log(
   chalk.white(`
@@ -40,7 +60,6 @@ console.log(
 `)
 );
 console.log("Welcome to the create-apt-dapp wizard 🔮");
-
 process.on("SIGINT", () => {
   process.exit(0);
 }); // CTRL+C
@@ -51,6 +70,7 @@ process.on("SIGTERM", () => {
   process.exit(0);
 }); // `kill` command
 
-startStandardWorkflow()
+const programOptions = program.opts();
+startStandardWorkflow(programOptions)
   .then((options) => generateDapp(options))
   .catch(console.error);
