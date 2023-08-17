@@ -1,6 +1,6 @@
 {
   "name": "create-apt-dapp",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "bin": {
     "create-apt-dapp": "./dist/index.js"
   },
