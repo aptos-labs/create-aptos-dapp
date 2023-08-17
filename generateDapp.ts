@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 import chalk from "chalk";
-import { Template, Network, PackageManager } from "./standardWorkflow";
+import { ARGUMENT_NAMES, Template, Network, PackageManager } from "./constants.js";
 
 const runCommand = (command) => {
   try {
@@ -13,14 +13,14 @@ const runCommand = (command) => {
 };
 
 export const generateDapp = async (opts: {
-  projectPath: string;
+  name: string;
   template: Template;
   network: Network;
   packageManager: PackageManager;
 }) => {
-  const repoName = opts.projectPath || "my-aptos-dapp";
+  const repoName = opts[ARGUMENT_NAMES.NAME] || "my-aptos-dapp";
   let repoAddr;
-  switch (opts.template) {
+  switch (opts[ARGUMENT_NAMES.TEMPLATE]) {
     case "todolist":
       repoAddr = "https://github.com/0xmaayan/aptos-todolist.git";
       break;
@@ -50,7 +50,7 @@ export const generateDapp = async (opts: {
   // create .env file
   console.log("Creating .env file...");
   runCommand(`cd ${repoName} && touch .env`);
-  const network = opts.network || "testnet";
+  const network = opts[ARGUMENT_NAMES.NETWORK] || "testnet";
   runCommand(`echo "REACT_APP_NETWORK=${network}" > ${repoName}/.env`);
 
   // Install dependencies

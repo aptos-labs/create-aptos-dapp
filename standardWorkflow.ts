@@ -1,10 +1,5 @@
 import prompts from "prompts";
-
-export type Template = "new" | "todolist" | "nft-marketplace" | "defi";
-
-export type Network = "mainnet" | "testnet" | "devnet";
-
-export type PackageManager = "npm" | "pnpm" | "yarn";
+import { ARGUMENT_NAMES, Arguments } from "./constants.js";
 
 /// Figures out what package manager to use based on how you ran the command
 /// E.g. npx, pnpm dlx, yarn dlx...
@@ -15,21 +10,22 @@ const DEFAULT_PACKAGE_MANAGER = NPM_CONFIG_USER_AGENT.startsWith("yarn")
   ? "pnpm"
   : "npm";
 
-export async function startStandardWorkflow() {
-  const { projectPath } = await prompts({
+export async function startStandardWorkflow(options) {
+
+  const { name } = options[ARGUMENT_NAMES.NAME] == undefined ? await prompts({
     type: "text",
-    name: "projectPath",
+    name: ARGUMENT_NAMES.NAME,
     message: "Project name",
     initial: "my-aptos-dapp",
-  });
-  if (!projectPath) {
+  }) : options;
+  if (!name) {
     console.log("Exiting.");
     process.exit(0);
   }
 
-  const { template } = await prompts({
+  const { template } = options[ARGUMENT_NAMES.TEMPLATE] == undefined ? await prompts({
     type: "select",
-    name: "template",
+    name: ARGUMENT_NAMES.TEMPLATE,
     message: "Choose how to start",
     choices: [
       {
@@ -57,15 +53,16 @@ export async function startStandardWorkflow() {
     ],
     initial: 0,
     hint: "- Create a default dapp ",
-  });
+  }) : options;
+  console.log("template: " + template);
   if (!template) {
     console.log("Exiting.");
     process.exit(0);
   }
 
-  const { network } = await prompts({
+  const { network } = options[ARGUMENT_NAMES.NETWORK] == undefined ? await prompts({
     type: "select",
-    name: "network",
+    name: ARGUMENT_NAMES.NETWORK,
     message: "Choose your network",
     choices: [
       { title: "Mainnet", value: "mainnet" },
@@ -74,11 +71,14 @@ export async function startStandardWorkflow() {
     ],
     initial: 0,
     hint: "- You can change this later",
-  });
+  }) : options;
+  console.log("network: " + network);
   if (!network) {
     console.log("Exiting.");
     process.exit(0);
   }
+
+  console.log("packageManager: " + options[ARGUMENT_NAMES.PACKAGE_MANAGER]);
 
   const packageManagerInitialIndex =
     DEFAULT_PACKAGE_MANAGER === "npm"
@@ -88,9 +88,9 @@ export async function startStandardWorkflow() {
       : DEFAULT_PACKAGE_MANAGER === "pnpm"
       ? 2
       : 0;
-  const { packageManager } = await prompts({
+  const { packageManager } = options[ARGUMENT_NAMES.PACKAGE_MANAGER] == undefined ? await prompts({
     type: "select",
-    name: "packageManager",
+    name: ARGUMENT_NAMES.PACKAGE_MANAGER,
     message: "Choose your package manager",
     choices: [
       { title: "npm", value: "npm" },
@@ -98,21 +98,17 @@ export async function startStandardWorkflow() {
       { title: "pnpm", value: "pnpm" },
     ],
     initial: packageManagerInitialIndex,
-  });
+  }) : options;
+  console.log("packageManager: " + packageManager);
   if (!packageManager) {
     console.log("Exiting.");
     process.exit(0);
   }
 
   return {
-    projectPath,
+    name,
     template,
     network,
     packageManager,
-  } as {
-    projectPath: string;
-    template: Template;
-    network: Network;
-    packageManager: PackageManager;
-  };
+  } as Arguments;
 }
