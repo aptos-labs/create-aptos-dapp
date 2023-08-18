@@ -55,7 +55,8 @@ export const generateDapp = async (opts: {
   console.log("Creating .env file...");
   runCommand(`cd ${repoName} && touch .env`);
   const network = opts[ARGUMENT_NAMES.NETWORK] || "testnet";
-  runCommand(`echo "REACT_APP_NETWORK=${network}" > ${repoName}/.env`);
+  runCommand(`echo "VITE_APP_NETWORK=${network}" > ${repoName}/.env`);
+  runCommand(`echo "VITE_APP_NETWORK=${network}" > ${repoName}/frontend/.env`);
 
   // Install dependencies
   console.log("Installing dependencies...");
