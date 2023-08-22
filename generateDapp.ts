@@ -27,13 +27,13 @@ export const generateDapp = async (opts: {
   let repoAddr;
   switch (opts[ARGUMENT_NAMES.TEMPLATE]) {
     case "todolist":
-      repoAddr = "https://github.com/0xmaayan/aptos-todolist.git";
+      repoAddr = "https://github.com/aptos-labs/cad-todolist.git";
       break;
     case "new":
-      repoAddr = "https://github.com/0xmaayan/aptos-boilerplate.git";
+      repoAddr = "https://github.com/aptos-labs/cad-boilerplate.git";
       break;
     default:
-      repoAddr = "https://github.com/0xmaayan/aptos-boilerplate.git";
+      repoAddr = "https://github.com/aptos-labs/cad-boilerplate.git";
   }
   const gitCheckoutCommand = `git clone ${repoAddr} ${repoName}`;
   const deleteDotGitCommand = `rm -rf ${repoName}/.git`;
