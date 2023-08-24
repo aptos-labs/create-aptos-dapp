@@ -52,7 +52,7 @@ export async function startStandardWorkflow(options) {
           hint: "- Create a default web dapp ",
         })
       : options;
-  console.log("template: " + template);
+
   if (!template) {
     console.log("Exiting.");
     process.exit(0);
@@ -73,13 +73,11 @@ export async function startStandardWorkflow(options) {
           hint: "- You can change this later",
         })
       : options;
-  console.log("network: " + network);
+
   if (!network) {
     console.log("Exiting.");
     process.exit(0);
   }
-
-  console.log("packageManager: " + options[ARGUMENT_NAMES.PACKAGE_MANAGER]);
 
   const packageManagerInitialIndex =
     DEFAULT_PACKAGE_MANAGER === "npm"
@@ -103,7 +101,7 @@ export async function startStandardWorkflow(options) {
           initial: packageManagerInitialIndex,
         })
       : options;
-  console.log("package manager: " + packageManager);
+
   if (!packageManager) {
     console.log("Exiting.");
     process.exit(0);
