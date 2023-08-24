@@ -1,5 +1,7 @@
 import { execSync } from "child_process";
+import os from "os";
 import chalk from "chalk";
+
 import {
   ARGUMENT_NAMES,
   Template,
@@ -23,6 +25,8 @@ export const generateDapp = async (opts: {
   network: Network;
   packageManager: PackageManager;
 }) => {
+  const platform = os.platform();
+  console.log("platform", platform);
   const projectName = opts[ARGUMENT_NAMES.NAME] || "my-aptos-dapp";
   let templateDirectory;
   switch (opts[ARGUMENT_NAMES.TEMPLATE]) {
@@ -38,9 +42,20 @@ export const generateDapp = async (opts: {
     default:
       templateDirectory = "dapp-boilerplate";
   }
-  const copyTemplateToProjectDirectory = `cp -r templates/${templateDirectory} ${projectName}/`;
-  const installRootDepsCommand = `cd ${projectName} && ${opts.packageManager} install`;
-  const replaceNpmUsagesCommand = `cd ${projectName} && sed -i.bak 's/npm/${opts.packageManager}/g' package.json && rm package.json.bak`;
+
+  let copyTemplateToProjectDirectory;
+  let installRootDepsCommand;
+  let replaceNpmUsagesCommand;
+
+  if (platform === "win32") {
+    copyTemplateToProjectDirectory = `xcopy /s /e templates\\${templateDirectory} ${projectName}\\`;
+    installRootDepsCommand = `cd ${projectName} && ${opts.packageManager} install`;
+    replaceNpmUsagesCommand = `cd ${projectName} && (Get-Content package.json).replace('npm', '${opts.packageManager}') | Set-Content package.json`;
+  } else {
+    copyTemplateToProjectDirectory = `cp -r templates/${templateDirectory} ${projectName}/`;
+    installRootDepsCommand = `cd ${projectName} && ${opts.packageManager} install`;
+    replaceNpmUsagesCommand = `cd ${projectName} && sed -i.bak 's/npm/${opts.packageManager}/g' package.json && rm package.json.bak`;
+  }
 
   // Creating project directory
   console.log("Creating project...");
@@ -54,18 +69,34 @@ export const generateDapp = async (opts: {
 
   // create .env file
   console.log("Creating .env file...");
-  runCommand(`cd ${projectName} && touch .env`);
+  if (platform == "win32") {
+    runCommand(`cd ${projectName} && echo. > .env`);
+  } else {
+    runCommand(`cd ${projectName} && touch .env`);
+  }
   const network = opts[ARGUMENT_NAMES.NETWORK] || "testnet";
 
   // TODO more sophisticate way to distinguish between node and web env
-  if (templateDirectory === "node-boilerplate") {
-    runCommand(`echo "APP_NETWORK=${network}" > ${projectName}/.env`);
-    runCommand(`echo "APP_NETWORK=${network}" > ${projectName}/node/.env`);
+  if (platform == "win32") {
+    if (templateDirectory === "node-boilerplate") {
+      execSync(`echo APP_NETWORK=${network} > ${projectName}\\.env`);
+      execSync(`echo APP_NETWORK=${network} > ${projectName}\\node\\.env`);
+    } else {
+      execSync(`echo VITE_APP_NETWORK=${network} > ${projectName}\\.env`);
+      execSync(
+        `echo VITE_APP_NETWORK=${network} > ${projectName}\\frontend\\.env`
+      );
+    }
   } else {
-    runCommand(`echo "VITE_APP_NETWORK=${network}" > ${projectName}/.env`);
-    runCommand(
-      `echo "VITE_APP_NETWORK=${network}" > ${projectName}/frontend/.env`
-    );
+    if (templateDirectory === "node-boilerplate") {
+      runCommand(`echo "APP_NETWORK=${network}" > ${projectName}/.env`);
+      runCommand(`echo "APP_NETWORK=${network}" > ${projectName}/node/.env`);
+    } else {
+      runCommand(`echo "VITE_APP_NETWORK=${network}" > ${projectName}/.env`);
+      runCommand(
+        `echo "VITE_APP_NETWORK=${network}" > ${projectName}/frontend/.env`
+      );
+    }
   }
 
   // Install dependencies
