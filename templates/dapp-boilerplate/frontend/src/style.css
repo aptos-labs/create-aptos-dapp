@@ -1,0 +1,31 @@
+body {
+  margin: 0px;
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+.navbar-text {
+  font-size: 20px;
+}
+
+.navbar-button:hover {
+  background-color: #d32f2f;
+}
+
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust this to control vertical centering */
+}
+
+.center-image {
+  max-width: 100%;
+  max-height: 100%;
+}

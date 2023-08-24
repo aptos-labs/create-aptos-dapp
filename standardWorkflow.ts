@@ -11,67 +11,68 @@ const DEFAULT_PACKAGE_MANAGER = NPM_CONFIG_USER_AGENT.startsWith("yarn")
   : "npm";
 
 export async function startStandardWorkflow(options) {
-
-  const { name } = options[ARGUMENT_NAMES.NAME] == undefined ? await prompts({
-    type: "text",
-    name: ARGUMENT_NAMES.NAME,
-    message: "Project name",
-    initial: "my-aptos-dapp",
-  }) : options;
+  const { name } =
+    options[ARGUMENT_NAMES.NAME] == undefined
+      ? await prompts({
+          type: "text",
+          name: ARGUMENT_NAMES.NAME,
+          message: "Project name",
+          initial: "my-aptos-dapp",
+        })
+      : options;
   if (!name) {
     console.log("Exiting.");
     process.exit(0);
   }
 
-  const { template } = options[ARGUMENT_NAMES.TEMPLATE] == undefined ? await prompts({
-    type: "select",
-    name: ARGUMENT_NAMES.TEMPLATE,
-    message: "Choose how to start",
-    choices: [
-      {
-        title: "Boilerplate dapp",
-        value: "new",
-        message: "Start building your application from scratch",
-      },
-      {
-        title: "Todolist dapp",
-        value: "todolist",
-        message: "A template to build todo list dapp",
-      },
-      {
-        title: "NFT marketplace (coming soon)",
-        value: "nft-marketplace",
-        message: "A template to build NFTs marketplace",
-        disabled: true,
-      },
-      {
-        title: "Defi (coming soon)",
-        value: "defi",
-        message: "A template to build defi dapp",
-        disabled: true,
-      },
-    ],
-    initial: 0,
-    hint: "- Create a default dapp ",
-  }) : options;
+  const { template } =
+    options[ARGUMENT_NAMES.TEMPLATE] == undefined
+      ? await prompts({
+          type: "select",
+          name: ARGUMENT_NAMES.TEMPLATE,
+          message: "Choose how to start",
+          choices: [
+            {
+              title: "Dapp Boilerplate",
+              value: "dapp-boilerplate",
+              message: "Start building your dapp from scratch",
+            },
+            {
+              title: "Node Boilerplate",
+              value: "node-boilerplate",
+              message: "Start building your node dapp from scratch",
+            },
+            {
+              title: "Todolist dapp",
+              value: "todolist",
+              message: "A template to build todo list dapp",
+            },
+          ],
+          initial: 0,
+          hint: "- Create a default web dapp ",
+        })
+      : options;
   console.log("template: " + template);
   if (!template) {
     console.log("Exiting.");
     process.exit(0);
   }
 
-  const { network } = options[ARGUMENT_NAMES.NETWORK] == undefined ? await prompts({
-    type: "select",
-    name: ARGUMENT_NAMES.NETWORK,
-    message: "Choose your network",
-    choices: [
-      { title: "Mainnet", value: "mainnet" },
-      { title: "Testnet", value: "testnet" },
-      { title: "Devnet", value: "devnet" },
-    ],
-    initial: 0,
-    hint: "- You can change this later",
-  }) : options;
+  const { network } =
+    options[ARGUMENT_NAMES.NETWORK] == undefined
+      ? await prompts({
+          type: "select",
+          name: ARGUMENT_NAMES.NETWORK,
+          message: "Choose your network",
+          choices: [
+            { title: "Mainnet", value: "mainnet" },
+            { title: "Testnet", value: "testnet" },
+            { title: "Devnet", value: "devnet" },
+          ],
+          initial: 0,
+          hint: "- You can change this later",
+        })
+      : options;
   console.log("network: " + network);
   if (!network) {
     console.log("Exiting.");
@@ -88,18 +89,21 @@ export async function startStandardWorkflow(options) {
       : DEFAULT_PACKAGE_MANAGER === "pnpm"
       ? 2
       : 0;
-  const { packageManager } = options[ARGUMENT_NAMES.PACKAGE_MANAGER] == undefined ? await prompts({
-    type: "select",
-    name: ARGUMENT_NAMES.PACKAGE_MANAGER,
-    message: "Choose your package manager",
-    choices: [
-      { title: "npm", value: "npm" },
-      { title: "yarn", value: "yarn" },
-      { title: "pnpm", value: "pnpm" },
-    ],
-    initial: packageManagerInitialIndex,
-  }) : options;
-  console.log("packageManager: " + packageManager);
+  const { packageManager } =
+    options[ARGUMENT_NAMES.PACKAGE_MANAGER] == undefined
+      ? await prompts({
+          type: "select",
+          name: ARGUMENT_NAMES.PACKAGE_MANAGER,
+          message: "Choose your package manager",
+          choices: [
+            { title: "npm", value: "npm" },
+            { title: "yarn", value: "yarn" },
+            { title: "pnpm", value: "pnpm" },
+          ],
+          initial: packageManagerInitialIndex,
+        })
+      : options;
+  console.log("package manager: " + packageManager);
   if (!packageManager) {
     console.log("Exiting.");
     process.exit(0);
