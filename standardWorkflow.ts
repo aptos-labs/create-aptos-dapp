@@ -35,7 +35,7 @@ export async function startStandardWorkflow(options) {
             {
               title: "Dapp Boilerplate",
               value: "dapp-boilerplate",
-              message: "Start building your dapp from scratch",
+              message: "Start building your web dapp from scratch",
             },
             {
               title: "Node Boilerplate",
@@ -44,12 +44,11 @@ export async function startStandardWorkflow(options) {
             },
             {
               title: "Todolist dapp",
-              value: "todolist",
+              value: "todolist-boilerplate",
               message: "A template to build todo list dapp",
             },
           ],
           initial: 0,
-          hint: "- Create a default web dapp ",
         })
       : options;
 

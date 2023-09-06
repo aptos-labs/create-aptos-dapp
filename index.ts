@@ -68,7 +68,10 @@ process.on("SIGTERM", () => {
   process.exit(0);
 }); // `kill` command
 
-const programOptions = program.opts();
-startStandardWorkflow(programOptions)
-  .then((options) => generateDapp(options))
-  .catch(console.error);
+async function main() {
+  const programOptions = program.opts();
+  const options = await startStandardWorkflow(programOptions);
+  generateDapp(options);
+}
+
+main().catch(console.error);
