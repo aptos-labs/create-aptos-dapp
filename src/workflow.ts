@@ -1,5 +1,6 @@
 import prompts from "prompts";
 import { ARGUMENT_NAMES, Arguments } from "./constants.js";
+import { validateProjectName } from "./utils/validation.js";
 
 /// Figures out what package manager to use based on how you ran the command
 /// E.g. npx, pnpm dlx, yarn dlx...
@@ -18,6 +19,7 @@ export async function startWorkflow(options) {
           name: ARGUMENT_NAMES.NAME,
           message: "Project name",
           initial: "my-aptos-dapp",
+          validate: (value: string) => validateProjectName(value),
         })
       : options;
   if (!name) {

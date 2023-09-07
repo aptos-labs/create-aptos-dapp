@@ -12,6 +12,6 @@
     "allowSyntheticDefaultImports": true,
     "strict": true
   },
-  "include": ["./index.ts", "src/workflow.ts", "src/generateDapp.ts"],
+  "include": ["./index.ts", "src/*/**.ts"],
   "exclude": ["node_modules"]
 }
