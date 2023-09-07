@@ -1,6 +1,9 @@
 // constants.ts
 
-export type Template = "new" | "todolist" | "nft-marketplace" | "defi";
+export type Template =
+  | "dapp-boilerplate"
+  | "node-boilerplate"
+  | "todolist-boilerplate";
 
 export type Network = "mainnet" | "testnet" | "devnet";
 
@@ -11,6 +14,12 @@ export type Arguments = {
   template: Template;
   network: Network;
   packageManager: PackageManager;
+};
+
+export type ArgumentOption = {
+  shorthand: string;
+  flag: ArgumentsKeys;
+  description: string;
 };
 
 export type ArgumentsKeys = keyof Arguments;

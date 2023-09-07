@@ -10,7 +10,7 @@ const DEFAULT_PACKAGE_MANAGER = NPM_CONFIG_USER_AGENT.startsWith("yarn")
   ? "pnpm"
   : "npm";
 
-export async function startStandardWorkflow(options) {
+export async function startWorkflow(options) {
   const { name } =
     options[ARGUMENT_NAMES.NAME] == undefined
       ? await prompts({

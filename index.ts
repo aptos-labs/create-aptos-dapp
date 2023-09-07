@@ -2,15 +2,10 @@
 
 import chalk from "chalk";
 import { Command } from "commander";
-import { startStandardWorkflow } from "./standardWorkflow.js";
-import { generateDapp } from "./generateDapp.js";
-import { ArgumentsKeys } from "./constants.js";
+import { startWorkflow } from "./src/workflow.js";
+import { generateDapp } from "./src/generateDapp.js";
+import { ArgumentOption } from "./src/constants.js";
 
-type ArgumentOption = {
-  shorthand: string;
-  flag: ArgumentsKeys;
-  description: string;
-};
 const argumentOptions: ArgumentOption[] = [
   {
     shorthand: "n",
@@ -25,7 +20,7 @@ const argumentOptions: ArgumentOption[] = [
   {
     shorthand: "c",
     flag: "network",
-    description: "select the chain on which your application will run",
+    description: "select the network on which your application will run",
   },
   {
     shorthand: "pm",
@@ -70,7 +65,7 @@ process.on("SIGTERM", () => {
 
 async function main() {
   const programOptions = program.opts();
-  const options = await startStandardWorkflow(programOptions);
+  const options = await startWorkflow(programOptions);
   generateDapp(options);
 }
 
