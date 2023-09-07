@@ -1,6 +1,14 @@
 {
   "name": "create-apt-dapp",
   "version": "0.0.25",
+  "keywords": [
+    "create aptos dapp",
+    "create-aptos-dapp",
+    "create-apt-dapp",
+    "create apt dapp",
+    "aptos",
+    "boilerplate"
+  ],
   "bin": {
     "create-apt-dapp": "./dist/index.js"
   },
@@ -20,5 +28,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.5.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aptos-labs/create-aptos-dapp"
+  },
+  "homepage": "https://github.com/aptos-labs/create-aptos-dapp/blob/main/README.md"
 }
