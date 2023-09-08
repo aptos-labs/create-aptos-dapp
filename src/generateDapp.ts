@@ -1,21 +1,15 @@
-import { execSync } from "child_process";
-import chalk from "chalk";
+import { green, bold } from "kolorist";
+import path from "path";
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
+
 import {
   ARGUMENT_NAMES,
   Template,
   Network,
   PackageManager,
 } from "./constants.js";
-
-const runCommand = (command) => {
-  try {
-    execSync(`${command}`, { stdio: "inherit" });
-  } catch (e) {
-    console.error(`Failed to execute ${command}`, e);
-    return false;
-  }
-  return true;
-};
+import { copy, runCommand } from "./utils/helpers.js";
 
 export const generateDapp = async (opts: {
   name: string;
@@ -24,84 +18,117 @@ export const generateDapp = async (opts: {
   packageManager: PackageManager;
 }) => {
   const projectName = opts[ARGUMENT_NAMES.NAME] || "my-aptos-dapp";
-  let repoAddr;
+
+  // internal template directory path
+  const templateDir = path.resolve(
+    fileURLToPath(import.meta.url),
+    "../../templates",
+    opts[ARGUMENT_NAMES.TEMPLATE]
+  );
+  // internal template directory files
+  const files = fs.readdirSync(templateDir);
+
+  // current working directory
+  const cwd = process.cwd();
+
+  // target directory - current directory + chosen project name
+  const targetDirectory = path.join(cwd, projectName);
+
+  // make target directory if not exist
+  if (!fs.existsSync(targetDirectory)) {
+    fs.mkdirSync(targetDirectory, { recursive: true });
+  }
+
+  const write = (file: string, content?: string) => {
+    // file to copy to target directory
+    const targetPath = path.join(targetDirectory, file);
+    if (content) {
+      fs.writeFileSync(targetPath, content);
+    } else {
+      copy(path.join(templateDir, file), targetPath);
+    }
+  };
+
+  // loop over template files and write to target directory
+  // TODO - why does it include .DS_Store?
+  for (const file of files.filter((f) => f !== ".DS_Store")) {
+    write(file);
+  }
+
+  // cd into target directory
+  process.chdir(targetDirectory);
+
+  // generate root package.json
+  const pkg = JSON.parse(
+    fs.readFileSync(path.join(templateDir, `package.json`), "utf-8")
+  );
+  // set package name to chosen project name
+  pkg.name = projectName;
+
+  // add npm scripts
   switch (opts[ARGUMENT_NAMES.TEMPLATE]) {
-    case "todolist-boilerplate":
-      repoAddr = "https://github.com/aptos-labs/cad-todolist.git";
+    case "node-boilerplate":
+      pkg.scripts["postinstall"] = `cd node && ${opts.packageManager} install`;
+      pkg.scripts["start"] = `cd node && ts-node index.ts`;
       break;
     case "dapp-boilerplate":
-      repoAddr = "https://github.com/aptos-labs/cad-boilerplate.git";
+      pkg.scripts[
+        "postinstall"
+      ] = `cd frontend && ${opts.packageManager} install`;
+      pkg.scripts["start"] = `cd frontend && ${opts.packageManager} run dev`;
       break;
-    case "node-boilerplate":
-      repoAddr = "https://github.com/aptos-labs/cad-node-boilerplate.git";
+    case "todolist-boilerplate":
+      pkg.scripts[
+        "postinstall"
+      ] = `cd frontend && ${opts.packageManager} install`;
+      pkg.scripts["start"] = `cd frontend && ${opts.packageManager} run start`;
       break;
     default:
-      repoAddr = "https://github.com/aptos-labs/cad-boilerplate.git";
+      throw new Error("invalid template name");
   }
-  const gitCheckoutCommand = `git clone ${repoAddr} ${projectName}`;
-  const deleteDotGitCommand = `rm -rf ${projectName}/.git`;
-  const replaceNpmUsagesCommand = `cd ${projectName} && sed -i.bak 's/npm/${opts.packageManager}/g' package.json && rm package.json.bak`;
-  const installRootDepsCommand = `cd ${projectName} && ${opts.packageManager} install`;
 
-  // Clone the repo
-  console.log("Cloning template repo...");
-  const checkedOut = runCommand(gitCheckoutCommand);
-  const deleteDotGit = runCommand(deleteDotGitCommand);
-  if (!checkedOut || !deleteDotGit) {
-    console.error("Failed to clone the repo");
-    process.exit(-1);
-  } else {
-    console.log("Cloned successfully");
-  }
+  write("package.json", JSON.stringify(pkg, null, 2) + "\n");
+
+  // install dependencies
+  const installRootDepsCommand = `${opts.packageManager} install`;
+  runCommand(installRootDepsCommand);
 
   // create .env file
-  console.log("Creating .env file...");
-  runCommand(`cd ${projectName} && touch .env`);
   const network = opts[ARGUMENT_NAMES.NETWORK] || "testnet";
   // TODO find a more sophisticate way to distinguish between node and web env
   if (opts[ARGUMENT_NAMES.TEMPLATE] === "node-boilerplate") {
-    runCommand(`echo "APP_NETWORK=${network}" > ${projectName}/.env`);
-    runCommand(`echo "APP_NETWORK=${network}" > ${projectName}/node/.env`);
+    write(".env", `APP_NETWORK=${network}`);
+    write("node/.env", `APP_NETWORK=${network}`);
   } else {
-    runCommand(`echo "VITE_APP_NETWORK=${network}" > ${projectName}/.env`);
-    runCommand(
-      `echo "VITE_APP_NETWORK=${network}" > ${projectName}/frontend/.env`
-    );
-  }
-
-  // Install dependencies
-  console.log("Installing dependencies...");
-  const replaceNpmUsages = runCommand(replaceNpmUsagesCommand);
-  const installedRootDeps = runCommand(installRootDepsCommand);
-  if (!replaceNpmUsages || !installedRootDeps) {
-    console.error("Failed to install dependencies");
-    process.exit(-1);
+    write(".env", `VITE_APP_NETWORK=${network}`);
+    write("frontend/.env", `VITE_APP_NETWORK=${network}`);
   }
 
   // Log next steps
-  console.log("Success! You're ready to start building your dapp on Aptos.");
-
-  console.log(chalk.bold("\nNext steps:") + "\n");
   console.log(
-    chalk.green(`1. run [cd ${projectName}] to your dapp directory.`) + "\n"
+    bold("\nSuccess! You're ready to start building your dapp on Aptos.")
+  );
+
+  console.log(bold("\nNext steps:") + "\n");
+  console.log(
+    green(`1. run [cd ${projectName}] to your dapp directory.`) + "\n"
   );
   console.log(
-    chalk.green(
+    green(
       `2. run [${opts.packageManager} run move:init] to initialize a new CLI Profile.`
     ) + "\n"
   );
   console.log(
-    chalk.green(
+    green(
       `3. run [${opts.packageManager} run move:compile] to compile your move contract.`
     ) + "\n"
   );
   console.log(
-    chalk.green(
+    green(
       `4. run [${opts.packageManager} run move:publish] to publish your contract.`
     ) + "\n"
   );
   console.log(
-    chalk.green(`5. run [${opts.packageManager} start] to run your dapp.`) +
-      "\n"
+    green(`5. run [${opts.packageManager} start] to run your dapp.`) + "\n"
   );
 };
