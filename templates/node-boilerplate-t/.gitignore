@@ -1,0 +1,4 @@
+node_modules
+.aptos
+.env
+.DS_Store
