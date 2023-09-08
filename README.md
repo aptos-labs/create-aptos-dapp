@@ -2,9 +2,7 @@
 
 `create-apt-dapp` provides a starter kit for dapp developers to easily bootstrap a dapp on the Aptos network.
 
-:::tip
-No need to clone: run "npx create-apt-dapp" in your terminal to get started
-:::
+> **_NOTE:_** No need to clone: run `npx create-apt-dapp` in your terminal to get started
 
 ### Quick Start
 
@@ -35,7 +33,6 @@ Then follow the prompts!
 ### Prerequisites
 
 - [node and npm](https://nodejs.org/en) (npm ≥ 5.2.0)
-- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ### Templates
 
