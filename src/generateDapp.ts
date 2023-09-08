@@ -81,7 +81,7 @@ export const generateDapp = async (opts: {
       pkg.scripts[
         "postinstall"
       ] = `cd frontend && ${opts.packageManager} install`;
-      pkg.scripts["start"] = `cd frontend && ${opts.packageManager} run start`;
+      pkg.scripts["start"] = `cd frontend && ${opts.packageManager} run dev`;
       break;
     default:
       throw new Error("invalid template name");
