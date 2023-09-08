@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import chalk from "chalk";
+import { white } from "kolorist";
 import { Command } from "commander";
 import { startWorkflow } from "./src/workflow.js";
 import { generateDapp } from "./src/generateDapp.js";
@@ -38,7 +38,7 @@ for (const option of argumentOptions) {
 program.parse(process.argv);
 
 console.log(
-  chalk.white(`
+  white(`
                                                                                ./&@@@@@%*                   /%@@@#,
             @@.               #@@@@@@@@@@@@@*   (@@@@@@@@@@@@@@@@@@@@%     *@@@@@@@@@@@@@@@@@           *@@@@/..,@@@@@
            @@@@/              #@@*        /@@@           /@@(            /((((((((((((((*   *((*       ,@@@         %

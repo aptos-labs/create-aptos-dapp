@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "target": "es6",
     "moduleResolution": "node",
     "noImplicitAny": false,
     "removeComments": true,
@@ -10,8 +9,10 @@
     "outDir": "dist",
     "declaration": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "target": "ES2022",
+    "module": "ES2020"
   },
-  "include": ["./index.ts", "src/*/**.ts"],
+  "include": ["./index.ts", "src"],
   "exclude": ["node_modules"]
 }
