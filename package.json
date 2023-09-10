@@ -1,6 +1,9 @@
 {
   "name": "create-apt-dapp",
-  "version": "0.0.27",
+  "description": "a starter kit for dapp developers to easily bootstrap a dapp on the Aptos network",
+  "version": "0.0.29",
+  "license": "Apache-2.0",
+  "author": "aptoslabs.com",
   "keywords": [
     "create aptos dapp",
     "create-aptos-dapp",
@@ -16,7 +19,7 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc && cp -r templates dist/templates",
     "dev": "npm run build && node dist/index.js",
-    "prepublish": "npm run clean && npm run build && npm publish"
+    "prepublish": "npm run build && npm publish"
   },
   "files": [
     "dist"
@@ -34,5 +37,8 @@
     "type": "git",
     "url": "https://github.com/aptos-labs/create-aptos-dapp"
   },
-  "homepage": "https://github.com/aptos-labs/create-aptos-dapp/blob/main/README.md"
+  "homepage": "https://github.com/aptos-labs/create-aptos-dapp/blob/main/README.md",
+  "bugs": {
+    "url": "https://github.com/aptos-labs/create-aptos-dapp/issues"
+  }
 }
