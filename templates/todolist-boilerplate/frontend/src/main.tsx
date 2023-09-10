@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import App from "./App";
 
-import Start from "./start";
-import { AlertProvider } from "./components/alertProvider";
+import { AlertProvider } from "./hooks/alertProvider";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <AlertProvider>
-      <Start />
+      <App />
     </AlertProvider>
   </React.StrictMode>
 );
