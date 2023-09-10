@@ -1,37 +1,27 @@
+import { red } from "kolorist";
 import prompts from "prompts";
-import { ARGUMENT_NAMES, Arguments } from "./constants.js";
+import { Selections } from "./types.js";
+import { getUserPackageManager } from "./utils/helpers.js";
 import { validateProjectName } from "./utils/validation.js";
 
-/// Figures out what package manager to use based on how you ran the command
-/// E.g. npx, pnpm dlx, yarn dlx...
-const NPM_CONFIG_USER_AGENT = process.env.npm_config_user_agent || "";
-const DEFAULT_PACKAGE_MANAGER = NPM_CONFIG_USER_AGENT.startsWith("yarn")
-  ? "yarn"
-  : NPM_CONFIG_USER_AGENT.startsWith("pnpm")
-  ? "pnpm"
-  : "npm";
+export async function startWorkflow() {
+  let result: prompts.Answers<
+    "projectName" | "template" | "network" | "packageManager"
+  >;
 
-export async function startWorkflow(options) {
-  const { name } =
-    options[ARGUMENT_NAMES.NAME] == undefined
-      ? await prompts({
+  try {
+    result = await prompts(
+      [
+        {
           type: "text",
-          name: ARGUMENT_NAMES.NAME,
+          name: "projectName",
           message: "Project name",
           initial: "my-aptos-dapp",
           validate: (value: string) => validateProjectName(value),
-        })
-      : options;
-  if (!name) {
-    console.log("Exiting.");
-    process.exit(0);
-  }
-
-  const { template } =
-    options[ARGUMENT_NAMES.TEMPLATE] == undefined
-      ? await prompts({
+        },
+        {
           type: "select",
-          name: ARGUMENT_NAMES.TEMPLATE,
+          name: "template",
           message: "Choose how to start",
           choices: [
             {
@@ -51,19 +41,10 @@ export async function startWorkflow(options) {
             },
           ],
           initial: 0,
-        })
-      : options;
-
-  if (!template) {
-    console.log("Exiting.");
-    process.exit(0);
-  }
-
-  const { network } =
-    options[ARGUMENT_NAMES.NETWORK] == undefined
-      ? await prompts({
+        },
+        {
           type: "select",
-          name: ARGUMENT_NAMES.NETWORK,
+          name: "network",
           message: "Choose your network",
           choices: [
             { title: "Mainnet", value: "mainnet" },
@@ -72,46 +53,37 @@ export async function startWorkflow(options) {
           ],
           initial: 0,
           hint: "- You can change this later",
-        })
-      : options;
-
-  if (!network) {
-    console.log("Exiting.");
-    process.exit(0);
-  }
-
-  const packageManagerInitialIndex =
-    DEFAULT_PACKAGE_MANAGER === "npm"
-      ? 0
-      : DEFAULT_PACKAGE_MANAGER === "yarn"
-      ? 1
-      : DEFAULT_PACKAGE_MANAGER === "pnpm"
-      ? 2
-      : 0;
-  const { packageManager } =
-    options[ARGUMENT_NAMES.PACKAGE_MANAGER] == undefined
-      ? await prompts({
+        },
+        {
           type: "select",
-          name: ARGUMENT_NAMES.PACKAGE_MANAGER,
+          name: "packageManager",
           message: "Choose your package manager",
           choices: [
             { title: "npm", value: "npm" },
             { title: "yarn", value: "yarn" },
             { title: "pnpm", value: "pnpm" },
           ],
-          initial: packageManagerInitialIndex,
-        })
-      : options;
-
-  if (!packageManager) {
-    console.log("Exiting.");
+          initial: getUserPackageManager(),
+        },
+      ],
+      {
+        onCancel: () => {
+          throw new Error(red("✖") + " Operation cancelled");
+        },
+      }
+    );
+  } catch (err: any) {
+    console.log(err.message);
     process.exit(0);
   }
 
+  const { projectName, template, network, packageManager } = result;
+  const environment = template === "node-boilerplate" ? "node" : "web";
   return {
-    name,
+    projectName,
     template,
     network,
     packageManager,
-  } as Arguments;
+    environment,
+  } as Selections;
 }

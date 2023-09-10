@@ -3,27 +3,17 @@ import path from "path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 
-import {
-  ARGUMENT_NAMES,
-  Template,
-  Network,
-  PackageManager,
-} from "./constants.js";
+import { Selections } from "./types.js";
 import { copy, runCommand } from "./utils/helpers.js";
 
-export const generateDapp = async (opts: {
-  name: string;
-  template: Template;
-  network: Network;
-  packageManager: PackageManager;
-}) => {
-  const projectName = opts[ARGUMENT_NAMES.NAME] || "my-aptos-dapp";
+export const generateDapp = async (selection: Selections) => {
+  const projectName = selection.projectName || "my-aptos-dapp";
 
   // internal template directory path
   const templateDir = path.resolve(
     fileURLToPath(import.meta.url),
     "../../templates",
-    opts[ARGUMENT_NAMES.TEMPLATE]
+    selection.template
   );
   // internal template directory files
   const files = fs.readdirSync(templateDir);
@@ -39,6 +29,7 @@ export const generateDapp = async (opts: {
     fs.mkdirSync(targetDirectory, { recursive: true });
   }
 
+  // write to file
   const write = (file: string, content?: string) => {
     // file to copy to target directory
     const targetPath = path.join(targetDirectory, file);
@@ -66,37 +57,28 @@ export const generateDapp = async (opts: {
   pkg.name = projectName;
 
   // add npm scripts
-  switch (opts[ARGUMENT_NAMES.TEMPLATE]) {
-    case "node-boilerplate":
-      pkg.scripts["postinstall"] = `cd node && ${opts.packageManager} install`;
-      pkg.scripts["start"] = `cd node && ts-node index.ts`;
-      break;
-    case "dapp-boilerplate":
-      pkg.scripts[
-        "postinstall"
-      ] = `cd frontend && ${opts.packageManager} install`;
-      pkg.scripts["start"] = `cd frontend && ${opts.packageManager} run dev`;
-      break;
-    case "todolist-boilerplate":
-      pkg.scripts[
-        "postinstall"
-      ] = `cd frontend && ${opts.packageManager} install`;
-      pkg.scripts["start"] = `cd frontend && ${opts.packageManager} run dev`;
-      break;
-    default:
-      throw new Error("invalid template name");
+  if (selection.environment === "node") {
+    pkg.scripts[
+      "postinstall"
+    ] = `cd node && ${selection.packageManager} install`;
+    pkg.scripts["start"] = `cd node && ts-node index.ts`;
+  } else {
+    pkg.scripts[
+      "postinstall"
+    ] = `cd frontend && ${selection.packageManager} install`;
+    pkg.scripts["start"] = `cd frontend && ${selection.packageManager} run dev`;
   }
 
   write("package.json", JSON.stringify(pkg, null, 2) + "\n");
 
   // install dependencies
-  const installRootDepsCommand = `${opts.packageManager} install`;
+  const installRootDepsCommand = `${selection.packageManager} install`;
   runCommand(installRootDepsCommand);
 
   // create .env file
-  const network = opts[ARGUMENT_NAMES.NETWORK] || "testnet";
+  const network = selection.network || "testnet";
   // TODO find a more sophisticate way to distinguish between node and web env
-  if (opts[ARGUMENT_NAMES.TEMPLATE] === "node-boilerplate") {
+  if (selection.environment === "node") {
     write(".env", `APP_NETWORK=${network}`);
     write("node/.env", `APP_NETWORK=${network}`);
   } else {
@@ -115,20 +97,20 @@ export const generateDapp = async (opts: {
   );
   console.log(
     green(
-      `2. run [${opts.packageManager} run move:init] to initialize a new CLI Profile.`
+      `2. run [${selection.packageManager} run move:init] to initialize a new CLI Profile.`
     ) + "\n"
   );
   console.log(
     green(
-      `3. run [${opts.packageManager} run move:compile] to compile your move contract.`
+      `3. run [${selection.packageManager} run move:compile] to compile your move contract.`
     ) + "\n"
   );
   console.log(
     green(
-      `4. run [${opts.packageManager} run move:publish] to publish your contract.`
+      `4. run [${selection.packageManager} run move:publish] to publish your contract.`
     ) + "\n"
   );
   console.log(
-    green(`5. run [${opts.packageManager} start] to run your dapp.`) + "\n"
+    green(`5. run [${selection.packageManager} start] to run your dapp.`) + "\n"
   );
 };
