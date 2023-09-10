@@ -67,7 +67,7 @@ module todolist_addr::todolist {
     let todo_list = borrow_global_mut<TodoList>(signer_address);
     // assert task exists
     assert!(task_id < vector::length(&todo_list.tasks), ETASK_DOESNT_EXIST);
-    // gets the task matches the task_id
+    // gets the task matched the task_id
     let task_record = vector::borrow_mut(&mut todo_list.tasks, task_id);
     // assert task is not completed
     assert!(task_record.completed == false, ETASK_IS_COMPLETED);
