@@ -27,17 +27,20 @@ export async function startWorkflow() {
             {
               title: "Dapp Boilerplate",
               value: "dapp-boilerplate",
-              message: "Start building your web dapp from scratch",
+              description:
+                "A simple and light-weight web based dapp template that includes the basic structure needed for starting a dapp",
             },
             {
               title: "Node Boilerplate",
               value: "node-boilerplate",
-              message: "Start building your node dapp from scratch",
+              description:
+                "A simple and light-weight node template that includes the basic structure needed for starting a node project on Aptos",
             },
             {
               title: "Todolist dapp",
               value: "todolist-boilerplate",
-              message: "A template to build todo list dapp",
+              description:
+                "A fully working todo list dapp with pre-implemented smart contract and UI",
             },
           ],
           initial: 0,
