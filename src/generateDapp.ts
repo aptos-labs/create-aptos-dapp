@@ -75,9 +75,12 @@ export const generateDapp = async (selection: Selections) => {
   const installRootDepsCommand = `${selection.packageManager} install`;
   runCommand(installRootDepsCommand);
 
+  console.log(
+    green("Installing dependencies, might take a couple of minutes...")
+  );
+
   // create .env file
   const network = selection.network || "testnet";
-  // TODO find a more sophisticate way to distinguish between node and web env
   if (selection.environment === "node") {
     write(".env", `APP_NETWORK=${network}`);
     write("node/.env", `APP_NETWORK=${network}`);
