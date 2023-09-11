@@ -1,5 +1,6 @@
 {
   "name": "aptos-todolist",
+  "license": "Apache-2.0",
   "version": "0.0.0",
   "scripts": {
     "move:init": "export $(cat .env | xargs) && aptos init --network=$VITE_APP_NETWORK --profile=$VITE_APP_NETWORK",

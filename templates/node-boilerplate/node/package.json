@@ -1,6 +1,7 @@
 {
   "name": "node",
   "version": "0.0.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "aptos": "^1.18.0"
   },
