@@ -1,5 +1,4 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { createEntryPayload } from "@thalalabs/surf";
 import { Col, Input, Button } from "antd";
 import { useState } from "react";
 import { ABI } from "../abi";
@@ -31,16 +30,6 @@ export default function TaskInput({
     // check for connected account
     if (!account) return;
     setTransactionInProgress(true);
-    // build a transaction payload to be submited
-    const payload = {
-      type: "entry_function_payload",
-      ...createEntryPayload(ABI, {
-        function: "create_task",
-        type_arguments: [],
-        arguments: [newTask],
-      }).rawPayload,
-    };
-
     // hold the latest task.task_id from our local state
 
     // build a newTaskToPush objct into our local state
@@ -52,7 +41,12 @@ export default function TaskInput({
 
     try {
       // sign and submit transaction to chain
-      const response = await signAndSubmitTransaction(payload);
+      const response = await signAndSubmitTransaction({
+        type: "entry_function_payload",
+        function: `${ABI.address}::todolist::create_task`,
+        type_arguments: [],
+        arguments: [newTask],
+      });
       // wait for transaction
       await provider.waitForTransaction(response.hash);
       setSuccessAlertHash(response.hash, network?.name);

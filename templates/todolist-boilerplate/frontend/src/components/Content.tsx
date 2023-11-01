@@ -1,14 +1,11 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { createEntryPayload } from "@thalalabs/surf";
-import { Spin, Row, Col, Button, Input, List, Checkbox } from "antd";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
+import { Spin } from "antd";
 import { useCallback, useEffect, useState } from "react";
-import { ABI } from "../abi";
-import { useAlert } from "../hooks/alertProvider";
-import { client, provider } from "../utils/consts";
+import { aptos } from "../utils/consts";
 import { Task } from "../utils/types";
 import ListView from "../views/ListView";
 import NoListView from "../views/NoListView";
+import { ABI } from "../abi";
 
 export default function Content() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -26,12 +23,12 @@ export default function Content() {
   const fetchList = useCallback(async () => {
     if (!accountAddr) return [];
     try {
-      const todoListResource = await client.resource.TodoList({
-        type_arguments: [],
-        account: accountAddr,
+      const todoListResource = await aptos.getAccountResource({
+        accountAddress: accountAddr,
+        resourceType: `${ABI.address}::todolist::TodoList`,
       });
       setAccountHasList(true);
-      setTasks(todoListResource.data.tasks as Task[]);
+      setTasks(todoListResource.tasks as Task[]);
     } catch (e: any) {
       setAccountHasList(false);
     }

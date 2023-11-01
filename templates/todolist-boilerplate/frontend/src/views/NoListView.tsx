@@ -1,9 +1,8 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { createEntryPayload } from "@thalalabs/surf";
 import { Row, Col, Button } from "antd";
 import { ABI } from "../abi";
 import { useAlert } from "../hooks/alertProvider";
-import { provider, network } from "../utils/consts";
+import { provider } from "../utils/consts";
 
 type NoListViewProps = {
   setTransactionInProgress: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,18 +19,14 @@ export default function NoListView({
   const addNewList = async () => {
     if (!account) return [];
     setTransactionInProgress(true);
-    // build a transaction payload to be submited
-    const payload = {
-      type: "entry_function_payload",
-      ...createEntryPayload(ABI, {
-        function: "create_list",
-        type_arguments: [],
-        arguments: [],
-      }).rawPayload,
-    };
     try {
       // sign and submit transaction to chain
-      const response = await signAndSubmitTransaction(payload);
+      const response = await signAndSubmitTransaction({
+        type: "entry_function_payload",
+        function: `${ABI.address}::todolist::create_list`,
+        type_arguments: [],
+        arguments: [],
+      });
       // wait for transaction
       await provider.waitForTransaction(response.hash);
       setAccountHasList(true);
