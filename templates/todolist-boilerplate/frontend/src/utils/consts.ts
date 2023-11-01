@@ -1,6 +1,5 @@
-import { createClient } from "@thalalabs/surf";
+import { Aptos, AptosConfig } from "@aptos-labs/ts-sdk";
 import { Network, Provider } from "aptos";
-import { ABI } from "../abi";
 
 export const network =
   import.meta.env.VITE_APP_NETWORK === "devnet"
@@ -12,6 +11,4 @@ export const network =
     : Network.LOCAL;
 
 export const provider = new Provider(network);
-export const client = createClient({
-  nodeUrl: provider.aptosClient.nodeUrl,
-}).useABI(ABI);
+export const aptos = new Aptos(new AptosConfig({ network }));

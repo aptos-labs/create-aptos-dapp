@@ -1,5 +1,4 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { createEntryPayload } from "@thalalabs/surf";
 import { Col, List, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { ABI } from "../abi";
@@ -28,18 +27,15 @@ export default function Tasks({
     if (!account) return;
     if (!event.target.checked) return;
     setTransactionInProgress(true);
-    const payload = {
-      type: "entry_function_payload",
-      ...createEntryPayload(ABI, {
-        function: "complete_task",
-        type_arguments: [],
-        arguments: [taskId],
-      }).rawPayload,
-    };
 
     try {
       // sign and submit transaction to chain
-      const response = await signAndSubmitTransaction(payload);
+      const response = await signAndSubmitTransaction({
+        type: "entry_function_payload",
+        function: `${ABI.address}::todolist::complete_task`,
+        type_arguments: [],
+        arguments: [taskId],
+      });
       // wait for transaction
       await provider.waitForTransaction(response.hash);
       setSuccessAlertHash(response.hash, network?.name);
