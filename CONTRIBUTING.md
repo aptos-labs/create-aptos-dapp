@@ -1,6 +1,6 @@
 ### Getting Started
 
-```
+```bash
 git clone git@github.com:aptos-labs/create-aptos-dapp.git
 cd create-aptos-dapp
 pnpm install
@@ -8,7 +8,7 @@ pnpm install
 
 ### Run
 
-```
+```bash
 pnpm run dev
 ```
 
