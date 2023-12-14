@@ -80,12 +80,16 @@ export async function startWorkflow() {
     process.exit(0);
   }
 
+  // copt the initialResults
   let result = { ...initialResult };
 
   try {
     let confirmOptions = true;
 
+    // loop until they confirm they want to make the project
     while (confirmOptions) {
+
+      // confirm prompt
       const { confirm } = await prompts(
         [
           {
@@ -103,6 +107,7 @@ export async function startWorkflow() {
       );
 
       if (confirm) {
+        // choose the option prompt
         const changeOptions = await prompts(
           [
             {
@@ -124,7 +129,7 @@ export async function startWorkflow() {
           }
         );
 
-        // Ask for new values based on the user's choice
+        // Ask for new values based on the user's choice and update the result object
         switch (changeOptions.optionToChange) {
           case "projectName":
             result.projectName = (
