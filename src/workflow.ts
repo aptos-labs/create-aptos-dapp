@@ -91,7 +91,7 @@ export async function startWorkflow() {
           {
             type: "confirm",
             name: "confirm",
-            message: "Do you want to change any options?",
+            message: "Do you want to make any changes?(Default is No)",
             initial: false,
           },
         ],
@@ -168,7 +168,6 @@ export async function startWorkflow() {
             ).template;
             break;
           case "network":
-            console.log("network fired");
             result.network = (
               await prompts({
                 type: "select",
