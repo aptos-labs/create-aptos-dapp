@@ -5,12 +5,12 @@ import { getUserPackageManager } from "./utils/helpers.js";
 import { validateProjectName } from "./utils/validation.js";
 
 export async function startWorkflow() {
-  let result: prompts.Answers<
+  let initialResult: prompts.Answers<
     "projectName" | "template" | "network" | "packageManager"
   >;
 
   try {
-    result = await prompts(
+    initialResult = await prompts(
       [
         {
           type: "text",
@@ -75,6 +75,129 @@ export async function startWorkflow() {
         },
       }
     );
+  } catch (err: any) {
+    console.log(err.message);
+    process.exit(0);
+  }
+
+  let result = { ...initialResult };
+
+  try {
+    let confirmOptions = true;
+
+    while (confirmOptions) {
+      const { confirm } = await prompts(
+        [
+          {
+            type: "confirm",
+            name: "confirm",
+            message: "Do you want to change any options?",
+            initial: false,
+          },
+        ],
+        {
+          onCancel: () => {
+            throw new Error(red("✖") + " Operation cancelled");
+          },
+        }
+      );
+
+      // If the user wants to change options, show a menu
+      if (confirm) {
+        const changeOptions = await prompts(
+          [
+            {
+              type: "select",
+              name: "optionToChange",
+              message: "Select the option you want to change",
+              choices: [
+                { title: "Project Name", value: "projectName" },
+                { title: "Template", value: "template" },
+                { title: "Network", value: "network" },
+                { title: "Package Manager", value: "packageManager" },
+              ],
+            },
+          ],
+          {
+            onCancel: () => {
+              throw new Error(red("✖") + " Operation cancelled");
+            },
+          }
+        );
+
+        // Ask for new values based on the user's choice
+        switch (changeOptions.optionToChange) {
+          case "projectName":
+            result.projectName = (
+              await prompts({
+                type: "text",
+                name: "projectName",
+                message: "Enter new project name",
+                initial: initialResult.projectName,
+                validate: (value) => validateProjectName(value),
+              })
+            ).projectName;
+            break;
+          case "template":
+            result.template = (
+              await prompts({
+                type: "select",
+                name: "template",
+                message: "Choose how to start",
+                choices: [
+                  {
+                    title: "Dapp Boilerplate",
+                    value: "dapp-boilerplate",
+                    description:
+                      "A simple and light-weight web-based dapp template",
+                  },
+                  // Add other template choices...
+                ],
+                initial: initialResult.template,
+              })
+            ).template;
+            break;
+          case "network":
+            result.network = (
+              await prompts({
+                type: "select",
+                name: "network",
+                message: "Choose your network",
+                choices: [
+                  { title: "Mainnet", value: "mainnet" },
+                  { title: "Testnet", value: "testnet" },
+                  { title: "Devnet", value: "devnet" },
+                ],
+                initial: initialResult.network,
+                hint: "- You can change this later",
+              })
+            ).network;
+            break;
+          case "packageManager":
+            result.packageManager = (
+              await prompts({
+                type: "select",
+                name: "packageManager",
+                message: "Choose your package manager",
+                choices: [
+                  { title: "npm", value: "npm" },
+                  { title: "yarn", value: "yarn" },
+                  { title: "pnpm", value: "pnpm" },
+                ],
+                initial: initialResult.packageManager,
+              })
+            ).packageManager;
+            break;
+          // Add similar cases for other options...
+
+          default:
+            break;
+        }
+      } else {
+        // If the user is satisfied with the options, exit the loop
+        confirmOptions = false;
+      }
+    }
   } catch (err: any) {
     console.log(err.message);
     process.exit(0);
