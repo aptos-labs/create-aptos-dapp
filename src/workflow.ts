@@ -102,7 +102,6 @@ export async function startWorkflow() {
         }
       );
 
-      // If the user wants to change options, show a menu
       if (confirm) {
         const changeOptions = await prompts(
           [
@@ -133,7 +132,7 @@ export async function startWorkflow() {
                 type: "text",
                 name: "projectName",
                 message: "Enter new project name",
-                initial: initialResult.projectName,
+                initial: result.projectName,
                 validate: (value) => validateProjectName(value),
               })
             ).projectName;
@@ -149,15 +148,27 @@ export async function startWorkflow() {
                     title: "Dapp Boilerplate",
                     value: "dapp-boilerplate",
                     description:
-                      "A simple and light-weight web-based dapp template",
+                      "A simple and light-weight web based dapp template that includes the basic structure needed for starting a dapp",
                   },
-                  // Add other template choices...
+                  {
+                    title: "Node Boilerplate",
+                    value: "node-boilerplate",
+                    description:
+                      "A simple and light-weight node template that includes the basic structure needed for starting a node project on Aptos",
+                  },
+                  {
+                    title: "Todolist dapp",
+                    value: "todolist-boilerplate",
+                    description:
+                      "A fully working todo list dapp with pre-implemented smart contract and UI",
+                  },
                 ],
-                initial: initialResult.template,
+                initial: 0,
               })
             ).template;
             break;
           case "network":
+            console.log("network fired");
             result.network = (
               await prompts({
                 type: "select",
@@ -168,7 +179,7 @@ export async function startWorkflow() {
                   { title: "Testnet", value: "testnet" },
                   { title: "Devnet", value: "devnet" },
                 ],
-                initial: initialResult.network,
+                initial: 0,
                 hint: "- You can change this later",
               })
             ).network;
@@ -184,17 +195,16 @@ export async function startWorkflow() {
                   { title: "yarn", value: "yarn" },
                   { title: "pnpm", value: "pnpm" },
                 ],
-                initial: initialResult.packageManager,
+                initial: 0,
               })
             ).packageManager;
             break;
-          // Add similar cases for other options...
 
           default:
+            console.log("Invalid option selected");
             break;
         }
       } else {
-        // If the user is satisfied with the options, exit the loop
         confirmOptions = false;
       }
     }
