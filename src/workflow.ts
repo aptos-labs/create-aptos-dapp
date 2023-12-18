@@ -136,7 +136,7 @@ export async function startWorkflow() {
               await prompts({
                 type: "text",
                 name: "projectName",
-                message: "Enter new project name",
+                message: "Enter a new project name",
                 initial: result.projectName,
                 validate: (value) => validateProjectName(value),
               })
