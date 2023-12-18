@@ -80,7 +80,7 @@ export async function startWorkflow() {
     process.exit(0);
   }
 
-  // copt the initialResults
+  // copy the initialResults
   let result = { ...initialResult };
 
   try {
