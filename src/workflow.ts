@@ -86,7 +86,7 @@ export async function startWorkflow() {
   try {
     let confirmOptions = true;
 
-    // loop until they confirm they want to make the project
+    // loop until user confirms they want to create the project
     while (confirmOptions) {
 
       // confirm prompt
