@@ -2,6 +2,7 @@ import prompts from "prompts";
 import { red } from "kolorist";
 import { validateProjectName } from "./utils/validation.js";
 
+/** workflow object containing all the text for the different prompt options */
 export const workflowOptions = {
   projectName: {
     type: "text",
@@ -61,7 +62,7 @@ export const workflowOptions = {
 };
 
 /**
- * dwadwadawdawdawdawd
+ * allows users to select a prompt option and change the initial results 
  *
  * @export
  * @param {(prompts.Answers<
