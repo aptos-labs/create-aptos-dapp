@@ -3,6 +3,7 @@ import prompts from "prompts";
 import { Selections } from "./types.js";
 import { getUserPackageManager } from "./utils/helpers.js";
 import { validateProjectName } from "./utils/validation.js";
+import { rechoseWorkflow } from "./rechoseWorkflow.js";
 
 export async function startWorkflow() {
   let initialResult: prompts.Answers<
@@ -84,7 +85,7 @@ export async function startWorkflow() {
   let result = { ...initialResult };
 
   try {
-    // // A boolean variable that keeps track on whether the user wants to change their initial choices
+    // A boolean variable that keeps track on whether the user wants to change their initial choices
     let confirmOptions = true;
 
     // loop until user confirms they want to create the project
@@ -107,107 +108,8 @@ export async function startWorkflow() {
       );
 
       if (confirm) {
-        // choose the option prompt
-        const changeOptions = await prompts(
-          [
-            {
-              type: "select",
-              name: "optionToChange",
-              message: "Select the choice you want to change",
-              choices: [
-                { title: "Project Name", value: "projectName" },
-                { title: "Template", value: "template" },
-                { title: "Network", value: "network" },
-                { title: "Package Manager", value: "packageManager" },
-              ],
-            },
-          ],
-          {
-            onCancel: () => {
-              throw new Error(red("✖") + " Operation cancelled");
-            },
-          }
-        );
-
-        // Ask for new values based on the user's choice and update the result object
-        switch (changeOptions.optionToChange) {
-          case "projectName":
-            result.projectName = (
-              await prompts({
-                type: "text",
-                name: "projectName",
-                message: "Enter a new project name",
-                initial: result.projectName,
-                validate: (value) => validateProjectName(value),
-              })
-            ).projectName;
-            break;
-          case "template":
-            result.template = (
-              await prompts({
-                type: "select",
-                name: "template",
-                message: "Choose how to start",
-                choices: [
-                  {
-                    title: "Dapp Boilerplate",
-                    value: "dapp-boilerplate",
-                    description:
-                      "A simple and light-weight web based dapp template that includes the basic structure needed for starting a dapp",
-                  },
-                  {
-                    title: "Node Boilerplate",
-                    value: "node-boilerplate",
-                    description:
-                      "A simple and light-weight node template that includes the basic structure needed for starting a node project on Aptos",
-                  },
-                  {
-                    title: "Todolist dapp",
-                    value: "todolist-boilerplate",
-                    description:
-                      "A fully working todo list dapp with pre-implemented smart contract and UI",
-                  },
-                ],
-                initial: 0,
-              })
-            ).template;
-            break;
-          case "network":
-            result.network = (
-              await prompts({
-                type: "select",
-                name: "network",
-                message: "Choose your network",
-                choices: [
-                  { title: "Mainnet", value: "mainnet" },
-                  { title: "Testnet", value: "testnet" },
-                  { title: "Devnet", value: "devnet" },
-                ],
-                initial: 0,
-                hint: "- You can change this later",
-              })
-            ).network;
-            break;
-          case "packageManager":
-            result.packageManager = (
-              await prompts({
-                type: "select",
-                name: "packageManager",
-                message: "Choose your package manager",
-                choices: [
-                  { title: "npm", value: "npm" },
-                  { title: "yarn", value: "yarn" },
-                  { title: "pnpm", value: "pnpm" },
-                ],
-                initial: 0,
-              })
-            ).packageManager;
-            break;
-
-          default:
-            console.log("Invalid option selected");
-            break;
-        }
+        // a seperate function for selecting the prompt you want to edit
+        await rechoseWorkflow(result);
       } else {
         confirmOptions = false;
       }
