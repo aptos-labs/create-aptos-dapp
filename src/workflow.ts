@@ -113,7 +113,7 @@ export async function startWorkflow() {
             {
               type: "select",
               name: "optionToChange",
-              message: "Select the option you want to change",
+              message: "Select the choice you want to change",
               choices: [
                 { title: "Project Name", value: "projectName" },
                 { title: "Template", value: "template" },
