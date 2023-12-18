@@ -84,11 +84,11 @@ export async function startWorkflow() {
   let result = { ...initialResult };
 
   try {
+    // // A boolean variable that keeps track on whether the user wants to change their initial choices
     let confirmOptions = true;
 
     // loop until user confirms they want to create the project
     while (confirmOptions) {
-
       // confirm prompt
       const { confirm } = await prompts(
         [
