@@ -57,7 +57,7 @@ export const workflowOptions = {
       { title: "yarn", value: "yarn" },
       { title: "pnpm", value: "pnpm" },
     ],
-    initial: 0,
+    initial: getUserPackageManager()
   },
 };
 
