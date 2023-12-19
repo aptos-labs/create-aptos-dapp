@@ -1,4 +1,10 @@
+import prompts from "prompts";
+
 // constants.ts
+
+export type Result = prompts.Answers<
+  "projectName" | "template" | "network" | "packageManager"
+>;
 
 export type Template =
   | "dapp-boilerplate"
