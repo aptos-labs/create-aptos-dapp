@@ -1,4 +1,4 @@
-import { validateProjectName } from "./utils/validation.js";
+import { validateProjectName, getUserPackageManager } from "./utils/index.js";
 
 /** workflow object containing all the text for the different prompt options */
 export const workflowOptions = {
@@ -55,7 +55,6 @@ export const workflowOptions = {
       { title: "yarn", value: "yarn" },
       { title: "pnpm", value: "pnpm" },
     ],
-    //   initial: getUserPackageManager(),
-    initial: 0,
+    initial: getUserPackageManager(),
   },
 };

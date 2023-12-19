@@ -1,9 +1,8 @@
 import { red } from "kolorist";
 import prompts from "prompts";
-import { Selections } from "./types.js";
+import { Selections, Result } from "./types.js";
 import { rechoseWorkflow } from "./rechoseWorkflow.js";
 import { workflowOptions } from "./workflowOptions.js";
-import { Result } from "./types.js";
 
 export async function startWorkflow() {
   let initialResult: Result;
