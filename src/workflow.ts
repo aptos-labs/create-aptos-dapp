@@ -3,8 +3,7 @@ import prompts from "prompts";
 import { Selections } from "./types.js";
 import { getUserPackageManager } from "./utils/helpers.js";
 import { validateProjectName } from "./utils/validation.js";
-import { rechoseWorkflow } from "./rechoseWorkflow.js";
-import { workflowOptions } from "./workflowOptions.js";
+import { rechoseWorkflow, workflowOptions } from "./rechoseWorkflow.js";
 
 export async function startWorkflow() {
   let initialResult: prompts.Answers<
