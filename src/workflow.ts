@@ -3,11 +3,10 @@ import prompts from "prompts";
 import { Selections } from "./types.js";
 import { rechoseWorkflow } from "./rechoseWorkflow.js";
 import { workflowOptions } from "./workflowOptions.js";
+import { Result } from "./types.js";
 
 export async function startWorkflow() {
-  let initialResult: prompts.Answers<
-    "projectName" | "template" | "network" | "packageManager"
-  >;
+  let initialResult: Result;
 
   try {
     initialResult = await prompts(

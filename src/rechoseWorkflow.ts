@@ -1,21 +1,16 @@
 import prompts from "prompts";
 import { red } from "kolorist";
 import { workflowOptions } from "./workflowOptions.js";
+import { Result } from "./types.js";
 
 /**
  * allows users to select a prompt option and change the initial results
  *
  * @export
- * @param {(prompts.Answers<
- *     "projectName" | "template" | "network" | "packageManager"
- *   >)} result
+ * @param {Result} result
  * @return {*}  {Promise<void>}
  */
-export async function rechoseWorkflow(
-  result: prompts.Answers<
-    "projectName" | "template" | "network" | "packageManager"
-  >
-): Promise<void> {
+export async function rechoseWorkflow(result: Result): Promise<void> {
   // choose the option prompt
   const changeOptions = await prompts(
     [
