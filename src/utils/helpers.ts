@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import path from "path";
 import fs from "node:fs";
+import os from "node:os";
 
 export const runCommand = (command) => {
   try {
@@ -54,4 +55,23 @@ export const getUserPackageManager = () => {
       ? 2
       : 0;
   return packageManagerInitialIndex;
+};
+
+/**
+ * Get current running operation system
+ *
+ * @returns "MacOS" | "Ubuntu" | "Windows"
+ */
+export const getOS = (): string => {
+  const platform = os.platform();
+  switch (platform) {
+    case "darwin":
+      return "MacOS";
+    case "linux":
+      return "Ubuntu";
+    case "win32":
+      return "Windows";
+    default:
+      throw new Error(`Unsupported OS ${platform}`);
+  }
 };
