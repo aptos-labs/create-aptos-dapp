@@ -5,6 +5,7 @@ import fs from "node:fs";
 
 import { Selections } from "./types.js";
 import { copy, runCommand } from "./utils/helpers.js";
+import { generateRootPackageJsonFile } from "./generateRootPackageJsonFile.js";
 
 export const generateDapp = async (selection: Selections) => {
   const projectName = selection.projectName || "my-aptos-dapp";
@@ -49,26 +50,8 @@ export const generateDapp = async (selection: Selections) => {
   // cd into target directory
   process.chdir(targetDirectory);
 
-  // generate root package.json
-  const pkg = JSON.parse(
-    fs.readFileSync(path.join(templateDir, `package.json`), "utf-8")
-  );
-  // set package name to chosen project name
-  pkg.name = projectName;
-
-  // add npm scripts
-  if (selection.environment === "node") {
-    pkg.scripts[
-      "postinstall"
-    ] = `cd node && ${selection.packageManager} install`;
-    pkg.scripts["start"] = `cd node && ts-node index.ts`;
-  } else {
-    pkg.scripts[
-      "postinstall"
-    ] = `cd frontend && ${selection.packageManager} install`;
-    pkg.scripts["start"] = `cd frontend && ${selection.packageManager} run dev`;
-  }
-
+  // generate template root package.json file
+  const pkg = generateRootPackageJsonFile(templateDir, selection, projectName);
   write("package.json", JSON.stringify(pkg, null, 2) + "\n");
 
   // install dependencies
