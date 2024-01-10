@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add OS compatibility for running `move` command
+
 # 0.0.2 (2024-01-30)
 
 - Add a confirmation step in the wizard flow

@@ -1,7 +1,6 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Col, Input, Button } from "antd";
 import { useState } from "react";
-import { ABI } from "../abi";
 import { useAlert } from "../hooks/alertProvider";
 import { provider } from "../utils/consts";
 import { Task } from "../utils/types";
@@ -43,7 +42,9 @@ export default function TaskInput({
       // sign and submit transaction to chain
       const response = await signAndSubmitTransaction({
         type: "entry_function_payload",
-        function: `${ABI.address}::todolist::create_task`,
+        function: `${
+          import.meta.env.VITE_MODULE_ADDRESS
+        }::todolist::create_task`,
         type_arguments: [],
         arguments: [newTask],
       });

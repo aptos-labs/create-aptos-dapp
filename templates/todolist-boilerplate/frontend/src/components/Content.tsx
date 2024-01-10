@@ -5,7 +5,6 @@ import { aptos } from "../utils/consts";
 import { Task } from "../utils/types";
 import ListView from "../views/ListView";
 import NoListView from "../views/NoListView";
-import { ABI } from "../abi";
 
 export default function Content() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -25,7 +24,9 @@ export default function Content() {
     try {
       const todoListResource = await aptos.getAccountResource({
         accountAddress: accountAddr,
-        resourceType: `${ABI.address}::todolist::TodoList`,
+        resourceType: `${
+          import.meta.env.VITE_MODULE_ADDRESS
+        }::todolist::TodoList`,
       });
       setAccountHasList(true);
       setTasks(todoListResource.tasks as Task[]);

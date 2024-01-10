@@ -29,29 +29,3 @@ export const copyDir = (srcDir: string, destDir: string) => {
     copy(srcFile, destFile);
   }
 };
-
-/**
- * Figures out what package manager to use based on how you ran the command
- * E.g. npx, pnpm dlx, yarn dlx...
- * Then it returns the package manager initial index to use in the
- * package manager prompt
- *
- * @returns number
- */
-export const getUserPackageManager = () => {
-  const NPM_CONFIG_USER_AGENT = process.env.npm_config_user_agent || "";
-  const DEFAULT_PACKAGE_MANAGER = NPM_CONFIG_USER_AGENT.startsWith("yarn")
-    ? "yarn"
-    : NPM_CONFIG_USER_AGENT.startsWith("pnpm")
-    ? "pnpm"
-    : "npm";
-  const packageManagerInitialIndex =
-    DEFAULT_PACKAGE_MANAGER === "npm"
-      ? 0
-      : DEFAULT_PACKAGE_MANAGER === "yarn"
-      ? 1
-      : DEFAULT_PACKAGE_MANAGER === "pnpm"
-      ? 2
-      : 0;
-  return packageManagerInitialIndex;
-};

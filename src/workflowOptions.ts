@@ -1,4 +1,4 @@
-import { validateProjectName, getUserPackageManager } from "./utils/index.js";
+import { validateProjectName } from "./utils/index.js";
 
 /** workflow object containing all the text for the different prompt options */
 export const workflowOptions = {
@@ -13,18 +13,6 @@ export const workflowOptions = {
     name: "template",
     message: "Choose how to start",
     choices: [
-      {
-        title: "Dapp Boilerplate",
-        value: "dapp-boilerplate",
-        description:
-          "A simple and light-weight web based dapp template that includes the basic structure needed for starting a dapp",
-      },
-      {
-        title: "Node Boilerplate",
-        value: "node-boilerplate",
-        description:
-          "A simple and light-weight node template that includes the basic structure needed for starting a node project on Aptos",
-      },
       {
         title: "Todolist dapp",
         value: "todolist-boilerplate",
@@ -45,16 +33,5 @@ export const workflowOptions = {
     ],
     initial: 0,
     hint: "- You can change this later",
-  },
-  packageManager: {
-    type: "select",
-    name: "packageManager",
-    message: "Choose your package manager",
-    choices: [
-      { title: "npm", value: "npm" },
-      { title: "yarn", value: "yarn" },
-      { title: "pnpm", value: "pnpm" },
-    ],
-    initial: getUserPackageManager(),
   },
 };
