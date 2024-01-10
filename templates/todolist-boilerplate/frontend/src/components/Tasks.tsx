@@ -1,7 +1,6 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Col, List, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { ABI } from "../abi";
 import { useAlert } from "../hooks/alertProvider";
 import { provider } from "../utils/consts";
 import { Task } from "../utils/types";
@@ -32,7 +31,9 @@ export default function Tasks({
       // sign and submit transaction to chain
       const response = await signAndSubmitTransaction({
         type: "entry_function_payload",
-        function: `${ABI.address}::todolist::complete_task`,
+        function: `${
+          import.meta.env.VITE_MODULE_ADDRESS
+        }::todolist::complete_task`,
         type_arguments: [],
         arguments: [taskId],
       });

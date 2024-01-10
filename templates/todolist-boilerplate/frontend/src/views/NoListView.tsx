@@ -1,6 +1,5 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Row, Col, Button } from "antd";
-import { ABI } from "../abi";
 import { useAlert } from "../hooks/alertProvider";
 import { provider } from "../utils/consts";
 
@@ -23,7 +22,9 @@ export default function NoListView({
       // sign and submit transaction to chain
       const response = await signAndSubmitTransaction({
         type: "entry_function_payload",
-        function: `${ABI.address}::todolist::create_list`,
+        function: `${
+          import.meta.env.VITE_MODULE_ADDRESS
+        }::todolist::create_list`,
         type_arguments: [],
         arguments: [],
       });
