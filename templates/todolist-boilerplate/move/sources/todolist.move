@@ -1,4 +1,4 @@
-module todolist_addr::todolist {
+module module_addr::todolist {
 
   use aptos_framework::account;
   use aptos_framework::event;
