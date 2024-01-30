@@ -1,7 +1,7 @@
 {
-  "name": "create-apt-dapp",
+  "name": "create-aptos-dapp",
   "description": "a starter kit for dapp developers to easily bootstrap a dapp on the Aptos network",
-  "version": "0.0.32",
+  "version": "0.0.2",
   "license": "Apache-2.0",
   "author": "aptoslabs.com",
   "keywords": [
@@ -13,7 +13,7 @@
     "boilerplate"
   ],
   "bin": {
-    "create-apt-dapp": "./dist/index.js"
+    "create-aptos-dapp": "./dist/index.js"
   },
   "scripts": {
     "clean": "rm -rf dist",
