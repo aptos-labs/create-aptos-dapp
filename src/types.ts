@@ -4,10 +4,7 @@ import prompts from "prompts";
 
 export type Result = prompts.Answers<"projectName" | "template" | "network">;
 
-export type Template =
-  | "dapp-boilerplate"
-  | "node-boilerplate"
-  | "todolist-boilerplate";
+export type Template = "todolist-boilerplate";
 
 export type Network = "mainnet" | "testnet" | "devnet";
 

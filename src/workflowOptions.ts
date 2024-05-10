@@ -6,6 +6,7 @@ export const workflowOptions = {
     type: "text",
     name: "projectName",
     message: "Enter a new project name",
+    initial: "my-aptos-dapp",
     validate: (value: string) => validateProjectName(value),
   },
   template: {

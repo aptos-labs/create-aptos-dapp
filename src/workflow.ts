@@ -10,10 +10,7 @@ export async function startWorkflow() {
   try {
     initialResult = await prompts(
       [
-        {
-          ...workflowOptions.projectName,
-          initial: "my-aptos-dapp",
-        },
+        workflowOptions.projectName,
         workflowOptions.template,
         workflowOptions.network,
       ],
@@ -67,11 +64,9 @@ export async function startWorkflow() {
   }
 
   const { projectName, template, network } = result;
-  const environment = template === "node-boilerplate" ? "node" : "web";
   return {
     projectName,
     template,
     network,
-    environment,
   } as Selections;
 }

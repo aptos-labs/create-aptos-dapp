@@ -8,7 +8,7 @@ import {
   useContext,
   useState,
 } from "react";
-import { ErrorAlert, SuccessAlert } from "../components/Alert";
+import { ErrorAlert, SuccessAlert } from "../components/Alerts";
 
 interface AlertContextState {
   setSuccessAlertHash: (hash: string, networkName?: string) => void;
