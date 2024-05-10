@@ -1,6 +1,7 @@
 import { Alert } from "antd";
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
+// Alert type
 type Alert = {
   text: ReactNode;
   setText: Dispatch<SetStateAction<ReactNode | null>>;
