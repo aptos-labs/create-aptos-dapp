@@ -1,4 +1,4 @@
-import { validateProjectName, getUserPackageManager } from "./utils/index.js";
+import { validateProjectName } from "./utils/index.js";
 
 /** workflow object containing all the text for the different prompt options */
 export const workflowOptions = {
