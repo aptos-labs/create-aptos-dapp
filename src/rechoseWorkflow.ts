@@ -22,7 +22,6 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
           { title: "Project Name", value: "projectName" },
           { title: "Template", value: "template" },
           { title: "Network", value: "network" },
-          { title: "Package Manager", value: "packageManager" },
         ],
       },
     ],
@@ -48,11 +47,6 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
       break;
     case "network":
       result.network = (await prompts(workflowOptions.network)).network;
-      break;
-    case "packageManager":
-      result.packageManager = (
-        await prompts(workflowOptions.packageManager)
-      ).packageManager;
       break;
 
     default:
