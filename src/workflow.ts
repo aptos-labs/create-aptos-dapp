@@ -16,7 +16,6 @@ export async function startWorkflow() {
         },
         workflowOptions.template,
         workflowOptions.network,
-        workflowOptions.packageManager,
       ],
       {
         onCancel: () => {
@@ -67,13 +66,10 @@ export async function startWorkflow() {
     process.exit(0);
   }
 
-  const { projectName, template, network, packageManager } = result;
-  const environment = template === "node-boilerplate" ? "node" : "web";
+  const { projectName, template, network } = result;
   return {
     projectName,
     template,
     network,
-    packageManager,
-    environment,
   } as Selections;
 }

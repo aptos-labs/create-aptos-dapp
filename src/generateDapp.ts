@@ -57,22 +57,13 @@ export const generateDapp = async (selection: Selections) => {
   pkg.name = projectName;
 
   // add npm scripts
-  if (selection.environment === "node") {
-    pkg.scripts[
-      "postinstall"
-    ] = `cd node && ${selection.packageManager} install`;
-    pkg.scripts["start"] = `cd node && ts-node index.ts`;
-  } else {
-    pkg.scripts[
-      "postinstall"
-    ] = `cd frontend && ${selection.packageManager} install`;
-    pkg.scripts["start"] = `cd frontend && ${selection.packageManager} run dev`;
-  }
+  pkg.scripts["postinstall"] = `cd frontend && npm install`;
+  pkg.scripts["start"] = `cd frontend && npm run dev`;
 
   write("package.json", JSON.stringify(pkg, null, 2) + "\n");
 
   // install dependencies
-  const installRootDepsCommand = `${selection.packageManager} install`;
+  const installRootDepsCommand = `npm install`;
   runCommand(installRootDepsCommand);
 
   console.log(
@@ -81,13 +72,8 @@ export const generateDapp = async (selection: Selections) => {
 
   // create .env file
   const network = selection.network || "testnet";
-  if (selection.environment === "node") {
-    write(".env", `APP_NETWORK=${network}`);
-    write("node/.env", `APP_NETWORK=${network}`);
-  } else {
-    write(".env", `VITE_APP_NETWORK=${network}`);
-    write("frontend/.env", `VITE_APP_NETWORK=${network}`);
-  }
+  write(".env", `VITE_APP_NETWORK=${network}`);
+  write("frontend/.env", `VITE_APP_NETWORK=${network}`);
 
   // Log next steps
   console.log(
@@ -99,21 +85,13 @@ export const generateDapp = async (selection: Selections) => {
     green(`1. run [cd ${projectName}] to your dapp directory.`) + "\n"
   );
   console.log(
-    green(
-      `2. run [${selection.packageManager} run move:init] to initialize a new CLI Profile.`
-    ) + "\n"
+    green(`2. run [npm run move:init] to initialize a new CLI Profile.`) + "\n"
   );
   console.log(
-    green(
-      `3. run [${selection.packageManager} run move:compile] to compile your move contract.`
-    ) + "\n"
+    green(`3. run [npm run move:compile] to compile your move contract.`) + "\n"
   );
   console.log(
-    green(
-      `4. run [${selection.packageManager} run move:publish] to publish your contract.`
-    ) + "\n"
+    green(`4. run [npm run move:publish] to publish your contract.`) + "\n"
   );
-  console.log(
-    green(`5. run [${selection.packageManager} start] to run your dapp.`) + "\n"
-  );
+  console.log(green(`5. run [npm start] to run your dapp.`) + "\n");
 };
