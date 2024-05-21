@@ -1,14 +1,17 @@
 {
-  "name": "aptos-dapp-boilerplate",
+  "name": "fungible-asset-template",
   "license": "Apache-2.0",
   "version": "0.0.0",
   "scripts": {
-    "move:init": "export $(cat .env | xargs) && aptos init --network=$VITE_APP_NETWORK --profile=$VITE_APP_NETWORK",
-    "move:compile": "export $(cat .env | xargs) && aptos move compile --package-dir move --skip-fetch-latest-git-deps --named-addresses module_addr=$(./scripts/get_module_addr.sh)",
-    "move:test": "export $(cat .env | xargs) && aptos move test --package-dir move --skip-fetch-latest-git-deps --named-addresses module_addr=$(./scripts/get_module_addr.sh)",
-    "move:publish": "export $(cat .env | xargs) && aptos move publish --package-dir move --skip-fetch-latest-git-deps --named-addresses module_addr=$(./scripts/get_module_addr.sh) --profile=$VITE_APP_NETWORK && ./scripts/gen_abi.sh"
+    "move:init": "node ./scripts/init && node ./scripts/update_env",
+    "move:compile": "node ./scripts/move/compile",
+    "move:test": "node ./scripts/move/test",
+    "move:publish": "node ./scripts/move/publish"
   },
   "devDependencies": {
-    "@aptos-labs/aptos-cli": "latest"
+    "@aptos-labs/ts-sdk": "1.15.0",
+    "js-yaml": "4.1.0",
+    "dotenv": "16.3.1",
+    "tree-kill": "1.2.2"
   }
 }
