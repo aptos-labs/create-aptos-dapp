@@ -3,13 +3,12 @@ import ReactDOM from "react-dom/client";
 // wallet adapter
 import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
 // wallets
-import { PetraWallet } from "petra-plugin-wallet-adapter";
 import { PontemWallet } from "@pontem/wallet-adapter-plugin";
 
 import App from "./App";
 import "./index.css";
 
-const wallets = [new PetraWallet(), new PontemWallet()];
+const wallets = [new PontemWallet()];
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

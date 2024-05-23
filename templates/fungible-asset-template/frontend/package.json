@@ -6,7 +6,6 @@
     "@aptos-labs/wallet-adapter-ant-design": "^2.3.0",
     "@aptos-labs/wallet-adapter-react": "^2.4.0",
     "@pontem/wallet-adapter-plugin": "^0.2.0",
-    "petra-plugin-wallet-adapter": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
