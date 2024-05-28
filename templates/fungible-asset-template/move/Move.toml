@@ -1,9 +1,19 @@
 [package]
-name = 'my_app'
-version = '1.0.0'
-[dependencies.AptosFramework]
-git = 'https://github.com/aptos-labs/aptos-core.git'
-rev = 'main'
-subdir = 'aptos-move/framework/aptos-framework'
+name = "launchpad"
+version = "1.0.0"
+authors = []
+
 [addresses]
-module_addr='_'
+launchpad_addr = "_"
+minter = "_"
+
+[dev-addresses]
+launchpad_addr = "0x100"
+minter = "0x101"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "mainnet", subdir = "aptos-move/framework/aptos-framework"}
+AptosTokenObjects = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "mainnet", subdir = "aptos-move/framework/aptos-token-objects"}
+TokenMinter = { git = "https://github.com/aptos-labs/token-minter.git", rev = "main", subdir = "token-minter"}
+
+[dev-dependencies]
