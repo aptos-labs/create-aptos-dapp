@@ -1,4 +1,4 @@
-module launchpad_addr::ft_launchpad {
+module launchpad_addr::fa_launchpad {
     use std::option;
     use std::signer;
     use std::string;

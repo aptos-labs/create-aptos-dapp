@@ -5,14 +5,14 @@ script {
     use std::vector;
     use aptos_framework::fungible_asset;
     use aptos_framework::primary_fungible_store;
-    use launchpad_addr::ft_launchpad;
+    use launchpad_addr::fa_launchpad;
 
     fun create_and_mint_some_fas(sender: &signer) {
         let sender_addr = signer::address_of(sender);
 
         // create first FA
 
-        ft_launchpad::create_fa(
+        fa_launchpad::create_fa(
             sender,
             option::some(1000),
             string::utf8(b"FA1"),
@@ -22,18 +22,18 @@ script {
             string::utf8(b"project_url"),
             1,
         );
-        let registry = ft_launchpad::get_registry();
+        let registry = fa_launchpad::get_registry();
         let fa_1_owner = *vector::borrow(&registry, vector::length(&registry) - 1);
-        let fa_1 = ft_launchpad::get_fa_obj(fa_1_owner);
+        let fa_1 = fa_launchpad::get_fa_obj(fa_1_owner);
         assert!(fungible_asset::supply(fa_1) == option::some(0), 1);
 
-        ft_launchpad::mint_fa(sender, fa_1, 20);
+        fa_launchpad::mint_fa(sender, fa_1, 20);
         assert!(fungible_asset::supply(fa_1) == option::some(20), 2);
         assert!(primary_fungible_store::balance(sender_addr, fa_1) == 20, 3);
 
         // create second FA
 
-        ft_launchpad::create_fa(
+        fa_launchpad::create_fa(
             sender,
             option::some(500),
             string::utf8(b"FA2"),
@@ -43,12 +43,12 @@ script {
             string::utf8(b"project_url"),
             1
         );
-        let registry = ft_launchpad::get_registry();
+        let registry = fa_launchpad::get_registry();
         let fa_2_owner = *vector::borrow(&registry, vector::length(&registry) - 1);
-        let fa_2 = ft_launchpad::get_fa_obj(fa_2_owner);
+        let fa_2 = fa_launchpad::get_fa_obj(fa_2_owner);
         assert!(fungible_asset::supply(fa_2) == option::some(0), 4);
 
-        ft_launchpad::mint_fa(sender, fa_2, 300);
+        fa_launchpad::mint_fa(sender, fa_2, 300);
         assert!(fungible_asset::supply(fa_2) == option::some(300), 5);
         assert!(primary_fungible_store::balance(sender_addr, fa_2) == 300, 6);
     }

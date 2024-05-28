@@ -16,7 +16,7 @@
 /// 5. configurable royalty
 /// 6. max supply or unlimited supply collection
 /// 7. mint stages and allowlists
-module launchpad_addr::nft_launchpad {
+module launchpad_addr::nfa_launchpad {
 
     use std::option;
     use std::signer;
