@@ -193,7 +193,8 @@ module launchpad_addr::fa_launchpad {
         fa_obj: object::Object<fungible_asset::Metadata>,
         amount: u64
     ) acquires FAController, FAConfig, Config {
-        check_mint_limit_and_update_mint_tracker(signer::address_of(sender), fa_obj, amount);
+        let sender_addr = signer::address_of(sender);
+        check_mint_limit_and_update_mint_tracker(sender_addr, fa_obj, amount);
         let total_mint_fee = get_total_mint_fee(fa_obj, amount);
         pay_for_mint(sender, total_mint_fee);
         mint_fa_internal(sender, fa_obj, amount, total_mint_fee);
@@ -320,7 +321,7 @@ module launchpad_addr::fa_launchpad {
         }
     }
 
-    // ================================= Tests ================================== //
+    // ================================= Uint Tests ================================== //
 
     #[test_only]
     use aptos_framework::aptos_coin;
