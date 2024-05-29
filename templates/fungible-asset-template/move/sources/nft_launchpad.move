@@ -375,7 +375,8 @@ module launchpad_addr::nft_launchpad {
             // placeholder value, please read name from json metadata in storage
             string_utils::to_string(&next_nft_id),
             royalty::get(collection_obj),
-            string_utils::format2(&b"{}/{}", collection_uri, next_nft_id),
+            // TODO: does petra support this? image url is in the json, wallet or any UI should fetch json first then fetch image
+            string_utils::format2(&b"{}/{}.json", collection_uri, next_nft_id),
         );
         token_components::create_refs(nft_obj_constructor_ref);
         let nft_obj = object::object_from_constructor_ref(nft_obj_constructor_ref);
