@@ -21,6 +21,8 @@ script {
             string::utf8(b"icon_url"),
             string::utf8(b"project_url"),
             1,
+            0,
+            option::some(500),
         );
         let registry = fa_launchpad::get_registry();
         let fa_1_owner = *vector::borrow(&registry, vector::length(&registry) - 1);
@@ -41,7 +43,9 @@ script {
             3,
             string::utf8(b"icon_url"),
             string::utf8(b"project_url"),
-            1
+            1,
+            0,
+            option::some(500),
         );
         let registry = fa_launchpad::get_registry();
         let fa_2_owner = *vector::borrow(&registry, vector::length(&registry) - 1);

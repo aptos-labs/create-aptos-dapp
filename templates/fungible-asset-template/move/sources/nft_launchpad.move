@@ -16,15 +16,23 @@
 /// 5. configurable royalty
 /// 6. max supply or unlimited supply collection
 /// 7. mint stages and allowlists
-module launchpad_addr::nfa_launchpad {
-
+module launchpad_addr::nft_launchpad {
     use std::option;
     use std::signer;
     use std::string;
     use std::vector;
+    use aptos_std::simple_map;
+    use aptos_std::table;
+    use aptos_framework::aptos_account;
+    use aptos_framework::aptos_coin;
+    use aptos_framework::event;
     use aptos_framework::object;
+    use aptos_framework::timestamp;
     use aptos_token_objects::collection;
     use aptos_token_objects::royalty;
+    use aptos_token_objects::token;
+    use minter::token_components;
+    use minter::mint_stage;
     use minter::collection_properties;
     use minter::collection_components;
     use minter::coin_payment;
@@ -50,26 +58,66 @@ module launchpad_addr::nfa_launchpad {
 
     /// Sender is not admin
     const E_NOT_ADMIN: u64 = 1;
+    /// No mint limit
+    const E_NO_MINT_LIMIT: u64 = 2;
+    /// Mint limit reached
+    const E_MINT_LIMIT_REACHED: u64 = 3;
+    /// No active mint stages
+    const E_NO_ACTIVE_STAGES: u64 = 4;
 
-    const PRESALE_MINT_STAGE_CATEGORY: vector<u8> = b"Presale mint stage";
-    const PUBLIC_SALE_MINT_STAGE_CATEGORY: vector<u8> = b"Public sale mint stage";
-    const PRESALE_COIN_PAYMENT_CATEGORY: vector<u8> = b"Presale mint fee";
-    const PUBLIC_SALE_COIN_PAYMENT_CATEGORY: vector<u8> = b"Public sale mint fee";
+    // const MINT_STAGE_BEFORE_ALLOWLIST: vector<u8> = b"Mint stage not open: before allowlist begins";
+    // const MINT_STAGE_ALLOWLIST: vector<u8> = b"Mint stage open: allowlist";
+    // const MINT_STAGE_BETWEEN_ALLOWLIST_AND_PUBLIC: vector<u8> = b"Mint stage not open: between allowlist and public";
+    // const MINT_STAGE_PUBLIC: vector<u8> = b"Mint stage open: public";
+    // const MINT_STAGE_ENDED: vector<u8> = b"Mint has ended";
+    const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
+    const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint mint stage";
+    const ALLOW_LIST_COIN_PAYMENT_CATEGORY: vector<u8> = b"Allowlist mint fee";
+    const PUBLIC_MINT_COIN_PAYMENT_CATEGORY: vector<u8> = b"Public mint mint fee";
 
-    /// Unique per collection
-    struct CollectionConfroller has key {
+    #[event]
+    struct CreateCollectionEvent has store, drop {
+        creator_addr: address,
+        collection_owner_obj: object::Object<CollectionOwnerObjConfig>,
+        collection_obj: object::Object<collection::Collection>,
+        max_supply: option::Option<u64>,
+        name: string::String,
+        uri: string::String,
+        pre_mint_amount: u64,
+        allowlist_mint_config: option::Option<(vector<address>, u64, u64, u64, u64)>,
+        public_mint_config: option::Option<(u64, u64, u64, u64)>,
+    }
+
+    #[event]
+    struct MintNftEvent has store, drop {
+        collection_obj: object::Object<collection::Collection>,
+        nft_obj: object::Object<token::Token>,
+        recipient_addr: address,
+        mint_fee: u64,
+    }
+
+    /// Unique per FA
+    /// We need this object to own the FA object instead of contract directly owns the FA object
+    /// This helps us avoid address collision when we create multiple FAs with same name
+    struct CollectionOwnerObjConfig has key {
+        /// Only thing it stores is the link to FA object
+        collection_obj: object::Object<collection::Collection>,
         extend_ref: object::ExtendRef,
     }
 
     /// Unique per collection
     struct CollectionConfig has key {
-        allowlist_mint_fee_per_nft: u64,
-        public_mint_fee_per_nft: u64,
+        /// key is stage, value is mint fee denomination
+        mint_fee_by_stages: simple_map::SimpleMap<
+            string::String,
+            coin_payment::CoinPayment<aptos_coin::AptosCoin>
+        >,
+        collection_owner_obj: object::Object<CollectionOwnerObjConfig>,
     }
 
     /// Global per contract
     struct Registry has key {
-        collections: vector<object::Object<collection::Collection>>
+        collection_owner_objects: vector<object::Object<CollectionOwnerObjConfig>>
     }
 
     /// Global per contract
@@ -82,7 +130,7 @@ module launchpad_addr::nfa_launchpad {
     // If you deploy the moduelr under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
-            collections: vector::empty()
+            collection_owner_objects: vector::empty()
         });
         move_to(sender, Config {
             admin_addr: signer::address_of(sender),
@@ -105,194 +153,204 @@ module launchpad_addr::nfa_launchpad {
     }
 
     public entry fun create_collection(
-        creator: &signer,
+        sender: &signer,
         description: string::String,
         name: string::String,
         uri: string::String,
         max_supply: option::Option<u64>,
         royalty_percentage: option::Option<u64>,
-        allowlist_mint_fee_per_nft: u64,
-        public_mint_fee_per_nft: u64,
-    ) {
-        let creator_addr = signer::address_of(creator);
-        let collection_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
-        let collection_owner_obj_signer = object::generate_signer(collection_owner_obj_constructor_ref);
-        let royalty = royalty(&mut royalty_percentage, creator_addr);
+        pre_mint_nft_names: vector<string::String>,
+        pre_mint_nft_descriptions: vector<string::String>,
+        allowlist_mint_config: option::Option<(vector<address>, u64, u64, u64, u64)>,
+        public_mint_config: option::Option<(u64, u64, u64, u64)>,
+    ) acquires Registry, Config, CollectionConfig {
+        let sender_addr = signer::address_of(sender);
+        assert!(is_admin(sender_addr), E_NOT_ADMIN);
 
-        let collection = create_collection_internal(
-            &collection_obj_signer,
-            description,
-            name,
-            uri,
-            max_supply,
-            royalty,
-        );
+        let royalty = royalty(&mut royalty_percentage, sender_addr);
+
+        let collection_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
+        let collection_owner_obj_signer = &object::generate_signer(collection_owner_obj_constructor_ref);
+
+        let collection_obj_constructor_ref = if (option::is_some(&max_supply)) {
+            &collection::create_fixed_collection(
+                collection_owner_obj_signer,
+                description,
+                option::extract(&mut max_supply),
+                name,
+                royalty,
+                uri,
+            )
+        } else {
+            &collection::create_unlimited_collection(
+                collection_owner_obj_signer,
+                description,
+                name,
+                royalty,
+                uri,
+            )
+        };
+        let collection_obj_signer = &object::generate_signer(collection_obj_constructor_ref);
+        let collection_obj_addr = signer::address_of(collection_obj_signer);
+
+        let collection_obj = object::object_from_constructor_ref(collection_obj_constructor_ref);
 
         configure_collection_and_token_properties(
-            &collection_obj_signer,
-            collection,
-            false, false, false, false
+            collection_obj_signer,
+            collection_obj,
+            false,
+            false,
+            false,
+            false,
         );
+        collection_components::create_refs_and_properties(collection_obj_constructor_ref);
 
-        move_to(&collection_obj_signer, CollectionConfroller {
-            extend_ref: object::generate_extend_ref(collection_obj_constructor_ref)
+        move_to(collection_owner_obj_signer, CollectionOwnerObjConfig {
+            extend_ref: object::generate_extend_ref(collection_obj_constructor_ref),
+            collection_obj,
+        });
+        let collection_owner_obj = object::object_from_constructor_ref(collection_owner_obj_constructor_ref);
+        move_to(collection_obj_signer, CollectionConfig {
+            mint_fee_by_stages: simple_map::new(),
+            collection_owner_obj,
         });
 
-        move_to(&collection_obj_signer, CollectionConfig {
-            allowlist_mint_fee_per_nft,
-            public_mint_fee_per_nft,
-        });
-    }
-
-    public entry fun pre_mint_tokens(
-        creator: &signer,
-        config: Object<EZLaunchConfig>,
-        token_names: vector<String>, // not provided by creator, we could parse from metadata json file
-        token_uris: vector<String>, // not provided by creator, we could parse from metadata json file
-        token_descriptions: vector<String>, // not provided by creator, we could parse from metadata json file
-        num_tokens: u64,
-    ) acquires EZLaunchConfig {
-        pre_mint_tokens_impl(creator, config, token_names, token_uris, token_descriptions, num_tokens)
-    }
-
-    public entry fun mint(minter: &signer, config: Object<EZLaunchConfig>, amount: u64) acquires EZLaunchConfig {
-        mint_impl(minter, config, amount);
-    }
-
-    /// Add a mint stage to the launch configuration.
-    /// `no_allowlist_max_mint` is the maximum number of tokens that can be minted in this stage without an allowlist.
-    public entry fun add_stage(
-        creator: &signer,
-        config: Object<EZLaunchConfig>,
-        stage_category: String,
-        start_time: u64,
-        end_time: u64,
-        no_allowlist_max_mint: Option<u64>,
-    ) acquires EZLaunchConfig {
-        mint_stage::create(
-            &authorized_config_signer(creator, config),
-            start_time,
-            end_time,
-            stage_category,
-            no_allowlist_max_mint,
-        );
-    }
-
-    /// Add mint fee for a mint stage. Stage should be the same as the mint stage.
-    public entry fun add_fee(
-        creator: &signer,
-        config: Object<EZLaunchConfig>,
-        mint_fee: u64,
-        destination: address,
-        stage: String,
-    ) acquires EZLaunchConfig {
-        let config = authorized_borrow_mut(creator, config);
-        let fee = coin_payment::create<AptosCoin>(mint_fee, destination, stage);
-        if (simple_map::contains_key(&config.fees, &stage)) {
-            let fees = simple_map::borrow_mut(&mut config.fees, &stage);
-            vector::push_back(fees, fee);
-        } else {
-            simple_map::add(&mut config.fees, stage, vector[fee]);
-        };
-    }
-
-    /// If this function is called, `no_allowlist_max_mint` will be ignored as an allowlist exists.
-    public entry fun add_to_allowlist(
-        owner: &signer,
-        config: Object<EZLaunchConfig>,
-        stage: String,
-        addrs: vector<address>,
-        amounts: vector<u64>,
-    ) {
-        let addrs_length = vector::length(&addrs);
-        assert!(addrs_length == vector::length(&amounts), EINVALID_ARGUMENTS);
-
-        for (i in 0..addrs_length) {
-            let addr = *vector::borrow(&addrs, i);
-            let amount = *vector::borrow(&amounts, i);
-            mint_stage::add_to_allowlist(owner, config, stage, addr, amount);
-        };
-    }
-
-    public entry fun remove_from_allowlist(
-        owner: &signer,
-        config: Object<EZLaunchConfig>,
-        stage: String,
-        addrs: vector<address>,
-    ) {
-        for (i in 0..vector::length(&addrs)) {
-            let addr = *vector::borrow(&addrs, i);
-            mint_stage::remove_from_allowlist(owner, config, stage, addr);
-        };
-    }
-
-    public entry fun repopulate_allowlist(
-        owner: &signer,
-        config: Object<EZLaunchConfig>,
-        stage: String,
-        addrs: vector<address>,
-        amounts: vector<u64>,
-    ) {
-        let addrs_length = vector::length(&addrs);
-        assert!(addrs_length == vector::length(&amounts), EINVALID_ARGUMENTS);
-
-        mint_stage::remove_everyone_from_allowlist(owner, config, stage);
-        for (i in 0..addrs_length) {
-            let addr = *vector::borrow(&addrs, i);
-            let amount = *vector::borrow(&amounts, i);
-            mint_stage::add_to_allowlist(owner, config, stage, addr, amount);
-        };
-    }
-
-    public entry fun pre_mint_tokens_impl(
-        creator: &signer,
-        config: Object<EZLaunchConfig>,
-        token_names: vector<String>,
-        token_uris: vector<String>,
-        token_descriptions: vector<String>,
-        num_tokens: u64,
-    ) acquires EZLaunchConfig {
-        assert!(
-            vector::length(&token_names) == num_tokens,
-            error::invalid_argument(ETOKEN_METADATA_CONFIGURATION_INVALID)
-        );
-        assert!(
-            vector::length(&token_uris) == num_tokens,
-            error::invalid_argument(ETOKEN_METADATA_CONFIGURATION_INVALID)
-        );
-        assert!(
-            vector::length(&token_descriptions) == num_tokens,
-            error::invalid_argument(ETOKEN_METADATA_CONFIGURATION_INVALID)
-        );
-
-        let i = 0;
-        let length = vector::length(&token_names);
-        while (i < length) {
-            let token = pre_mint_token(
-                creator,
-                config,
-                *vector::borrow(&token_descriptions, i),
-                *vector::borrow(&token_names, i),
-                *vector::borrow(&token_uris, i),
+        if (option::is_some(&allowlist_mint_config)) {
+            let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
+            let fee_category = string::utf8(ALLOW_LIST_COIN_PAYMENT_CATEGORY);
+            let (
+                allowlist,
+                start_time,
+                end_time,
+                mint_limit_per_addr,
+                mint_fee_per_nft,
+            ) = *option::borrow(&allowlist_mint_config);
+            mint_stage::create(
+                collection_obj_signer,
+                start_time,
+                end_time,
+                stage,
+                option::none(),
             );
-            vector::push_back(&mut borrow_mut(config).available_tokens, token);
-            i = i + 1;
+
+            for (i in 0..vector::length(&allowlist)) {
+                mint_stage::add_to_allowlist(
+                    collection_obj_signer,
+                    collection_obj,
+                    stage,
+                    *vector::borrow(&allowlist, i),
+                    mint_limit_per_addr
+                );
+            };
+
+            let config = borrow_global<Config>(@launchpad_addr);
+            let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
+            let fee = coin_payment::create<aptos_coin::AptosCoin>(mint_fee_per_nft, config.mint_fee_collector_addr, fee_category);
+            simple_map::upsert(&mut collection_config.mint_fee_by_stages, stage, fee);
         };
+
+        if (option::is_some(&public_mint_config)) {
+            let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
+            let fee_category = string::utf8(PUBLIC_MINT_COIN_PAYMENT_CATEGORY);
+            let (
+                start_time,
+                end_time,
+                mint_limit_per_addr,
+                mint_fee_per_nft,
+            ) = *option::borrow(&public_mint_config);
+            mint_stage::create(
+                collection_obj_signer,
+                start_time,
+                end_time,
+                stage,
+                option::some(mint_limit_per_addr),
+            );
+
+            let config = borrow_global<Config>(@launchpad_addr);
+            let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
+            let fee = coin_payment::create<aptos_coin::AptosCoin>(mint_fee_per_nft, config.mint_fee_collector_addr, fee_category);
+            simple_map::upsert(&mut collection_config.mint_fee_by_stages, stage, fee);
+        };
+
+        let registry = borrow_global_mut<Registry>(@launchpad_addr);
+        vector::push_back(&mut registry.collection_owner_objects, collection_owner_obj);
+
+        event::emit(CreateCollectionEvent {
+            creator_addr: sender_addr,
+            collection_owner_obj,
+            collection_obj,
+            max_supply,
+            name,
+            uri,
+            allowlist_mint_config,
+            public_mint_config,
+            pre_mint_amount: vector::length(&pre_mint_nft_names),
+        });
+
+        mint_nft_internal(sender, collection_obj, pre_mint_nft_names, pre_mint_nft_descriptions, 0);
+    }
+
+    public entry fun mint(sender: &signer, collection_obj: object::Object<collection::Collection>) acquires CollectionConfig, CollectionOwnerObjConfig {
+        let sender_addr = signer::address_of(sender);
+
+        // Check mint stages configured, in this example, we execute the earliest stage.
+        let stage = &mint_stage::execute_earliest_stage(sender, collection_obj, 1);
+        assert!(option::is_some(stage), E_NO_ACTIVE_STAGES);
+
+        // After stage has been executed, take fee payments from `minter` prior to minting.
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
+        let mint_fee = execute_payment(sender, &collection_config.mint_fee_by_stages, option::borrow(stage));
+
+        let collection_owner_obj = borrow_global<CollectionConfig>(object::object_address(&collection_obj)).collection_owner_obj;
+        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(object::object_address(&collection_owner_obj));
+        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+        let collection_obj_signer = &collection_components::collection_object_signer(collection_owner_obj_signer, collection_obj);
+        let nft_obj_constructor_ref = &token::create(
+            collection_obj_signer,
+            collection::name(collection_obj),
+            description,
+            name,
+            royalty::get(collection_obj),
+            uri,
+        );
+        token_components::create_refs(nft_obj_constructor_ref);
+        let nft_obj = object::object_from_constructor_ref(nft_obj_constructor_ref);
+        object::transfer(collection_obj_signer, nft_obj, sender_addr);
+
+        event::emit(MintNftEvent {
+            recipient_addr: sender_addr,
+            mint_fee,
+            collection_obj,
+            nft_obj,
+        });
     }
 
     // ================================= View  ================================= //
 
     #[view]
-    public fun minting_ended(config: Object<EZLaunchConfig>): bool acquires EZLaunchConfig {
-        vector::length(&borrow(config).available_tokens) == 0
-    }
+    public fun get_current_stage(collection_obj: object::Object<collection::Collection>): vector<u8> acquires CollectionConfig {
+        let current_timestamp = timestamp::now_microseconds();
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
+        if (option::is_some(&collection_config.allowlist_mint_config)) {
+            let allowlist_mint_config = option::borrow(&collection_config.allowlist_mint_config);
+            if (current_timestamp < allowlist_mint_config.mint_start_timestamp) {
+                return MINT_STAGE_BEFORE_ALLOWLIST;
+            };
+            if (option::is_some(&collection_config.public_mint_config)) {
 
-    #[view]
-    public fun authorized_collection(
-        config_owner: &signer,
-        config: Object<EZLaunchConfig>
-    ): Object<Collection> acquires EZLaunchConfig {
-        authorized_borrow(config_owner, config).collection
+            } else {
+
+            }
+        } else {
+            let public_mint_config = option::borrow(&collection_config.public_mint_config);
+            if (current_timestamp < public_mint_config.mint_start_timestamp) {
+                MINT_STAGE_BEFORE_ALLOWLIST
+            } else if (current_timestamp > public_mint_config.mint_end_timestamp) {
+                MINT_STAGE_ENDED
+            } else {
+                MINT_STAGE_PUBLIC
+            }
+        }
     }
 
     // ================================= Helpers ================================= //
@@ -307,120 +365,20 @@ module launchpad_addr::nfa_launchpad {
         }
     }
 
-    fun pre_mint_token(
-        creator: &signer,
-        config: Object<EZLaunchConfig>,
-        description: String,
-        name: String,
-        uri: String,
-    ): Object<Token> acquires EZLaunchConfig {
-        let object_signer = &authorized_config_signer(creator, config);
-        let collection = borrow(config).collection;
-        let config_address = object::object_address(&config);
-
-        let constructor_ref = &token::create(
-            object_signer,
-            collection::name(collection),
-            description,
-            name,
-            royalty::get(collection),
-            uri,
-        );
-        token_components::create_refs(constructor_ref);
-
-        let token = object::object_from_constructor_ref(constructor_ref);
-        object::transfer(object_signer, token, config_address);
-
-        token
-    }
-
-    /// Minter calls this function to mint the `amount` of tokens.
-    /// This function validates that an active mint stage exists. The earliest stage is executed.
-    /// If the stage has an allowlist, the minter must be on the allowlist.
-    /// If the stage has a mint fee, the minter must pay the fee prior to minting.
-    fun mint_impl(
-        minter: &signer,
-        config_obj: Object<EZLaunchConfig>,
-        amount: u64
-    ): Object<Token> acquires EZLaunchConfig {
-        let object_signer = config_signer(config_obj);
-        let config = borrow(config_obj);
-        let available_tokens = config.available_tokens;
-        let length = vector::length(&available_tokens);
-        assert!(length > 0, error::permission_denied(ETOKENS_ALL_MINTED));
-
-        // Check mint stages configured, in this example, we execute the earliest stage.
-        let stage = &mint_stage::execute_earliest_stage(minter, config_obj, amount);
-        assert!(option::is_some(stage), ENO_ACTIVE_STAGES);
-
-        // After stage has been executed, take fee payments from `minter` prior to minting.
-        execute_payment(minter, &config.fees, option::borrow(stage));
-
-        let token = vector::pop_back(&mut available_tokens);
-        object::transfer(&object_signer, token, signer::address_of(minter));
-
-        token
-    }
-
-
-    fun authorized_config_signer(
-        config_owner: &signer,
-        config: Object<EZLaunchConfig>
-    ): signer acquires EZLaunchConfig {
-        let config = authorized_borrow(config_owner, config);
-        object::generate_signer_for_extending(&config.extend_ref)
-    }
-
-    fun config_signer(config: Object<EZLaunchConfig>): signer acquires EZLaunchConfig {
-        let config = borrow(config);
-        object::generate_signer_for_extending(&config.extend_ref)
-    }
-
     fun execute_payment(
         minter: &signer,
-        fees: &SimpleMap<String, vector<CoinPayment<AptosCoin>>>,
-        stage: &String,
-    ) {
-        let fees = simple_map::borrow(fees, stage);
-        vector::for_each_ref(fees, |fee| {
-            coin_payment::execute(minter, fee)
-        });
-    }
-
-    fun create_collection_internal(
-        object_signer: &signer,
-        description: string::String,
-        name: string::String,
-        uri: string::String,
-        max_supply: option::Option<u64>,
-        royalty: option::Option<royalty::Royalty>,
-    ): object::Object<collection::Collection> {
-        let constructor_ref = if (option::is_some(&max_supply)) {
-            collection::create_fixed_collection(
-                object_signer,
-                description,
-                option::extract(&mut max_supply),
-                name,
-                royalty,
-                uri,
-            )
-        } else {
-            collection::create_unlimited_collection(
-                object_signer,
-                description,
-                name,
-                royalty,
-                uri,
-            )
-        };
-        collection_components::create_refs_and_properties(&constructor_ref);
-        object::object_from_constructor_ref(&constructor_ref)
+        fees: &simple_map::SimpleMap<string::String, coin_payment::CoinPayment<aptos_coin::AptosCoin>>,
+        stage: &string::String,
+    ): u64 {
+        let fee = simple_map::borrow(fees, stage);
+        coin_payment::execute(minter, fee);
+        coin_payment::amount(fee)
     }
 
     fun royalty(
-        royalty_numerator: &mut Option<u64>,
+        royalty_numerator: &mut option::Option<u64>,
         admin_addr: address,
-    ): Option<Royalty> {
+    ): option::Option<royalty::Royalty> {
         if (option::is_some(royalty_numerator)) {
             let num = option::extract(royalty_numerator);
             option::some(royalty::create(num, 100, admin_addr))
@@ -431,55 +389,28 @@ module launchpad_addr::nfa_launchpad {
 
     fun configure_collection_and_token_properties(
         creator: &signer,
-        collection: object::Object<collection::Collection>,
+        collection_obj: object::Object<collection::Collection>,
         mutable_collection_metadata: bool,
         mutable_token_metadata: bool,
         tokens_burnable_by_collection_owner: bool,
         tokens_transferrable_by_collection_owner: bool,
     ) {
-        collection_properties::set_mutable_description(creator, collection, mutable_collection_metadata);
-        collection_properties::set_mutable_uri(creator, collection, mutable_collection_metadata);
-        collection_properties::set_mutable_royalty(creator, collection, mutable_collection_metadata);
-        collection_properties::set_mutable_token_name(creator, collection, mutable_token_metadata);
-        collection_properties::set_mutable_token_properties(creator, collection, mutable_token_metadata);
-        collection_properties::set_mutable_token_description(creator, collection, mutable_token_metadata);
-        collection_properties::set_mutable_token_uri(creator, collection, mutable_token_metadata);
+        collection_properties::set_mutable_description(creator, collection_obj, mutable_collection_metadata);
+        collection_properties::set_mutable_uri(creator, collection_obj, mutable_collection_metadata);
+        collection_properties::set_mutable_royalty(creator, collection_obj, mutable_collection_metadata);
+        collection_properties::set_mutable_token_name(creator, collection_obj, mutable_token_metadata);
+        collection_properties::set_mutable_token_properties(creator, collection_obj, mutable_token_metadata);
+        collection_properties::set_mutable_token_description(creator, collection_obj, mutable_token_metadata);
+        collection_properties::set_mutable_token_uri(creator, collection_obj, mutable_token_metadata);
         collection_properties::set_tokens_transferable_by_collection_owner(
             creator,
-            collection,
+            collection_obj,
             tokens_transferrable_by_collection_owner
         );
         collection_properties::set_tokens_burnable_by_collection_owner(
             creator,
-            collection,
+            collection_obj,
             tokens_burnable_by_collection_owner
         );
-    }
-
-    inline fun assert_owner<T: key>(owner: address, object: Object<T>) {
-        assert!(object::owner(object) == owner, error::permission_denied(ENOT_OWNER));
-    }
-
-    inline fun authorized_borrow(config_owner: &signer, config: Object<EZLaunchConfig>): &EZLaunchConfig {
-        assert_owner(signer::address_of(config_owner), config);
-        borrow(config)
-    }
-
-    inline fun authorized_borrow_mut(config_owner: &signer, config: Object<EZLaunchConfig>): &mut EZLaunchConfig {
-        assert_owner(signer::address_of(config_owner), config);
-        borrow_mut(config)
-    }
-
-    inline fun borrow(config: Object<EZLaunchConfig>): &EZLaunchConfig {
-        freeze(borrow_mut(config))
-    }
-
-    inline fun borrow_mut(config: Object<EZLaunchConfig>): &mut EZLaunchConfig acquires EZLaunchConfig {
-        let config_address = object::object_address(&config);
-        assert!(
-            exists<EZLaunchConfig>(config_address),
-            error::not_found(ECONFIG_DOES_NOT_EXIST)
-        );
-        borrow_global_mut<EZLaunchConfig>(config_address)
     }
 }
