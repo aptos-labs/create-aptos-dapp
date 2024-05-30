@@ -71,7 +71,7 @@ module launchpad_addr::fa_launchpad {
 
     /// Global per contract
     struct Registry has key {
-        fa_owner_objects: vector<object::Object<FAOwnerObjConfig>>,
+        fa_objects: vector<object::Object<fungible_asset::Metadata>>,
     }
 
     /// Global per contract
@@ -84,7 +84,7 @@ module launchpad_addr::fa_launchpad {
     // If you deploy the moduelr under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
-            fa_owner_objects: vector::empty()
+            fa_objects: vector::empty()
         });
         move_to(sender, Config {
             admin_addr: signer::address_of(sender),
@@ -166,7 +166,7 @@ module launchpad_addr::fa_launchpad {
         });
 
         let registry = borrow_global_mut<Registry>(@launchpad_addr);
-        vector::push_back(&mut registry.fa_owner_objects, fa_owner_obj);
+        vector::push_back(&mut registry.fa_objects, fa_obj);
 
         event::emit(CreateFAEvent {
             creator_addr: sender_addr,
@@ -215,17 +215,9 @@ module launchpad_addr::fa_launchpad {
     }
 
     #[view]
-    public fun get_registry(): vector<object::Object<FAOwnerObjConfig>> acquires Registry {
+    public fun get_registry(): vector<object::Object<fungible_asset::Metadata>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
-        registry.fa_owner_objects
-    }
-
-    #[view]
-    public fun get_fa_obj(
-        fa_owner_obj: object::Object<FAOwnerObjConfig>,
-    ): object::Object<fungible_asset::Metadata> acquires FAOwnerObjConfig {
-        let fa_owner_obj = borrow_global<FAOwnerObjConfig>(object::object_address(&fa_owner_obj));
-        fa_owner_obj.fa_obj
+        registry.fa_objects
     }
 
     #[view]
@@ -334,7 +326,7 @@ module launchpad_addr::fa_launchpad {
     fun test_happy_path(
         aptos_framework: &signer,
         sender: &signer,
-    ) acquires Registry, FAController, Config, FAConfig, FAOwnerObjConfig {
+    ) acquires Registry, FAController, Config, FAConfig {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
         let sender_addr = signer::address_of(sender);
@@ -356,8 +348,7 @@ module launchpad_addr::fa_launchpad {
             option::some(500)
         );
         let registry = get_registry();
-        let fa_1_owner = *vector::borrow(&registry, vector::length(&registry) - 1);
-        let fa_1 = get_fa_obj(fa_1_owner);
+        let fa_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(fungible_asset::supply(fa_1) == option::some(0), 1);
 
         mint_fa(sender, fa_1, 20);
@@ -379,8 +370,7 @@ module launchpad_addr::fa_launchpad {
             option::some(500)
         );
         let registry = get_registry();
-        let fa_2_owner = *vector::borrow(&registry, vector::length(&registry) - 1);
-        let fa_2 = get_fa_obj(fa_2_owner);
+        let fa_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(fungible_asset::supply(fa_2) == option::some(0), 4);
 
         account::create_account_for_test(sender_addr);

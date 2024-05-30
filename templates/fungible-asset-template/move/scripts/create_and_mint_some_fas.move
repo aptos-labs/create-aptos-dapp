@@ -25,8 +25,7 @@ script {
             option::some(500),
         );
         let registry = fa_launchpad::get_registry();
-        let fa_1_owner = *vector::borrow(&registry, vector::length(&registry) - 1);
-        let fa_1 = fa_launchpad::get_fa_obj(fa_1_owner);
+        let fa_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(fungible_asset::supply(fa_1) == option::some(0), 1);
 
         fa_launchpad::mint_fa(sender, fa_1, 20);
@@ -48,8 +47,7 @@ script {
             option::some(500),
         );
         let registry = fa_launchpad::get_registry();
-        let fa_2_owner = *vector::borrow(&registry, vector::length(&registry) - 1);
-        let fa_2 = fa_launchpad::get_fa_obj(fa_2_owner);
+        let fa_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(fungible_asset::supply(fa_2) == option::some(0), 4);
 
         fa_launchpad::mint_fa(sender, fa_2, 300);

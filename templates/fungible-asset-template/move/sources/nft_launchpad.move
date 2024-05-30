@@ -77,7 +77,7 @@ module launchpad_addr::nft_launchpad {
 
     /// Global per contract
     struct Registry has key {
-        collection_owner_objects: vector<object::Object<CollectionOwnerObjConfig>>
+        collection_objects: vector<object::Object<collection::Collection>>
     }
 
     /// Global per contract
@@ -90,7 +90,7 @@ module launchpad_addr::nft_launchpad {
     // If you deploy the moduelr under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
-            collection_owner_objects: vector::empty()
+            collection_objects: vector::empty()
         });
         move_to(sender, Config {
             admin_addr: signer::address_of(sender),
@@ -222,7 +222,7 @@ module launchpad_addr::nft_launchpad {
         };
 
         let registry = borrow_global_mut<Registry>(@launchpad_addr);
-        vector::push_back(&mut registry.collection_owner_objects, collection_owner_obj);
+        vector::push_back(&mut registry.collection_objects, collection_obj);
 
         event::emit(CreateCollectionEvent {
             creator_addr: sender_addr,
@@ -278,9 +278,9 @@ module launchpad_addr::nft_launchpad {
     }
 
     #[view]
-    public fun get_registry(): vector<object::Object<CollectionOwnerObjConfig>> acquires Registry {
+    public fun get_registry(): vector<object::Object<collection::Collection>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
-        registry.collection_owner_objects
+        registry.collection_objects
     }
 
     #[view]
