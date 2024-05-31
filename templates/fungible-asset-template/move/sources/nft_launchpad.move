@@ -57,11 +57,11 @@ module launchpad_addr::nft_launchpad {
         mint_fee: u64,
     }
 
-    /// Unique per FA
-    /// We need this object to own the FA object instead of contract directly owns the FA object
-    /// This helps us avoid address collision when we create multiple FAs with same name
+    /// Unique per collection
+    /// We need this object to own the collection object instead of contract directly owns the collection object
+    /// This helps us avoid address collision when we create multiple collections with same name
     struct CollectionOwnerObjConfig has key {
-        /// Only thing it stores is the link to FA object
+        /// Only thing it stores is the link to collection object
         collection_obj: object::Object<collection::Collection>,
         extend_ref: object::ExtendRef,
     }
