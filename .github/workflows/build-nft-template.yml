@@ -1,4 +1,4 @@
-name: Build Fungible Asset Template Frontend
+name: Build NFT Template Frontend
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ jobs:
     concurrency: ci-${{ github.ref }}
     defaults:
       run:
-        working-directory: ./templates/fungible-asset-template/frontend
+        working-directory: ./templates/nft-template/frontend
     steps:
       - uses: actions/checkout@v3
 
