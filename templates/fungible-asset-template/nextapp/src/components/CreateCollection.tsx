@@ -17,7 +17,7 @@ export const CreateCollection = () => {
     "https://github.com/aptos-labs/solana-to-aptos/tree/main/aptos/launchpad"
   );
   const [royaltyPercentage, setRoyaltyPercentage] = useState(10);
-  const [preMintAmount, setPreMintAmount] = useState(100);
+  const [preMintAmount, setPreMintAmount] = useState(5);
 
   const currentUnixTimestamp = Math.floor(Date.now() / 1000);
 

@@ -1,6 +1,5 @@
 import { CollectionInfo } from "@/components/CollectionInfo";
 import { MintNft } from "@/components/MintNft";
-import { nftLaunchpadClient, collectionClient } from "@/utils/aptos";
 import { Box, Card, CardBody, CardFooter, CardHeader } from "@chakra-ui/react";
 
 type Props = {
@@ -12,7 +11,7 @@ export default async function Page({ params: { address } }: Props) {
     <Card>
       <CardHeader>
         <Box textAlign="center" fontSize="xl">
-          User Created Fungible Asset
+          User Created Collection
         </Box>
       </CardHeader>
       <CardBody>

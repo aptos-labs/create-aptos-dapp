@@ -22,7 +22,7 @@ export const NavBar = () => {
         href="/"
       >
         <Text fontSize="xl" fontWeight="bold">
-          Fungible Asset
+          NFT
         </Text>
         <Text fontSize="xl" fontWeight="bold">
           Launchpad

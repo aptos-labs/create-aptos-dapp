@@ -445,7 +445,7 @@ module launchpad_addr::nft_launchpad {
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         mint_nft(user1, collection_1);
-        
+
         // assert!(fungible_asset::supply(fa_1) == option::some(20), 2);
         // assert!(primary_fungible_store::balance(sender_addr, fa_1) == 20, 3);
         //
