@@ -11,6 +11,7 @@ PUBLISHER_PROFILE=testnet-profile-1
 CONTRACT_ADDRESS=$(cat contract_address.txt)
 
 aptos move upgrade-object-package \
+  --package-dir move \
   --object-address $CONTRACT_ADDRESS \
   --named-addresses launchpad_addr=$CONTRACT_ADDRESS \
   --profile $PUBLISHER_PROFILE \

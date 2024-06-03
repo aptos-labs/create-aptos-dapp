@@ -16,6 +16,7 @@ SENDER_PROFILE=testnet-profile-1
 
 # Run the script
 aptos move run-script \
+  --package-dir move \
 	--assume-yes \
   --profile $SENDER_PROFILE \
   --compiled-script-path build/launchpad/bytecode_scripts/create_and_mint_some_fas.mv

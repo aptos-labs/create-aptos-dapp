@@ -158,21 +158,21 @@ module launchpad_addr::nft_launchpad {
         };
         let collection_obj_signer = &object::generate_signer(collection_obj_constructor_ref);
         let collection_obj_addr = signer::address_of(collection_obj_signer);
-
         let collection_obj = object::object_from_constructor_ref(collection_obj_constructor_ref);
 
+        collection_components::create_refs_and_properties(collection_obj_constructor_ref);
+
         configure_collection_and_token_properties(
-            collection_obj_signer,
+            collection_owner_obj_signer,
             collection_obj,
             false,
             false,
             false,
             false,
         );
-        collection_components::create_refs_and_properties(collection_obj_constructor_ref);
 
         move_to(collection_owner_obj_signer, CollectionOwnerObjConfig {
-            extend_ref: object::generate_extend_ref(collection_obj_constructor_ref),
+            extend_ref: object::generate_extend_ref(collection_owner_obj_constructor_ref),
             collection_obj,
         });
         let collection_owner_obj = object::object_from_constructor_ref(collection_owner_obj_constructor_ref);
@@ -248,7 +248,7 @@ module launchpad_addr::nft_launchpad {
         };
     }
 
-    public entry fun mint(
+    public entry fun mint_nft(
         sender: &signer,
         collection_obj: object::Object<collection::Collection>
     ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
@@ -356,19 +356,16 @@ module launchpad_addr::nft_launchpad {
         mint_fee: u64,
     ) acquires CollectionConfig, CollectionOwnerObjConfig {
         let collection_config = borrow_global_mut<CollectionConfig>(object::object_address(&collection_obj));
-        let collection_uri = collection::uri(collection_obj);
         let next_nft_id = collection_config.next_nft_id;
+
         let collection_owner_obj = collection_config.collection_owner_obj;
         let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
             object::object_address(&collection_owner_obj)
         );
         let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
-        let collection_obj_signer = &collection_components::collection_object_signer(
-            collection_owner_obj_signer,
-            collection_obj
-        );
+
         let nft_obj_constructor_ref = &token::create(
-            collection_obj_signer,
+            collection_owner_obj_signer,
             collection::name(collection_obj),
             // placeholder value, please read description from json metadata in storage
             string_utils::to_string(&next_nft_id),
@@ -376,11 +373,11 @@ module launchpad_addr::nft_launchpad {
             string_utils::to_string(&next_nft_id),
             royalty::get(collection_obj),
             // TODO: does petra support this? image url is in the json, wallet or any UI should fetch json first then fetch image
-            string_utils::format2(&b"{}/{}.json", collection_uri, next_nft_id),
+            string_utils::format2(&b"{}/{}.json", collection::uri(collection_obj), next_nft_id),
         );
         token_components::create_refs(nft_obj_constructor_ref);
         let nft_obj = object::object_from_constructor_ref(nft_obj_constructor_ref);
-        object::transfer(collection_obj_signer, nft_obj, sender_addr);
+        object::transfer(collection_owner_obj_signer, nft_obj, sender_addr);
         collection_config.next_nft_id = next_nft_id + 1;
 
         event::emit(MintNftEvent {
@@ -389,5 +386,95 @@ module launchpad_addr::nft_launchpad {
             collection_obj,
             nft_obj,
         });
+    }
+
+    #[test_only]
+    use aptos_framework::aptos_coin;
+    #[test_only]
+    use aptos_framework::coin;
+    #[test_only]
+    use aptos_framework::timestamp;
+    #[test_only]
+    use aptos_framework::account;
+
+    #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200, user2 = @0x201)]
+    fun test_happy_path(
+        aptos_framework: &signer,
+        sender: &signer,
+        user1: &signer,
+        user2: &signer,
+    ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
+        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
+
+        let sender_addr = signer::address_of(sender);
+        let user1_addr = signer::address_of(user1);
+        let user2_addr = signer::address_of(user2);
+
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+
+        init_module(sender);
+
+        // create first FA
+
+        create_collection(
+            sender,
+            string::utf8(b"description"),
+            string::utf8(b"name"),
+            string::utf8(b"hello.com"),
+            option::some(10),
+            option::some(10),
+            3,
+            option::none(),
+            option::none(),
+            option::none(),
+            option::none(),
+            option::none(),
+            option::some(timestamp::now_seconds()),
+            option::some(timestamp::now_seconds() + 100),
+            option::some(2),
+            option::some(10),
+        );
+        let registry = get_registry();
+        let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
+        assert!(collection::count(collection_1) == option::some(3), 1);
+
+        account::create_account_for_test(user1_addr);
+        coin::register<aptos_coin::AptosCoin>(user1);
+
+        let mint_fee = get_mint_fee(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
+        aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
+
+        mint_nft(user1, collection_1);
+        
+        // assert!(fungible_asset::supply(fa_1) == option::some(20), 2);
+        // assert!(primary_fungible_store::balance(sender_addr, fa_1) == 20, 3);
+        //
+        // // create second FA
+        //
+        // create_fa(
+        //     sender,
+        //     option::some(1000),
+        //     string::utf8(b"FA2"),
+        //     string::utf8(b"FA2"),
+        //     3,
+        //     string::utf8(b"icon_url"),
+        //     string::utf8(b"project_url"),
+        //     1,
+        //     0,
+        //     option::some(500)
+        // );
+        // let registry = get_registry();
+        // let fa_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
+        // assert!(fungible_asset::supply(fa_2) == option::some(0), 4);
+        //
+
+        // let mint_fee = get_total_mint_fee(fa_2, 300);
+        // aptos_coin::mint(aptos_framework, sender_addr, mint_fee);
+        // mint_fa(sender, fa_2, 300);
+        // assert!(fungible_asset::supply(fa_2) == option::some(300), 5);
+        // assert!(primary_fungible_store::balance(sender_addr, fa_2) == 300, 6);
+
+        coin::destroy_burn_cap(burn_cap);
+        coin::destroy_mint_cap(mint_cap);
     }
 }
