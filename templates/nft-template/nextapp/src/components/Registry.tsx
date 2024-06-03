@@ -20,8 +20,10 @@ export const Registry = async () => {
       functionArguments: [],
     })
     .then((res) => {
-      const faObjects = res[0] as { inner: string }[];
-      return faObjects.map((faObject) => faObject.inner);
+      const collectionObjects = res[0] as { inner: string }[];
+      return collectionObjects.map(
+        (collectionObject) => collectionObject.inner
+      );
     });
 
   return registry ? (
