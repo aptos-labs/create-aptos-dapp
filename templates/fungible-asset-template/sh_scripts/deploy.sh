@@ -14,7 +14,7 @@ OUTPUT=$(aptos move create-object-and-publish-package \
   --skip-fetch-latest-git-deps \
   --package-dir move \
   --address-name launchpad_addr \
-  --named-addresses "launchpad_addr=$PUBLISHER_ADDR\
+  --named-addresses "launchpad_addr=$PUBLISHER_ADDR" \
   --profile $PUBLISHER_PROFILE \
 	--assume-yes)
 

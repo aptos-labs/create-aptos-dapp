@@ -12,10 +12,16 @@ module launchpad_addr::fa_launchpad {
 
     /// Sender is not admin
     const E_NOT_ADMIN: u64 = 1;
+    /// Sender is not pending admin
+    const E_NOT_PENDING_ADMIN: u64 = 2;
+    /// Only admin can update mint fee collector
+    const E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
+    /// Only admin can create FA
+    const E_ONLY_ADMIN_CAN_CREATE_FA: u64 = 4;
     /// No mint limit
-    const E_NO_MINT_LIMIT: u64 = 2;
+    const E_NO_MINT_LIMIT: u64 = 5;
     /// Mint limit reached
-    const E_MINT_LIMIT_REACHED: u64 = 3;
+    const E_MINT_LIMIT_REACHED: u64 = 6;
 
     #[event]
     struct CreateFAEvent has store, drop {
@@ -56,6 +62,8 @@ module launchpad_addr::fa_launchpad {
         transfer_ref: fungible_asset::TransferRef,
     }
 
+    /// Tracks mint limit per address
+    /// Initial supply (minted at creation) is not counted towards mint limit
     struct MintLimit has store {
         limit: u64,
         mint_tracker: table::Table<address, u64>,
@@ -77,6 +85,7 @@ module launchpad_addr::fa_launchpad {
     /// Global per contract
     struct Config has key {
         admin_addr: address,
+        pending_admin_addr: option::Option<address>,
         mint_fee_collector_addr: address,
     }
 
@@ -88,21 +97,32 @@ module launchpad_addr::fa_launchpad {
         });
         move_to(sender, Config {
             admin_addr: signer::address_of(sender),
+            pending_admin_addr: option::none(),
             mint_fee_collector_addr: signer::address_of(sender),
         });
     }
 
     // ================================= Entry Functions ================================= //
 
-    public entry fun update_admin(sender: &signer, new_admin: address) acquires Config {
-        assert!(is_admin(signer::address_of(sender)), E_NOT_ADMIN);
+    public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
+        let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        config.admin_addr = new_admin;
+        assert!(is_admin(config, sender_addr), E_NOT_ADMIN);
+        config.pending_admin_addr = option::some(new_admin);
+    }
+
+    public entry fun set_admin(sender: &signer) acquires Config {
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_pending_admin(config, sender_addr), E_NOT_PENDING_ADMIN);
+        config.admin_addr = sender_addr;
+        config.pending_admin_addr = option::none();
     }
 
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
-        assert!(is_admin(signer::address_of(sender)), E_NOT_ADMIN);
+        let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
@@ -119,7 +139,8 @@ module launchpad_addr::fa_launchpad {
         mint_limit_per_addr: option::Option<u64>,
     ) acquires Registry, Config, FAController {
         let sender_addr = signer::address_of(sender);
-        assert!(is_admin(sender_addr), E_NOT_ADMIN);
+        let config = borrow_global<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_CREATE_FA);
 
         let fa_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
         let fa_owner_obj_signer = &object::generate_signer(fa_owner_obj_constructor_ref);
@@ -255,14 +276,21 @@ module launchpad_addr::fa_launchpad {
 
     // ================================= Helper Functions ================================== //
 
-    fun is_admin(sender: address): bool acquires Config {
-        let config = borrow_global<Config>(@launchpad_addr);
-        if (object::is_object(@launchpad_addr)) {
-            let obj = object::address_to_object<object::ObjectCore>(@launchpad_addr);
-            object::is_owner(obj, sender)
+    fun is_admin(config: &Config, sender: address): bool {
+        if (sender == config.admin_addr) {
+            true
         } else {
-            sender == config.admin_addr
+            if (object::is_object(@launchpad_addr)) {
+                let obj = object::address_to_object<object::ObjectCore>(@launchpad_addr);
+                object::is_owner(obj, sender) || sender == config.admin_addr
+            } else {
+                false
+            }
         }
+    }
+
+    fun is_pending_admin(config: &Config, sender: address): bool {
+        config.pending_admin_addr == option::some(sender)
     }
 
     fun check_mint_limit_and_update_mint_tracker(
