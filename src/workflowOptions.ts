@@ -18,6 +18,11 @@ export const workflowOptions = {
         value: "fungible-asset-template",
         description: "A dapp to mint a fungible asset",
       },
+      {
+        title: "NFT",
+        value: "nft-template",
+        description: "A dapp to mint a NFT",
+      },
     ],
     initial: 0,
   },
@@ -28,7 +33,6 @@ export const workflowOptions = {
     choices: [
       { title: "Mainnet", value: "mainnet" },
       { title: "Testnet", value: "testnet" },
-      { title: "Devnet", value: "devnet" },
     ],
     initial: 0,
     hint: "- You can change this later",

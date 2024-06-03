@@ -49,19 +49,6 @@ export const generateDapp = async (selection: Selections) => {
   // cd into target directory
   process.chdir(targetDirectory);
 
-  // generate root package.json
-  const pkg = JSON.parse(
-    fs.readFileSync(path.join(templateDir, `package.json`), "utf-8")
-  );
-  // set package name to chosen project name
-  pkg.name = projectName;
-
-  // add npm scripts
-  pkg.scripts["postinstall"] = `cd frontend && npm install`;
-  pkg.scripts["start"] = `cd frontend && npm run dev`;
-
-  write("package.json", JSON.stringify(pkg, null, 2) + "\n");
-
   // install dependencies
   const installRootDepsCommand = `npm install`;
   runCommand(installRootDepsCommand);
@@ -72,8 +59,7 @@ export const generateDapp = async (selection: Selections) => {
 
   // create .env file
   const network = selection.network || "testnet";
-  write(".env", `VITE_APP_NETWORK=${network}`);
-  write("frontend/.env", `VITE_APP_NETWORK=${network}`);
+  write("apps/launchpad/.env", `VITE_APP_NETWORK=${network}`);
 
   // Log next steps
   console.log(
@@ -84,14 +70,5 @@ export const generateDapp = async (selection: Selections) => {
   console.log(
     green(`1. run [cd ${projectName}] to your dapp directory.`) + "\n"
   );
-  console.log(
-    green(`2. run [npm run move:init] to initialize a new CLI Profile.`) + "\n"
-  );
-  console.log(
-    green(`3. run [npm run move:compile] to compile your move contract.`) + "\n"
-  );
-  console.log(
-    green(`4. run [npm run move:publish] to publish your contract.`) + "\n"
-  );
-  console.log(green(`5. run [npm start] to run your dapp.`) + "\n");
+  console.log(green(`5. run [npm run dev] to run your dapp.`) + "\n");
 };

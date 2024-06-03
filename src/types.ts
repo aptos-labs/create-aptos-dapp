@@ -4,9 +4,9 @@ import prompts from "prompts";
 
 export type Result = prompts.Answers<"projectName" | "template" | "network">;
 
-export type Template = "fungible-asset-template";
+export type Template = "fungible-asset-template" | "nft-template";
 
-export type Network = "mainnet" | "testnet" | "devnet";
+export type Network = "mainnet" | "testnet";
 
 export type Selections = {
   projectName: string;
