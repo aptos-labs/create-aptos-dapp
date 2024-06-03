@@ -1,0 +1,19 @@
+{
+  "name": "fungible-asset-template",
+  "license": "Apache-2.0",
+  "version": "0.0.0",
+  "scripts": {
+    "move:init": "node ./scripts/init && node ./scripts/update_env",
+    "move:compile": "node ./scripts/move/compile",
+    "move:test": "node ./scripts/move/test",
+    "move:publish": "node ./scripts/move/publish"
+  },
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "1.16.0"
+  },
+  "devDependencies": {
+    "js-yaml": "4.1.0",
+    "dotenv": "16.3.1",
+    "tree-kill": "1.2.2"
+  }
+}
