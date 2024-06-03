@@ -3,7 +3,7 @@ module launchpad_addr::fa_launchpad {
     use std::signer;
     use std::string;
     use std::vector;
-    use aptos_std::table;
+    use aptos_std::smart_table;
     use aptos_framework::aptos_account;
     use aptos_framework::event;
     use aptos_framework::fungible_asset;
@@ -66,7 +66,7 @@ module launchpad_addr::fa_launchpad {
     /// Initial supply (minted at creation) is not counted towards mint limit
     struct MintLimit has store {
         limit: u64,
-        mint_tracker: table::Table<address, u64>,
+        mint_tracker: smart_table::SmartTable<address, u64>,
     }
 
     /// Unique per FA
@@ -178,7 +178,7 @@ module launchpad_addr::fa_launchpad {
             mint_limit: if (option::is_some(&mint_limit_per_addr)) {
                 option::some(MintLimit {
                     limit: *option::borrow(&mint_limit_per_addr),
-                    mint_tracker: table::new()
+                    mint_tracker: smart_table::new()
                 })
             } else {
                 option::none()
@@ -262,7 +262,7 @@ module launchpad_addr::fa_launchpad {
         assert!(option::is_some(&fa_config.mint_limit), E_NO_MINT_LIMIT);
         let mint_limit = option::borrow(&fa_config.mint_limit);
         let mint_tracker = &mint_limit.mint_tracker;
-        *table::borrow_with_default(mint_tracker, addr, &0)
+        *smart_table::borrow_with_default(mint_tracker, addr, &0)
     }
 
     #[view]
@@ -282,7 +282,7 @@ module launchpad_addr::fa_launchpad {
         } else {
             if (object::is_object(@launchpad_addr)) {
                 let obj = object::address_to_object<object::ObjectCore>(@launchpad_addr);
-                object::is_owner(obj, sender) || sender == config.admin_addr
+                object::is_owner(obj, sender)
             } else {
                 false
             }
@@ -307,7 +307,7 @@ module launchpad_addr::fa_launchpad {
             );
             let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
             let mint_limit = option::borrow_mut(&mut fa_config.mint_limit);
-            table::upsert(&mut mint_limit.mint_tracker, sender, old_amount + amount)
+            smart_table::upsert(&mut mint_limit.mint_tracker, sender, old_amount + amount)
         }
     }
 
