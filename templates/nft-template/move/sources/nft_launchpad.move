@@ -3,7 +3,7 @@ module launchpad_addr::nft_launchpad {
     use std::signer;
     use std::string;
     use std::vector;
-    use aptos_std::table;
+    use aptos_std::simple_map;
     use aptos_std::string_utils;
     use aptos_framework::aptos_account;
     use aptos_framework::event;
@@ -19,12 +19,18 @@ module launchpad_addr::nft_launchpad {
 
     /// Sender is not admin
     const E_NOT_ADMIN: u64 = 1;
+    /// Sender is not pending admin
+    const E_NOT_PENDING_ADMIN: u64 = 2;
+    /// Only admin can update mint fee collector
+    const E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
+    /// Only admin can create FA
+    const E_ONLY_ADMIN_CAN_CREATE_FA: u64 = 4;
     /// No mint limit
-    const E_NO_MINT_LIMIT: u64 = 2;
+    const E_NO_MINT_LIMIT: u64 = 5;
     /// Mint limit reached
-    const E_MINT_LIMIT_REACHED: u64 = 3;
+    const E_MINT_LIMIT_REACHED: u64 = 6;
     /// No active mint stages
-    const E_NO_ACTIVE_STAGES: u64 = 4;
+    const E_NO_ACTIVE_STAGES: u64 = 7;
 
     const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint mint stage";
@@ -69,7 +75,7 @@ module launchpad_addr::nft_launchpad {
     /// Unique per collection
     struct CollectionConfig has key {
         /// Key is stage, value is mint fee denomination
-        mint_fee_per_nft_by_stages: table::Table<string::String, u64>,
+        mint_fee_per_nft_by_stages: simple_map::SimpleMap<string::String, u64>,
         collection_owner_obj: object::Object<CollectionOwnerObjConfig>,
         /// Monotonic increasing ID, Starts from 1
         next_nft_id: u64,
@@ -83,6 +89,7 @@ module launchpad_addr::nft_launchpad {
     /// Global per contract
     struct Config has key {
         admin_addr: address,
+        pending_admin_addr: option::Option<address>,
         mint_fee_collector_addr: address,
     }
 
@@ -94,21 +101,32 @@ module launchpad_addr::nft_launchpad {
         });
         move_to(sender, Config {
             admin_addr: signer::address_of(sender),
+            pending_admin_addr: option::none(),
             mint_fee_collector_addr: signer::address_of(sender),
         });
     }
 
     // ================================= Entry Functions ================================= //
 
-    public entry fun update_admin(sender: &signer, new_admin: address) acquires Config {
-        assert!(is_admin(signer::address_of(sender)), E_NOT_ADMIN);
+    public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
+        let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        config.admin_addr = new_admin;
+        assert!(is_admin(config, sender_addr), E_NOT_ADMIN);
+        config.pending_admin_addr = option::some(new_admin);
+    }
+
+    public entry fun set_admin(sender: &signer) acquires Config {
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_pending_admin(config, sender_addr), E_NOT_PENDING_ADMIN);
+        config.admin_addr = sender_addr;
+        config.pending_admin_addr = option::none();
     }
 
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
-        assert!(is_admin(signer::address_of(sender)), E_NOT_ADMIN);
+        let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
@@ -131,7 +149,8 @@ module launchpad_addr::nft_launchpad {
         public_mint_fee_per_nft: option::Option<u64>,
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
-        assert!(is_admin(sender_addr), E_NOT_ADMIN);
+        let config = borrow_global<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_CREATE_FA);
 
         let royalty = royalty(&mut royalty_percentage, sender_addr);
 
@@ -177,7 +196,7 @@ module launchpad_addr::nft_launchpad {
         });
         let collection_owner_obj = object::object_from_constructor_ref(collection_owner_obj_constructor_ref);
         move_to(collection_obj_signer, CollectionConfig {
-            mint_fee_per_nft_by_stages: table::new(),
+            mint_fee_per_nft_by_stages: simple_map::new(),
             collection_owner_obj,
             next_nft_id: 1,
         });
@@ -204,7 +223,7 @@ module launchpad_addr::nft_launchpad {
             };
 
             let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-            table::upsert(&mut collection_config.mint_fee_per_nft_by_stages, stage, *option::borrow(&allowlist_mint_fee_per_nft));
+            simple_map::upsert(&mut collection_config.mint_fee_per_nft_by_stages, stage, *option::borrow(&allowlist_mint_fee_per_nft));
         };
 
         if (option::is_some(&public_mint_end_time)) {
@@ -218,7 +237,7 @@ module launchpad_addr::nft_launchpad {
             );
 
             let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-            table::upsert(&mut collection_config.mint_fee_per_nft_by_stages, stage, *option::borrow(&public_mint_fee_per_nft));
+            simple_map::upsert(&mut collection_config.mint_fee_per_nft_by_stages, stage, *option::borrow(&public_mint_fee_per_nft));
         };
 
         let registry = borrow_global_mut<Registry>(@launchpad_addr);
@@ -289,20 +308,27 @@ module launchpad_addr::nft_launchpad {
         stage: string::String,
     ): u64 acquires CollectionConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-        let fee = *table::borrow(&collection_config.mint_fee_per_nft_by_stages, stage);
+        let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage);
         fee
     }
 
     // ================================= Helpers ================================= //
 
-    fun is_admin(sender: address): bool acquires Config {
-        let config = borrow_global<Config>(@launchpad_addr);
-        if (object::is_object(@launchpad_addr)) {
-            let obj = object::address_to_object<object::ObjectCore>(@launchpad_addr);
-            object::is_owner(obj, sender)
+    fun is_admin(config: &Config, sender: address): bool {
+        if (sender == config.admin_addr) {
+            true
         } else {
-            sender == config.admin_addr
+            if (object::is_object(@launchpad_addr)) {
+                let obj = object::address_to_object<object::ObjectCore>(@launchpad_addr);
+                object::is_owner(obj, sender)
+            } else {
+                false
+            }
         }
+    }
+
+    fun is_pending_admin(config: &Config, sender: address): bool {
+        config.pending_admin_addr == option::some(sender)
     }
 
     fun pay_for_mint(sender: &signer, mint_fee: u64) acquires Config {
