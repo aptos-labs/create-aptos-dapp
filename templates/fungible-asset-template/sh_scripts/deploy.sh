@@ -10,13 +10,11 @@ PUBLISHER_PROFILE=testnet-profile-1
 
 PUBLISHER_ADDR=0x$(aptos config show-profiles --profile=$PUBLISHER_PROFILE | grep 'account' | sed -n 's/.*"account": \"\(.*\)\".*/\1/p')
 
-MINTER_ADDR="0x9d7365d7a09ee3a5610a2131d6ee395531d581e7a7c42582de51a3f111534bbd"
-
 OUTPUT=$(aptos move create-object-and-publish-package \
   --skip-fetch-latest-git-deps \
   --package-dir move \
   --address-name launchpad_addr \
-  --named-addresses "launchpad_addr=$PUBLISHER_ADDR,minter=$MINTER_ADDR"\
+  --named-addresses "launchpad_addr=$PUBLISHER_ADDR\
   --profile $PUBLISHER_PROFILE \
 	--assume-yes)
 

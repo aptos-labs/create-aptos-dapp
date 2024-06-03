@@ -5,14 +5,15 @@ const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 
 const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
 const accountAddress =
-  config["profiles"]["testnet-profile-1"];
+  config["profiles"][process.env.VITE_APP_NETWORK]["account"];
+
 async function test() {
   const move = new cli.Move();
 
   await move.test({
     packageDirectoryPath: "move",
     namedAddresses: {
-      launchpad_addr: accountAddress, // make module_addr generic and fetch from Move.toml file
+      module_addr: accountAddress, // make module_addr generic and fetch from Move.toml file
     },
   });
 }
