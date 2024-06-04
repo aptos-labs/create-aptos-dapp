@@ -17,19 +17,15 @@ module launchpad_addr::nft_launchpad {
     use minter::collection_components;
 
     /// Sender is not admin
-    const E_NOT_ADMIN: u64 = 1;
+    const ENOT_ADMIN: u64 = 1;
     /// Sender is not pending admin
-    const E_NOT_PENDING_ADMIN: u64 = 2;
+    const ENOT_PENDING_ADMIN: u64 = 2;
     /// Only admin can update mint fee collector
-    const E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
+    const EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
     /// Only admin can create collection
-    const E_ONLY_ADMIN_CAN_CREATE_COLLECTION: u64 = 4;
-    /// No mint limit
-    const E_NO_MINT_LIMIT: u64 = 5;
-    /// Mint limit reached
-    const E_MINT_LIMIT_REACHED: u64 = 6;
+    const EONLY_ADMIN_CAN_CREATE_COLLECTION: u64 = 4;
     /// No active mint stages
-    const E_NO_ACTIVE_STAGES: u64 = 7;
+    const E_NO_ACTIVE_STAGES: u64 = 5;
 
     const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint mint stage";
@@ -108,14 +104,14 @@ module launchpad_addr::nft_launchpad {
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), E_NOT_ADMIN);
+        assert!(is_admin(config, sender_addr), ENOT_ADMIN);
         config.pending_admin_addr = option::some(new_admin);
     }
 
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_pending_admin(config, sender_addr), E_NOT_PENDING_ADMIN);
+        assert!(is_pending_admin(config, sender_addr), ENOT_PENDING_ADMIN);
         config.admin_addr = sender_addr;
         config.pending_admin_addr = option::none();
     }
@@ -123,7 +119,7 @@ module launchpad_addr::nft_launchpad {
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
@@ -147,7 +143,7 @@ module launchpad_addr::nft_launchpad {
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_CREATE_COLLECTION);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_CREATE_COLLECTION);
 
         let royalty = royalty(&mut royalty_percentage, sender_addr);
 
