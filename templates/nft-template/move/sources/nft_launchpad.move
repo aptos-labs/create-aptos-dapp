@@ -77,8 +77,6 @@ module launchpad_addr::nft_launchpad {
         /// Key is stage, value is mint fee denomination
         mint_fee_per_nft_by_stages: simple_map::SimpleMap<string::String, u64>,
         collection_owner_obj: object::Object<CollectionOwnerObjConfig>,
-        /// Monotonic increasing ID, Starts from 1
-        next_nft_id: u64,
     }
 
     /// Global per contract
@@ -198,7 +196,6 @@ module launchpad_addr::nft_launchpad {
         move_to(collection_obj_signer, CollectionConfig {
             mint_fee_per_nft_by_stages: simple_map::new(),
             collection_owner_obj,
-            next_nft_id: 1,
         });
 
         if (option::is_some(&allowlist)) {
@@ -381,8 +378,8 @@ module launchpad_addr::nft_launchpad {
         collection_obj: object::Object<collection::Collection>,
         mint_fee: u64,
     ) acquires CollectionConfig, CollectionOwnerObjConfig {
-        let collection_config = borrow_global_mut<CollectionConfig>(object::object_address(&collection_obj));
-        let next_nft_id = collection_config.next_nft_id;
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
+        let next_nft_id = *option::borrow(&collection::count(collection_obj));
 
         let collection_owner_obj = collection_config.collection_owner_obj;
         let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
@@ -404,7 +401,6 @@ module launchpad_addr::nft_launchpad {
         token_components::create_refs(nft_obj_constructor_ref);
         let nft_obj = object::object_from_constructor_ref(nft_obj_constructor_ref);
         object::transfer(collection_owner_obj_signer, nft_obj, sender_addr);
-        collection_config.next_nft_id = next_nft_id + 1;
 
         event::emit(MintNftEvent {
             recipient_addr: sender_addr,
@@ -471,6 +467,7 @@ module launchpad_addr::nft_launchpad {
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         mint_nft(user1, collection_1);
+
 
         // assert!(fungible_asset::supply(collection_1) == option::some(20), 2);
         // assert!(primary_fungible_store::balance(sender_addr, collection_1) == 20, 3);
