@@ -295,6 +295,25 @@ module launchpad_addr::nft_launchpad {
         fee
     }
 
+    #[view]
+    public fun aggregated_view(
+        // collection_obj: object::Object<collection::Collection>,
+    ): vector<(string::String, string::String)> acquires Registry {
+        // let name = collection::name(collection_obj);
+        // let uri = collection::uri(collection_obj);
+        // (name, uri)
+        let registry = get_registry();
+
+        let result = vector::empty();
+        for (i in 0..vector::length(&registry)) {
+            let collection_obj = *vector::borrow(&registry, i);
+            let name = collection::name(collection_obj);
+            let uri = collection::uri(collection_obj);
+            vector::push_back(&mut result, (name, uri));
+        };
+        result
+    }
+
     // ================================= Helpers ================================= //
 
     fun is_admin(config: &Config, sender: address): bool {
@@ -427,7 +446,7 @@ module launchpad_addr::nft_launchpad {
 
         mint_nft(user1, collection_1);
 
-
+        let res = aggregated_view();
         // assert!(fungible_asset::supply(collection_1) == option::some(20), 2);
         // assert!(primary_fungible_store::balance(sender_addr, collection_1) == 20, 3);
         //

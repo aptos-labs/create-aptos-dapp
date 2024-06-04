@@ -136,6 +136,13 @@ export const CreateCollection = () => {
     });
     await webIrys.ready();
 
+    const irysAddr = webIrys.address;
+    console.log(`Irys address: ${irysAddr}`);
+
+    await webIrys.getBalance(irysAddr).then((balance) => {
+      console.log(`Balance: ${balance}`);
+    });
+
     try {
       const fundTx = await webIrys.fund(1000);
       console.log(
