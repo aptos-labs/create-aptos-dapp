@@ -6,7 +6,7 @@ export type Result = prompts.Answers<"projectName" | "template" | "network">;
 
 export type Template = "digital-asset-template";
 
-export type Network = "mainnet" | "testnet" | "devnet";
+export type Network = "mainnet" | "testnet";
 
 export type Selections = {
   projectName: string;
