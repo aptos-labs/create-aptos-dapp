@@ -319,18 +319,18 @@ export const CreateCollection = () => {
           />
         </FormControl>
         <Button onClick={onFundIrys}>Fund Irys</Button>
-        <div>
-          <div className="input-group">
-            <label htmlFor="file" className="sr-only">
+        <Box>
+          <Box className="input-group">
+            <FormLabel htmlFor="file" className="sr-only">
               Choose Multiple Files
-            </label>
+            </FormLabel>
             <input
               id="folder"
               type="file"
               multiple
               onChange={handleMultipleFiles}
             />
-          </div>
+          </Box>
           {files && (
             <section>
               Files details:
@@ -350,11 +350,11 @@ export const CreateCollection = () => {
             </section>
           )}
           {files && (
-            <button onClick={() => onUploadToIrys(files)} className="submit">
-              Upload Multiple files
-            </button>
+            <Button onClick={() => onUploadToIrys(files)} className="submit">
+              Upload Assets
+            </Button>
           )}
-        </div>
+        </Box>
         <Button onClick={onCreate}>Create</Button>
       </Box>
     )
