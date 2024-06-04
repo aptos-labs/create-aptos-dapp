@@ -23,8 +23,8 @@ module launchpad_addr::nft_launchpad {
     const E_NOT_PENDING_ADMIN: u64 = 2;
     /// Only admin can update mint fee collector
     const E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
-    /// Only admin can create FA
-    const E_ONLY_ADMIN_CAN_CREATE_FA: u64 = 4;
+    /// Only admin can create colection
+    const E_ONLY_ADMIN_CAN_CREATE_COLLECTION: u64 = 4;
     /// No mint limit
     const E_NO_MINT_LIMIT: u64 = 5;
     /// Mint limit reached
@@ -94,7 +94,7 @@ module launchpad_addr::nft_launchpad {
     }
 
     // If you deploy the module under an object, sender is the object's signer
-    // If you deploy the moduelr under your own account, sender is your account's signer
+    // If you deploy the module under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
             collection_objects: vector::empty()
@@ -115,7 +115,7 @@ module launchpad_addr::nft_launchpad {
         config.pending_admin_addr = option::some(new_admin);
     }
 
-    public entry fun set_admin(sender: &signer) acquires Config {
+    public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
         assert!(is_pending_admin(config, sender_addr), E_NOT_PENDING_ADMIN);
@@ -150,7 +150,7 @@ module launchpad_addr::nft_launchpad {
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_CREATE_FA);
+        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_CREATE_COLLECTION);
 
         let royalty = royalty(&mut royalty_percentage, sender_addr);
 
@@ -440,7 +440,7 @@ module launchpad_addr::nft_launchpad {
 
         init_module(sender);
 
-        // create first FA
+        // create first collection
 
         create_collection(
             sender,
@@ -472,16 +472,16 @@ module launchpad_addr::nft_launchpad {
 
         mint_nft(user1, collection_1);
 
-        // assert!(fungible_asset::supply(fa_1) == option::some(20), 2);
-        // assert!(primary_fungible_store::balance(sender_addr, fa_1) == 20, 3);
+        // assert!(fungible_asset::supply(collection_1) == option::some(20), 2);
+        // assert!(primary_fungible_store::balance(sender_addr, collection_1) == 20, 3);
         //
-        // // create second FA
+        // // create second collection
         //
-        // create_fa(
+        // create_collection(
         //     sender,
         //     option::some(1000),
-        //     string::utf8(b"FA2"),
-        //     string::utf8(b"FA2"),
+        //     string::utf8(b"collection2"),
+        //     string::utf8(b"collection2"),
         //     3,
         //     string::utf8(b"icon_url"),
         //     string::utf8(b"project_url"),
@@ -490,15 +490,15 @@ module launchpad_addr::nft_launchpad {
         //     option::some(500)
         // );
         // let registry = get_registry();
-        // let fa_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
-        // assert!(fungible_asset::supply(fa_2) == option::some(0), 4);
+        // let collection_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
+        // assert!(fungible_asset::supply(collection_2) == option::some(0), 4);
         //
 
-        // let mint_fee = get_total_mint_fee(fa_2, 300);
+        // let mint_fee = get_total_mint_fee(collection_2, 300);
         // aptos_coin::mint(aptos_framework, sender_addr, mint_fee);
-        // mint_fa(sender, fa_2, 300);
-        // assert!(fungible_asset::supply(fa_2) == option::some(300), 5);
-        // assert!(primary_fungible_store::balance(sender_addr, fa_2) == 300, 6);
+        // mint_collection(sender, collection_2, 300);
+        // assert!(fungible_asset::supply(collection_2) == option::some(300), 5);
+        // assert!(primary_fungible_store::balance(sender_addr, collection_2) == 300, 6);
 
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
