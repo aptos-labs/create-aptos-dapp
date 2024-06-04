@@ -12,7 +12,7 @@ jobs:
     concurrency: ci-${{ github.ref }}
     defaults:
       run:
-        working-directory: ./templates/fungible-asset-template/frontend
+        working-directory: ./templates/digital-asset-template/frontend
     steps:
       - uses: actions/checkout@v3
 
