@@ -11,17 +11,17 @@ module launchpad_addr::fa_launchpad {
     use aptos_framework::primary_fungible_store;
 
     /// Sender is not admin
-    const E_NOT_ADMIN: u64 = 1;
+    const ENOT_ADMIN: u64 = 1;
     /// Sender is not pending admin
-    const E_NOT_PENDING_ADMIN: u64 = 2;
+    const ENOT_PENDING_ADMIN: u64 = 2;
     /// Only admin can update mint fee collector
-    const E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
+    const EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
     /// Only admin can create FA
-    const E_ONLY_ADMIN_CAN_CREATE_FA: u64 = 4;
+    const EONLY_ADMIN_CAN_CREATE_FA: u64 = 4;
     /// No mint limit
-    const E_NO_MINT_LIMIT: u64 = 5;
+    const ENO_MINT_LIMIT: u64 = 5;
     /// Mint limit reached
-    const E_MINT_LIMIT_REACHED: u64 = 6;
+    const EMINT_LIMIT_REACHED: u64 = 6;
 
     #[event]
     struct CreateFAEvent has store, drop {
@@ -107,14 +107,14 @@ module launchpad_addr::fa_launchpad {
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), E_NOT_ADMIN);
+        assert!(is_admin(config, sender_addr), ENOT_ADMIN);
         config.pending_admin_addr = option::some(new_admin);
     }
 
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_pending_admin(config, sender_addr), E_NOT_PENDING_ADMIN);
+        assert!(is_pending_admin(config, sender_addr), ENOT_PENDING_ADMIN);
         config.admin_addr = sender_addr;
         config.pending_admin_addr = option::none();
     }
@@ -122,7 +122,7 @@ module launchpad_addr::fa_launchpad {
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
@@ -140,7 +140,7 @@ module launchpad_addr::fa_launchpad {
     ) acquires Registry, Config, FAController {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), E_ONLY_ADMIN_CAN_CREATE_FA);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_CREATE_FA);
 
         let fa_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
         let fa_owner_obj_signer = &object::generate_signer(fa_owner_obj_constructor_ref);
@@ -259,7 +259,7 @@ module launchpad_addr::fa_launchpad {
         addr: address
     ): u64 acquires FAConfig {
         let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
-        assert!(option::is_some(&fa_config.mint_limit), E_NO_MINT_LIMIT);
+        assert!(option::is_some(&fa_config.mint_limit), ENO_MINT_LIMIT);
         let mint_limit = option::borrow(&fa_config.mint_limit);
         let mint_tracker = &mint_limit.mint_tracker;
         *smart_table::borrow_with_default(mint_tracker, addr, &0)
@@ -303,7 +303,7 @@ module launchpad_addr::fa_launchpad {
             let old_amount = get_current_minted_amount(fa_obj, sender);
             assert!(
                 old_amount + amount <= *option::borrow(&mint_limit),
-                E_MINT_LIMIT_REACHED,
+                EMINT_LIMIT_REACHED,
             );
             let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
             let mint_limit = option::borrow_mut(&mut fa_config.mint_limit);
