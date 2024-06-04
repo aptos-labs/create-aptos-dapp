@@ -111,7 +111,7 @@ module launchpad_addr::fa_launchpad {
         config.pending_admin_addr = option::some(new_admin);
     }
 
-    public entry fun set_admin(sender: &signer) acquires Config {
+    public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
         assert!(is_pending_admin(config, sender_addr), E_NOT_PENDING_ADMIN);
