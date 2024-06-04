@@ -179,15 +179,6 @@ module launchpad_addr::nft_launchpad {
 
         collection_components::create_refs_and_properties(collection_obj_constructor_ref);
 
-        configure_collection_and_token_properties(
-            collection_owner_obj_signer,
-            collection_obj,
-            false,
-            false,
-            false,
-            false,
-        );
-
         move_to(collection_owner_obj_signer, CollectionOwnerObjConfig {
             extend_ref: object::generate_extend_ref(collection_owner_obj_constructor_ref),
             collection_obj,
@@ -344,33 +335,6 @@ module launchpad_addr::nft_launchpad {
         } else {
             option::none()
         }
-    }
-
-    fun configure_collection_and_token_properties(
-        creator: &signer,
-        collection_obj: object::Object<collection::Collection>,
-        mutable_collection_metadata: bool,
-        mutable_token_metadata: bool,
-        tokens_burnable_by_collection_owner: bool,
-        tokens_transferrable_by_collection_owner: bool,
-    ) {
-        collection_properties::set_mutable_description(creator, collection_obj, mutable_collection_metadata);
-        collection_properties::set_mutable_uri(creator, collection_obj, mutable_collection_metadata);
-        collection_properties::set_mutable_royalty(creator, collection_obj, mutable_collection_metadata);
-        collection_properties::set_mutable_token_name(creator, collection_obj, mutable_token_metadata);
-        collection_properties::set_mutable_token_properties(creator, collection_obj, mutable_token_metadata);
-        collection_properties::set_mutable_token_description(creator, collection_obj, mutable_token_metadata);
-        collection_properties::set_mutable_token_uri(creator, collection_obj, mutable_token_metadata);
-        collection_properties::set_tokens_transferable_by_collection_owner(
-            creator,
-            collection_obj,
-            tokens_transferrable_by_collection_owner
-        );
-        collection_properties::set_tokens_burnable_by_collection_owner(
-            creator,
-            collection_obj,
-            tokens_burnable_by_collection_owner
-        );
     }
 
     fun mint_nft_internal(
