@@ -23,7 +23,7 @@ module launchpad_addr::nft_launchpad {
     const E_NOT_PENDING_ADMIN: u64 = 2;
     /// Only admin can update mint fee collector
     const E_ONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
-    /// Only admin can create colection
+    /// Only admin can create collection
     const E_ONLY_ADMIN_CAN_CREATE_COLLECTION: u64 = 4;
     /// No mint limit
     const E_NO_MINT_LIMIT: u64 = 5;
