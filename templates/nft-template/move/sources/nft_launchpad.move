@@ -14,7 +14,6 @@ module launchpad_addr::nft_launchpad {
 
     use minter::token_components;
     use minter::mint_stage;
-    use minter::collection_properties;
     use minter::collection_components;
 
     /// Sender is not admin
@@ -343,7 +342,6 @@ module launchpad_addr::nft_launchpad {
         mint_fee: u64,
     ) acquires CollectionConfig, CollectionOwnerObjConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-        let next_nft_id = *option::borrow(&collection::count(collection_obj));
 
         let collection_owner_obj = collection_config.collection_owner_obj;
         let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
@@ -351,6 +349,7 @@ module launchpad_addr::nft_launchpad {
         );
         let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
 
+        let next_nft_id = *option::borrow(&collection::count(collection_obj));
         let nft_obj_constructor_ref = &token::create(
             collection_owner_obj_signer,
             collection::name(collection_obj),
