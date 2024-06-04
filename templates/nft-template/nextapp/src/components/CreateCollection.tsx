@@ -1,5 +1,6 @@
 "use client";
 
+import { WebIrys } from "@irys/sdk";
 import { ABI } from "@/utils/abi_nft_launchpad";
 import { humanReadableToOnChain } from "@/utils/math";
 import { aptosClient } from "@/utils/aptos";
@@ -17,10 +18,9 @@ import { useWalletClient } from "@thalalabs/surf/hooks";
 import { useRef } from "react";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
 
 export const CreateCollection = () => {
-  const inputRef = useRef(); // Create a reference to the file input element
-
   const [maxSupply, setMaxSupply] = useState("1000");
   const [collectionName, setCollectionName] = useState("Test Collection Name");
   const [collectionDescription, setDescription] = useState(
@@ -52,80 +52,134 @@ export const CreateCollection = () => {
   const [publicMintFeePerNft, setPublicMintFeePerNft] = useState(100);
 
   const { client: walletClient } = useWalletClient();
+  const aptosWallet = useWallet();
 
-  const [status, setStatus] = useState("");
+  const [files, setFiles] = useState<File[] | null>(null);
 
-  const onFilesAdded = async (files) => {
-    setStatus("Uploading...");
+  // const onFilesAdded = async (files) => {
+  //   setStatus("Uploading...");
+  //   try {
+  //     const collectionFile = files.find(
+  //       (file) => file.name === "collection.json"
+  //     );
+  //     const imageFiles = files.filter((file) =>
+  //       file.path.startsWith("images/")
+  //     );
+  //     const metadataFiles = files.filter((file) =>
+  //       file.path.startsWith("metadatas/")
+  //     );
+
+  //     // 1. Upload the collection image to Irys
+  //     const collectionImageFile = files.find(
+  //       (file) => file.path === "collection-image.png"
+  //     );
+  //     const collectionImageUrl = await uploadToIrys(collectionImageFile);
+
+  //     // 2. Update the collection.json file
+  //     const collectionData = JSON.parse(await collectionFile.text());
+  //     collectionData.image = collectionImageUrl;
+  //     const updatedCollectionFile = new File(
+  //       [JSON.stringify(collectionData)],
+  //       "collection.json",
+  //       { type: "application/json" }
+  //     );
+  //     const collectionJsonUrl = await uploadToIrys(updatedCollectionFile);
+
+  //     // 3. Upload all NFT images to Irys
+  //     const nftImageUrls = await Promise.all(imageFiles.map(uploadToIrys));
+
+  //     // 4. Update all NFT metadata files
+  //     const updatedMetadataFiles = await Promise.all(
+  //       metadataFiles.map(async (file) => {
+  //         const metadata = JSON.parse(await file.text());
+  //         const imageFileName = file.name.replace("metadata.json", "image.png");
+  //         const imageUrl = nftImageUrls.find((url) =>
+  //           url.includes(imageFileName)
+  //         );
+  //         metadata.image = imageUrl;
+  //         return new File([JSON.stringify(metadata)], file.name, {
+  //           type: "application/json",
+  //         });
+  //       })
+  //     );
+
+  //     const metadataUrls = await Promise.all(
+  //       updatedMetadataFiles.map(uploadToIrys)
+  //     );
+
+  //     setStatus("Upload complete!");
+  //   } catch (error) {
+  //     console.error(error);
+  //     setStatus("Error uploading files");
+  //   }
+  // };
+
+  // const onDrop = useCallback(
+  //   (acceptedFiles) => {
+  //     onFilesAdded(acceptedFiles);
+  //   },
+  //   [onFilesAdded]
+  // );
+
+  // const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  //   onDrop,
+  //   noClick: true,
+  //   noKeyboard: true,
+  //   // webkitdirectory: "true", // To allow folder selection
+  // });
+
+  const onFundIrys = async () => {
+    const webIrys = new WebIrys({
+      network: "devnet",
+      token: "aptos",
+      wallet: { rpcUrl: "testnet", name: "aptos", provider: aptosWallet },
+    });
+    await webIrys.ready();
+
     try {
-      const collectionFile = files.find(
-        (file) => file.name === "collection.json"
+      const fundTx = await webIrys.fund(1000);
+      console.log(
+        `Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${
+          webIrys.token
+        }, tx: ${JSON.stringify(fundTx)}`
       );
-      const imageFiles = files.filter((file) =>
-        file.path.startsWith("images/")
-      );
-      const metadataFiles = files.filter((file) =>
-        file.path.startsWith("metadatas/")
-      );
-
-      // 1. Upload the collection image to Irys
-      const collectionImageFile = files.find(
-        (file) => file.path === "collection-image.png"
-      );
-      const collectionImageUrl = await uploadToIrys(collectionImageFile);
-
-      // 2. Update the collection.json file
-      const collectionData = JSON.parse(await collectionFile.text());
-      collectionData.image = collectionImageUrl;
-      const updatedCollectionFile = new File(
-        [JSON.stringify(collectionData)],
-        "collection.json",
-        { type: "application/json" }
-      );
-      const collectionJsonUrl = await uploadToIrys(updatedCollectionFile);
-
-      // 3. Upload all NFT images to Irys
-      const nftImageUrls = await Promise.all(imageFiles.map(uploadToIrys));
-
-      // 4. Update all NFT metadata files
-      const updatedMetadataFiles = await Promise.all(
-        metadataFiles.map(async (file) => {
-          const metadata = JSON.parse(await file.text());
-          const imageFileName = file.name.replace("metadata.json", "image.png");
-          const imageUrl = nftImageUrls.find((url) =>
-            url.includes(imageFileName)
-          );
-          metadata.image = imageUrl;
-          return new File([JSON.stringify(metadata)], file.name, {
-            type: "application/json",
-          });
-        })
-      );
-
-      const metadataUrls = await Promise.all(
-        updatedMetadataFiles.map(uploadToIrys)
-      );
-
-      setStatus("Upload complete!");
-    } catch (error) {
-      console.error(error);
-      setStatus("Error uploading files");
+    } catch (e) {
+      console.log("Error uploading data ", e);
     }
   };
 
-  const onDrop = useCallback(
-    (acceptedFiles) => {
-      onFilesAdded(acceptedFiles);
-    },
-    [onFilesAdded]
-  );
+  const handleMultipleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files: File[] = [];
+    if (e.target.files) {
+      for (let i = 0; i < e.target.files.length; i++) {
+        files.push(e.target.files[i]);
+      }
+    }
+    setFiles(files);
+  };
+  const onUploadToIrys = async (files: File[]) => {
+    const webIrys = new WebIrys({
+      network: "devnet",
+      token: "aptos",
+      wallet: { rpcUrl: "testnet", name: "aptos", provider: aptosWallet },
+    });
+    await webIrys.ready();
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    noClick: true,
-    noKeyboard: true,
-    // webkitdirectory: "true", // To allow folder selection
-  });
+    try {
+      const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
+
+      console.log(
+        `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${
+          receipt.id
+        } 
+      access with: https://gateway.irys.xyz/${
+        receipt.manifestId
+      }/<image-name>, receipt: ${JSON.stringify(receipt)}`
+      );
+    } catch (e) {
+      console.log("Error uploading file ", e);
+    }
+  };
 
   const onCreate = async () => {
     if (!walletClient) {
@@ -264,26 +318,43 @@ export const CreateCollection = () => {
             value={publicMintFeePerNft}
           />
         </FormControl>
-        <Box
-          {...getRootProps()}
-          border="2px dashed"
-          borderColor="gray.300"
-          borderRadius="md"
-          p="20px"
-          textAlign="center"
-          cursor="pointer"
-          bg={isDragActive ? "gray.100" : "white"}
-          _hover={{ bg: "gray.50" }}
-        >
-          <input {...getInputProps()} />
-          <VStack spacing={2}>
-            <Text fontSize="lg" color="gray.500">
-              {isDragActive
-                ? "Drop the files here..."
-                : "Drag & drop a folder here, or click to select files"}
-            </Text>
-          </VStack>
-        </Box>
+        <Button onClick={onFundIrys}>Fund Irys</Button>
+        <div>
+          <div className="input-group">
+            <label htmlFor="file" className="sr-only">
+              Choose Multiple Files
+            </label>
+            <input
+              id="folder"
+              type="file"
+              multiple
+              onChange={handleMultipleFiles}
+            />
+          </div>
+          {files && (
+            <section>
+              Files details:
+              <ul>
+                {files.map((file) => {
+                  return (
+                    <>
+                      <hr />
+                      <li>Name: {file.name}</li>
+
+                      <li>Type: {file.type}</li>
+                      <li>Size: {file.size} bytes</li>
+                    </>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+          {files && (
+            <button onClick={() => onUploadToIrys(files)} className="submit">
+              Upload Multiple files
+            </button>
+          )}
+        </div>
         <Button onClick={onCreate}>Create</Button>
       </Box>
     )
