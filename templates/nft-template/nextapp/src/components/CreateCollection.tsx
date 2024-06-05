@@ -326,7 +326,7 @@ export const CreateCollection = () => {
           />
         </FormControl>
         <Button onClick={onFundIrys}>Fund Irys</Button>
-        <Box>
+        {/* <Box>
           <Box className="input-group">
             <FormLabel htmlFor="file" className="sr-only">
               Choose Multiple Files
@@ -361,7 +361,123 @@ export const CreateCollection = () => {
               Upload Assets
             </Button>
           )}
-        </Box>
+        </Box> */}
+        <div
+          className={`bg-white rounded-lg border shadow-2xl mx-auto min-w-full`}
+        >
+          <div className="flex p-5">
+            <div
+              className={`space-y-6 ${
+                memoizedPreviewURL && memoizedReceiptView ? "w-1/2" : "w-full"
+              }`}
+            >
+              <div
+                className="border-2 border-dashed bg-[#EEF0F6]/60 border-[#EEF0F6] rounded-lg p-4 text-center"
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const droppedFiles = Array.from(event.dataTransfer.files);
+                  const newUploadedFiles: FileWrapper[] = droppedFiles.map(
+                    (file) => ({
+                      file,
+                      isUploaded: false,
+                      id: "",
+                      previewURL: "",
+                      loadingReceipt: false,
+                    })
+                  );
+                  setFiles(newUploadedFiles);
+                }}
+              >
+                <p className="text-gray-400 mb-2">Drag and drop files here</p>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <button
+                  onClick={resetFilesAndOpenFileDialog}
+                  className={`w-full min-w-full py-2 px-4 bg-[#DBDEE9] text-text font-bold rounded-md flex items-center justify-center transition-colors duration-500 ease-in-out  ${
+                    // txProcessing
+                    //   ? "bg-[#DBDEE9] cursor-not-allowed"
+                    //   : "hover:bg-[#DBDEE9] hover:font-bold"
+                    "hover:bg-[#DBDEE9] hover:font-bold"
+                  }`}
+                  // disabled={txProcessing}
+                >
+                  {/* {txProcessing ? (
+                    <Spinner color="text-background" />
+                  ) : (
+                    "Browse Files"
+                  )} */}
+                  {"Browse Files"}
+                </button>
+              </div>
+              {files.length > 0 && (
+                <div className="flex flex-col space-y-2">
+                  {files.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-start mb-2"
+                    >
+                      <span className="mr-2 text-text">{file.file.name}</span>
+                      {file.isUploaded && (
+                        <>
+                          <span className="ml-auto">
+                            {showImageView && (
+                              <button
+                                className="p-2 h-10 font-xs bg-black rounded-full text-white w-10 flex items-center justify-center transition-colors duration-500 ease-in-out hover:text-white"
+                                onClick={() => setPreviewURL(file.previewURL)}
+                              >
+                                <AiOutlineFileSearch className="white-2xl" />
+                              </button>
+                            )}
+                          </span>
+
+                          <span className="ml-2">
+                            {showReceiptView && (
+                              <button
+                                className="p-2 h-10 font-xs bg-black rounded-full text-white w-10 flex items-center justify-center transition-colors duration-500 ease-in-out hover:text-white"
+                                onClick={() => showReceipt(index, file.id)}
+                              >
+                                {file.loadingReceipt ? (
+                                  <Spinner color="text-background" />
+                                ) : (
+                                  <PiReceiptLight className="text-2xl" />
+                                )}
+                              </button>
+                            )}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {memoizedReceiptView && (
+                <div className="h-56 flex justify-center space-y-4 bg-[#EEF0F6]/60 rounded-xl overflow-auto">
+                  {memoizedReceiptView}
+                </div>
+              )}
+              {memoizedPreviewURL && (
+                <div className="h-56 flex justify-center space-y-4 bg-[#EEF0F6]/60 rounded-xl overflow-auto">
+                  {memoizedPreviewURL}
+                </div>
+              )}
+
+              <MultiButton
+                onClick={handleUpload}
+                disabled={txProcessing}
+                requireLitAuth={false}
+                checkConnect={!gasless}
+              >
+                {txProcessing ? <Spinner color="text-background" /> : "Upload"}
+              </MultiButton>
+            </div>
+          </div>
+        </div>
         <Button onClick={onCreate}>Create</Button>
       </Box>
     )
