@@ -1,4 +1,4 @@
-module launchpad_addr::nft_launchpad {
+module launchpad_addr::launchpad {
     use std::option::{Self, Option};
     use std::signer;
     use std::string::{Self, String};
@@ -188,7 +188,7 @@ module launchpad_addr::nft_launchpad {
         });
 
         if (option::is_some(&allowlist)) {
-            let allowlist = *option::borrow(&allowlist); 
+            let allowlist = *option::borrow(&allowlist);
             let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
             mint_stage::create(
                 collection_obj_signer,
