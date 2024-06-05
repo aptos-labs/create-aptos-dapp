@@ -1,16 +1,19 @@
 module launchpad_addr::nft_launchpad {
-    use std::option;
+    use std::option::{Self, Option};
     use std::signer;
-    use std::string;
+    use std::string::{Self, String};
     use std::vector;
-    use aptos_std::simple_map;
+
+    use aptos_std::simple_map::{Self, SimpleMap};
     use aptos_std::string_utils;
+
     use aptos_framework::aptos_account;
     use aptos_framework::event;
-    use aptos_framework::object;
-    use aptos_token_objects::collection;
-    use aptos_token_objects::royalty;
-    use aptos_token_objects::token;
+    use aptos_framework::object::{Self, Object};
+
+    use aptos_token_objects::collection::{Self, Collection};
+    use aptos_token_objects::royalty::{Self, Royalty};
+    use aptos_token_objects::token::{Self, Token};
 
     use minter::token_components;
     use minter::mint_stage;
@@ -33,27 +36,27 @@ module launchpad_addr::nft_launchpad {
     #[event]
     struct CreateCollectionEvent has store, drop {
         creator_addr: address,
-        collection_owner_obj: object::Object<CollectionOwnerObjConfig>,
-        collection_obj: object::Object<collection::Collection>,
-        max_supply: option::Option<u64>,
-        name: string::String,
-        uri: string::String,
+        collection_owner_obj: Object<CollectionOwnerObjConfig>,
+        collection_obj: Object<Collection>,
+        max_supply: Option<u64>,
+        name: String,
+        uri: String,
         pre_mint_amount: u64,
-        allowlist: option::Option<vector<address>>,
-        allowlist_start_time: option::Option<u64>,
-        allowlist_end_time: option::Option<u64>,
-        allowlist_mint_limit_per_addr: option::Option<u64>,
-        allowlist_mint_fee_per_nft: option::Option<u64>,
-        public_mint_start_time: option::Option<u64>,
-        public_mint_end_time: option::Option<u64>,
-        public_mint_limit_per_addr: option::Option<u64>,
-        public_mint_fee_per_nft: option::Option<u64>,
+        allowlist: Option<vector<address>>,
+        allowlist_start_time: Option<u64>,
+        allowlist_end_time: Option<u64>,
+        allowlist_mint_limit_per_addr: Option<u64>,
+        allowlist_mint_fee_per_nft: Option<u64>,
+        public_mint_start_time: Option<u64>,
+        public_mint_end_time: Option<u64>,
+        public_mint_limit_per_addr: Option<u64>,
+        public_mint_fee_per_nft: Option<u64>,
     }
 
     #[event]
     struct MintNftEvent has store, drop {
-        collection_obj: object::Object<collection::Collection>,
-        nft_obj: object::Object<token::Token>,
+        collection_obj: Object<Collection>,
+        nft_obj: Object<Token>,
         recipient_addr: address,
         mint_fee: u64,
     }
@@ -63,26 +66,26 @@ module launchpad_addr::nft_launchpad {
     /// This helps us avoid address collision when we create multiple collections with same name
     struct CollectionOwnerObjConfig has key {
         /// Only thing it stores is the link to collection object
-        collection_obj: object::Object<collection::Collection>,
+        collection_obj: Object<Collection>,
         extend_ref: object::ExtendRef,
     }
 
     /// Unique per collection
     struct CollectionConfig has key {
         /// Key is stage, value is mint fee denomination
-        mint_fee_per_nft_by_stages: simple_map::SimpleMap<string::String, u64>,
-        collection_owner_obj: object::Object<CollectionOwnerObjConfig>,
+        mint_fee_per_nft_by_stages: SimpleMap<String, u64>,
+        collection_owner_obj: Object<CollectionOwnerObjConfig>,
     }
 
     /// Global per contract
     struct Registry has key {
-        collection_objects: vector<object::Object<collection::Collection>>
+        collection_objects: vector<Object<Collection>>
     }
 
     /// Global per contract
     struct Config has key {
         admin_addr: address,
-        pending_admin_addr: option::Option<address>,
+        pending_admin_addr: Option<address>,
         mint_fee_collector_addr: address,
     }
 
@@ -125,21 +128,21 @@ module launchpad_addr::nft_launchpad {
 
     public entry fun create_collection(
         sender: &signer,
-        description: string::String,
-        name: string::String,
-        uri: string::String,
-        max_supply: option::Option<u64>,
-        royalty_percentage: option::Option<u64>,
+        description: String,
+        name: String,
+        uri: String,
+        max_supply: Option<u64>,
+        royalty_percentage: Option<u64>,
         pre_mint_amount: u64,
-        allowlist: option::Option<vector<address>>,
-        allowlist_start_time: option::Option<u64>,
-        allowlist_end_time: option::Option<u64>,
-        allowlist_mint_limit_per_addr: option::Option<u64>,
-        allowlist_mint_fee_per_nft: option::Option<u64>,
-        public_mint_start_time: option::Option<u64>,
-        public_mint_end_time: option::Option<u64>,
-        public_mint_limit_per_addr: option::Option<u64>,
-        public_mint_fee_per_nft: option::Option<u64>,
+        allowlist: Option<vector<address>>,
+        allowlist_start_time: Option<u64>,
+        allowlist_end_time: Option<u64>,
+        allowlist_mint_limit_per_addr: Option<u64>,
+        allowlist_mint_fee_per_nft: Option<u64>,
+        public_mint_start_time: Option<u64>,
+        public_mint_end_time: Option<u64>,
+        public_mint_limit_per_addr: Option<u64>,
+        public_mint_fee_per_nft: Option<u64>,
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@launchpad_addr);
@@ -252,7 +255,7 @@ module launchpad_addr::nft_launchpad {
 
     public entry fun mint_nft(
         sender: &signer,
-        collection_obj: object::Object<collection::Collection>
+        collection_obj: Object<Collection>
     ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
         let sender_addr = signer::address_of(sender);
 
@@ -280,15 +283,15 @@ module launchpad_addr::nft_launchpad {
     }
 
     #[view]
-    public fun get_registry(): vector<object::Object<collection::Collection>> acquires Registry {
+    public fun get_registry(): vector<Object<Collection>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.collection_objects
     }
 
     #[view]
     public fun get_mint_fee(
-        collection_obj: object::Object<collection::Collection>,
-        stage: string::String,
+        collection_obj: Object<Collection>,
+        stage: String,
     ): u64 acquires CollectionConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
         let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage);
@@ -321,9 +324,9 @@ module launchpad_addr::nft_launchpad {
     }
 
     fun royalty(
-        royalty_numerator: &mut option::Option<u64>,
+        royalty_numerator: &mut Option<u64>,
         admin_addr: address,
-    ): option::Option<royalty::Royalty> {
+    ): Option<Royalty> {
         if (option::is_some(royalty_numerator)) {
             let num = option::extract(royalty_numerator);
             option::some(royalty::create(num, 100, admin_addr))
@@ -334,7 +337,7 @@ module launchpad_addr::nft_launchpad {
 
     fun mint_nft_internal(
         sender_addr: address,
-        collection_obj: object::Object<collection::Collection>,
+        collection_obj: Object<Collection>,
         mint_fee: u64,
     ) acquires CollectionConfig, CollectionOwnerObjConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
@@ -370,7 +373,7 @@ module launchpad_addr::nft_launchpad {
     }
 
     #[test_only]
-    use aptos_framework::aptos_coin;
+    use aptos_framework::aptos_coin::{Self, AptosCoin};
     #[test_only]
     use aptos_framework::coin;
     #[test_only]
@@ -378,18 +381,15 @@ module launchpad_addr::nft_launchpad {
     #[test_only]
     use aptos_framework::account;
 
-    #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200, user2 = @0x201)]
+    #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200)]
     fun test_happy_path(
         aptos_framework: &signer,
         sender: &signer,
         user1: &signer,
-        user2: &signer,
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
-        let sender_addr = signer::address_of(sender);
         let user1_addr = signer::address_of(user1);
-        let user2_addr = signer::address_of(user2);
 
         timestamp::set_time_has_started_for_testing(aptos_framework);
 
@@ -420,41 +420,12 @@ module launchpad_addr::nft_launchpad {
         assert!(collection::count(collection_1) == option::some(3), 1);
 
         account::create_account_for_test(user1_addr);
-        coin::register<aptos_coin::AptosCoin>(user1);
+        coin::register<AptosCoin>(user1);
 
         let mint_fee = get_mint_fee(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         mint_nft(user1, collection_1);
-
-
-        // assert!(fungible_asset::supply(collection_1) == option::some(20), 2);
-        // assert!(primary_fungible_store::balance(sender_addr, collection_1) == 20, 3);
-        //
-        // // create second collection
-        //
-        // create_collection(
-        //     sender,
-        //     option::some(1000),
-        //     string::utf8(b"collection2"),
-        //     string::utf8(b"collection2"),
-        //     3,
-        //     string::utf8(b"icon_url"),
-        //     string::utf8(b"project_url"),
-        //     1,
-        //     0,
-        //     option::some(500)
-        // );
-        // let registry = get_registry();
-        // let collection_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
-        // assert!(fungible_asset::supply(collection_2) == option::some(0), 4);
-        //
-
-        // let mint_fee = get_total_mint_fee(collection_2, 300);
-        // aptos_coin::mint(aptos_framework, sender_addr, mint_fee);
-        // mint_collection(sender, collection_2, 300);
-        // assert!(fungible_asset::supply(collection_2) == option::some(300), 5);
-        // assert!(primary_fungible_store::balance(sender_addr, collection_2) == 300, 6);
 
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
