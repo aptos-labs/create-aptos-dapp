@@ -9,6 +9,9 @@ echo "##### Upgrade module #####"
 PUBLISHER_PROFILE=testnet-profile-1
 
 CONTRACT_ADDRESS=$(cat contract_address.txt)
+
+# Please find the token-minter contract address on the network you deploy to
+# This is my testnet token-minter contract address
 MINTER_ADDR="0x9d7365d7a09ee3a5610a2131d6ee395531d581e7a7c42582de51a3f111534bbd"
 
 aptos move upgrade-object-package \
