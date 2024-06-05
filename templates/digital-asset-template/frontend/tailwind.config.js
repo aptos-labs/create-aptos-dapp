@@ -114,13 +114,13 @@ module.exports = {
     plugin(function addTextStyles({ addComponents, theme }) {
       addComponents({
         // Component Regular Text Styles
-        ".component-100": {
+        ".body-sm": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.16"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.regular"),
         },
-        ".component-200": {
+        ".body-md": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.18"),
           lineHeight: theme("lineHeight.28"),
@@ -128,29 +128,21 @@ module.exports = {
         },
 
         // Component Semibold Text Styles
-        ".component-100-semibold": {
+        ".body-sm-semibold": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.16"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.semibold"),
         },
-        ".component-200-semibold": {
+        ".body-md-semibold": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.18"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.semibold"),
         },
 
-        // Body Text Styles
-        ".body-100": {
-          fontFamily: theme("fontFamily.sans"),
-          fontSize: theme("fontSize.14"),
-          lineHeight: theme("lineHeight.22"),
-          fontWeight: theme("fontWeight.regular"),
-        },
-
         // Label Text Styles
-        ".label-100": {
+        ".label-sm": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.14"),
           lineHeight: theme("lineHeight.22"),
@@ -158,7 +150,7 @@ module.exports = {
         },
 
         // Title Text Styles
-        ".title-100": {
+        ".title-md": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.48"),
           lineHeight: theme("lineHeight.48"),
@@ -167,7 +159,7 @@ module.exports = {
         },
 
         // Heading Text Styles
-        ".heading-100": {
+        ".heading-md": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.30"),
           lineHeight: theme("lineHeight.36"),
@@ -175,7 +167,7 @@ module.exports = {
         },
 
         // Display Text Styles
-        ".display-100": {
+        ".display-md": {
           fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.51"),
           lineHeight: theme("lineHeight.62"),
