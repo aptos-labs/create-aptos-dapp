@@ -1,13 +1,15 @@
 module launchpad_addr::fa_launchpad {
     use std::option;
     use std::signer;
-    use std::string;
+    use std::string::{String, Self};
     use std::vector;
+
     use aptos_std::smart_table;
+
+    use aptos_framework::object::{Self, Object};
     use aptos_framework::aptos_account;
     use aptos_framework::event;
     use aptos_framework::fungible_asset;
-    use aptos_framework::object;
     use aptos_framework::primary_fungible_store;
 
     /// Sender is not admin
@@ -26,14 +28,14 @@ module launchpad_addr::fa_launchpad {
     #[event]
     struct CreateFAEvent has store, drop {
         creator_addr: address,
-        fa_owner_obj: object::Object<FAOwnerObjConfig>,
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_owner_obj: Object<FAOwnerObjConfig>,
+        fa_obj: Object<fungible_asset::Metadata>,
         max_supply: option::Option<u128>,
-        name: string::String,
-        symbol: string::String,
+        name: String,
+        symbol: String,
         decimals: u8,
-        icon_uri: string::String,
-        project_uri: string::String,
+        icon_uri: String,
+        project_uri: String,
         mint_fee_per_fa: u64,
         pre_mint_amount: u64,
         mint_limit_per_addr: option::Option<u64>,
@@ -41,7 +43,7 @@ module launchpad_addr::fa_launchpad {
 
     #[event]
     struct MintFAEvent has store, drop {
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_obj: Object<fungible_asset::Metadata>,
         amount: u64,
         recipient_addr: address,
         total_mint_fee: u64,
@@ -52,7 +54,7 @@ module launchpad_addr::fa_launchpad {
     /// This helps us avoid address collision when we create multiple FAs with same name
     struct FAOwnerObjConfig has key {
         /// Only thing it stores is the link to FA object
-        fa_obj: object::Object<fungible_asset::Metadata>
+        fa_obj: Object<fungible_asset::Metadata>
     }
 
     /// Unique per FA
@@ -74,12 +76,12 @@ module launchpad_addr::fa_launchpad {
         /// Mint fee per FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         mint_fee_per_fa: u64,
         mint_limit: option::Option<MintLimit>,
-        fa_owner_obj: object::Object<FAOwnerObjConfig>,
+        fa_owner_obj: Object<FAOwnerObjConfig>,
     }
 
     /// Global per contract
     struct Registry has key {
-        fa_objects: vector<object::Object<fungible_asset::Metadata>>,
+        fa_objects: vector<Object<fungible_asset::Metadata>>,
     }
 
     /// Global per contract
@@ -129,11 +131,11 @@ module launchpad_addr::fa_launchpad {
     public entry fun create_fa(
         sender: &signer,
         max_supply: option::Option<u128>,
-        name: string::String,
-        symbol: string::String,
+        name: String,
+        symbol: String,
         decimals: u8,
-        icon_uri: string::String,
-        project_uri: string::String,
+        icon_uri: String,
+        project_uri: String,
         mint_fee_per_fa: u64,
         pre_mint_amount: u64,
         mint_limit_per_addr: option::Option<u64>,
@@ -160,7 +162,7 @@ module launchpad_addr::fa_launchpad {
             icon_uri,
             project_uri
         );
-        let fa_obj = object::object_from_constructor_ref(fa_obj_constructor_ref);
+        let fa_obj = object::object_from_constructor_ref<>(fa_obj_constructor_ref);
         move_to(fa_owner_obj_signer, FAOwnerObjConfig {
             fa_obj,
         });
@@ -211,7 +213,7 @@ module launchpad_addr::fa_launchpad {
 
     public entry fun mint_fa(
         sender: &signer,
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_obj: Object<fungible_asset::Metadata>,
         amount: u64
     ) acquires FAController, FAConfig, Config {
         let sender_addr = signer::address_of(sender);
@@ -236,14 +238,14 @@ module launchpad_addr::fa_launchpad {
     }
 
     #[view]
-    public fun get_registry(): vector<object::Object<fungible_asset::Metadata>> acquires Registry {
+    public fun get_registry(): vector<Object<fungible_asset::Metadata>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.fa_objects
     }
 
     #[view]
     public fun get_mint_limit(
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_obj: Object<fungible_asset::Metadata>,
     ): option::Option<u64> acquires FAConfig {
         let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
         if (option::is_some(&fa_config.mint_limit)) {
@@ -255,10 +257,10 @@ module launchpad_addr::fa_launchpad {
 
     #[view]
     public fun get_current_minted_amount(
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_obj: Object<fungible_asset::Metadata>,
         addr: address
     ): u64 acquires FAConfig {
-        let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
+        let fa_config = borrow_global<FAConfig>(object::object_address((&fa_obj)));
         assert!(option::is_some(&fa_config.mint_limit), ENO_MINT_LIMIT);
         let mint_limit = option::borrow(&fa_config.mint_limit);
         let mint_tracker = &mint_limit.mint_tracker;
@@ -267,10 +269,10 @@ module launchpad_addr::fa_launchpad {
 
     #[view]
     public fun get_total_mint_fee(
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_obj: Object<fungible_asset::Metadata>,
         amount: u64
     ): u64 acquires FAConfig {
-        let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
+        let fa_config = borrow_global<FAConfig>(object::object_address((&fa_obj)));
         fa_config.mint_fee_per_fa * amount
     }
 
@@ -295,7 +297,7 @@ module launchpad_addr::fa_launchpad {
 
     fun check_mint_limit_and_update_mint_tracker(
         sender: address,
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_obj: Object<fungible_asset::Metadata>,
         amount: u64,
     ) acquires FAConfig {
         let mint_limit = get_mint_limit(fa_obj);
@@ -313,12 +315,12 @@ module launchpad_addr::fa_launchpad {
 
     fun mint_fa_internal(
         sender: &signer,
-        fa_obj: object::Object<fungible_asset::Metadata>,
+        fa_obj: Object<fungible_asset::Metadata>,
         amount: u64,
         total_mint_fee: u64,
     ) acquires FAController {
         let sender_addr = signer::address_of(sender);
-        let fa_obj_addr = object::object_address(&fa_obj);
+        let fa_obj_addr = object::object_address((&fa_obj));
 
         let fa_controller = borrow_global<FAController>(fa_obj_addr);
         primary_fungible_store::mint(&fa_controller.mint_ref, sender_addr, amount);
