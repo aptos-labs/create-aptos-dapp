@@ -1,7 +1,7 @@
 module launchpad_addr::fa_launchpad {
-    use std::option;
+    use std::option::{Self, Option};
     use std::signer;
-    use std::string::{String, Self};
+    use std::string::{Self, String};
     use std::vector;
 
     use aptos_std::smart_table;
@@ -162,7 +162,7 @@ module launchpad_addr::fa_launchpad {
             icon_uri,
             project_uri
         );
-        let fa_obj = object::object_from_constructor_ref<>(fa_obj_constructor_ref);
+        let fa_obj = object::object_from_constructor_ref(fa_obj_constructor_ref);
         move_to(fa_owner_obj_signer, FAOwnerObjConfig {
             fa_obj,
         });
@@ -241,6 +241,18 @@ module launchpad_addr::fa_launchpad {
     public fun get_registry(): vector<Object<fungible_asset::Metadata>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.fa_objects
+    }
+
+    #[view]
+    public fun get_fa_detail(
+        fa_obj: Object<fungible_asset::Metadata>,
+    ): (String, String, Option<u128>, Option<u128>, u8) {
+        let name = fungible_asset::name(fa_obj);
+        let symbol = fungible_asset::symbol(fa_obj);
+        let current_supply = fungible_asset::supply(fa_obj);
+        let max_supply = fungible_asset::maximum(fa_obj);
+        let decimals = fungible_asset::decimals(fa_obj);
+        (name, symbol, current_supply, max_supply, decimals)
     }
 
     #[view]
