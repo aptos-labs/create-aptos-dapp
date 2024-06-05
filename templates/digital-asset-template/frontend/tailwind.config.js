@@ -73,6 +73,9 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      fontFamily: {
+        sans: ["sans-serif"],
+      },
       fontSize: {
         12: "0.75rem",
         14: "0.875rem",
@@ -112,13 +115,13 @@ module.exports = {
       addComponents({
         // Component Regular Text Styles
         ".component-100": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.16"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.regular"),
         },
         ".component-200": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.18"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.regular"),
@@ -126,13 +129,13 @@ module.exports = {
 
         // Component Semibold Text Styles
         ".component-100-semibold": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.16"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.semibold"),
         },
         ".component-200-semibold": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.18"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.semibold"),
@@ -140,7 +143,7 @@ module.exports = {
 
         // Body Text Styles
         ".body-100": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.14"),
           lineHeight: theme("lineHeight.22"),
           fontWeight: theme("fontWeight.regular"),
@@ -148,7 +151,7 @@ module.exports = {
 
         // Label Text Styles
         ".label-100": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.14"),
           lineHeight: theme("lineHeight.22"),
           fontWeight: theme("fontWeight.semibold"),
@@ -156,7 +159,7 @@ module.exports = {
 
         // Title Text Styles
         ".title-100": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.48"),
           lineHeight: theme("lineHeight.48"),
           fontWeight: theme("fontWeight.bold"),
@@ -165,7 +168,7 @@ module.exports = {
 
         // Heading Text Styles
         ".heading-100": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.30"),
           lineHeight: theme("lineHeight.36"),
           fontWeight: theme("fontWeight.semibold"),
@@ -173,7 +176,7 @@ module.exports = {
 
         // Display Text Styles
         ".display-100": {
-          fontFamily: theme("fontFamily.landing"),
+          fontFamily: theme("fontFamily.sans"),
           fontSize: theme("fontSize.51"),
           lineHeight: theme("lineHeight.62"),
           fontWeight: theme("fontWeight.medium"),
