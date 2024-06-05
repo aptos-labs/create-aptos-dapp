@@ -27,7 +27,7 @@ function App() {
       <section className="hero-container flex gap-6 px-6">
         <img src={IMG()} />
         <div>
-          <h1>{COLLECTION_NAME}</h1>
+          <h1 className="title-100">{COLLECTION_NAME}</h1>
           {config.socials && (
             <ul className="flex gap-4">
               {config.socials.twitter && (
@@ -42,7 +42,7 @@ function App() {
               )}
             </ul>
           )}
-          <p>{COLLECTION_DESCRIPTION}</p>
+          <p className="component-100">{COLLECTION_DESCRIPTION}</p>
           <div className="flex justify-between items-center">
             <div className="flex gap-4">
               <Input />
@@ -87,7 +87,7 @@ function App() {
         <section className="our-story-container px-6 flex gap-6">
           <div>
             <p>{config.ourStory.subTitle}</p>
-            <p>{config.ourStory.title}</p>
+            <p className="heading-100">{config.ourStory.title}</p>
             <p>{config.ourStory.description}</p>
             <Button>Join Our Discord</Button>
           </div>
@@ -98,7 +98,7 @@ function App() {
 
       {/* How to mint */}
       <section className="how-to-mint-container px-6 text-center">
-        <h2>How to mint NFT</h2>
+        <h2 className="heading-100">How to mint NFT</h2>
 
         <ol className="flex justify-between">
           {[
@@ -123,7 +123,7 @@ function App() {
       {/* Our Team */}
       {config.ourTeam && (
         <section className="team-container px-6">
-          <h2 className="text-center">{config.ourTeam.title}</h2>
+          <h2 className="text-center heading-100">{config.ourTeam.title}</h2>
           <ul className="flex justify-center gap-4">
             {config.ourTeam?.members.map(({ img, name, role, socials }) => (
               <li key={name}>
@@ -151,7 +151,7 @@ function App() {
       {/* FAQ */}
       {!!config.faqs && (
         <section className="faq-container px-6">
-          <h2 className="text-center">{config.faqs.title}</h2>
+          <h2 className="text-center heading-100">{config.faqs.title}</h2>
 
           {config.faqs.questions.length > 0 && (
             <ul>
