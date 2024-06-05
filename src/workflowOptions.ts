@@ -28,7 +28,6 @@ export const workflowOptions = {
     choices: [
       { title: "Mainnet", value: "mainnet" },
       { title: "Testnet", value: "testnet" },
-      { title: "Devnet", value: "devnet" },
     ],
     initial: 0,
     hint: "- You can change this later",
