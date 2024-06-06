@@ -14,9 +14,9 @@ export const workflowOptions = {
     message: "Choose how to start",
     choices: [
       {
-        title: "Fungible Asset",
+        title: "Digital Asset",
         value: "digital-asset-template",
-        description: "A dapp to mint a fungible asset",
+        description: "A dapp to mint a digital asset",
       },
     ],
     initial: 0,

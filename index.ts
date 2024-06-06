@@ -19,7 +19,7 @@ console.log(
  #@@%                 @@@     #@@*                       /@@(               .@@@@@@@@@@@@@@@             %@@@@@@@@@@@/
 `)
 );
-console.log("Welcome to the create-apt-dapp wizard 🔮");
+console.log("Welcome to the create-aptos-dapp wizard 🔮");
 
 async function main() {
   const selection = await startWorkflow();
