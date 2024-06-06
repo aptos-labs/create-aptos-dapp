@@ -4,6 +4,20 @@ import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { Progress } from "./components/ui/progress";
 import { config } from "./config";
+import { Image } from "./components/ui/image";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./components/ui/card";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+} from "./components/ui/accordion";
+import { AccordionContent } from "@radix-ui/react-accordion";
 
 const IMG = (w: number = 300, h: number = 300) =>
   `https://picsum.photos/seed/picsum/${w}/${h}`;
@@ -14,170 +28,192 @@ const COLLECTION_DESCRIPTION = `Step into the enchanting world of "Forest Friend
 
 function App() {
   return (
-    <main className="flex flex-col gap-6">
+    <div>
       {/* Nav Bar */}
-      <nav className="navbar-container px-6 flex justify-between">
-        <p className="navbar-text">Forest Friends</p>
+      <nav className="navbar-container px-6 pt-6 flex justify-between">
+        <p className="display">Forest Friends</p>
         <div>
           <WalletSelector />
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="hero-container flex gap-6 px-6">
-        <img src={IMG()} />
-        <div>
-          <h1 className="title-md">{COLLECTION_NAME}</h1>
-          {config.socials && (
-            <ul className="flex gap-4">
-              {config.socials.twitter && (
-                <li>
-                  <img />
-                </li>
-              )}
-              {config.socials.discord && (
-                <li>
-                  <img />
-                </li>
-              )}
-            </ul>
-          )}
-          <p className="body-sm">{COLLECTION_DESCRIPTION}</p>
-          <div className="flex justify-between items-center">
-            <div className="flex gap-4">
-              <Input />
-              <Button>Mint</Button>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <p>436/500 Minted</p>
-              <Progress value={(436 / 500) * 100} />
-            </div>
-          </div>
-          <div className="flex">
-            <p className="whitespace-nowrap">Collection Address</p>
-            <div className="basis-full" />
-
-            <p className="whitespace-nowrap">{COLLECTION_ADDRESS}</p>
-            <a className="whitespace-nowrap" href="#">
-              View on Explorer <img />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="stats-container px-6 ">
-        <ul className="flex gap-6 justify-stretch">
-          {[
-            { title: "Created NFTs", value: 500 },
-            { title: "Total Minted", value: 436 },
-            { title: "Unique Holders", value: 247 },
-          ].map(({ title, value }) => (
-            <li>
-              <p>{title}</p>
-              <p>{value}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Our Story */}
-      {config.ourStory && (
-        <section className="our-story-container px-6 flex gap-6">
-          <div>
-            <p>{config.ourStory.subTitle}</p>
-            <p className="heading-md">{config.ourStory.title}</p>
-            <p>{config.ourStory.description}</p>
-            <Button>Join Our Discord</Button>
-          </div>
-
-          <img src={IMG()} />
-        </section>
-      )}
-
-      {/* How to mint */}
-      <section className="how-to-mint-container px-6 text-center">
-        <h2 className="heading-md">How to mint NFT</h2>
-
-        <ol className="flex justify-between">
-          {[
-            "Connect Your Wallet",
-            "Select quantity you want to mint",
-            "Confirm transaction",
-            "Receive your NFTs",
-          ].map((text, index) => (
-            <li key={index} className="flex content-center">
-              <span className="">{index + 1}</span>
-              <p>{text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* Banner */}
-      <section className="banner-container">
-        <img />
-      </section>
-
-      {/* Our Team */}
-      {config.ourTeam && (
-        <section className="team-container px-6">
-          <h2 className="text-center heading-md">{config.ourTeam.title}</h2>
-          <ul className="flex justify-center gap-4">
-            {config.ourTeam?.members.map(({ img, name, role, socials }) => (
-              <li key={name}>
-                <img src={img} />
-                <div className="flex justify-center">
-                  {name}
-                  {socials?.twitter && (
-                    <a href={socials.twitter}>
-                      <img />
-                    </a>
-                  )}
-                  {socials?.discord && (
-                    <a href={socials.discord}>
-                      <img />
-                    </a>
-                  )}
+      <main className="flex flex-col gap-10 md:gap-16 mt-6">
+        {/* Hero */}
+        <section className="hero-container flex flex-col md:flex-row gap-6 px-6">
+          <Image src={IMG()} rounded className="basis-2/5" />
+          <div className="basis-3/5 flex flex-col gap-4">
+            <h1 className="title-md">{COLLECTION_NAME}</h1>
+            {config.socials && (
+              <ul className="flex gap-4">
+                {config.socials.twitter && (
+                  <li>
+                    <Image />
+                  </li>
+                )}
+                {config.socials.discord && (
+                  <li>
+                    <Image />
+                  </li>
+                )}
+              </ul>
+            )}
+            <p className="body-sm">{COLLECTION_DESCRIPTION}</p>
+            <Card>
+              <CardContent
+                fullPadding
+                className="flex justify-between items-center">
+                <div className="flex gap-4">
+                  <Input />
+                  <Button>Mint</Button>
                 </div>
-                <p className="text-center">{role}</p>
+
+                <div className="flex flex-col gap-2">
+                  <p className="body-sm">436/500 Minted</p>
+                  <Progress value={(436 / 500) * 100} className="h-2" />
+                </div>
+              </CardContent>
+            </Card>
+            <div className="flex">
+              <p className="whitespace-nowrap">Collection Address</p>
+              <div className="basis-full" />
+
+              <p className="whitespace-nowrap">{COLLECTION_ADDRESS}</p>
+              <a className="whitespace-nowrap" href="#">
+                View on Explorer <Image />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats */}
+        <section className="stats-container px-6 ">
+          <ul className="flex flex-col md:flex-row gap-6">
+            {[
+              { title: "Created NFTs", value: 500 },
+              { title: "Total Minted", value: 436 },
+              { title: "Unique Holders", value: 247 },
+            ].map(({ title, value }) => (
+              <li className="basis-1/3">
+                <Card className="p-2" shadow="md">
+                  <p className="label-sm">{title}</p>
+                  <p className="heading-sm">{value}</p>
+                </Card>
               </li>
             ))}
           </ul>
         </section>
-      )}
 
-      {/* FAQ */}
-      {!!config.faqs && (
-        <section className="faq-container px-6">
-          <h2 className="text-center heading-md">{config.faqs.title}</h2>
+        {/* Our Story */}
+        {config.ourStory && (
+          <section className="our-story-container px-6 flex flex-col md:flex-row gap-6">
+            <div className="basis-3/5">
+              <p className="label-sm">{config.ourStory.subTitle}</p>
+              <p className="heading-md">{config.ourStory.title}</p>
+              <p className="body-sm pt-2">{config.ourStory.description}</p>
+              <Button className="mt-4" variant="outline">
+                Join Our Discord
+              </Button>
+            </div>
 
-          {config.faqs.questions.length > 0 && (
-            <ul>
-              {config.faqs.questions.map(({ title, description }, i) => (
-                <li key={i + title}>
-                  <p>{title}</p>
-                  <p>{description}</p>
+            <Image src={IMG()} rounded className="basis-2/5" />
+          </section>
+        )}
+
+        {/* How to mint */}
+        <section className="how-to-mint-container px-6 text-center">
+          <h2 className="heading-md">How to mint NFT</h2>
+
+          <ol className="flex flex-col md:flex-row items-center md:justify-between pt-6 gap-6">
+            {[
+              "Connect Your Wallet",
+              "Select quantity you want to mint",
+              "Confirm transaction",
+              "Receive your NFTs",
+            ].map((text, index) => (
+              <li key={index} className="flex items-center gap-4">
+                <span className="title-md">{index + 1}</span>
+                <p className="body-sm text-left">{text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Banner */}
+        <section className="banner-container">
+          <Image />
+        </section>
+
+        {/* Our Team */}
+        {config.ourTeam && (
+          <section className="team-container px-6">
+            <h2 className="text-center heading-md">{config.ourTeam.title}</h2>
+            <ul className="flex justify-center gap-4 flex-wrap mt-4">
+              {config.ourTeam?.members.map(({ img, name, role, socials }) => (
+                <li key={name}>
+                  <Card>
+                    <CardHeader>
+                      <Image src={img} rounded />
+                    </CardHeader>
+                    <CardContent>
+                      <CardTitle className="flex justify-center">
+                        {name}
+                        {socials?.twitter && (
+                          <a href={socials.twitter}>
+                            <Image />
+                          </a>
+                        )}
+                        {socials?.discord && (
+                          <a href={socials.discord}>
+                            <Image />
+                          </a>
+                        )}
+                      </CardTitle>
+                      <CardDescription>
+                        <p className="text-center">{role}</p>
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
                 </li>
               ))}
             </ul>
-          )}
-        </section>
-      )}
-
-      {/* Footer */}
-      <footer className="footer-container px-6">
-        <p>{COLLECTION_NAME}</p>
-
-        {config.socials && (
-          <div>
-            {config.socials.twitter && <img />}
-            {config.socials.discord && <img />}
-          </div>
+          </section>
         )}
-      </footer>
-    </main>
+
+        {/* FAQ */}
+        {!!config.faqs && (
+          <section className="faq-container px-6">
+            <h2 className="text-center heading-md">{config.faqs.title}</h2>
+
+            {config.faqs.questions.length > 0 && (
+              <Accordion type="multiple">
+                {config.faqs.questions.map(({ title, description }, i) => (
+                  <AccordionItem value={`${i}-${title}`}>
+                    <AccordionTrigger>
+                      <p className="body-md-semibold">{title}</p>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="body-sm py-4">{description}</p>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
+          </section>
+        )}
+
+        {/* Footer */}
+        <footer className="footer-container px-6 pb-6">
+          <p>{COLLECTION_NAME}</p>
+
+          {config.socials && (
+            <div>
+              {config.socials.twitter && <Image />}
+              {config.socials.discord && <Image />}
+            </div>
+          )}
+        </footer>
+      </main>
+    </div>
   );
 }
 

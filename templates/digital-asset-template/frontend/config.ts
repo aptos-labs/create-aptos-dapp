@@ -52,9 +52,21 @@ export const config: Config = {
   ourTeam: {
     title: "Our Team",
     members: [
-      { name: "Mepoti", role: "Founder & CEO", img: "" },
-      { name: "Zucker", role: "Director of Content", img: "" },
-      { name: "SimonT", role: "Lead Developer", img: "" },
+      {
+        name: "Mepoti",
+        role: "Founder & CEO",
+        img: "https://picsum.photos/seed/picsum/200/200",
+      },
+      {
+        name: "Zucker",
+        role: "Director of Content",
+        img: "https://picsum.photos/seed/picsum/200/200",
+      },
+      {
+        name: "SimonT",
+        role: "Lead Developer",
+        img: "https://picsum.photos/seed/picsum/200/200",
+      },
     ],
   },
 

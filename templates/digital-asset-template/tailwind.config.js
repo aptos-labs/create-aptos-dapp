@@ -70,6 +70,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ["sans-serif"],
+        display: ["Holtwood One SC", "serif"],
+        inter: ["Inter", "sans-serif"],
       },
       fontSize: {
         12: "0.75rem",
@@ -110,13 +112,13 @@ module.exports = {
       addComponents({
         // Component Regular Text Styles
         ".body-sm": {
-          fontFamily: theme("fontFamily.sans"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.16"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.regular"),
         },
         ".body-md": {
-          fontFamily: theme("fontFamily.sans"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.18"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.regular"),
@@ -124,13 +126,13 @@ module.exports = {
 
         // Component Semibold Text Styles
         ".body-sm-semibold": {
-          fontFamily: theme("fontFamily.sans"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.16"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.semibold"),
         },
         ".body-md-semibold": {
-          fontFamily: theme("fontFamily.sans"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.18"),
           lineHeight: theme("lineHeight.28"),
           fontWeight: theme("fontWeight.semibold"),
@@ -138,15 +140,15 @@ module.exports = {
 
         // Label Text Styles
         ".label-sm": {
-          fontFamily: theme("fontFamily.sans"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.14"),
-          lineHeight: theme("lineHeight.22"),
+          lineHeight: theme("lineHeight.14"),
           fontWeight: theme("fontWeight.semibold"),
         },
 
         // Title Text Styles
         ".title-md": {
-          fontFamily: theme("fontFamily.sans"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.48"),
           lineHeight: theme("lineHeight.48"),
           fontWeight: theme("fontWeight.bold"),
@@ -154,21 +156,32 @@ module.exports = {
         },
 
         // Heading Text Styles
+        ".heading-sm": {
+          fontFamily: theme("fontFamily.inter"),
+          fontSize: theme("fontSize.24"),
+          lineHeight: theme("lineHeight.32"),
+          fontWeight: theme("fontWeight.semibold"),
+          letterSpacing: "-0.6%",
+        },
         ".heading-md": {
-          fontFamily: theme("fontFamily.sans"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.30"),
           lineHeight: theme("lineHeight.36"),
           fontWeight: theme("fontWeight.semibold"),
         },
 
         // Display Text Styles
-        ".display-md": {
-          fontFamily: theme("fontFamily.sans"),
-          fontSize: theme("fontSize.51"),
-          lineHeight: theme("lineHeight.62"),
-          fontWeight: theme("fontWeight.medium"),
+        ".display": {
+          fontFamily: theme("fontFamily.display"),
+          fontSize: "32px",
+          lineHeight: "52px",
+          background:
+            "conic-gradient(from -63.47deg at 62.85% 143.27%, #F5088C 0deg, #FFC700 61.2deg, #C330F4 149.4deg, #154EFF 237.6deg, #F5088C 329.4deg, #F5088C 360deg)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
         },
       });
     }),
   ],
 };
+
