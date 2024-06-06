@@ -13,7 +13,11 @@ async function compile() {
   await move.compile({
     packageDirectoryPath: "move",
     namedAddresses: {
-      module_addr: accountAddress, // make module_addr generic and fetch from Move.toml file
+      launchpad_addr: accountAddress, // make launchpad_addr generic and fetch from Move.toml file
+      // Please find it on the network you are using
+      // This is my own deployed version on testnet
+      minter:
+        "0x9d7365d7a09ee3a5610a2131d6ee395531d581e7a7c42582de51a3f111534bbd",
     },
   });
 }
