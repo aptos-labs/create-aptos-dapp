@@ -13,12 +13,27 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useWalletClient } from "@thalalabs/surf/hooks";
 import { useRef } from "react";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import getReceipt from "@/utils/irys/getReceipt";
+import { fundAndUpload } from "@/utils/irys/fundAndUpload";
+
+type FileWrapper = {
+  file: File;
+  isUploaded: boolean;
+  id: string;
+  previewURL: string;
+  loadingReceipt: boolean;
+};
+
+type Tag = {
+  name: string;
+  value: string;
+};
 
 export const CreateCollection = () => {
   const [maxSupply, setMaxSupply] = useState("1000");
@@ -54,7 +69,10 @@ export const CreateCollection = () => {
   const { client: walletClient } = useWalletClient();
   const aptosWallet = useWallet();
 
-  const [files, setFiles] = useState<File[] | null>(null);
+  const [files, setFiles] = useState<FileWrapper[]>([]);
+  const [previewURL, setPreviewURL] = useState<string>();
+  const [receipt, setReceipt] = useState<string>();
+  const [txProcessing, setTxProcessing] = useState(false);
 
   // const onFilesAdded = async (files) => {
   //   setStatus("Uploading...");
@@ -155,16 +173,72 @@ export const CreateCollection = () => {
     }
   };
 
-  const handleMultipleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files: File[] = [];
-    if (e.target.files) {
-      for (let i = 0; i < e.target.files.length; i++) {
-        files.push(e.target.files[i]);
-      }
+  // const handleMultipleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files: File[] = [];
+  //   if (e.target.files) {
+  //     for (let i = 0; i < e.target.files.length; i++) {
+  //       files.push(e.target.files[i]);
+  //     }
+  //   }
+  //   setFiles(files);
+  // };
+  // const onUploadToIrys = async (files: File[]) => {
+  //   const webIrys = new WebIrys({
+  //     network: "devnet",
+  //     token: "aptos",
+  //     wallet: { rpcUrl: "testnet", name: "aptos", provider: aptosWallet },
+  //   });
+  //   await webIrys.ready();
+
+  //   try {
+  //     const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
+
+  //     console.log(
+  //       `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${
+  //         receipt.id
+  //       }
+  //     access with: https://gateway.irys.xyz/${
+  //       receipt.manifestId
+  //     }/<image-name>, receipt: ${JSON.stringify(receipt)}`
+  //     );
+  //   } catch (e) {
+  //     console.log("Error uploading file ", e);
+  //   }
+  // };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      const newUploadedFiles: FileWrapper[] = files.map((file) => ({
+        file,
+        isUploaded: false,
+        id: "",
+        previewURL: "",
+        loadingReceipt: false,
+      }));
+      setFiles(newUploadedFiles);
     }
-    setFiles(files);
   };
-  const onUploadToIrys = async (files: File[]) => {
+
+  const resetFilesAndOpenFileDialog = useCallback(() => {
+    setFiles([]);
+    setReceipt("");
+    setPreviewURL("");
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    if (input) {
+      input.click();
+    }
+  }, []);
+
+  const handleUpload = async () => {
+    if (!files || files.length === 0) {
+      console.log("Please select a file first");
+      return;
+    }
+    setTxProcessing(true);
+
     const webIrys = new WebIrys({
       network: "devnet",
       token: "aptos",
@@ -172,21 +246,91 @@ export const CreateCollection = () => {
     });
     await webIrys.ready();
 
-    try {
-      const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
+    // If more than one file is selected, then all files are wrapped together and uploaded in a single tx
+    if (files.length > 1) {
+      try {
+        // Remove the File objects from the FileWrapper objects
+        const filesToUpload: File[] = files.map((file) => file.file);
+        console.log("Multi-file upload");
+        let manifestId = "";
+        let receiptId = "";
 
-      console.log(
-        `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${
-          receipt.id
-        } 
-      access with: https://gateway.irys.xyz/${
-        receipt.manifestId
-      }/<image-name>, receipt: ${JSON.stringify(receipt)}`
-      );
-    } catch (e) {
-      console.log("Error uploading file ", e);
+        console.log("Standard upload");
+        [manifestId, receiptId] = await fundAndUpload(
+          webIrys,
+          filesToUpload,
+          []
+        );
+
+        console.log(
+          `Upload success manifestId=${manifestId} receiptId=${receiptId}`
+        );
+        // Now that the upload is done, update the FileWrapper objects with the preview URL
+        const updatedFiles = files.map((file) => ({
+          ...file,
+          id: receiptId,
+          isUploaded: true,
+          previewURL: manifestId + "/" + file.file.name,
+        }));
+        setFiles(updatedFiles);
+      } catch (e) {
+        console.log("Error on upload: ", e);
+      }
+    } else {
+      console.log("Single file upload");
+      // This occurs when exactly one file is selected
+      try {
+        for (const file of files) {
+          const tags: Tag[] = [{ name: "Content-Type", value: file.file.type }];
+          let uploadedTx = "";
+          uploadedTx = await fundAndUpload(webIrys, file.file, tags);
+          file.id = uploadedTx;
+          file.isUploaded = true;
+          file.previewURL = uploadedTx;
+        }
+      } catch (e) {
+        console.log("Error on upload: ", e);
+      }
     }
+    setTxProcessing(false);
   };
+
+  const showReceipt = async (fileIndex: number, receiptId: string) => {
+    let updatedFiles = [...files];
+    updatedFiles[fileIndex].loadingReceipt = true;
+    setFiles(updatedFiles);
+    try {
+      const receipt = await getReceipt(receiptId);
+      setReceipt(JSON.stringify(receipt));
+      setPreviewURL(""); // Only show one or the other
+    } catch (e) {
+      console.log("Error fetching receipt: " + e);
+    }
+    // For some reason we need to reset updatedFiles, probably a React state timing thing.
+    updatedFiles = [...files];
+    updatedFiles[fileIndex].loadingReceipt = false;
+    setFiles(updatedFiles);
+  };
+
+  // // Display only the last selected file's preview.
+  // const memoizedPreviewURL = useMemo(() => {
+  //   if (previewURL) {
+  //     return <UploadViewer previewURL={previewURL} checkEncrypted={false} />;
+  //   }
+  //   return null;
+  // }, [previewURL]);
+
+  // // Display only the receipt JSON when available.
+  // const memoizedReceiptView = useMemo(() => {
+  //   if (receipt && !previewURL) {
+  //     return (
+  //       <div className="w-full">
+  //         <ReceiptJSONView data={receipt} />
+  //       </div>
+  //     );
+  //   }
+  //   return null;
+  // }, [receipt, previewURL]);
 
   const onCreate = async () => {
     if (!walletClient) {
@@ -366,11 +510,7 @@ export const CreateCollection = () => {
           className={`bg-white rounded-lg border shadow-2xl mx-auto min-w-full`}
         >
           <div className="flex p-5">
-            <div
-              className={`space-y-6 ${
-                memoizedPreviewURL && memoizedReceiptView ? "w-1/2" : "w-full"
-              }`}
-            >
+            <div className={"space-y-6 w-full"}>
               <div
                 className="border-2 border-dashed bg-[#EEF0F6]/60 border-[#EEF0F6] rounded-lg p-4 text-center"
                 onDragOver={(event) => event.preventDefault()}
@@ -396,7 +536,7 @@ export const CreateCollection = () => {
                   onChange={handleFileUpload}
                   className="hidden"
                 />
-                <button
+                <Button
                   onClick={resetFilesAndOpenFileDialog}
                   className={`w-full min-w-full py-2 px-4 bg-[#DBDEE9] text-text font-bold rounded-md flex items-center justify-center transition-colors duration-500 ease-in-out  ${
                     // txProcessing
@@ -406,15 +546,10 @@ export const CreateCollection = () => {
                   }`}
                   // disabled={txProcessing}
                 >
-                  {/* {txProcessing ? (
-                    <Spinner color="text-background" />
-                  ) : (
-                    "Browse Files"
-                  )} */}
-                  {"Browse Files"}
-                </button>
+                  {txProcessing ? "Processing TX" : "Browse Files"}
+                </Button>
               </div>
-              {files.length > 0 && (
+              {files && files.length > 0 && (
                 <div className="flex flex-col space-y-2">
                   {files.map((file, index) => (
                     <div
@@ -424,30 +559,13 @@ export const CreateCollection = () => {
                       <span className="mr-2 text-text">{file.file.name}</span>
                       {file.isUploaded && (
                         <>
-                          <span className="ml-auto">
-                            {showImageView && (
-                              <button
-                                className="p-2 h-10 font-xs bg-black rounded-full text-white w-10 flex items-center justify-center transition-colors duration-500 ease-in-out hover:text-white"
-                                onClick={() => setPreviewURL(file.previewURL)}
-                              >
-                                <AiOutlineFileSearch className="white-2xl" />
-                              </button>
-                            )}
-                          </span>
-
                           <span className="ml-2">
-                            {showReceiptView && (
-                              <button
-                                className="p-2 h-10 font-xs bg-black rounded-full text-white w-10 flex items-center justify-center transition-colors duration-500 ease-in-out hover:text-white"
-                                onClick={() => showReceipt(index, file.id)}
-                              >
-                                {file.loadingReceipt ? (
-                                  <Spinner color="text-background" />
-                                ) : (
-                                  <PiReceiptLight className="text-2xl" />
-                                )}
-                              </button>
-                            )}
+                            <button
+                              className="p-2 h-10 font-xs bg-black rounded-full text-white w-10 flex items-center justify-center transition-colors duration-500 ease-in-out hover:text-white"
+                              onClick={() => showReceipt(index, file.id)}
+                            >
+                              {file.loadingReceipt ? "Loading" : "Receipt"}
+                            </button>
                           </span>
                         </>
                       )}
@@ -456,7 +574,7 @@ export const CreateCollection = () => {
                 </div>
               )}
 
-              {memoizedReceiptView && (
+              {/* {memoizedReceiptView && (
                 <div className="h-56 flex justify-center space-y-4 bg-[#EEF0F6]/60 rounded-xl overflow-auto">
                   {memoizedReceiptView}
                 </div>
@@ -465,16 +583,11 @@ export const CreateCollection = () => {
                 <div className="h-56 flex justify-center space-y-4 bg-[#EEF0F6]/60 rounded-xl overflow-auto">
                   {memoizedPreviewURL}
                 </div>
-              )}
+              )} */}
 
-              <MultiButton
-                onClick={handleUpload}
-                disabled={txProcessing}
-                requireLitAuth={false}
-                checkConnect={!gasless}
-              >
-                {txProcessing ? <Spinner color="text-background" /> : "Upload"}
-              </MultiButton>
+              <Button onClick={handleUpload} disabled={txProcessing}>
+                {txProcessing ? "Uploading" : "Upload"}
+              </Button>
             </div>
           </div>
         </div>
