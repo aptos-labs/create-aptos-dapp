@@ -1,4 +1,4 @@
-name: Build Fungible Asset Template Frontend
+name: Build Digital Asset Template Frontend
 
 on:
   pull_request:
