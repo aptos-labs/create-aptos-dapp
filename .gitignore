@@ -2,3 +2,5 @@ dist
 node_modules
 .DS_Store
 .idea
+templates/digital-asset-template
+templates/fungible-asset-template
