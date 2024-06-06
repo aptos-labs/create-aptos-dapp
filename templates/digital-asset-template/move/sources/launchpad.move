@@ -40,6 +40,7 @@ module launchpad_addr::launchpad {
         collection_obj: Object<Collection>,
         max_supply: Option<u64>,
         name: String,
+        description: String,
         uri: String,
         pre_mint_amount: u64,
         allowlist: Option<vector<address>>,
@@ -235,6 +236,7 @@ module launchpad_addr::launchpad {
             collection_obj,
             max_supply,
             name,
+            description,
             uri,
             pre_mint_amount,
             allowlist,
@@ -262,10 +264,28 @@ module launchpad_addr::launchpad {
         let stage = &mint_stage::execute_earliest_stage(sender, collection_obj, 1);
         assert!(option::is_some(stage), E_NO_ACTIVE_STAGES);
 
-        let mint_fee = get_mint_fee(collection_obj, *option::borrow(stage));
+        let mint_fee = get_mint_fee_per_nft(collection_obj, *option::borrow(stage));
         pay_for_mint(sender, mint_fee);
 
         mint_nft_internal(sender_addr, collection_obj, mint_fee);
+    }
+
+    public entry fun batch_mint_nft(
+        sender: &signer,
+        collection_obj: Object<Collection>,
+        amount: u64,
+    ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
+        let sender_addr = signer::address_of(sender);
+
+        let stage = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
+        assert!(option::is_some(stage), E_NO_ACTIVE_STAGES);
+
+        let mint_fee_per_nft = get_mint_fee_per_nft(collection_obj, *option::borrow(stage)) * amount;
+        pay_for_mint(sender, mint_fee_per_nft * amount);
+
+        for (i in 0..amount) {
+            mint_nft_internal(sender_addr, collection_obj, mint_fee_per_nft);
+        };
     }
 
     // ================================= View  ================================= //
@@ -289,7 +309,7 @@ module launchpad_addr::launchpad {
     }
 
     #[view]
-    public fun get_mint_fee(
+    public fun get_mint_fee_per_nft(
         collection_obj: Object<Collection>,
         stage: String,
     ): u64 acquires CollectionConfig {
@@ -422,7 +442,7 @@ module launchpad_addr::launchpad {
         account::create_account_for_test(user1_addr);
         coin::register<AptosCoin>(user1);
 
-        let mint_fee = get_mint_fee(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
+        let mint_fee = get_mint_fee_per_nft(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         mint_nft(user1, collection_1);
