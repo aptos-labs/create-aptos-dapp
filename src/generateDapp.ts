@@ -50,12 +50,10 @@ export const generateDapp = async (selection: Selections) => {
   process.chdir(targetDirectory);
 
   // install dependencies
-  const installRootDepsCommand = `npm install`;
-  runCommand(installRootDepsCommand);
+  console.log(green(`\nScaffolding project in ${targetDirectory}`));
 
-  console.log(
-    green("Installing dependencies, might take a couple of minutes...")
-  );
+  const installRootDepsCommand = `npm install --silent --no-progress`;
+  runCommand(installRootDepsCommand);
 
   // create .env file
   const network = selection.network || "testnet";
@@ -63,7 +61,7 @@ export const generateDapp = async (selection: Selections) => {
 
   // Log next steps
   console.log(
-    bold("\nSuccess! You're ready to start building your dapp on Aptos.")
+    green("\nSuccess! You're ready to start building your dapp on Aptos.")
   );
 
   console.log(bold("\nNext steps:") + "\n");
