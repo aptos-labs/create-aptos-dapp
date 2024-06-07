@@ -24,38 +24,11 @@ export function CreateCollection() {
   const [disableCreateCollectionButton, setDisableCreateCollectionButton] =
     useState<boolean>(true);
 
-  const currentUnixTimestamp = Math.floor(Date.now() / 1000);
-
-  // const [allowlist, setAllowlist] = useState<`0x${string}`[]>([]);
-  // const [allowlistStartTime, setAllowlistStartTime] =
-  //   useState(currentUnixTimestamp);
-  // const [allowlistEndTime, setAllowlistEndTime] = useState(
-  //   currentUnixTimestamp + 150
-  // );
-  // const [allowlistMintLimitPerAddr, setAllowlistMintLimitPerAddr] = useState(2);
-  // const [allowlistMintFeePerNft, setAllowlistMintFeePerNft] = useState(10);
-  // const [publicMintStartTime, setPublicMintStartTime] = useState(
-  //   currentUnixTimestamp + 210
-  // );
-  // const [publicMintEndTime, setPublicMintEndTime] = useState(
-  //   currentUnixTimestamp + 600
-  // );
-  // const [publicMintLimitPerAddr, setPublicMintLimitPerAddr] = useState(1);
-  // const [publicMintFeePerNft, setPublicMintFeePerNft] = useState(100);
-
-  const [collectionName, setCollectionName] = useState<string>();
-  const [collectionDescription, setDescription] = useState<string>();
-  const [projectUri, setProjectUri] = useState<string>();
-
   useEffect(() => {
     if (maxSupply && royaltyPercentage && maxSupply && preMintAmount) {
       setDisableCreateCollectionButton(false);
     }
   }, [maxSupply, royaltyPercentage, maxSupply, preMintAmount]);
-
-  const createAsset = async () => {};
-
-  const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {};
 
   return (
     <>
@@ -106,7 +79,6 @@ export function CreateCollection() {
           </div>
           <Button
             disabled={disableCreateCollectionButton}
-            onClick={createAsset}
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
           >
             Create Collection
@@ -123,11 +95,7 @@ export function CreateCollection() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center justify-between">
-                <Input
-                  type="file"
-                  placeholder="Upload Image"
-                  onChange={onUploadFile}
-                />
+                <Input type="file" placeholder="Upload Image" />
               </div>
             </CardContent>
           </Card>
