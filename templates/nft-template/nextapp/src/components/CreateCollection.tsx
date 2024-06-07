@@ -69,7 +69,9 @@ export const CreateCollection = () => {
   const { client: walletClient } = useWalletClient();
   const aptosWallet = useWallet();
 
-  const [files, setFiles] = useState<FileWrapper[]>([]);
+  // const [files, setFiles] = useState<FileWrapper[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+
   const [previewURL, setPreviewURL] = useState<string>();
   const [receipt, setReceipt] = useState<string>();
   const [txProcessing, setTxProcessing] = useState(false);
@@ -173,72 +175,16 @@ export const CreateCollection = () => {
     }
   };
 
-  // const handleMultipleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const files: File[] = [];
-  //   if (e.target.files) {
-  //     for (let i = 0; i < e.target.files.length; i++) {
-  //       files.push(e.target.files[i]);
-  //     }
-  //   }
-  //   setFiles(files);
-  // };
-  // const onUploadToIrys = async (files: File[]) => {
-  //   const webIrys = new WebIrys({
-  //     network: "devnet",
-  //     token: "aptos",
-  //     wallet: { rpcUrl: "testnet", name: "aptos", provider: aptosWallet },
-  //   });
-  //   await webIrys.ready();
-
-  //   try {
-  //     const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
-
-  //     console.log(
-  //       `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${
-  //         receipt.id
-  //       }
-  //     access with: https://gateway.irys.xyz/${
-  //       receipt.manifestId
-  //     }/<image-name>, receipt: ${JSON.stringify(receipt)}`
-  //     );
-  //   } catch (e) {
-  //     console.log("Error uploading file ", e);
-  //   }
-  // };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const files = Array.from(event.target.files);
-      const newUploadedFiles: FileWrapper[] = files.map((file) => ({
-        file,
-        isUploaded: false,
-        id: "",
-        previewURL: "",
-        loadingReceipt: false,
-      }));
-      setFiles(newUploadedFiles);
+  const handleMultipleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files: File[] = [];
+    if (e.target.files) {
+      for (let i = 0; i < e.target.files.length; i++) {
+        files.push(e.target.files[i]);
+      }
     }
+    setFiles(files);
   };
-
-  const resetFilesAndOpenFileDialog = useCallback(() => {
-    setFiles([]);
-    setReceipt("");
-    setPreviewURL("");
-    const input = document.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement;
-    if (input) {
-      input.click();
-    }
-  }, []);
-
-  const handleUpload = async () => {
-    if (!files || files.length === 0) {
-      console.log("Please select a file first");
-      return;
-    }
-    setTxProcessing(true);
-
+  const onUploadToIrys = async (files: File[]) => {
     const webIrys = new WebIrys({
       network: "devnet",
       token: "aptos",
@@ -246,71 +192,127 @@ export const CreateCollection = () => {
     });
     await webIrys.ready();
 
-    // If more than one file is selected, then all files are wrapped together and uploaded in a single tx
-    if (files.length > 1) {
-      try {
-        // Remove the File objects from the FileWrapper objects
-        const filesToUpload: File[] = files.map((file) => file.file);
-        console.log("Multi-file upload");
-        let manifestId = "";
-        let receiptId = "";
-
-        console.log("Standard upload");
-        [manifestId, receiptId] = await fundAndUpload(
-          webIrys,
-          filesToUpload,
-          []
-        );
-
-        console.log(
-          `Upload success manifestId=${manifestId} receiptId=${receiptId}`
-        );
-        // Now that the upload is done, update the FileWrapper objects with the preview URL
-        const updatedFiles = files.map((file) => ({
-          ...file,
-          id: receiptId,
-          isUploaded: true,
-          previewURL: manifestId + "/" + file.file.name,
-        }));
-        setFiles(updatedFiles);
-      } catch (e) {
-        console.log("Error on upload: ", e);
-      }
-    } else {
-      console.log("Single file upload");
-      // This occurs when exactly one file is selected
-      try {
-        for (const file of files) {
-          const tags: Tag[] = [{ name: "Content-Type", value: file.file.type }];
-          let uploadedTx = "";
-          uploadedTx = await fundAndUpload(webIrys, file.file, tags);
-          file.id = uploadedTx;
-          file.isUploaded = true;
-          file.previewURL = uploadedTx;
-        }
-      } catch (e) {
-        console.log("Error on upload: ", e);
-      }
-    }
-    setTxProcessing(false);
-  };
-
-  const showReceipt = async (fileIndex: number, receiptId: string) => {
-    let updatedFiles = [...files];
-    updatedFiles[fileIndex].loadingReceipt = true;
-    setFiles(updatedFiles);
     try {
-      const receipt = await getReceipt(receiptId);
-      setReceipt(JSON.stringify(receipt));
-      setPreviewURL(""); // Only show one or the other
+      const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
+
+      console.log(
+        `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${
+          receipt.id
+        }
+      access with: https://gateway.irys.xyz/${
+        receipt.manifestId
+      }/<image-name>, receipt: ${JSON.stringify(receipt)}`
+      );
     } catch (e) {
-      console.log("Error fetching receipt: " + e);
+      console.log("Error uploading file ", e);
     }
-    // For some reason we need to reset updatedFiles, probably a React state timing thing.
-    updatedFiles = [...files];
-    updatedFiles[fileIndex].loadingReceipt = false;
-    setFiles(updatedFiles);
   };
+
+  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.files) {
+  //     const files = Array.from(event.target.files);
+  //     const newUploadedFiles: FileWrapper[] = files.map((file) => ({
+  //       file,
+  //       isUploaded: false,
+  //       id: "",
+  //       previewURL: "",
+  //       loadingReceipt: false,
+  //     }));
+  //     setFiles(newUploadedFiles);
+  //   }
+  // };
+
+  // const resetFilesAndOpenFileDialog = useCallback(() => {
+  //   setFiles([]);
+  //   setReceipt("");
+  //   setPreviewURL("");
+  //   const input = document.querySelector(
+  //     'input[type="file"]'
+  //   ) as HTMLInputElement;
+  //   if (input) {
+  //     input.click();
+  //   }
+  // }, []);
+
+  // const handleUpload = async () => {
+  //   if (!files || files.length === 0) {
+  //     console.log("Please select a file first");
+  //     return;
+  //   }
+  //   setTxProcessing(true);
+
+  //   const webIrys = new WebIrys({
+  //     network: "devnet",
+  //     token: "aptos",
+  //     wallet: { rpcUrl: "testnet", name: "aptos", provider: aptosWallet },
+  //   });
+  //   await webIrys.ready();
+
+  //   // If more than one file is selected, then all files are wrapped together and uploaded in a single tx
+  //   if (files.length > 1) {
+  //     try {
+  //       // Remove the File objects from the FileWrapper objects
+  //       const filesToUpload: File[] = files.map((file) => file.file);
+  //       console.log("Multi-file upload");
+  //       let manifestId = "";
+  //       let receiptId = "";
+
+  //       console.log("Standard upload");
+  //       [manifestId, receiptId] = await fundAndUpload(
+  //         webIrys,
+  //         filesToUpload,
+  //         []
+  //       );
+
+  //       console.log(
+  //         `Upload success manifestId=${manifestId} receiptId=${receiptId}`
+  //       );
+  //       // Now that the upload is done, update the FileWrapper objects with the preview URL
+  //       const updatedFiles = files.map((file) => ({
+  //         ...file,
+  //         id: receiptId,
+  //         isUploaded: true,
+  //         previewURL: manifestId + "/" + file.file.name,
+  //       }));
+  //       setFiles(updatedFiles);
+  //     } catch (e) {
+  //       console.log("Error on upload: ", e);
+  //     }
+  //   } else {
+  //     console.log("Single file upload");
+  //     // This occurs when exactly one file is selected
+  //     try {
+  //       for (const file of files) {
+  //         const tags: Tag[] = [{ name: "Content-Type", value: file.file.type }];
+  //         let uploadedTx = "";
+  //         uploadedTx = await fundAndUpload(webIrys, file.file, tags);
+  //         file.id = uploadedTx;
+  //         file.isUploaded = true;
+  //         file.previewURL = uploadedTx;
+  //       }
+  //     } catch (e) {
+  //       console.log("Error on upload: ", e);
+  //     }
+  //   }
+  //   setTxProcessing(false);
+  // };
+
+  // const showReceipt = async (fileIndex: number, receiptId: string) => {
+  //   let updatedFiles = [...files];
+  //   updatedFiles[fileIndex].loadingReceipt = true;
+  //   setFiles(updatedFiles);
+  //   try {
+  //     const receipt = await getReceipt(receiptId);
+  //     setReceipt(JSON.stringify(receipt));
+  //     setPreviewURL(""); // Only show one or the other
+  //   } catch (e) {
+  //     console.log("Error fetching receipt: " + e);
+  //   }
+  //   // For some reason we need to reset updatedFiles, probably a React state timing thing.
+  //   updatedFiles = [...files];
+  //   updatedFiles[fileIndex].loadingReceipt = false;
+  //   setFiles(updatedFiles);
+  // };
 
   // // Display only the last selected file's preview.
   // const memoizedPreviewURL = useMemo(() => {
@@ -470,17 +472,35 @@ export const CreateCollection = () => {
           />
         </FormControl>
         <Button onClick={onFundIrys}>Fund Irys</Button>
-        {/* <Box>
+        <Box>
           <Box className="input-group">
             <FormLabel htmlFor="file" className="sr-only">
               Choose Multiple Files
             </FormLabel>
-            <input
-              id="folder"
-              type="file"
-              multiple
-              onChange={handleMultipleFiles}
-            />
+            <div>
+              <input
+                id="folder"
+                type="file"
+                multiple
+                onChange={handleMultipleFiles}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const droppedFiles = Array.from(event.dataTransfer.files);
+                  console.log("droppedFiles", droppedFiles);
+                  // const newUploadedFiles: FileWrapper[] = droppedFiles.map(
+                  //   (file) => ({
+                  //     file,
+                  //     isUploaded: false,
+                  //     id: "",
+                  //     previewURL: "",
+                  //     loadingReceipt: false,
+                  //   })
+                  // );
+                  setFiles(droppedFiles);
+                }}
+              />
+            </div>
           </Box>
           {files && (
             <section>
@@ -491,7 +511,6 @@ export const CreateCollection = () => {
                     <>
                       <hr />
                       <li>Name: {file.name}</li>
-
                       <li>Type: {file.type}</li>
                       <li>Size: {file.size} bytes</li>
                     </>
@@ -505,8 +524,8 @@ export const CreateCollection = () => {
               Upload Assets
             </Button>
           )}
-        </Box> */}
-        <div
+        </Box>
+        {/* <div
           className={`bg-white rounded-lg border shadow-2xl mx-auto min-w-full`}
         >
           <div className="flex p-5">
@@ -583,14 +602,14 @@ export const CreateCollection = () => {
                 <div className="h-56 flex justify-center space-y-4 bg-[#EEF0F6]/60 rounded-xl overflow-auto">
                   {memoizedPreviewURL}
                 </div>
-              )} */}
+              )}}
 
               <Button onClick={handleUpload} disabled={txProcessing}>
                 {txProcessing ? "Uploading" : "Upload"}
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
         <Button onClick={onCreate}>Create</Button>
       </Box>
     )
