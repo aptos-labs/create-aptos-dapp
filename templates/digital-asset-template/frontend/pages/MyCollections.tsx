@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CollectionData, useGetCollections } from "@/hooks/useGetCollections";
+import { NETWORK } from "@/constants";
 
 export function MyCollections() {
   const collections: Array<CollectionData> = useGetCollections();
@@ -35,6 +36,7 @@ export function MyCollections() {
         </TableHeader>
         <TableBody>
           {collections.length > 0 &&
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             collections.map((collection: any) => {
               return (
                 <TableRow key={collection.collection_id}>
@@ -43,19 +45,15 @@ export function MyCollections() {
                       <img
                         src={collection.collection_uri}
                         style={{ width: "40px" }}
-                        className="mr-2"
-                      ></img>
+                        className="mr-2"></img>
                       <span>{collection.collection_name}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Link
-                      to={`https://explorer.aptoslabs.com/object/${
-                        collection.collection_id
-                      }?network=${import.meta.env.VITE_APP_NETWORK}`}
+                      to={`https://explorer.aptoslabs.com/object/${collection.collection_id}?network=${NETWORK}`}
                       target="_blank"
-                      style={{ textDecoration: "underline" }}
-                    >
+                      style={{ textDecoration: "underline" }}>
                       {collection.collection_id}
                     </Link>
                   </TableCell>
