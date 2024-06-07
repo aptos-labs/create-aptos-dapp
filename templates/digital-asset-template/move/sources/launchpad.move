@@ -359,7 +359,7 @@ module launchpad_addr::launchpad {
         sender_addr: address,
         collection_obj: Object<Collection>,
         mint_fee: u64,
-    ) acquires CollectionConfig, CollectionOwnerObjConfig {
+    ): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
 
         let collection_owner_obj = collection_config.collection_owner_obj;
@@ -368,17 +368,20 @@ module launchpad_addr::launchpad {
         );
         let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
 
-        let next_nft_id = *option::borrow(&collection::count(collection_obj));
+        let next_nft_id = *option::borrow(&collection::count(collection_obj)) + 1;
+
+        let collection_uri = collection::uri(collection_obj);
+        let nft_metadata_uri = construct_nft_metadata_uri(&collection_uri, next_nft_id);
+
         let nft_obj_constructor_ref = &token::create(
             collection_owner_obj_signer,
             collection::name(collection_obj),
-            // placeholder value, please read description from json metadata in storage
+            // placeholder value, please read description from json metadata in offchain storage
             string_utils::to_string(&next_nft_id),
-            // placeholder value, please read name from json metadata in storage
+            // placeholder value, please read name from json metadata in offchain storage
             string_utils::to_string(&next_nft_id),
             royalty::get(collection_obj),
-            // TODO: does petra support this? image url is in the json, wallet or any UI should fetch json first then fetch image
-            string_utils::format2(&b"{}/{}.json", collection::uri(collection_obj), next_nft_id),
+            nft_metadata_uri,
         );
         token_components::create_refs(nft_obj_constructor_ref);
         let nft_obj = object::object_from_constructor_ref(nft_obj_constructor_ref);
@@ -390,6 +393,22 @@ module launchpad_addr::launchpad {
             collection_obj,
             nft_obj,
         });
+
+        nft_obj
+    }
+
+    fun construct_nft_metadata_uri(
+        collection_uri: &String,
+        next_nft_id: u64,
+    ): String {
+        let nft_metadata_uri = &mut string::sub_string(
+            collection_uri,
+            0,
+            string::length(collection_uri) - string::length(&string::utf8(b"collection.json"))
+        );
+        let nft_metadata_filename = string_utils::format1(&b"{}.json", next_nft_id);
+        string::append(nft_metadata_uri, nft_metadata_filename);
+        *nft_metadata_uri
     }
 
     #[test_only]
@@ -421,7 +440,7 @@ module launchpad_addr::launchpad {
             sender,
             string::utf8(b"description"),
             string::utf8(b"name"),
-            string::utf8(b"hello.com"),
+            string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
             option::some(10),
             option::some(10),
             3,
@@ -446,6 +465,9 @@ module launchpad_addr::launchpad {
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         mint_nft(user1, collection_1);
+
+        let nft = mint_nft_internal(user1_addr, collection_1, mint_fee);
+        assert!(token::uri(nft) == string::utf8(b"https://gateway.irys.xyz/manifest_id/5.json"), 2);
 
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
