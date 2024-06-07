@@ -18,6 +18,8 @@ module launchpad_addr::launchpad {
     use minter::token_components;
     use minter::mint_stage;
     use minter::collection_components;
+    #[test_only]
+    use aptos_std::debug;
 
     /// Sender is not admin
     const ENOT_ADMIN: u64 = 1;
@@ -359,7 +361,7 @@ module launchpad_addr::launchpad {
         sender_addr: address,
         collection_obj: Object<Collection>,
         mint_fee: u64,
-    ) acquires CollectionConfig, CollectionOwnerObjConfig {
+    ): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
 
         let collection_owner_obj = collection_config.collection_owner_obj;
@@ -390,6 +392,8 @@ module launchpad_addr::launchpad {
             collection_obj,
             nft_obj,
         });
+
+        nft_obj
     }
 
     #[test_only]
@@ -445,7 +449,17 @@ module launchpad_addr::launchpad {
         let mint_fee = get_mint_fee_per_nft(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
-        mint_nft(user1, collection_1);
+        let nft = mint_nft_internal(user1_addr, collection_1, 0);
+        debug::print(&token::uri(nft));
+        debug::print(&collection::uri(collection_1));
+        debug::print(&string_utils::format2(&b"{}/{}.json", string::utf8(b"hehe"), 1));
+
+
+
+        assert!(collection::uri(collection_1) == string::utf8(b"hello.com"), 2);
+        assert!(string_utils::format2(&b"{}/{}.json", collection::uri(collection_1), 1) == string::utf8(b"hello.com/1.json"), 2);
+
+        assert!(token::uri(nft) == string::utf8(b"\"hello.com\"/3.json"), 2);
 
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);

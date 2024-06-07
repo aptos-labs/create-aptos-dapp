@@ -10,6 +10,26 @@ import {
 } from "@chakra-ui/react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 
+type CollectionMetadata = {
+  name: string;
+  description: string;
+  image: string;
+  external_url: string;
+};
+
+type ImageAttribute = {
+  trait_type: string;
+  value: string;
+};
+
+type ImageMetadata = {
+  name: string;
+  description: string;
+  image: string;
+  external_url: string;
+  attributes: ImageAttribute[];
+};
+
 type Props = {
   onUpdateName: (name: string) => void;
   onUpdateDescription: (description: string) => void;
@@ -22,7 +42,7 @@ export const AssetUploader = ({
 }: Props) => {
   const aptosWallet = useWallet();
 
-  const [status, setStatus] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("Select files to upload");
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -54,6 +74,7 @@ export const AssetUploader = ({
   };
 
   const onUploadToIrys = async (files: File[]) => {
+    setUploadStatus("Uploading files...");
     const webIrys = new WebIrys({
       network: "devnet",
       token: "aptos",
@@ -61,92 +82,159 @@ export const AssetUploader = ({
     });
     await webIrys.ready();
 
+    const VALID_MEDIA_EXTENSIONS = ["png", "jpg", "jpeg", "gltf"];
+
+    const collectionMetadata = files.find(
+      (file) => file.name === "collection.json"
+    );
+
+    if (!collectionMetadata) {
+      console.error("Collection metadata not found");
+      return;
+    }
+
+    let mediaExt: string;
+    const collectionCover = files.find((file) =>
+      VALID_MEDIA_EXTENSIONS.some((ext) => {
+        if (file.name.endsWith(`collection.${ext}`)) {
+          mediaExt = ext;
+          return true;
+        } else {
+          return false;
+        }
+      })
+    );
+
+    if (!collectionCover) {
+      console.error("Collection cover not found");
+      return;
+    }
+
+    const imageMetadatas = files.filter(
+      (file) => file.name.endsWith("json") && file.name !== "collection.json"
+    );
+
+    if (imageMetadatas.length === 0) {
+      console.error("Image metadata not found");
+      return;
+    }
+
+    const imageFiles = files.filter(
+      (file) =>
+        file.name.endsWith(`.${mediaExt}`) && file.name !== collectionCover.name
+    );
+
+    if (imageFiles.length === 0) {
+      console.error("Image files not found");
+      return;
+    }
+
+    if (imageMetadatas.length !== imageFiles.length) {
+      console.error("Mismatch between image metadata and files");
+      return;
+    }
+
+    console.log(
+      "collectionCover",
+      collectionCover,
+      "collectionMetadata",
+      collectionMetadata,
+      "imageFiles",
+      imageFiles,
+      "imageMetadatas",
+      imageMetadatas
+    );
+
+    const totalFileSize =
+      collectionCover.size +
+      collectionMetadata.size +
+      imageFiles.reduce((acc, file) => acc + file.size, 0) +
+      imageMetadatas.reduce((acc, file) => acc + file.size, 0);
+
     try {
-      const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
+      const costToUpload = await webIrys.getPrice(totalFileSize);
+      const irysBalance = await webIrys.getLoadedBalance();
+      //   const convertedBalance = webIrys.utils
+      //     .fromAtomic(atomicBalance)
+      //     .toNumber();
+
+      console.log("costToUpload", costToUpload, "irysBalance", irysBalance);
+
+      if (irysBalance < costToUpload) {
+        const fundTx = await webIrys.fund(costToUpload.minus(irysBalance));
+        console.log(
+          `Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${
+            webIrys.token
+          }, tx: ${JSON.stringify(fundTx)}`
+        );
+      }
+
+      // upload collection cover
+      const collectionCoverReceipt = await webIrys.uploadFile(collectionCover);
+      console.log(
+        `Collection cover uploaded. Receipt Id=${collectionCoverReceipt.id}
+            access with: https://gateway.irys.xyz/${collectionCoverReceipt.id}`
+      );
+
+      // update collection metadata with the cover image and upload
+      const parsedCollectionMetadata: CollectionMetadata = JSON.parse(
+        await collectionMetadata.text()
+      );
+      onUpdateName(parsedCollectionMetadata.name);
+      onUpdateDescription(parsedCollectionMetadata.description);
+      parsedCollectionMetadata.image = `https://gateway.irys.xyz/${collectionCoverReceipt.id}`;
+      const updatedCollectionMetadata = new File(
+        [JSON.stringify(parsedCollectionMetadata)],
+        "collection.json",
+        { type: collectionMetadata.type }
+      );
+
+      const collectionMetadataReceipt = await webIrys.uploadFile(
+        updatedCollectionMetadata
+      );
+      console.log(
+        `Collection metadata uploaded. Receipt Id=${collectionMetadataReceipt.id}
+                access with: https://gateway.irys.xyz/${collectionMetadataReceipt.id}`
+      );
+      onUpdateProjectUri(
+        `https://gateway.irys.xyz/${collectionMetadataReceipt.id}`
+      );
+
+      // upload NFT images as a folder
+      const imagesReceipt = await webIrys.uploadFolder(imageFiles);
+      console.log(
+        `NFT images uploaded. Receipt Id=${imagesReceipt.id}
+                    access with: https://gateway.irys.xyz/${imagesReceipt.id}`
+      );
+
+      // update image metadata with the image URL and upload
+      const updatedImageMetadatas = await Promise.all(
+        imageMetadatas.map(async (file) => {
+          const metadata: ImageMetadata = JSON.parse(await file.text());
+          const imageUrl = `https://gateway.irys.xyz/${
+            imagesReceipt.manifestId
+          }/${file.name.replace("json", `${mediaExt}`)}`;
+          metadata.image = imageUrl;
+          return new File([JSON.stringify(metadata)], file.name, {
+            type: file.type,
+          });
+        })
+      );
+
+      const imageMetadatasReceipts = await webIrys.uploadFolder(
+        updatedImageMetadatas
+      );
 
       console.log(
-        `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${
-          receipt.id
-        }
-      access with: https://gateway.irys.xyz/${
-        receipt.manifestId
-      }/<image-name>, receipt: ${JSON.stringify(receipt)}`
+        `Image metadatas uploaded. Receipt Id=${imageMetadatasReceipts.id}
+                            access with: https://gateway.irys.xyz/${imageMetadatasReceipts.id}`
       );
+      setUploadStatus("Files uploaded successfully");
     } catch (e) {
-      console.log("Error uploading file ", e);
+      console.log("Error", e);
+      setUploadStatus("Error uploading files");
     }
   };
-
-  const onFilesAdded = async (files: File[]) => {
-    setStatus("Uploading...");
-    try {
-      const collectionFile = files.find(
-        (file) => file.name === "collection.json"
-      );
-      const imageFiles = files.filter((file) =>
-        file.webkitRelativePath.startsWith("images/")
-      );
-      const metadataFiles = files.filter((file) =>
-        file.webkitRelativePath.startsWith("metadatas/")
-      );
-
-      //   // 1. Upload the collection image to Irys
-      //   const collectionImageFile = files.find(
-      //     (file) => file.webkitRelativePath === "collection-image.png"
-      //   );
-      //   const collectionImageUrl = await uploadToIrys(collectionImageFile);
-
-      //   // 2. Update the collection.json file
-      //   const collectionData = JSON.parse(await collectionFile.text());
-      //   collectionData.image = collectionImageUrl;
-      //   const updatedCollectionFile = new File(
-      //     [JSON.stringify(collectionData)],
-      //     "collection.json",
-      //     { type: "application/json" }
-      //   );
-      //   const collectionJsonUrl = await uploadToIrys(updatedCollectionFile);
-
-      //   // 3. Upload all NFT images to Irys
-      //   const nftImageUrls = await Promise.all(imageFiles.map(uploadToIrys));
-
-      //   // 4. Update all NFT metadata files
-      //   const updatedMetadataFiles = await Promise.all(
-      //     metadataFiles.map(async (file) => {
-      //       const metadata = JSON.parse(await file.text());
-      //       const imageFileName = file.name.replace("metadata.json", "image.png");
-      //       const imageUrl = nftImageUrls.find((url) =>
-      //         url.includes(imageFileName)
-      //       );
-      //       metadata.image = imageUrl;
-      //       return new File([JSON.stringify(metadata)], file.name, {
-      //         type: "application/json",
-      //       });
-      //     })
-      //   );
-
-      //   const metadataUrls = await Promise.all(
-      //     updatedMetadataFiles.map(uploadToIrys)
-      //   );
-
-      setStatus("Upload complete!");
-    } catch (error) {
-      console.error(error);
-      setStatus("Error uploading files");
-    }
-  };
-
-  //   const uploadToIrys = async (file) => {
-  //     const formData = new FormData();
-  //     formData.append("file", file);
-
-  //     const response = await axios.post("https://api.irys.io/upload", formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     });
-
-  //     return response.data.url; // Adjust according to the actual response structure
-  //   };
 
   return (
     <Container>
@@ -201,6 +289,9 @@ export const AssetUploader = ({
             Upload Assets to Irys
           </Button>
         )}
+        <Text fontSize="lg" color="gray.500">
+          {uploadStatus}
+        </Text>
       </VStack>
     </Container>
   );
