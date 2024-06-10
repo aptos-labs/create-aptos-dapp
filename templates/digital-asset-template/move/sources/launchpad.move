@@ -280,7 +280,7 @@ module launchpad_addr::launchpad {
         let stage = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
         assert!(option::is_some(stage), E_NO_ACTIVE_STAGES);
 
-        let mint_fee_per_nft = get_mint_fee_per_nft(collection_obj, *option::borrow(stage)) * amount;
+        let mint_fee_per_nft = get_mint_fee_per_nft(collection_obj, *option::borrow(stage));
         pay_for_mint(sender, mint_fee_per_nft * amount);
 
         for (i in 0..amount) {
