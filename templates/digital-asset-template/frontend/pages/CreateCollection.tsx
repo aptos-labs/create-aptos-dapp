@@ -36,11 +36,12 @@ export function CreateCollection() {
   const navigate = useNavigate();
   if (import.meta.env.PROD) navigate("/", { replace: true });
 
-  // Collection data internal state
-  const [maxSupply, setMaxSupply] = useState<string>();
+  // Collection data entered by the user on UI
   const [royaltyPercentage, setRoyaltyPercentage] = useState<number>();
   const [preMintAmount, setPreMintAmount] = useState<number>();
 
+  // Collection data from collection metadata upload by the user
+  const [maxSupply, setMaxSupply] = useState<number>();
   const [collectionName, setCollectionName] = useState<string>();
   const [collectionDescription, setCollectionDescription] = useState<string>();
   const [projectUri, setProjectUri] = useState<string>();
@@ -78,6 +79,7 @@ export function CreateCollection() {
         files,
         setCollectionName,
         setCollectionDescription,
+        setMaxSupply,
         setProjectUri,
         setUploadStatus
       );
@@ -99,7 +101,7 @@ export function CreateCollection() {
           projectUri,
           maxSupply,
           royaltyPercentage,
-          "0", // amount of NFT to premint for myself
+          preMintAmount, // amount of NFT to premint for myself
           undefined, // addresses in the allow list
           undefined, // allow list start time (in seconds)
           undefined, // allow list end time (in seconds)
@@ -133,15 +135,6 @@ export function CreateCollection() {
             Create NFT Collection
           </h3>
           <div className="py-2">
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Max Supply</Label>
-              <Input
-                type="text"
-                onChange={(e) => {
-                  setMaxSupply(e.target.value);
-                }}
-              />
-            </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label>Royalty Percentage</Label>
               <Input

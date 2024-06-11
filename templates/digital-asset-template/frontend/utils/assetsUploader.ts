@@ -26,6 +26,7 @@ export const uploadCollectionData = async (
   setCollectionDescription: React.Dispatch<
     React.SetStateAction<string | undefined>
   >,
+  setMaxSupply: React.Dispatch<React.SetStateAction<number | undefined>>,
   setProjectUri: React.Dispatch<React.SetStateAction<string | undefined>>,
   setUploadStatus: React.Dispatch<React.SetStateAction<string>>
 ) => {
@@ -168,6 +169,7 @@ export const uploadCollectionData = async (
       updatedCollectionMetadata,
     ]);
     setProjectUri(`${metadataFolderReceipt}/collection.json`);
+    setMaxSupply(imageFiles.length);
 
     setUploadStatus("Files uploaded successfully");
   } else {
