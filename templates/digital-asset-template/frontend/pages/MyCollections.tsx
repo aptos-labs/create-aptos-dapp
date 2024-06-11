@@ -37,7 +37,7 @@ export function MyCollections() {
           {collections.length > 0 &&
             collections.map((collection: any) => {
               return (
-                <TableRow key={collection.adress}>
+                <TableRow key={collection.collection_id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center">
                       <img
