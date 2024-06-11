@@ -35,8 +35,18 @@ export const uploadCollectionData = async (
     files.push(fileList[i]);
   }
 
+  let collectionFiles = files.filter((file) =>
+    file.name.includes("collection")
+  );
+  if (collectionFiles.length !== 2) {
+    alert(
+      "Please make sure you include both collection.json and collection image file"
+    );
+    return;
+  }
+
   // Check collection.json file exists
-  const collectionMetadata = files.find(
+  const collectionMetadata = collectionFiles.find(
     (file) => file.name === "collection.json"
   );
   if (!collectionMetadata) {
@@ -46,18 +56,17 @@ export const uploadCollectionData = async (
     return;
   }
 
-  // check collection thumbnail image exists
-  let mediaExt: string;
-  const collectionCover = files.find((file) =>
-    VALID_MEDIA_EXTENSIONS.some((ext) => {
-      if (file.name.endsWith(`collection.${ext}`)) {
-        mediaExt = ext;
-        return true;
-      } else {
-        return false;
-      }
-    })
+  const collectionCover = collectionFiles.find((file) =>
+    VALID_MEDIA_EXTENSIONS.some((ext) => file.name.endsWith(`.${ext}`))
   );
+  if (!collectionCover) {
+    alert(
+      "Collection cover not found, please make sure you include the collection image file"
+    );
+    return;
+  }
+
+  const mediaExt = collectionCover?.name.split(".").pop();
 
   if (!collectionCover) {
     alert(
