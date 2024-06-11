@@ -67,11 +67,9 @@ export function CreateCollection() {
   // Function to upload Collection data to Irys - a decentralized asset server
   const onUploadFile = async () => {
     if (files) {
-      alert(`The upload process requires at least 4 message signatures
-      1. To upload a collection image into Irys
-      2. To upload a collection metadata file into Irys
-      3. To upload NFT image files into Irys
-      4. To upload NFT metadata files into Irys
+      alert(`The upload process requires at least 2 message signatures
+      1. To upload collection cover image file and NFT image files into Irys
+      2. To upload collection metadata file and NFT metadata files into Irys
 
       In the case we need to fund a node on Irys, a transfer transaction submission is required also.`);
 
