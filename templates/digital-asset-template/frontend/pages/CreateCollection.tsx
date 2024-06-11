@@ -55,14 +55,14 @@ export function CreateCollection() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (maxSupply && royaltyPercentage && maxSupply && preMintAmount) {
+    if (maxSupply && royaltyPercentage) {
       setDisableCreateCollectionButton(false);
     }
     // So we can upload a folder
     if (inputRef.current) {
       inputRef.current.setAttribute("webkitdirectory", "true");
     }
-  }, [maxSupply, royaltyPercentage, maxSupply, preMintAmount]);
+  }, [maxSupply, royaltyPercentage]);
 
   // Function to upload Collection data to Irys - a decentralized asset server
   const onUploadFile = async () => {
