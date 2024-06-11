@@ -13,6 +13,13 @@ export const config: Config = {
     homepage: "#",
   },
 
+  defaultCollection: {
+    name: "Forest Friends",
+    description:
+      "A collection of meticulously designed animal portraits, each reflecting a unique emotion and vibrant personality.",
+    image: Placeholder1,
+  },
+
   ourTeam: {
     title: "Our Team",
     members: [
@@ -80,6 +87,12 @@ export interface Config {
     twitter?: string;
     discord?: string;
     homepage?: string;
+  };
+
+  defaultCollection?: {
+    name: string;
+    description: string;
+    image: string;
   };
 
   ourTeam?: {

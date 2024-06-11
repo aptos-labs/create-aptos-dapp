@@ -17,6 +17,8 @@ import {
 } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { useQueryClient } from "@tanstack/react-query";
+import Placeholder1 from "@/assets/placeholders/bear-1.png";
+import { config } from "@/config";
 
 interface HeroSectionProps {}
 
@@ -26,8 +28,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
   const { account, signAndSubmitTransaction } = useWallet();
   const [nftCount, setNftCount] = useState(1);
 
-  if (!data) return null;
-  const { collection, totalMinted, maxSupply } = data;
+  const { collection, totalMinted = 0, maxSupply = 1 } = data ?? {};
 
   const mintNft = async (e: FormEvent) => {
     e.preventDefault();
@@ -36,7 +37,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
     const transaction: InputTransactionData = {
       data: {
         function: `${MODULE_ADDRESS}::launchpad::batch_mint_nft`,
-        functionArguments: [collection.collection_id, nftCount],
+        functionArguments: [collection?.collection_id, nftCount],
       },
     };
     const response = await signAndSubmitTransaction(transaction);
@@ -49,16 +50,21 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
     <section className="hero-container flex flex-col md:flex-row gap-6 px-6 max-w-screen-xl mx-auto w-full">
       <Image
         src={
-          collection.cdn_asset_uris.cdn_image_uri ??
-          collection.cdn_asset_uris.cdn_animation_uri
+          collection?.cdn_asset_uris.cdn_image_uri ??
+          collection?.cdn_asset_uris.cdn_animation_uri ??
+          Placeholder1
         }
         rounded
         className="basis-2/5"
       />
       <div className="basis-3/5 flex flex-col gap-4">
-        <h1 className="title-md">{collection.collection_name}</h1>
+        <h1 className="title-md">
+          {collection?.collection_name ?? config.defaultCollection?.name}
+        </h1>
         <Socials />
-        <p className="body-sm">{collection.description}</p>
+        <p className="body-sm">
+          {collection?.description ?? config.defaultCollection?.description}
+        </p>
         <Card>
           <CardContent
             fullPadding
@@ -91,11 +97,11 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
           </p>
 
           <div className="flex gap-x-2">
-            <AddressButton address={collection.collection_id} />
+            <AddressButton address={collection?.collection_id ?? ""} />
             <a
               className={buttonVariants({ variant: "link" })}
               target="_blank"
-              href={`https://explorer.aptoslabs.com/account/${collection.collection_id}?network=${NETWORK}`}>
+              href={`https://explorer.aptoslabs.com/account/${collection?.collection_id}?network=${NETWORK}`}>
               View on Explorer <Image src={ExternalLink} />
             </a>
           </div>
