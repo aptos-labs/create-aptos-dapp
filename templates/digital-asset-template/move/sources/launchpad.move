@@ -214,7 +214,7 @@ module launchpad_addr::launchpad {
             );
 
             for (i in 0..vector::length(&allowlist)) {
-                mint_stage::add_to_allowlist(
+                mint_stage::upsert_allowlist(
                     collection_owner_obj_signer,
                     collection_obj,
                     mint_stage::find_mint_stage_index_by_name(collection_obj, stage),
@@ -243,7 +243,7 @@ module launchpad_addr::launchpad {
             let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
 
             if (option::is_some(&public_mint_limit_per_addr)) {
-                mint_stage::set_public_stage_max_per_user(
+                mint_stage::upsert_public_stage_max_per_user(
                     collection_owner_obj_signer,
                     collection_obj,
                     stage_idx,
