@@ -9,10 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetCollections } from "@/hooks/useGetCollections";
+import { CollectionData, useGetCollections } from "@/hooks/useGetCollections";
 
 export function MyCollections() {
-  const collections = useGetCollections();
+  const collections: Array<CollectionData> = useGetCollections();
 
   // If we are on Production mode, redierct to the mint page
   const navigate = useNavigate();

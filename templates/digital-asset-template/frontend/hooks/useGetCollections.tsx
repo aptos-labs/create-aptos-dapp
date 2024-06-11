@@ -2,6 +2,15 @@ import { aptosClient } from "@/utils/aptosClient";
 import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { useState, useEffect } from "react";
 
+export type CollectionData = {
+  collection_name: string;
+  description: string;
+  uri: string;
+  collection_id: string;
+  total_minted_v2: string;
+  max_supply: string;
+};
+
 /**
  * A react hook to get all collections under the current contract.
  *
@@ -10,7 +19,7 @@ import { useState, useEffect } from "react";
  *
  */
 export function useGetCollections() {
-  const [fas, setFAs] = useState<any[]>([]);
+  const [collections, setCollections] = useState<Array<CollectionData>>([]);
 
   useEffect(() => {
     // fetch the contract registry address
@@ -19,13 +28,13 @@ export function useGetCollections() {
       getObjects(registry).then((objects) => {
         // get each collection object data
         getCollections(objects).then((data) => {
-          setFAs(data);
+          setCollections(data);
         });
       });
     });
   }, []);
 
-  return fas;
+  return collections;
 }
 
 const getRegistry = async () => {
@@ -69,7 +78,7 @@ const getCollections = async (objects: Array<string>) => {
       const formattedObjectAddress = AccountAddress.from(object).toString();
 
       const collection = await aptosClient().queryIndexer<{
-        current_collections_v2: [{}];
+        current_collections_v2: Array<CollectionData>;
       }>({
         query: {
           query: `query MyQuery {
