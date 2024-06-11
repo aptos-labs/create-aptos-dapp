@@ -62,6 +62,21 @@ module launchpad_addr::launchpad {
         mint_fee: u64,
     }
 
+    #[event]
+    struct BatchMintNftsEvent has store, drop {
+        collection_obj: Object<Collection>,
+        nft_objs: vector<Object<Token>>,
+        recipient_addr: address,
+        total_mint_fee: u64,
+    }
+
+    #[event]
+    struct BatchPreMintNftsEvent has store, drop {
+        collection_obj: Object<Collection>,
+        nft_objs: vector<Object<Token>>,
+        recipient_addr: address,
+    }
+
     /// Unique per collection
     /// We need this object to own the collection object instead of contract directly owns the collection object
     /// This helps us avoid address collision when we create multiple collections with same name
@@ -193,38 +208,66 @@ module launchpad_addr::launchpad {
             let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
             mint_stage::create(
                 collection_obj_signer,
+                stage,
                 *option::borrow(&allowlist_start_time),
                 *option::borrow(&allowlist_end_time),
-                stage,
-                option::none(),
             );
+
+            let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
+
+            if (option::is_some(&allowlist_mint_limit_per_addr)) {
+                mint_stage::set_public_stage_max_per_user(
+                    collection_owner_obj_signer,
+                    collection_obj,
+                    stage_idx,
+                    *option::borrow(&allowlist_mint_limit_per_addr)
+                );
+            };
 
             for (i in 0..vector::length(&allowlist)) {
                 mint_stage::add_to_allowlist(
-                    collection_obj_signer,
+                    collection_owner_obj_signer,
                     collection_obj,
-                    stage,
+                    stage_idx,
                     *vector::borrow(&allowlist, i),
                     *option::borrow(&allowlist_mint_limit_per_addr)
                 );
             };
 
             let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-            simple_map::upsert(&mut collection_config.mint_fee_per_nft_by_stages, stage, *option::borrow(&allowlist_mint_fee_per_nft));
+            simple_map::upsert(
+                &mut collection_config.mint_fee_per_nft_by_stages,
+                stage,
+                *option::borrow(&allowlist_mint_fee_per_nft)
+            );
         };
 
         if (option::is_some(&public_mint_end_time)) {
             let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
             mint_stage::create(
                 collection_obj_signer,
+                stage,
                 *option::borrow(&public_mint_start_time),
                 *option::borrow(&public_mint_end_time),
-                stage,
-                option::some(*option::borrow(&public_mint_limit_per_addr))
             );
 
+            let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
+
+            if (option::is_some(&public_mint_limit_per_addr)) {
+                mint_stage::set_public_stage_max_per_user(
+                    collection_owner_obj_signer,
+                    collection_obj,
+                    stage_idx,
+                    *option::borrow(&public_mint_limit_per_addr)
+                );
+            };
+
             let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-            simple_map::upsert(&mut collection_config.mint_fee_per_nft_by_stages, stage, *option::borrow(&public_mint_fee_per_nft));
+            simple_map::upsert(
+                &mut collection_config.mint_fee_per_nft_by_stages,
+                stage,
+                *option::borrow(&public_mint_fee_per_nft)
+            );
         };
 
         let registry = borrow_global_mut<Registry>(@launchpad_addr);
@@ -250,9 +293,17 @@ module launchpad_addr::launchpad {
             public_mint_fee_per_nft,
         });
 
+        let nft_objs = vector[];
         for (i in 0..pre_mint_amount) {
-            mint_nft_internal(sender_addr, collection_obj, 0);
+            let nft_obj = mint_nft_internal(sender_addr, collection_obj);
+            vector::push_back(&mut nft_objs, nft_obj);
         };
+
+        event::emit(BatchPreMintNftsEvent {
+            recipient_addr: sender_addr,
+            collection_obj,
+            nft_objs,
+        });
     }
 
     public entry fun mint_nft(
@@ -261,13 +312,20 @@ module launchpad_addr::launchpad {
     ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
         let sender_addr = signer::address_of(sender);
 
-        let stage = &mint_stage::execute_earliest_stage(sender, collection_obj, 1);
-        assert!(option::is_some(stage), E_NO_ACTIVE_STAGES);
+        let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, 1);
+        assert!(option::is_some(stage_idx), E_NO_ACTIVE_STAGES);
 
-        let mint_fee = get_mint_fee_per_nft(collection_obj, *option::borrow(stage));
+        let mint_fee = get_mint_fee_per_nft(collection_obj, *option::borrow(stage_idx));
         pay_for_mint(sender, mint_fee);
 
-        mint_nft_internal(sender_addr, collection_obj, mint_fee);
+        let nft_obj = mint_nft_internal(sender_addr, collection_obj);
+
+        event::emit(MintNftEvent {
+            recipient_addr: sender_addr,
+            mint_fee,
+            collection_obj,
+            nft_obj,
+        });
     }
 
     public entry fun batch_mint_nft(
@@ -277,15 +335,24 @@ module launchpad_addr::launchpad {
     ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
         let sender_addr = signer::address_of(sender);
 
-        let stage = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
-        assert!(option::is_some(stage), E_NO_ACTIVE_STAGES);
+        let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
+        assert!(option::is_some(stage_idx), E_NO_ACTIVE_STAGES);
 
-        let mint_fee_per_nft = get_mint_fee_per_nft(collection_obj, *option::borrow(stage));
-        pay_for_mint(sender, mint_fee_per_nft * amount);
+        let total_mint_fee = amount * get_mint_fee_per_nft(collection_obj, *option::borrow(stage_idx));
+        pay_for_mint(sender, total_mint_fee);
 
+        let nft_objs = vector[];
         for (i in 0..amount) {
-            mint_nft_internal(sender_addr, collection_obj, mint_fee_per_nft);
+            let nft_obj = mint_nft_internal(sender_addr, collection_obj);
+            vector::push_back(&mut nft_objs, nft_obj);
         };
+
+        event::emit(BatchMintNftsEvent {
+            recipient_addr: sender_addr,
+            total_mint_fee,
+            collection_obj,
+            nft_objs,
+        });
     }
 
     // ================================= View  ================================= //
@@ -311,10 +378,12 @@ module launchpad_addr::launchpad {
     #[view]
     public fun get_mint_fee_per_nft(
         collection_obj: Object<Collection>,
-        stage: String,
+        stage_idx: u64,
     ): u64 acquires CollectionConfig {
+        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, stage_idx);
+        let stage_name = mint_stage::mint_stage_name(stage_obj);
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-        let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage);
+        let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage_name);
         fee
     }
 
@@ -339,7 +408,7 @@ module launchpad_addr::launchpad {
 
     fun pay_for_mint(sender: &signer, mint_fee: u64) acquires Config {
         if (mint_fee > 0) {
-            aptos_account::transfer(sender, get_mint_fee_collector(), mint_fee)
+            aptos_account::transfer(sender, get_mint_fee_collector(), mint_fee);
         }
     }
 
@@ -358,7 +427,6 @@ module launchpad_addr::launchpad {
     fun mint_nft_internal(
         sender_addr: address,
         collection_obj: Object<Collection>,
-        mint_fee: u64,
     ): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
 
@@ -387,13 +455,6 @@ module launchpad_addr::launchpad {
         let nft_obj = object::object_from_constructor_ref(nft_obj_constructor_ref);
         object::transfer(collection_owner_obj_signer, nft_obj, sender_addr);
 
-        event::emit(MintNftEvent {
-            recipient_addr: sender_addr,
-            mint_fee,
-            collection_obj,
-            nft_obj,
-        });
-
         nft_obj
     }
 
@@ -420,17 +481,22 @@ module launchpad_addr::launchpad {
     #[test_only]
     use aptos_framework::account;
 
-    #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200)]
+    #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200, user2 = @0x201)]
     fun test_happy_path(
         aptos_framework: &signer,
         sender: &signer,
         user1: &signer,
+        user2: &signer,
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
         let user1_addr = signer::address_of(user1);
+        let user2_addr = signer::address_of(user2);
 
         timestamp::set_time_has_started_for_testing(aptos_framework);
+        account::create_account_for_test(user1_addr);
+        account::create_account_for_test(user2_addr);
+        coin::register<AptosCoin>(user1);
 
         init_module(sender);
 
@@ -444,13 +510,13 @@ module launchpad_addr::launchpad {
             option::some(10),
             option::some(10),
             3,
-            option::none(),
-            option::none(),
-            option::none(),
-            option::none(),
-            option::none(),
+            option::some(vector[user1_addr]),
             option::some(timestamp::now_seconds()),
             option::some(timestamp::now_seconds() + 100),
+            option::some(3),
+            option::some(5),
+            option::some(timestamp::now_seconds() + 200),
+            option::some(timestamp::now_seconds() + 300),
             option::some(2),
             option::some(10),
         );
@@ -458,15 +524,12 @@ module launchpad_addr::launchpad {
         let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(collection::count(collection_1) == option::some(3), 1);
 
-        account::create_account_for_test(user1_addr);
-        coin::register<AptosCoin>(user1);
-
-        let mint_fee = get_mint_fee_per_nft(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
+        let mint_fee = get_mint_fee_per_nft(collection_1, 0);
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         mint_nft(user1, collection_1);
 
-        let nft = mint_nft_internal(user1_addr, collection_1, mint_fee);
+        let nft = mint_nft_internal(user1_addr, collection_1);
         assert!(token::uri(nft) == string::utf8(b"https://gateway.irys.xyz/manifest_id/5.json"), 2);
 
         coin::destroy_burn_cap(burn_cap);
