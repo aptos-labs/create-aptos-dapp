@@ -4,16 +4,18 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import {
@@ -48,8 +50,10 @@ export function CreateCollection() {
   const [collectionDescription, setCollectionDescription] = useState<string>();
   const [projectUri, setProjectUri] = useState<string>();
 
+  const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
+  const [publicMintEndDate, setPublicMintEndDate] = useState<Date>();
   const [files, setFiles] = useState<FileList | null>(null);
-
+  console.log("publicMintStartDate", publicMintStartDate);
   // UI internal state
   const [uploadStatus, setUploadStatus] = useState("Upload Files");
 
@@ -60,7 +64,7 @@ export function CreateCollection() {
     if (inputRef.current) {
       inputRef.current.setAttribute("webkitdirectory", "true");
     }
-  }, [maxSupply, royaltyPercentage]);
+  }, []);
 
   // Function to upload Collection data to Irys - a decentralized asset server
   const onUploadFile = async () => {
@@ -81,6 +85,12 @@ export function CreateCollection() {
         setUploadStatus
       );
     }
+  };
+
+  const dateToSeconds = (date: Date | undefined) => {
+    if (!date) return;
+    const dateInSeconds = Math.floor(+date / 1000);
+    return dateInSeconds;
   };
 
   const createCollection = async () => {
@@ -104,13 +114,14 @@ export function CreateCollection() {
           undefined, // allow list end time (in seconds)
           undefined, // mint limit per address in the allow list
           undefined, // mint fee per NFT for the allow list
-          currentUnixTimestamp, // public mint start time (in seconds)
-          currentUnixTimestamp + secondsInAWeek, // public mint end time (in seconds)
+          dateToSeconds(publicMintStartDate), // public mint start time (in seconds)
+          dateToSeconds(publicMintEndDate), // public mint end time (in seconds)
           1, // mint limit per address in the public mint
           "0", // mint fee per NFT for the public mint
         ],
       },
     };
+    console.log("transaction", transaction);
     const response = await signAndSubmitTransaction(transaction);
 
     const committedTransactionResponse = await aptosClient().waitForTransaction(
@@ -146,6 +157,33 @@ export function CreateCollection() {
           </h3>
           <div className="py-2">
             <div className="mb-5 flex flex-col item-center space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardDescription>
+                    Uploads collection data to a decentralized storage
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center justify-between">
+                    <Input
+                      ref={inputRef}
+                      multiple
+                      type="file"
+                      placeholder="Upload Assets"
+                      onChange={(event) => setFiles(event.target.files)}
+                    />
+                  </div>
+                  <Button
+                    disabled={!account || !files}
+                    className="mt-4"
+                    onClick={onUploadFile}
+                  >
+                    {uploadStatus}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="mb-5 flex flex-col item-center space-y-4">
               <Label>Royalty Percentage</Label>
               <Input
                 type="text"
@@ -154,60 +192,94 @@ export function CreateCollection() {
                 }}
               />
             </div>
+
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Accordion type="single" collapsible>
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>Advanced options</AccordionTrigger>
-                  <AccordionContent className="border p-4">
-                    <div className="mb-5 flex flex-col item-center space-y-4">
-                      <Label>Mint for myself</Label>
-                      <Input
-                        type="number"
-                        value={preMintAmount}
-                        onChange={(e) => {
-                          setPreMintAmount(parseInt(e.target.value));
-                        }}
+              <div className="flex flex-row space-between">
+                <div className="flex flex-col mr-4">
+                  <Label className="mb-4">Public mint start date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[280px] justify-start text-left font-normal",
+                          !publicMintStartDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {publicMintStartDate ? (
+                          format(publicMintStartDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={publicMintStartDate}
+                        onSelect={setPublicMintStartDate}
+                        initialFocus
                       />
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="flex flex-col">
+                  <Label className="mb-4">Public mint end date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[280px] justify-start text-left font-normal",
+                          !publicMintEndDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {publicMintEndDate ? (
+                          format(publicMintEndDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={publicMintEndDate}
+                        onSelect={setPublicMintEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
             </div>
           </div>
+          <div className="mb-5 flex flex-col item-center space-y-4">
+            <Label>Mint for myself (optional)</Label>
+            <Input
+              type="number"
+              value={preMintAmount}
+              onChange={(e) => {
+                setPreMintAmount(parseInt(e.target.value));
+              }}
+            />
+          </div>
           <Button
-            disabled={!maxSupply || !royaltyPercentage || !account}
+            disabled={
+              !maxSupply ||
+              !royaltyPercentage ||
+              !account ||
+              !publicMintStartDate ||
+              !royaltyPercentage
+            }
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-            onClick={createCollection}>
+            onClick={createCollection}
+          >
             Create Collection
           </Button>
-        </div>
-
-        <div className="w-1/3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload Collection Data</CardTitle>
-              <CardDescription>
-                Uploads collection data to a decentralized storage
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center justify-between">
-                <Input
-                  ref={inputRef}
-                  multiple
-                  type="file"
-                  placeholder="Upload Assets"
-                  onChange={(event) => setFiles(event.target.files)}
-                />
-              </div>
-              <Button
-                disabled={!account || !files}
-                className="mt-4"
-                onClick={onUploadFile}>
-                {uploadStatus}
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </>
