@@ -21,24 +21,6 @@ export function Mint() {
     );
   }
 
-  // if (!data) {
-  //   return (
-  //     <div className="text-center p-8">
-  //       <h1 className="title-md">Collection Not Configured</h1>
-  //       <p className="body-md max-w-md mx-auto mt-8">
-  //         Please ensure you copy your collection's id from your launchpad to
-  //         <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-  //           frontend/config.ts
-  //         </code>
-  //       </p>
-  //       <p className="body-md max-w-md mx-auto mt-4">
-  //         Configure the remaining sections of the configuration file. Removing a
-  //         section will remove it from the rendered page.
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div style={{ overflow: "hidden" }} className="overflow-hidden">
       <Header />

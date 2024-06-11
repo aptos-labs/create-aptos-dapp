@@ -4,14 +4,41 @@ import { useMintData } from "../hooks/useMintData";
 import { Link } from "react-router-dom";
 import { IS_DEV } from "@/constants";
 import { config } from "@/config";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const Header: FC = () => {
   const { data } = useMintData();
-  // if (!data) return null;
 
   return (
-    <header>
-      <nav className="navbar-container px-6 pt-6 flex justify-between max-w-screen-xl mx-auto">
+    <header className="px-6 pt-6">
+      {!config.collection_id && (
+        <Alert className="mb-6" variant="destructive">
+          <AlertTitle className="body-md-semibold">
+            Collection ID not set
+          </AlertTitle>
+          <AlertDescription className="body-sm">
+            This page is placeholder content, to render your collection:
+            <ol className="list-decimal list-inside">
+              <li>
+                Make sure you have created a collection, click the "My
+                Collections" button and verify a collection is created.
+              </li>
+              <li>
+                Fill in the{" "}
+                <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+                  collection_id
+                </code>{" "}
+                field in
+                <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+                  frontend/config.ts
+                </code>
+              </li>
+            </ol>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <nav className="navbar-container  flex justify-between max-w-screen-xl mx-auto">
         <p className="display">
           {data?.collection.collection_name ?? config.defaultCollection?.name}
         </p>
