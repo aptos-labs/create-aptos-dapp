@@ -17,7 +17,7 @@ async function compile() {
       // Please find it on the network you are using
       // This is my own deployed version on testnet
       minter:
-        "0xb31c421b64aa345df39a374459757244eeb70bd94886f47a32c2f886b662f7d0",
+        "0x93f379226ae424367346b2803b340b1eda36cb2416037a7e71a6761e3a551e5c",
     },
   });
 }
