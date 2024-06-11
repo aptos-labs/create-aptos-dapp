@@ -32,7 +32,9 @@ export function CreateCollection() {
   const aptosWallet = useWallet();
   const { account, signAndSubmitTransaction } = useWallet();
 
+  // If we are on Production mode, redierct to the mint page
   const navigate = useNavigate();
+  if (import.meta.env.PROD) navigate("/", { replace: true });
 
   // Collection data internal state
   const [maxSupply, setMaxSupply] = useState<string>();
@@ -44,12 +46,6 @@ export function CreateCollection() {
   const [projectUri, setProjectUri] = useState<string>();
 
   const [files, setFiles] = useState<FileList | null>(null);
-
-  const [publicMintStartTime, setPublicMintStartTime] =
-    useState<number>(currentUnixTimestamp);
-  const [publicMintEndTime, setPublicMintEndTime] = useState<number>(
-    currentUnixTimestamp + secondsInAWeek
-  );
 
   // UI internal state
   const [uploadStatus, setUploadStatus] = useState("Upload Files");
@@ -111,8 +107,8 @@ export function CreateCollection() {
           undefined, // allow list end time (in seconds)
           undefined, // mint limit per address in the allow list
           undefined, // mint fee per NFT for the allow list
-          publicMintStartTime, // public mint start time (in seconds)
-          publicMintEndTime, // public mint end time (in seconds)
+          currentUnixTimestamp, // public mint start time (in seconds)
+          currentUnixTimestamp + secondsInAWeek, // public mint end time (in seconds)
           1, // mint limit per address in the public mint
           "0", // mint fee per NFT for the public mint
         ],
@@ -178,7 +174,7 @@ export function CreateCollection() {
             </div>
           </div>
           <Button
-            //disabled={disableCreateCollectionButton}
+            disabled={disableCreateCollectionButton}
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
             onClick={createCollection}
           >

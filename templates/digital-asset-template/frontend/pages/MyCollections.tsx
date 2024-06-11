@@ -1,3 +1,4 @@
+import { Link, useNavigate } from "react-router-dom";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import {
   Table,
@@ -9,10 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetCollections } from "@/hooks/useGetCollections";
-import { Link } from "react-router-dom";
 
 export function MyCollections() {
   const collections = useGetCollections();
+
+  // If we are on Production mode, redierct to the mint page
+  const navigate = useNavigate();
+  if (import.meta.env.PROD) navigate("/", { replace: true });
 
   return (
     <>
@@ -23,11 +27,10 @@ export function MyCollections() {
         </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Collection</TableHead>
+            <TableHead>Collection</TableHead>
             <TableHead>Collection Address</TableHead>
             <TableHead>Minted NFTs</TableHead>
             <TableHead>Max Supply</TableHead>
-            <TableHead>Mint Page</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -58,14 +61,6 @@ export function MyCollections() {
                   </TableCell>
                   <TableCell>{collection.total_minted_v2}</TableCell>
                   <TableCell>{collection.max_supply}</TableCell>
-                  <TableCell>
-                    <Link
-                      className="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                      to={"/"}
-                    >
-                      Open
-                    </Link>
-                  </TableCell>
                 </TableRow>
               );
             })}
