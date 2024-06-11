@@ -1,3 +1,4 @@
+import { Link, useNavigate } from "react-router-dom";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import {
   Table,
@@ -8,10 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+import { CollectionData, useGetCollections } from "@/hooks/useGetCollections";
 
 export function MyCollections() {
-  const collections: any[] = [];
+  const collections: Array<CollectionData> = useGetCollections();
+
+  // If we are on Production mode, redierct to the mint page
+  const navigate = useNavigate();
+  if (import.meta.env.PROD) navigate("/", { replace: true });
 
   return (
     <>
@@ -22,19 +27,17 @@ export function MyCollections() {
         </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Collection</TableHead>
+            <TableHead>Collection</TableHead>
             <TableHead>Collection Address</TableHead>
-            <TableHead>Created NFTs</TableHead>
             <TableHead>Minted NFTs</TableHead>
-            <TableHead>Owners</TableHead>
-            <TableHead>Mint Page</TableHead>
+            <TableHead>Max Supply</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {collections.length > 0 &&
             collections.map((collection: any) => {
               return (
-                <TableRow key={collection.adress}>
+                <TableRow key={collection.collection_id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center">
                       <img
@@ -42,31 +45,22 @@ export function MyCollections() {
                         style={{ width: "40px" }}
                         className="mr-2"
                       ></img>
-                      <span>{collection.name}</span>
+                      <span>{collection.collection_name}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Link
                       to={`https://explorer.aptoslabs.com/object/${
-                        collection.address
+                        collection.collection_id
                       }?network=${import.meta.env.VITE_APP_NETWORK}`}
                       target="_blank"
                       style={{ textDecoration: "underline" }}
                     >
-                      {collection.address}
+                      {collection.collection_id}
                     </Link>
                   </TableCell>
-                  <TableCell>{collection.created}</TableCell>
-                  <TableCell>{collection.minted}</TableCell>
-                  <TableCell>{collection.owners}</TableCell>
-                  <TableCell>
-                    <Link
-                      className="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                      to={"/"}
-                    >
-                      Open
-                    </Link>
-                  </TableCell>
+                  <TableCell>{collection.total_minted_v2}</TableCell>
+                  <TableCell>{collection.max_supply}</TableCell>
                 </TableRow>
               );
             })}
