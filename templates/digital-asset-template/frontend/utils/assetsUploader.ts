@@ -116,39 +116,30 @@ export const uploadCollectionData = async (
   const funded = await checkIfFund(aptosWallet, totalFileSize);
 
   if (funded) {
-    // upload collection thumbnail image
-    const collectionCoverReceipt = await uploadFile(
-      aptosWallet,
-      collectionCover
-    );
+    // Upload collection thumbnail image and all NFT images as a folder
+    const imageFolderReceipt = await uploadFolder(aptosWallet, [
+      ...imageFiles,
+      collectionCover,
+    ]);
 
-    // update collection metadata with the cover image and upload
+    // Update collection metadata with the cover image
     const parsedCollectionMetadata: CollectionMetadata = JSON.parse(
       await collectionMetadata.text()
     );
     setCollectionName(parsedCollectionMetadata.name);
     setCollectionDescription(parsedCollectionMetadata.description);
-    parsedCollectionMetadata.image = collectionCoverReceipt;
+    parsedCollectionMetadata.image = `${imageFolderReceipt}/collection.${mediaExt}`;
     const updatedCollectionMetadata = new File(
       [JSON.stringify(parsedCollectionMetadata)],
       "collection.json",
       { type: collectionMetadata.type }
     );
-    const collectionMetadataReceipt = await uploadFile(
-      aptosWallet,
-      updatedCollectionMetadata
-    );
 
-    setProjectUri(collectionMetadataReceipt);
-
-    // upload all NFT images as a folder
-    const imagesReceipt = await uploadFolder(aptosWallet, imageFiles);
-
-    // update each image metadata with the related image URL and upload
+    // Update each image metadata with the related image URL
     const updatedImageMetadatas = await Promise.all(
       nftImageMetadatas.map(async (file) => {
         const metadata: ImageMetadata = JSON.parse(await file.text());
-        const imageUrl = `${imagesReceipt}/collection/images/${file.name.replace(
+        const imageUrl = `${imageFolderReceipt}/${file.name.replace(
           "json",
           `${mediaExt}`
         )}`;
@@ -161,7 +152,13 @@ export const uploadCollectionData = async (
         return fileMetadata;
       })
     );
-    await uploadFolder(aptosWallet, updatedImageMetadatas);
+
+    // Upload collection metadata and all NFTs' metadata as a folder
+    const metadataFolderReceipt = await uploadFolder(aptosWallet, [
+      ...updatedImageMetadatas,
+      updatedCollectionMetadata,
+    ]);
+    setProjectUri(`${metadataFolderReceipt}/collection.json`);
 
     setUploadStatus("Files uploaded successfully");
   } else {
