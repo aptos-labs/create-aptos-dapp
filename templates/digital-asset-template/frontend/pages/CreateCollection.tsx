@@ -43,6 +43,10 @@ export function CreateCollection() {
   // Collection data entered by the user on UI
   const [royaltyPercentage, setRoyaltyPercentage] = useState<number>();
   const [preMintAmount, setPreMintAmount] = useState<number>();
+  const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
+  const [publicMintEndDate, setPublicMintEndDate] = useState<Date>();
+  const [mintLimitPerAccount, setMintLimitPerAccount] = useState<number>();
+  const [mintFeePerNFT, setMintFeePerNFT] = useState<number>();
 
   // Collection data from collection metadata upload by the user
   const [maxSupply, setMaxSupply] = useState<number>();
@@ -50,10 +54,8 @@ export function CreateCollection() {
   const [collectionDescription, setCollectionDescription] = useState<string>();
   const [projectUri, setProjectUri] = useState<string>();
 
-  const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
-  const [publicMintEndDate, setPublicMintEndDate] = useState<Date>();
   const [files, setFiles] = useState<FileList | null>(null);
-  console.log("publicMintStartDate", publicMintStartDate);
+
   // UI internal state
   const [uploadStatus, setUploadStatus] = useState("Upload Files");
 
@@ -116,8 +118,8 @@ export function CreateCollection() {
           undefined, // mint fee per NFT for the allow list
           dateToSeconds(publicMintStartDate), // public mint start time (in seconds)
           dateToSeconds(publicMintEndDate), // public mint end time (in seconds)
-          1, // mint limit per address in the public mint
-          "0", // mint fee per NFT for the public mint
+          mintLimitPerAccount, // mint limit per address in the public mint
+          mintFeePerNFT, // mint fee per NFT for the public mint
         ],
       },
     };
@@ -256,6 +258,26 @@ export function CreateCollection() {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="mb-5 flex flex-col item-center space-y-4">
+            <Label>Limit mint per address</Label>
+            <Input
+              type="number"
+              value={mintLimitPerAccount}
+              onChange={(e) => {
+                setMintLimitPerAccount(parseInt(e.target.value));
+              }}
+            />
+          </div>
+          <div className="mb-5 flex flex-col item-center space-y-4">
+            <Label>Mint fee per NFT</Label>
+            <Input
+              type="number"
+              value={mintFeePerNFT}
+              onChange={(e) => {
+                setMintFeePerNFT(parseInt(e.target.value));
+              }}
+            />
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label>Mint for myself (optional)</Label>
