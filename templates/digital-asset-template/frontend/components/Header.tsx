@@ -1,9 +1,9 @@
-import { IS_DEV } from "@/constants";
 import { useMintData } from "@/pages/Mint/hooks/useMintData";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { WalletSelector } from "./WalletSelector";
+import { IS_DEV } from "@/constants";
 import { buttonVariants } from "./ui/button";
 import { config } from "@/config";
 
@@ -14,13 +14,13 @@ export function Header() {
   const isRoot = location.pathname === "/";
 
   const title = useMemo(() => {
-    if (!isRoot) return "Fungible Asset Launchpad";
+    if (!isRoot) return "NFT Collection Launchpad";
     return (
-      data?.asset.symbol.toUpperCase() ??
-      config.defaultAsset?.name ??
-      "Fungible Asset Launchpad"
+      data?.collection.collection_name ??
+      config.defaultCollection?.name ??
+      "NFT Collection Launchpad"
     );
-  }, [isRoot, data?.asset]);
+  }, [isRoot, data?.collection]);
 
   return (
     <div className="flex items-center justify-between px-6 py-2 max-w-screen-xl mx-auto w-full">
@@ -33,17 +33,16 @@ export function Header() {
           <>
             <Link
               className={buttonVariants({ variant: "secondary" })}
-              to={"/my-assets"}>
-              My Assets
+              to={"/my-collections"}>
+              My Collections
             </Link>
             <Link
               className={buttonVariants({ variant: "secondary" })}
-              to={"/create-asset"}>
-              Create Asset
+              to={"/create-collection"}>
+              Create Collection
             </Link>
           </>
         )}
-
         <WalletSelector />
       </div>
     </div>

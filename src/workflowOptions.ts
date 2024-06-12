@@ -18,6 +18,11 @@ export const workflowOptions = {
         value: "digital-asset-template",
         description: "A dapp to mint a digital asset",
       },
+      {
+        title: "Fungible Asset",
+        value: "fungible-asset-template",
+        description: "A dapp to mint a fungible asset",
+      },
     ],
     initial: 0,
   },
