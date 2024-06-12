@@ -26,9 +26,10 @@
   ],
   "type": "module",
   "dependencies": {
+    "kolorist": "^1.8.0",
+    "ora": "^8.0.1",
     "prompts": "^2.4.2",
-    "typescript": "^4.7.4",
-    "kolorist": "^1.8.0"
+    "typescript": "^4.7.4"
   },
   "devDependencies": {
     "@types/node": "^20.5.0"

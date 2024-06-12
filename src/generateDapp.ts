@@ -2,11 +2,14 @@ import { green, bold, white } from "kolorist";
 import path from "path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
+import ora from "ora";
 
 import { Selections } from "./types.js";
 import { copy, runCommand } from "./utils/helpers.js";
 
-export const generateDapp = async (selection: Selections) => {
+const spinner = (text: string) => ora({ text, stream: process.stdout });
+
+export async function generateDapp(selection: Selections) {
   const projectName = selection.projectName || "my-aptos-dapp";
 
   // internal template directory path
@@ -23,6 +26,11 @@ export const generateDapp = async (selection: Selections) => {
 
   // target directory - current directory + chosen project name
   const targetDirectory = path.join(cwd, projectName);
+
+  console.log(); // print new line
+  const toolSpinner = spinner(
+    `Scaffolding project in ${targetDirectory}`
+  ).start();
 
   // make target directory if not exist
   if (!fs.existsSync(targetDirectory)) {
@@ -58,14 +66,14 @@ export const generateDapp = async (selection: Selections) => {
   process.chdir(targetDirectory);
 
   // install dependencies
-  console.log(green(`\nScaffolding project in ${targetDirectory}`));
-
   const installRootDepsCommand = `npm install --silent --no-progress`;
   runCommand(installRootDepsCommand);
 
   // create .env file
   const network = selection.network || "testnet";
   write(".env", `VITE_APP_NETWORK=${network}`);
+
+  toolSpinner.succeed();
 
   // Log next steps
   console.log(
@@ -101,4 +109,4 @@ export const generateDapp = async (selection: Selections) => {
     green(`6. open up your project in your favorite IDE and start coding!`) +
       "\n"
   );
-};
+}
