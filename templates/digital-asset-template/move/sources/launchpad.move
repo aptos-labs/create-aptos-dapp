@@ -523,6 +523,7 @@ module launchpad_addr::launchpad {
         let user1_addr = signer::address_of(user1);
         let user2_addr = signer::address_of(user2);
 
+        // current timestamp is 0 after initialization
         timestamp::set_time_has_started_for_testing(aptos_framework);
         account::create_account_for_test(user1_addr);
         account::create_account_for_test(user2_addr);
@@ -561,6 +562,33 @@ module launchpad_addr::launchpad {
 
         let nft = mint_nft_internal(user1_addr, collection_1);
         assert!(token::uri(nft) == string::utf8(b"https://gateway.irys.xyz/manifest_id/5.json"), 2);
+
+        let active_or_next_stage = get_active_or_next_mint_stage(collection_1);
+        assert!(active_or_next_stage == option::some(string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY)), 3);
+        let (start_time, end_time) = get_mint_stage_start_and_end_time(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY));
+        assert!(start_time == 0, 4);
+        assert!(end_time == 100, 5);
+
+        // bump global timestamp to 150 so allowlist stage is over but public mint stage is not started yet
+        timestamp::update_global_time_for_test_secs(150);
+        let active_or_next_stage = get_active_or_next_mint_stage(collection_1);
+        assert!(active_or_next_stage == option::some(string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY)), 6);
+        let (start_time, end_time) = get_mint_stage_start_and_end_time(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
+        assert!(start_time == 200, 7);
+        assert!(end_time == 300, 8);
+
+        // bump global timestamp to 250 so public mint stage is active
+        timestamp::update_global_time_for_test_secs(250);
+        let active_or_next_stage = get_active_or_next_mint_stage(collection_1);
+        assert!(active_or_next_stage == option::some(string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY)), 9);
+        let (start_time, end_time) = get_mint_stage_start_and_end_time(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
+        assert!(start_time == 200, 10);
+        assert!(end_time == 300, 11);
+
+        // bump global timestamp to 350 so public mint stage is over
+        timestamp::update_global_time_for_test_secs(350);
+        let active_or_next_stage = get_active_or_next_mint_stage(collection_1);
+        assert!(active_or_next_stage == option::none(), 12);
 
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
