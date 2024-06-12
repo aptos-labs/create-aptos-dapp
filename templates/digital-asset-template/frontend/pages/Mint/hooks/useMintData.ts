@@ -1,5 +1,7 @@
 import { config } from "@/config";
+import { MODULE_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
+import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { useQuery } from "@tanstack/react-query";
 
 export interface Token {
@@ -47,6 +49,37 @@ interface MintData {
   startDate: Date;
   endDate: Date;
   isMintActive: boolean;
+  isMintInfinite: boolean;
+}
+
+async function getStartAndEndTime(
+  collection_id: string
+): Promise<[start: Date, end: Date]> {
+  const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
+    payload: {
+      function: `${AccountAddress.from(
+        MODULE_ADDRESS
+      )}::launchpad::get_active_or_next_mint_stage`,
+      functionArguments: [collection_id],
+    },
+  });
+
+  const mintStage = mintStageRes[0].vec[0];
+
+  const startAndEndRes = await aptosClient().view<[string, string]>({
+    payload: {
+      function: `${AccountAddress.from(
+        MODULE_ADDRESS
+      )}::launchpad::get_mint_stage_start_and_end_time`,
+      functionArguments: [collection_id, mintStage],
+    },
+  });
+
+  const [start, end] = startAndEndRes;
+  return [
+    new Date(parseInt(start, 10) * 1000),
+    new Date(parseInt(end, 10) * 1000),
+  ];
 }
 
 export function useMintData(collection_id: string = config.collection_id) {
@@ -56,8 +89,8 @@ export function useMintData(collection_id: string = config.collection_id) {
     queryFn: async () => {
       if (!collection_id) return null;
 
-      const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      const startDate = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
+      const [startDate, endDate] = await getStartAndEndTime(collection_id);
+      const oneYearLater = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
 
       const res = await aptosClient().queryIndexer<MintQueryResult>({
         query: {
@@ -112,6 +145,7 @@ export function useMintData(collection_id: string = config.collection_id) {
         endDate,
         startDate,
         isMintActive: new Date() >= startDate && new Date() <= endDate,
+        isMintInfinite: endDate >= oneYearLater,
       } satisfies MintData;
     },
   });
