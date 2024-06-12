@@ -1,4 +1,4 @@
-import { green, bold } from "kolorist";
+import { green, bold, white } from "kolorist";
 import path from "path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
@@ -41,8 +41,16 @@ export const generateDapp = async (selection: Selections) => {
   };
 
   // loop over template files and write to target directory
-  // TODO - why does it include .DS_Store?
-  for (const file of files.filter((f) => f !== ".DS_Store")) {
+  // ignore .DS_Store, node_modules, package-lock.json, .aptos, build, .env
+  for (const file of files.filter(
+    (f) =>
+      f !== ".DS_Store" &&
+      f !== "node_modules" &&
+      f !== "package-lock.json" &&
+      f !== ".aptos" &&
+      f !== "build" &&
+      f !== ".env"
+  )) {
     write(file);
   }
 
@@ -66,19 +74,31 @@ export const generateDapp = async (selection: Selections) => {
 
   console.log(bold("\nNext steps:") + "\n");
   console.log(
-    green(`1. run [cd ${projectName}] to your dapp directory.`) + "\n"
+    green(`1. run ${white(`cd ${projectName}`)} to your dapp directory.`) + "\n"
   );
   console.log(
-    green(`2. run [npm run move:init] to initialize a new CLI Profile.`) + "\n"
+    green(
+      `2. run ${white("npm run move:init")} to initialize a new CLI Profile.`
+    ) + "\n"
   );
   console.log(
-    green(`2. run [npm run move:test] to run move module unit tests.`) + "\n"
+    green(
+      `2. run ${white("npm run move:test")} to run move module unit tests.`
+    ) + "\n"
   );
   console.log(
-    green(`3. run [npm run move:compile] to compile your move contract.`) + "\n"
+    green(
+      `3. run ${white("npm run move:compile")} to compile your move contract.`
+    ) + "\n"
   );
   console.log(
-    green(`4. run [npm run move:publish] to publish your contract.`) + "\n"
+    green(`4. run ${white("npm run move:publish")} to publish your contract.`) +
+      "\n"
   );
-  console.log(green(`5. run [npm run dev] to run your dapp.`) + "\n");
+  console.log(green(`5. run ${white("npm run dev")} to run your dapp.`) + "\n");
+
+  console.log(
+    green(`6. open up your project in your favorite IDE and start coding!`) +
+      "\n"
+  );
 };
