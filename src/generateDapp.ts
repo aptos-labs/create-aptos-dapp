@@ -72,6 +72,9 @@ export const generateDapp = async (selection: Selections) => {
     green(`2. run [npm run move:init] to initialize a new CLI Profile.`) + "\n"
   );
   console.log(
+    green(`2. run [npm run move:test] to run move module unit tests.`) + "\n"
+  );
+  console.log(
     green(`3. run [npm run move:compile] to compile your move contract.`) + "\n"
   );
   console.log(
