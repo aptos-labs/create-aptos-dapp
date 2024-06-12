@@ -43,7 +43,9 @@ export function CreateCollection() {
   const [royaltyPercentage, setRoyaltyPercentage] = useState<number>();
   const [preMintAmount, setPreMintAmount] = useState<number>();
   const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
+  const [publicMintStartTime, setPublicMintStartTime] = useState<string>();
   const [publicMintEndDate, setPublicMintEndDate] = useState<Date>();
+  const [publicMintEndTime, setPublicMintEndTime] = useState<string>();
   const [mintLimitPerAccount, setMintLimitPerAccount] = useState<number>();
   const [mintFeePerNFT, setMintFeePerNFT] = useState<number>();
 
@@ -66,6 +68,32 @@ export function CreateCollection() {
       inputRef.current.setAttribute("webkitdirectory", "true");
     }
   }, []);
+
+  const onPublicMintStartTime = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const timeValue = event.target.value;
+    setPublicMintStartTime(timeValue);
+
+    const [hours, minutes] = timeValue.split(":").map(Number);
+
+    publicMintStartDate?.setHours(hours);
+    publicMintStartDate?.setMinutes(minutes);
+    publicMintStartDate?.setSeconds(0);
+    setPublicMintStartDate(publicMintStartDate);
+  };
+
+  const onPublicMintEndTime = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const timeValue = event.target.value;
+    setPublicMintEndTime(timeValue);
+
+    const [hours, minutes] = timeValue.split(":").map(Number);
+
+    publicMintEndDate?.setHours(hours);
+    publicMintEndDate?.setMinutes(minutes);
+    publicMintEndDate?.setSeconds(0);
+    setPublicMintEndDate(publicMintEndDate);
+  };
 
   // Function to upload Collection data to Irys - a decentralized asset server
   const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +222,7 @@ export function CreateCollection() {
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {publicMintStartDate ? (
-                          format(publicMintStartDate, "PPP")
+                          format(publicMintStartDate, "MM/dd/yyyy hh:mm a")
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -206,6 +234,14 @@ export function CreateCollection() {
                         selected={publicMintStartDate}
                         onSelect={setPublicMintStartDate}
                         initialFocus
+                        footer={
+                          <Input
+                            type="time"
+                            className="w-max py-6"
+                            value={publicMintStartTime}
+                            onChange={(event) => onPublicMintStartTime(event)}
+                          />
+                        }
                       />
                     </PopoverContent>
                   </Popover>
@@ -224,7 +260,7 @@ export function CreateCollection() {
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {publicMintEndDate ? (
-                          format(publicMintEndDate, "PPP")
+                          format(publicMintEndDate, "MM/dd/yyyy hh:mm a")
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -236,6 +272,14 @@ export function CreateCollection() {
                         selected={publicMintEndDate}
                         onSelect={setPublicMintEndDate}
                         initialFocus
+                        footer={
+                          <Input
+                            type="time"
+                            className="w-max py-6"
+                            value={publicMintEndTime}
+                            onChange={(event) => onPublicMintEndTime(event)}
+                          />
+                        }
                       />
                     </PopoverContent>
                   </Popover>
