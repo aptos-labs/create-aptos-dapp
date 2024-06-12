@@ -110,7 +110,7 @@ export function CreateCollection() {
           projectUri,
           maxSupply,
           royaltyPercentage,
-          preMintAmount, // amount of NFT to premint for myself
+          preMintAmount ?? 0, // amount of NFT to premint for myself
           undefined, // addresses in the allow list
           undefined, // allow list start time (in seconds)
           undefined, // allow list end time (in seconds)
@@ -123,7 +123,7 @@ export function CreateCollection() {
         ],
       },
     };
-    console.log("transaction", transaction);
+
     const response = await signAndSubmitTransaction(transaction);
 
     const committedTransactionResponse = await aptosClient().waitForTransaction(
