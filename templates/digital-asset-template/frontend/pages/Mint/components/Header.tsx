@@ -40,7 +40,7 @@ export const Header: FC = () => {
         </Alert>
       )}
 
-      <nav className="navbar-container  flex justify-between max-w-screen-xl mx-auto">
+      <nav className="navbar-container flex justify-between max-w-screen-xl mx-auto flex-wrap">
         <p className="display">
           {data?.collection.collection_name ?? config.defaultCollection?.name}
         </p>

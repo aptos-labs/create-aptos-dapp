@@ -121,12 +121,14 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             </div>
           )}
 
-          {data?.endDate && new Date() < data.endDate && (
-            <div className="flex gap-x-2 justify-between flex-wrap">
-              <p className="body-sm-semibold">Minting ends</p>
-              <p className="body-sm">{formatDate(data.endDate)}</p>
-            </div>
-          )}
+          {data?.endDate &&
+            new Date() < data.endDate &&
+            !data.isMintInfinite && (
+              <div className="flex gap-x-2 justify-between flex-wrap">
+                <p className="body-sm-semibold">Minting ends</p>
+                <p className="body-sm">{formatDate(data.endDate)}</p>
+              </div>
+            )}
 
           {data?.endDate && new Date() > data.endDate && (
             <p className="body-sm-semibold">Minting has ended</p>
