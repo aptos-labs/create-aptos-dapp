@@ -32,6 +32,14 @@ module launchpad_addr::launchpad {
     const ENO_ACTIVE_STAGES: u64 = 5;
     /// Creator must set at least one mint stage
     const EAT_LEAST_ONE_STAGE_IS_REQUIRED: u64 = 6;
+    /// Start time must be set for stage
+    const ESTART_TIME_MUST_BE_SET_FOR_STAGE: u64 = 7;
+    /// End time must be set for stage
+    const EEND_TIME_MUST_BE_SET_FOR_STAGE: u64 = 8;
+    /// Mint limit per address must be set for stage
+    const EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE: u64 = 9;
+    /// Mint fee per nft must be set for stage
+    const EMINT_FEE_PER_NFT_MUST_BE_SET_FOR_STAGE: u64 = 10;
 
     const ONE_HUNDRED_YEARS_IN_SECONDS: u64 = 100 * 365 * 24 * 60 * 60;
 
@@ -213,61 +221,28 @@ module launchpad_addr::launchpad {
             EAT_LEAST_ONE_STAGE_IS_REQUIRED
         );
 
-        if (option::is_some(&allowlist)) {
-            let allowlist = *option::borrow(&allowlist);
-            let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
-            mint_stage::create(
-                collection_obj_signer,
-                stage,
-                *option::borrow(&allowlist_start_time),
-                *option::borrow(&allowlist_end_time),
-            );
+        add_allowlist_stage(
+            collection_obj,
+            collection_obj_addr,
+            collection_obj_signer,
+            collection_owner_obj_signer,
+            allowlist,
+            allowlist_start_time,
+            allowlist_end_time,
+            allowlist_mint_limit_per_addr,
+            allowlist_mint_fee_per_nft,
+        );
 
-            for (i in 0..vector::length(&allowlist)) {
-                mint_stage::upsert_allowlist(
-                    collection_owner_obj_signer,
-                    collection_obj,
-                    mint_stage::find_mint_stage_index_by_name(collection_obj, stage),
-                    *vector::borrow(&allowlist, i),
-                    *option::borrow(&allowlist_mint_limit_per_addr)
-                );
-            };
-
-            let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-            simple_map::upsert(
-                &mut collection_config.mint_fee_per_nft_by_stages,
-                stage,
-                *option::borrow(&allowlist_mint_fee_per_nft)
-            );
-        };
-
-        if (option::is_some(&public_mint_start_time)) {
-            let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
-            mint_stage::create(
-                collection_obj_signer,
-                stage,
-                *option::borrow(&public_mint_start_time),
-                *option::borrow_with_default(&public_mint_end_time, &ONE_HUNDRED_YEARS_IN_SECONDS),
-            );
-
-            let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
-
-            if (option::is_some(&public_mint_limit_per_addr)) {
-                mint_stage::upsert_public_stage_max_per_user(
-                    collection_owner_obj_signer,
-                    collection_obj,
-                    stage_idx,
-                    *option::borrow(&public_mint_limit_per_addr)
-                );
-            };
-
-            let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-            simple_map::upsert(
-                &mut collection_config.mint_fee_per_nft_by_stages,
-                stage,
-                *option::borrow(&public_mint_fee_per_nft)
-            );
-        };
+        add_public_mint_stage(
+            collection_obj,
+            collection_obj_addr,
+            collection_obj_signer,
+            collection_owner_obj_signer,
+            public_mint_start_time,
+            public_mint_end_time,
+            public_mint_limit_per_addr,
+            public_mint_fee_per_nft,
+        );
 
         let registry = borrow_global_mut<Registry>(@launchpad_addr);
         vector::push_back(&mut registry.collection_objects, collection_obj);
@@ -436,6 +411,98 @@ module launchpad_addr::launchpad {
 
     fun is_pending_admin(config: &Config, sender: address): bool {
         config.pending_admin_addr == option::some(sender)
+    }
+
+    fun add_allowlist_stage(
+        collection_obj: Object<Collection>,
+        collection_obj_addr: address,
+        collection_obj_signer: &signer,
+        collection_owner_obj_signer: &signer,
+        allowlist: Option<vector<address>>,
+        allowlist_start_time: Option<u64>,
+        allowlist_end_time: Option<u64>,
+        allowlist_mint_limit_per_addr: Option<u64>,
+        allowlist_mint_fee_per_nft: Option<u64>,
+    ) acquires CollectionConfig {
+        if (option::is_none(&allowlist)) {
+            return
+        };
+
+        assert!(option::is_some(&allowlist_start_time), ESTART_TIME_MUST_BE_SET_FOR_STAGE);
+        assert!(option::is_some(&allowlist_end_time), EEND_TIME_MUST_BE_SET_FOR_STAGE);
+        assert!(option::is_some(&allowlist_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
+        assert!(option::is_some(&allowlist_mint_fee_per_nft), EMINT_FEE_PER_NFT_MUST_BE_SET_FOR_STAGE);
+
+        let allowlist = *option::borrow(&allowlist);
+        let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
+        mint_stage::create(
+            collection_obj_signer,
+            stage,
+            *option::borrow(&allowlist_start_time),
+            *option::borrow(&allowlist_end_time),
+        );
+
+        for (i in 0..vector::length(&allowlist)) {
+            mint_stage::upsert_allowlist(
+                collection_owner_obj_signer,
+                collection_obj,
+                mint_stage::find_mint_stage_index_by_name(collection_obj, stage),
+                *vector::borrow(&allowlist, i),
+                *option::borrow(&allowlist_mint_limit_per_addr)
+            );
+        };
+
+        let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
+        simple_map::upsert(
+            &mut collection_config.mint_fee_per_nft_by_stages,
+            stage,
+            *option::borrow(&allowlist_mint_fee_per_nft)
+        );
+    }
+
+    fun add_public_mint_stage(
+        collection_obj: Object<Collection>,
+        collection_obj_addr: address,
+        collection_obj_signer: &signer,
+        collection_owner_obj_signer: &signer,
+        public_mint_start_time: Option<u64>,
+        public_mint_end_time: Option<u64>,
+        public_mint_limit_per_addr: Option<u64>,
+        public_mint_fee_per_nft: Option<u64>,
+    ) acquires CollectionConfig {
+        if (option::is_none(&public_mint_start_time)) {
+            return
+        };
+
+        assert!(option::is_some(&public_mint_end_time), EEND_TIME_MUST_BE_SET_FOR_STAGE);
+        assert!(option::is_some(&public_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
+        assert!(option::is_some(&public_mint_fee_per_nft), EMINT_FEE_PER_NFT_MUST_BE_SET_FOR_STAGE);
+
+        let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
+        mint_stage::create(
+            collection_obj_signer,
+            stage,
+            *option::borrow(&public_mint_start_time),
+            *option::borrow_with_default(&public_mint_end_time, &ONE_HUNDRED_YEARS_IN_SECONDS),
+        );
+
+        let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
+
+        if (option::is_some(&public_mint_limit_per_addr)) {
+            mint_stage::upsert_public_stage_max_per_user(
+                collection_owner_obj_signer,
+                collection_obj,
+                stage_idx,
+                *option::borrow(&public_mint_limit_per_addr)
+            );
+        };
+
+        let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
+        simple_map::upsert(
+            &mut collection_config.mint_fee_per_nft_by_stages,
+            stage,
+            *option::borrow(&public_mint_fee_per_nft)
+        );
     }
 
     fun pay_for_mint(sender: &signer, mint_fee: u64) acquires Config {
