@@ -28,6 +28,8 @@ import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
 
+import { dateToSeconds } from "../utils/helpers";
+
 export function CreateCollection() {
   // Wallet connect providers
   const aptosWallet = useWallet();
@@ -84,12 +86,6 @@ export function CreateCollection() {
         setUploadStatus
       );
     }
-  };
-
-  const dateToSeconds = (date: Date | undefined) => {
-    if (!date) return;
-    const dateInSeconds = Math.floor(+date / 1000);
-    return dateInSeconds;
   };
 
   const createCollection = async () => {
