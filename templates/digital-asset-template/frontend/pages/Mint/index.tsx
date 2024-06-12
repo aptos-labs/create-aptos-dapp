@@ -8,7 +8,7 @@ import { OurTeamSection } from "./components/OurTeamSection";
 import { FAQSection } from "./components/FAQSection";
 import { useMintData } from "./hooks/useMintData";
 import { Socials } from "./components/Socials";
-import { Header } from "./components/Header";
+import { ConnectWalletAler } from "./components/ConnectWalletAlert";
 
 export function Mint() {
   const { data, isLoading } = useMintData();
@@ -23,8 +23,8 @@ export function Mint() {
 
   return (
     <div style={{ overflow: "hidden" }} className="overflow-hidden">
-      <Header />
       <main className="flex flex-col gap-10 md:gap-16 mt-6">
+        <ConnectWalletAler />
         <HeroSection />
         <StatsSection />
         <OurStorySection />
