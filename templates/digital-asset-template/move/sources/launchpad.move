@@ -474,7 +474,6 @@ module launchpad_addr::launchpad {
             return
         };
 
-        assert!(option::is_some(&public_mint_end_time), EEND_TIME_MUST_BE_SET_FOR_STAGE);
         assert!(option::is_some(&public_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
         assert!(option::is_some(&public_mint_fee_per_nft), EMINT_FEE_PER_NFT_MUST_BE_SET_FOR_STAGE);
 
