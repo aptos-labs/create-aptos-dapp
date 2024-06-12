@@ -33,6 +33,8 @@ module launchpad_addr::launchpad {
     /// Creator must set at least one mint stage
     const EAT_LEAST_ONE_STAGE_IS_REQUIRED: u64 = 6;
 
+    const ONE_HUNDRED_YEARS_IN_SECONDS: u64 = 100 * 365 * 24 * 60 * 60;
+
     const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint mint stage";
 
@@ -245,7 +247,7 @@ module launchpad_addr::launchpad {
                 collection_obj_signer,
                 stage,
                 *option::borrow(&public_mint_start_time),
-                *option::borrow(&public_mint_end_time),
+                *option::borrow_with_default(&public_mint_end_time, &ONE_HUNDRED_YEARS_IN_SECONDS),
             );
 
             let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
