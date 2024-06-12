@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { IS_DEV } from "@/constants";
 import { config } from "@/config";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertOctagon } from "lucide-react";
 
 export const Header: FC = () => {
   const { data } = useMintData();
@@ -12,7 +13,8 @@ export const Header: FC = () => {
   return (
     <header className="px-6 pt-6">
       {!config.collection_id && (
-        <Alert className="mb-6" variant="destructive">
+        <Alert className="mb-6" variant="warning">
+          <AlertOctagon className="w-4 h-5" />
           <AlertTitle className="body-md-semibold">
             Collection ID not set
           </AlertTitle>
