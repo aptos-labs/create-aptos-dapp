@@ -44,8 +44,9 @@ interface MintData {
   totalMinted: number;
   uniqueHolders: number;
   collection: Collection;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
+  isMintActive: boolean;
 }
 
 export function useMintData(collection_id: string = config.collection_id) {
@@ -54,6 +55,10 @@ export function useMintData(collection_id: string = config.collection_id) {
     refetchInterval: 1000 * 30,
     queryFn: async () => {
       if (!collection_id) return null;
+
+      const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const startDate = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
+
       const res = await aptosClient().queryIndexer<MintQueryResult>({
         query: {
           variables: {
@@ -104,8 +109,9 @@ export function useMintData(collection_id: string = config.collection_id) {
           res.current_collection_ownership_v2_view_aggregate.aggregate?.count ??
           0,
         collection,
-        endDate: "", // endDateRes[0][0].inner,
-        startDate: "", // startDateRes[0][0].inner,
+        endDate,
+        startDate,
+        isMintActive: new Date() >= startDate && new Date() <= endDate,
       } satisfies MintData;
     },
   });

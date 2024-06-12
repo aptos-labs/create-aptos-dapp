@@ -19,6 +19,7 @@ import { aptosClient } from "@/utils/aptosClient";
 import { useQueryClient } from "@tanstack/react-query";
 import Placeholder1 from "@/assets/placeholders/bear-1.png";
 import { config } from "@/config";
+import { formatDate } from "@/utils/formatDate";
 
 interface HeroSectionProps {}
 
@@ -32,7 +33,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
 
   const mintNft = async (e: FormEvent) => {
     e.preventDefault();
-    if (!account) return;
+    if (!account || !data?.isMintActive) return;
 
     const transaction: InputTransactionData = {
       data: {
@@ -65,6 +66,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
         <p className="body-sm">
           {collection?.description ?? config.defaultCollection?.description}
         </p>
+
         <Card>
           <CardContent
             fullPadding
@@ -72,12 +74,15 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             <form onSubmit={mintNft} className="flex gap-4">
               <Input
                 type="number"
+                disabled={!data?.isMintActive}
                 value={nftCount}
                 onChange={(e) =>
                   setNftCount(parseInt(e.currentTarget.value, 10))
                 }
               />
-              <Button type="submit">Mint</Button>
+              <Button type="submit" disabled={!data?.isMintActive}>
+                Mint
+              </Button>
             </form>
 
             <div className="flex flex-col gap-2">
@@ -91,6 +96,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             </div>
           </CardContent>
         </Card>
+
         <div className="flex gap-x-2 items-center flex-wrap justify-between">
           <p className="whitespace-nowrap body-sm-semibold">
             Collection Address
@@ -105,6 +111,26 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
               View on Explorer <Image src={ExternalLink} />
             </a>
           </div>
+        </div>
+
+        <div>
+          {data?.startDate && new Date() < data.startDate && (
+            <div className="flex gap-x-2 justify-between flex-wrap">
+              <p className="body-sm-semibold">Minting starts</p>
+              <p className="body-sm">{formatDate(data.startDate)}</p>
+            </div>
+          )}
+
+          {data?.endDate && new Date() < data.endDate && (
+            <div className="flex gap-x-2 justify-between flex-wrap">
+              <p className="body-sm-semibold">Minting ends</p>
+              <p className="body-sm">{formatDate(data.endDate)}</p>
+            </div>
+          )}
+
+          {data?.endDate && new Date() > data.endDate && (
+            <p className="body-sm-semibold">Minting has ended</p>
+          )}
         </div>
       </div>
     </section>
