@@ -140,7 +140,7 @@ export function CreateCollection() {
           dateToSeconds(publicMintStartDate), // public mint start time (in seconds)
           dateToSeconds(publicMintEndDate), // public mint end time (in seconds)
           mintLimitPerAccount, // mint limit per address in the public mint
-          mintFeePerNFT, // mint fee per NFT for the public mint
+          mintFeePerNFT ? mintFeePerNFT / 1e8 : 0, // mint fee per NFT for the public mint
         ],
       },
     };
