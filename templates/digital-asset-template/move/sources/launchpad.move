@@ -259,7 +259,7 @@ module launchpad_addr::launchpad {
         });
 
         let nft_objs = vector[];
-        for (i in 0..option::borrow_with_default(&pre_mint_amount, &0)) {
+        for (i in 0..*option::borrow_with_default(&pre_mint_amount, &0)) {
             let nft_obj = mint_nft_internal(sender_addr, collection_obj);
             vector::push_back(&mut nft_objs, nft_obj);
         };
