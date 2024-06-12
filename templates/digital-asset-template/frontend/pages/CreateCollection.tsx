@@ -28,9 +28,6 @@ import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
 
-const currentUnixTimestamp = Math.floor(Date.now() / 1000);
-const secondsInAWeek = 7 * 24 * 60 * 60;
-
 export function CreateCollection() {
   // Wallet connect providers
   const aptosWallet = useWallet();
