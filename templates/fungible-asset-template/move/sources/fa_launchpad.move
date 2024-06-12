@@ -29,7 +29,7 @@ module launchpad_addr::fa_launchpad {
         icon_uri: string::String,
         project_uri: string::String,
         mint_fee_per_fa: u64,
-        pre_mint_amount: u64,
+        pre_mint_amount: option::Option<u64>,
         mint_limit_per_addr: option::Option<u64>,
     }
 
@@ -115,7 +115,7 @@ module launchpad_addr::fa_launchpad {
         icon_uri: string::String,
         project_uri: string::String,
         mint_fee_per_fa: u64,
-        pre_mint_amount: u64,
+        pre_mint_amount: option::Option<u64>,
         mint_limit_per_addr: option::Option<u64>,
     ) acquires Registry, Config, FAController {
         let sender_addr = signer::address_of(sender);
@@ -183,8 +183,9 @@ module launchpad_addr::fa_launchpad {
             mint_limit_per_addr,
         });
 
-        if (pre_mint_amount > 0) {
-            mint_fa_internal(sender, fa_obj, pre_mint_amount, 0)
+        if (option::is_some(&pre_mint_amount)) {
+            let amount = *option::borrow(&pre_mint_amount);
+            mint_fa_internal(sender, fa_obj, amount, 0);
         }
     }
 
