@@ -53,10 +53,10 @@ export function CreateCollection() {
   const [collectionDescription, setCollectionDescription] = useState<string>();
   const [projectUri, setProjectUri] = useState<string>();
 
-  const [files, setFiles] = useState<FileList | null>(null);
-
   // UI internal state
-  const [uploadStatus, setUploadStatus] = useState("Upload Files");
+  const [uploadStatus, setUploadStatus] = useState(
+    "Uploads collection files to Irys, a decentralized storage"
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -68,14 +68,14 @@ export function CreateCollection() {
   }, []);
 
   // Function to upload Collection data to Irys - a decentralized asset server
-  const onUploadFile = async () => {
-    if (files) {
+  const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = event.target.files;
       alert(`The upload process requires at least 2 message signatures
       1. To upload collection cover image file and NFT image files into Irys
       2. To upload collection metadata file and NFT metadata files into Irys
 
       In the case we need to fund a node on Irys, a transfer transaction submission is required also.`);
-
       await uploadCollectionData(
         aptosWallet,
         files,
@@ -154,9 +154,7 @@ export function CreateCollection() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Card>
                 <CardHeader>
-                  <CardDescription>
-                    Uploads collection data to a decentralized storage
-                  </CardDescription>
+                  <CardDescription>{uploadStatus}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col items-center justify-between">
@@ -165,16 +163,9 @@ export function CreateCollection() {
                       multiple
                       type="file"
                       placeholder="Upload Assets"
-                      onChange={(event) => setFiles(event.target.files)}
+                      onChange={(event) => onUploadFile(event)}
                     />
                   </div>
-                  <Button
-                    disabled={!account || !files}
-                    className="mt-4"
-                    onClick={onUploadFile}
-                  >
-                    {uploadStatus}
-                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -288,7 +279,9 @@ export function CreateCollection() {
               !royaltyPercentage ||
               !account ||
               !publicMintStartDate ||
-              !royaltyPercentage
+              !royaltyPercentage ||
+              !mintLimitPerAccount ||
+              !mintFeePerNFT
             }
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
             onClick={createCollection}
