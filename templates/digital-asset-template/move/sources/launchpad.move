@@ -232,7 +232,7 @@ module launchpad_addr::launchpad {
             );
         };
 
-        if (option::is_some(&public_mint_end_time)) {
+        if (option::is_some(&public_mint_start_time)) {
             let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
             mint_stage::create(
                 collection_obj_signer,
