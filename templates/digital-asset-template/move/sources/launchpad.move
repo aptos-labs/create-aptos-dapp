@@ -51,11 +51,11 @@ module launchpad_addr::launchpad {
         creator_addr: address,
         collection_owner_obj: Object<CollectionOwnerObjConfig>,
         collection_obj: Object<Collection>,
-        max_supply: Option<u64>,
+        max_supply: u64,
         name: String,
         description: String,
         uri: String,
-        pre_mint_amount: u64,
+        pre_mint_amount: Option<u64>,
         allowlist: Option<vector<address>>,
         allowlist_start_time: Option<u64>,
         allowlist_end_time: Option<u64>,
@@ -160,9 +160,9 @@ module launchpad_addr::launchpad {
         description: String,
         name: String,
         uri: String,
-        max_supply: Option<u64>,
+        max_supply: u64,
         royalty_percentage: Option<u64>,
-        pre_mint_amount: u64,
+        pre_mint_amount: Option<u64>,
         allowlist: Option<vector<address>>,
         allowlist_start_time: Option<u64>,
         allowlist_end_time: Option<u64>,
@@ -182,24 +182,15 @@ module launchpad_addr::launchpad {
         let collection_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
         let collection_owner_obj_signer = &object::generate_signer(collection_owner_obj_constructor_ref);
 
-        let collection_obj_constructor_ref = if (option::is_some(&max_supply)) {
+        let collection_obj_constructor_ref =
             &collection::create_fixed_collection(
                 collection_owner_obj_signer,
                 description,
-                option::extract(&mut max_supply),
+                max_supply,
                 name,
                 royalty,
                 uri,
-            )
-        } else {
-            &collection::create_unlimited_collection(
-                collection_owner_obj_signer,
-                description,
-                name,
-                royalty,
-                uri,
-            )
-        };
+            );
         let collection_obj_signer = &object::generate_signer(collection_obj_constructor_ref);
         let collection_obj_addr = signer::address_of(collection_obj_signer);
         let collection_obj = object::object_from_constructor_ref(collection_obj_constructor_ref);
@@ -268,7 +259,7 @@ module launchpad_addr::launchpad {
         });
 
         let nft_objs = vector[];
-        for (i in 0..pre_mint_amount) {
+        for (i in 0..option::borrow_with_default(&pre_mint_amount, &0)) {
             let nft_obj = mint_nft_internal(sender_addr, collection_obj);
             vector::push_back(&mut nft_objs, nft_obj);
         };
@@ -604,9 +595,9 @@ module launchpad_addr::launchpad {
             string::utf8(b"description"),
             string::utf8(b"name"),
             string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
+            10,
             option::some(10),
-            option::some(10),
-            3,
+            option::some(3),
             option::some(vector[user1_addr]),
             option::some(timestamp::now_seconds()),
             option::some(timestamp::now_seconds() + 100),
