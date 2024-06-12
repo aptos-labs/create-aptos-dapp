@@ -29,7 +29,9 @@ module launchpad_addr::launchpad {
     /// Only admin can create collection
     const EONLY_ADMIN_CAN_CREATE_COLLECTION: u64 = 4;
     /// No active mint stages
-    const E_NO_ACTIVE_STAGES: u64 = 5;
+    const ENO_ACTIVE_STAGES: u64 = 5;
+    /// Creator must set at least one mint stage
+    const EAT_LEAST_ONE_STAGE_IS_REQUIRED: u64 = 6;
 
     const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint mint stage";
@@ -204,6 +206,11 @@ module launchpad_addr::launchpad {
             collection_owner_obj,
         });
 
+        assert!(
+            option::is_some(&allowlist) || option::is_some(&public_mint_start_time),
+            EAT_LEAST_ONE_STAGE_IS_REQUIRED
+        );
+
         if (option::is_some(&allowlist)) {
             let allowlist = *option::borrow(&allowlist);
             let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
@@ -303,7 +310,7 @@ module launchpad_addr::launchpad {
         let sender_addr = signer::address_of(sender);
 
         let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, 1);
-        assert!(option::is_some(stage_idx), E_NO_ACTIVE_STAGES);
+        assert!(option::is_some(stage_idx), ENO_ACTIVE_STAGES);
 
         let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
         let stage_name = mint_stage::mint_stage_name(stage_obj);
@@ -328,11 +335,11 @@ module launchpad_addr::launchpad {
         let sender_addr = signer::address_of(sender);
 
         let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
-        assert!(option::is_some(stage_idx), E_NO_ACTIVE_STAGES);
+        assert!(option::is_some(stage_idx), ENO_ACTIVE_STAGES);
 
         let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
         let stage_name = mint_stage::mint_stage_name(stage_obj);
-        let total_mint_fee = amount * get_mint_fee_per_nft(collection_obj,  stage_name);
+        let total_mint_fee = amount * get_mint_fee_per_nft(collection_obj, stage_name);
         pay_for_mint(sender, total_mint_fee);
 
         let nft_objs = vector[];
