@@ -10,6 +10,7 @@ module launchpad_addr::launchpad {
     use aptos_framework::aptos_account;
     use aptos_framework::event;
     use aptos_framework::object::{Self, Object};
+    use aptos_framework::timestamp;
 
     use aptos_token_objects::collection::{Self, Collection};
     use aptos_token_objects::royalty::{Self, Royalty};
@@ -304,7 +305,9 @@ module launchpad_addr::launchpad {
         let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, 1);
         assert!(option::is_some(stage_idx), E_NO_ACTIVE_STAGES);
 
-        let mint_fee = get_mint_fee_per_nft(collection_obj, *option::borrow(stage_idx));
+        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
+        let stage_name = mint_stage::mint_stage_name(stage_obj);
+        let mint_fee = get_mint_fee_per_nft(collection_obj, stage_name);
         pay_for_mint(sender, mint_fee);
 
         let nft_obj = mint_nft_internal(sender_addr, collection_obj);
@@ -327,7 +330,9 @@ module launchpad_addr::launchpad {
         let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
         assert!(option::is_some(stage_idx), E_NO_ACTIVE_STAGES);
 
-        let total_mint_fee = amount * get_mint_fee_per_nft(collection_obj, *option::borrow(stage_idx));
+        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
+        let stage_name = mint_stage::mint_stage_name(stage_obj);
+        let total_mint_fee = amount * get_mint_fee_per_nft(collection_obj,  stage_name);
         pay_for_mint(sender, total_mint_fee);
 
         let nft_objs = vector[];
@@ -367,14 +372,43 @@ module launchpad_addr::launchpad {
     #[view]
     public fun get_mint_fee_per_nft(
         collection_obj: Object<Collection>,
-        stage_idx: u64,
+        stage_name: String,
     ): u64 acquires CollectionConfig {
-        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, stage_idx);
-        let stage_name = mint_stage::mint_stage_name(stage_obj);
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
         let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage_name);
         fee
     }
+
+    // Returns the name of the current active mint stage or the next mint stage if there is no active mint stage
+    #[view]
+    public fun get_active_or_next_mint_stage(collection_obj: Object<Collection>): Option<String> {
+        let active_stage_idx = mint_stage::ccurent_active_stage(collection_obj);
+        if (option::is_some(&active_stage_idx)) {
+            let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(&active_stage_idx));
+            let stage_name = mint_stage::mint_stage_name(stage_obj);
+            option::some(stage_name)
+        } else {
+            let stages = mint_stage::stages(collection_obj);
+            for (i in 0..vector::length(&stages)) {
+                let stage_name = *vector::borrow(&stages, i);
+                let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
+                if (mint_stage::start_time(collection_obj, stage_idx) > timestamp::now_seconds()) {
+                    return option::some(stage_name)
+                }
+            };
+            option::none()
+        }
+    }
+
+    #[view]
+    public fun get_mint_stage_start_and_end_time(collection_obj: Object<Collection>, stage_name: String): (u64, u64) {
+        let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
+        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, stage_idx);
+        let start_time = mint_stage::mint_stage_start_time(stage_obj);
+        let end_time = mint_stage::mint_stage_end_time(stage_obj);
+        (start_time, end_time)
+    }
+
 
     // ================================= Helpers ================================= //
 
@@ -466,8 +500,6 @@ module launchpad_addr::launchpad {
     #[test_only]
     use aptos_framework::coin;
     #[test_only]
-    use aptos_framework::timestamp;
-    #[test_only]
     use aptos_framework::account;
 
     #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200, user2 = @0x201)]
@@ -513,7 +545,7 @@ module launchpad_addr::launchpad {
         let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(collection::count(collection_1) == option::some(3), 1);
 
-        let mint_fee = get_mint_fee_per_nft(collection_1, 0);
+        let mint_fee = get_mint_fee_per_nft(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY));
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         mint_nft(user1, collection_1);
