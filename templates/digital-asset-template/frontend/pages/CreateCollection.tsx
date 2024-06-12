@@ -23,6 +23,8 @@ import {
 import { aptosClient } from "@/utils/aptosClient";
 import { uploadCollectionData } from "@/utils/assetsUploader";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertOctagon } from "lucide-react";
 
 const currentUnixTimestamp = Math.floor(Date.now() / 1000);
 const secondsInAWeek = 7 * 24 * 60 * 60;
@@ -50,15 +52,10 @@ export function CreateCollection() {
 
   // UI internal state
   const [uploadStatus, setUploadStatus] = useState("Upload Files");
-  const [disableCreateCollectionButton, setDisableCreateCollectionButton] =
-    useState<boolean>(true);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (maxSupply && royaltyPercentage) {
-      setDisableCreateCollectionButton(false);
-    }
     // So we can upload a folder
     if (inputRef.current) {
       inputRef.current.setAttribute("webkitdirectory", "true");
@@ -131,6 +128,19 @@ export function CreateCollection() {
       <LaunchpadHeader />
       <div className="flex items-center justify-between px-6 py-2">
         <div className="w-2/4">
+          {!account && (
+            <Alert variant="warning">
+              <AlertOctagon className="w-4 h-5" />
+              <AlertTitle className="body-md-semibold">
+                Connect wallet
+              </AlertTitle>
+              <AlertDescription className="body-sm">
+                To continue with creating your collection, first connect your
+                wallet.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <h3 className="font-bold leading-none tracking-tight md:text-xl dark:text-white py-2">
             Create NFT Collection
           </h3>
@@ -165,10 +175,9 @@ export function CreateCollection() {
             </div>
           </div>
           <Button
-            disabled={disableCreateCollectionButton}
+            disabled={!maxSupply || !royaltyPercentage || !account}
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-            onClick={createCollection}
-          >
+            onClick={createCollection}>
             Create Collection
           </Button>
         </div>
@@ -191,7 +200,10 @@ export function CreateCollection() {
                   onChange={(event) => setFiles(event.target.files)}
                 />
               </div>
-              <Button className="mt-4" onClick={onUploadFile}>
+              <Button
+                disabled={!account || !files}
+                className="mt-4"
+                onClick={onUploadFile}>
                 {uploadStatus}
               </Button>
             </CardContent>
