@@ -201,7 +201,7 @@ export function CreateCollection() {
                 />
               </div>
               <Button
-                disabled={!account}
+                disabled={!account || !files}
                 className="mt-4"
                 onClick={onUploadFile}>
                 {uploadStatus}
