@@ -17,6 +17,7 @@ import { aptosClient } from "@/utils/aptosClient";
 import { useQueryClient } from "@tanstack/react-query";
 import Placeholder1 from "@/assets/placeholders/asset.png";
 import { config } from "@/config";
+import { convertAmountFromHumanReadableToOnChain } from "@/utils/helpers";
 
 interface HeroSectionProps {}
 
@@ -34,8 +35,11 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
 
     const transaction: InputTransactionData = {
       data: {
-        function: `${MODULE_ADDRESS}::fa_launchpad::mint_fa`,
-        functionArguments: [asset.asset_type, assetCount],
+        function: `${MODULE_ADDRESS}::launchpad::mint_fa`,
+        functionArguments: [
+          asset.asset_type,
+          convertAmountFromHumanReadableToOnChain(assetCount, asset.decimals),
+        ],
       },
     };
     const response = await signAndSubmitTransaction(transaction);

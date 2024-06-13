@@ -76,7 +76,7 @@ async function getMintLimit(asset_id: string): Promise<number> {
     payload: {
       function: `${AccountAddress.from(
         MODULE_ADDRESS
-      )}::fa_launchpad::get_mint_limit`,
+      )}::launchpad::get_mint_limit`,
       functionArguments: [asset_id],
     },
   });

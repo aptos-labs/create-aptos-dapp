@@ -17,6 +17,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { aptosClient } from "@/utils/aptosClient";
+import {
+  APT_DECIMALS,
+  convertAmountFromHumanReadableToOnChain,
+} from "@/utils/helpers";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
@@ -29,8 +33,8 @@ export function CreateFungibleAsset() {
   const [symbol, setSymbol] = useState<string>();
   const [maxSupply, setMaxSupply] = useState<string>();
   const [mintFeePerFA, setMintFeePerFA] = useState<number>();
-  const [maxMintPerAccount, setMaxMintPerAccount] = useState<string>();
-  const [decimal, setDecimal] = useState<string>();
+  const [maxMintPerAccount, setMaxMintPerAccount] = useState<number>();
+  const [decimal, setDecimal] = useState<number>();
   const [iconURL, setIconURL] = useState<string>();
   const [projectURL, setProjectURL] = useState<string>();
   const [mintForMyself, setMintForMyself] = useState<number>();
@@ -67,7 +71,7 @@ export function CreateFungibleAsset() {
       data: {
         function: `${
           import.meta.env.VITE_MODULE_ADDRESS
-        }::fa_launchpad::create_fa`,
+        }::launchpad::create_fa`,
         typeArguments: [],
         functionArguments: [
           maxSupply,
@@ -76,9 +80,19 @@ export function CreateFungibleAsset() {
           decimal,
           iconURL,
           projectURL,
-          mintFeePerFA ? mintFeePerFA * 1e8 : 0,
+          mintFeePerFA
+            ? convertAmountFromHumanReadableToOnChain(
+                mintFeePerFA,
+                APT_DECIMALS
+              )
+            : 0,
           mintForMyself,
-          maxMintPerAccount,
+          maxMintPerAccount
+            ? convertAmountFromHumanReadableToOnChain(
+                maxMintPerAccount,
+                decimal!
+              )
+            : 0,
         ],
       },
     };
@@ -172,7 +186,7 @@ export function CreateFungibleAsset() {
               <Input
                 type="number"
                 onChange={(e) => {
-                  setMaxMintPerAccount(e.target.value);
+                  setMaxMintPerAccount(parseInt(e.target.value));
                 }}
               />
             </div>
@@ -181,7 +195,7 @@ export function CreateFungibleAsset() {
               <Input
                 type="number"
                 onChange={(e) => {
-                  setDecimal(e.target.value);
+                  setDecimal(parseInt(e.target.value));
                 }}
               />
             </div>
