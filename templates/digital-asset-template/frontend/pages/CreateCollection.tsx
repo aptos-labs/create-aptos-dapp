@@ -313,7 +313,7 @@ export function CreateCollection() {
               type="number"
               value={mintFeePerNFT}
               onChange={(e) => {
-                setMintFeePerNFT(parseInt(e.target.value));
+                setMintFeePerNFT(parseFloat(e.target.value));
               }}
             />
           </div>

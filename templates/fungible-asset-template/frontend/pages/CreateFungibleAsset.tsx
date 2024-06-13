@@ -177,7 +177,7 @@ export function CreateFungibleAsset() {
               <Input
                 type="number"
                 onChange={(e) => {
-                  setMintFeePerFA(parseInt(e.target.value));
+                  setMintFeePerFA(parseFloat(e.target.value));
                 }}
               />
             </div>
