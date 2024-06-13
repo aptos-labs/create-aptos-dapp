@@ -67,6 +67,7 @@ module launchpad_addr::launchpad {
         transfer_ref: fungible_asset::TransferRef,
     }
 
+    /// Unique per FA
     struct MintLimit has store {
         limit: u64,
         mint_tracker: Table<address, u64>,
@@ -107,6 +108,7 @@ module launchpad_addr::launchpad {
 
     // ================================= Entry Functions ================================= //
 
+    // Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -114,6 +116,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::some(new_admin);
     }
 
+    // Accept admin of the contract
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -122,6 +125,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::none();
     }
 
+    // Update mint fee collector address
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -129,6 +133,7 @@ module launchpad_addr::launchpad {
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
+    // Create a fungible asset
     public entry fun create_fa(
         sender: &signer,
         max_supply: Option<u128>,
@@ -213,6 +218,7 @@ module launchpad_addr::launchpad {
         }
     }
 
+    // Mint fungible asset
     public entry fun mint_fa(
         sender: &signer,
         fa_obj: Object<Metadata>,
@@ -227,24 +233,35 @@ module launchpad_addr::launchpad {
 
     // ================================= View Functions ================================== //
 
+    // Get contract admin
     #[view]
     public fun get_admin(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.admin_addr
     }
 
+    // Get contract pending admin
+    #[view]
+    public fun get_pendingadmin(): Option<address> acquires Config {
+        let config = borrow_global<Config>(@launchpad_addr);
+        config.pending_admin_addr
+    }
+
+    // Get mint fee collector address
     #[view]
     public fun get_mint_fee_collector(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.mint_fee_collector_addr
     }
 
+    // Get all fungible assets created using this contract
     #[view]
     public fun get_registry(): vector<Object<Metadata>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.fa_objects
     }
 
+    // Get fungible asset metadata
     #[view]
     public fun get_fa_objects_metadatas(
         collection_obj: Object<Metadata> 
@@ -255,6 +272,7 @@ module launchpad_addr::launchpad {
         (symbol, name, decimals)
     }
 
+    // Get mint limit per address
     #[view]
     public fun get_mint_limit(
         fa_obj: Object<Metadata>,
@@ -267,6 +285,7 @@ module launchpad_addr::launchpad {
         }
     }
 
+    // Get current minted amount by an address
     #[view]
     public fun get_current_minted_amount(
         fa_obj: Object<Metadata>,
@@ -279,6 +298,7 @@ module launchpad_addr::launchpad {
         *table::borrow_with_default(mint_tracker, addr, &0)
     }
 
+    // Get mint fee per FA
     #[view]
     public fun get_mint_fee_per_fa(
         fa_obj: Object<Metadata>,

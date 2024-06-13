@@ -134,6 +134,7 @@ module launchpad_addr::launchpad {
 
     // ================================= Entry Functions ================================= //
 
+    // Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -141,6 +142,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::some(new_admin);
     }
 
+    // Accept admin of the contract
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -149,6 +151,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::none();
     }
 
+    // Update mint fee collector address
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -156,6 +159,7 @@ module launchpad_addr::launchpad {
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
+    // Create a collection
     public entry fun create_collection(
         sender: &signer,
         description: String,
@@ -272,6 +276,7 @@ module launchpad_addr::launchpad {
         });
     }
 
+    // Mint a single NFT
     public entry fun mint_nft(
         sender: &signer,
         collection_obj: Object<Collection>
@@ -296,6 +301,7 @@ module launchpad_addr::launchpad {
         });
     }
 
+    // Mint multiple NFTs
     public entry fun batch_mint_nft(
         sender: &signer,
         collection_obj: Object<Collection>,
@@ -327,24 +333,35 @@ module launchpad_addr::launchpad {
 
     // ================================= View  ================================= //
 
+    // Get contract admin
     #[view]
     public fun get_admin(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.admin_addr
     }
 
+    // Get contract pending admin
+    #[view]
+    public fun get_pendingadmin(): Option<address> acquires Config {
+        let config = borrow_global<Config>(@launchpad_addr);
+        config.pending_admin_addr
+    }
+
+    // Get mint fee collector address
     #[view]
     public fun get_mint_fee_collector(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.mint_fee_collector_addr
     }
 
+    // Get all collections created using this contract
     #[view]
     public fun get_registry(): vector<Object<Collection>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.collection_objects
     }
 
+    // Get mint fee per NFT for a specific stage
     #[view]
     public fun get_mint_fee_per_nft(
         collection_obj: Object<Collection>,
@@ -355,7 +372,7 @@ module launchpad_addr::launchpad {
         fee
     }
 
-    // Returns the name of the current active mint stage or the next mint stage if there is no active mint stage
+    // Get the name of the current active mint stage or the next mint stage if there is no active mint stage
     #[view]
     public fun get_active_or_next_mint_stage(collection_obj: Object<Collection>): Option<String> {
         let active_stage_idx = mint_stage::ccurent_active_stage(collection_obj);
@@ -376,6 +393,7 @@ module launchpad_addr::launchpad {
         }
     }
 
+    // Get the start and end time of a mint stage
     #[view]
     public fun get_mint_stage_start_and_end_time(collection_obj: Object<Collection>, stage_name: String): (u64, u64) {
         let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
@@ -384,7 +402,6 @@ module launchpad_addr::launchpad {
         let end_time = mint_stage::mint_stage_end_time(stage_obj);
         (start_time, end_time)
     }
-
 
     // ================================= Helpers ================================= //
 
