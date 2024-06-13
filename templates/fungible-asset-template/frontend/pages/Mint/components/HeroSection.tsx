@@ -31,7 +31,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
 
   const mintNft = async (e: FormEvent) => {
     e.preventDefault();
-    if (!account || !data?.isMintActive || !asset) return;
+    if (!account || !asset) return;
 
     const transaction: InputTransactionData = {
       data: {
@@ -67,15 +67,12 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             <form onSubmit={mintNft} className="flex gap-4 basis-1/3">
               <Input
                 type="number"
-                disabled={!data?.isMintActive}
                 value={assetCount}
                 onChange={(e) =>
                   setAssetCount(parseInt(e.currentTarget.value, 10))
                 }
               />
-              <Button type="submit" disabled={!data?.isMintActive}>
-                Mint
-              </Button>
+              <Button type="submit">Mint</Button>
             </form>
 
             <div className="flex flex-col basis-1/3">
@@ -108,28 +105,6 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             </a>
           </div>
         </div>
-
-        {/* <div>
-          {data?.startDate && new Date() < data.startDate && (
-            <div className="flex gap-x-2 justify-between flex-wrap">
-              <p className="body-sm-semibold">Minting starts</p>
-              <p className="body-sm">{formatDate(data.startDate)}</p>
-            </div>
-          )}
-
-          {data?.endDate &&
-            new Date() < data.endDate &&
-            !data.isMintInfinite && (
-              <div className="flex gap-x-2 justify-between flex-wrap">
-                <p className="body-sm-semibold">Minting ends</p>
-                <p className="body-sm">{formatDate(data.endDate)}</p>
-              </div>
-            )}
-
-          {data?.endDate && new Date() > data.endDate && (
-            <p className="body-sm-semibold">Minting has ended</p>
-          )}
-        </div> */}
       </div>
     </section>
   );
