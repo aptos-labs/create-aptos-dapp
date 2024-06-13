@@ -24,6 +24,7 @@ import {
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
+import { MODULE_ADDRESS } from "@/constants";
 
 export function CreateFungibleAsset() {
   const aptosWallet = useWallet();
@@ -136,8 +137,27 @@ export function CreateFungibleAsset() {
               </AlertTitle>
               <AlertDescription className="body-sm">
                 To continue with creating your asset, first connect your wallet
-                by copy the private_key from the .aptos/config.yaml file and
-                import it into the wallet.
+                by copy the private_key from the{" "}
+                <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+                  .aptos/config.yaml
+                </code>{" "}
+                file and import it into the wallet.
+              </AlertDescription>
+            </Alert>
+          )}
+          {account && account.address !== MODULE_ADDRESS && (
+            <Alert variant="warning">
+              <AlertOctagon className="w-4 h-5" />
+              <AlertTitle className="body-md-semibold">
+                Wrong account connected
+              </AlertTitle>
+              <AlertDescription className="body-sm">
+                To continue with creating your asset, make sure you are
+                connected with the same profile account as in your
+                <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+                  .aptos/config.yaml
+                </code>{" "}
+                file
               </AlertDescription>
             </Alert>
           )}
