@@ -23,6 +23,10 @@ import {
 } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { uploadCollectionData } from "@/utils/assetsUploader";
+import {
+  APT_DECIMALS,
+  convertAmountFromHumanReadableToOnChain,
+} from "@/utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
@@ -140,7 +144,12 @@ export function CreateCollection() {
           dateToSeconds(publicMintStartDate), // public mint start time (in seconds)
           dateToSeconds(publicMintEndDate), // public mint end time (in seconds)
           mintLimitPerAccount, // mint limit per address in the public mint
-          mintFeePerNFT ? mintFeePerNFT * 1e8 : 0, // mint fee per NFT for the public mint, on chain stored in smallest unit of APT (i.e. 1e8 oAPT = 1 APT)
+          mintFeePerNFT
+            ? convertAmountFromHumanReadableToOnChain(
+                mintFeePerNFT,
+                APT_DECIMALS
+              )
+            : 0, // mint fee per NFT for the public mint, on chain stored in smallest unit of APT (i.e. 1e8 oAPT = 1 APT)
         ],
       },
     };
@@ -304,7 +313,7 @@ export function CreateCollection() {
               type="number"
               value={mintFeePerNFT}
               onChange={(e) => {
-                setMintFeePerNFT(parseInt(e.target.value));
+                setMintFeePerNFT(parseFloat(e.target.value));
               }}
             />
           </div>
