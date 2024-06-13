@@ -33,12 +33,14 @@ export function Header() {
           <>
             <Link
               className={buttonVariants({ variant: "secondary" })}
-              to={"/my-assets"}>
+              to={"/my-assets"}
+            >
               My Assets
             </Link>
             <Link
               className={buttonVariants({ variant: "secondary" })}
-              to={"/create-asset"}>
+              to={"/create-asset"}
+            >
               Create Asset
             </Link>
           </>

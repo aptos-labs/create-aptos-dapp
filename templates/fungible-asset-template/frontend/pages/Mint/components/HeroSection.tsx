@@ -17,7 +17,6 @@ import { aptosClient } from "@/utils/aptosClient";
 import { useQueryClient } from "@tanstack/react-query";
 import Placeholder1 from "@/assets/placeholders/asset.png";
 import { config } from "@/config";
-import { formatDate } from "@/utils/formatDate";
 
 interface HeroSectionProps {}
 
@@ -59,7 +58,8 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
         <Card>
           <CardContent
             fullPadding
-            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center">
+            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center"
+          >
             <form onSubmit={mintNft} className="flex gap-4 basis-1/3">
               <Input
                 type="number"
@@ -98,13 +98,14 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             <a
               className={buttonVariants({ variant: "link" })}
               target="_blank"
-              href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=${NETWORK}`}>
+              href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=${NETWORK}`}
+            >
               View on Explorer <Image src={ExternalLink} />
             </a>
           </div>
         </div>
 
-        <div>
+        {/* <div>
           {data?.startDate && new Date() < data.startDate && (
             <div className="flex gap-x-2 justify-between flex-wrap">
               <p className="body-sm-semibold">Minting starts</p>
@@ -124,7 +125,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
           {data?.endDate && new Date() > data.endDate && (
             <p className="body-sm-semibold">Minting has ended</p>
           )}
-        </div>
+        </div> */}
       </div>
     </section>
   );
@@ -144,7 +145,8 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
     <Button
       onClick={onCopy}
       className="whitespace-nowrap flex gap-1 px-0 py-0"
-      variant="link">
+      variant="link"
+    >
       {copied ? (
         "Copied!"
       ) : (
