@@ -149,7 +149,7 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Cost to mint</Label>
+              <Label>Mint fee per fungible asset</Label>
               <Input
                 type="number"
                 onChange={(e) => {
