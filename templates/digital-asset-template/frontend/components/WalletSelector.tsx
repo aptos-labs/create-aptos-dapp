@@ -97,18 +97,20 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
           <WalletRow key={wallet.name} wallet={wallet} onConnect={close} />
         ))}
       </div>
-      <Collapsible className="flex flex-col gap-4">
-        <CollapsibleTrigger asChild>
-          <Button size="sm" variant="ghost" className="gap-2">
-            More wallets <ChevronDown />
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="flex flex-col gap-3">
-          {moreWallets.map((wallet) => (
-            <WalletRow key={wallet.name} wallet={wallet} onConnect={close} />
-          ))}
-        </CollapsibleContent>
-      </Collapsible>
+      {!!moreWallets.length && (
+        <Collapsible className="flex flex-col gap-4">
+          <CollapsibleTrigger asChild>
+            <Button size="sm" variant="ghost" className="gap-2">
+              More wallets <ChevronDown />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-3">
+            {moreWallets.map((wallet) => (
+              <WalletRow key={wallet.name} wallet={wallet} onConnect={close} />
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
     </DialogContent>
   );
 }
@@ -123,7 +125,8 @@ function WalletRow({ wallet, onConnect }: WalletRowProps) {
     <WalletItem
       wallet={wallet}
       onConnect={onConnect}
-      className="flex items-center justify-between px-4 py-3 gap-4 border rounded-md">
+      className="flex items-center justify-between px-4 py-3 gap-4 border rounded-md"
+    >
       <div className="flex items-center gap-4">
         <WalletItem.Icon className="h-6 w-6" />
         <WalletItem.Name className="text-base font-normal" />
