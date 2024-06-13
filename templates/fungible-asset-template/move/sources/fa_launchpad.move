@@ -183,7 +183,7 @@ module launchpad_addr::fa_launchpad {
             mint_limit_per_addr,
         });
 
-        if (option::is_some(&pre_mint_amount)) {
+        if (*option::borrow_with_default(&pre_mint_amount, &0) > 0) {
             let amount = *option::borrow(&pre_mint_amount);
             mint_fa_internal(sender, fa_obj, amount, 0);
         }
