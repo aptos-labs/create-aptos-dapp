@@ -1,4 +1,5 @@
 import { WebIrys } from "@irys/sdk";
+import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "./aptosClient";
 
 const getWebIrys = async (aptosWallet: any) => {
@@ -19,35 +20,39 @@ const getWebIrys = async (aptosWallet: any) => {
 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
 6. if payer balance < the amount, replenish the payer balance*/
 
-export const checkIfFund = async (aptosWallet: any, file: File) => {
-  const fileSize = file.size;
+export const checkIfFund = async (
+  aptosWallet: WalletContextState,
+  fileSize: number
+) => {
   // 1. estimate the gas cost based on the data size https://docs.irys.xyz/developer-docs/irys-sdk/api/getPrice
   const webIrys = await getWebIrys(aptosWallet);
-  const priceConverted = webIrys.utils.fromAtomic(fileSize).toNumber();
+  const costToUpload = await webIrys.getPrice(fileSize);
   // 2. check the wallet balance on the irys node: irys.getLoadedBalance()
-  const atomicBalance = await webIrys.getLoadedBalance();
-  const convertedBalance = webIrys.utils.fromAtomic(atomicBalance).toNumber();
+  const irysBalance = await webIrys.getLoadedBalance();
   // 3. if balance is enough, then upload without funding
-  if (convertedBalance > priceConverted) {
+  if (irysBalance.toNumber() > costToUpload.toNumber()) {
     return true;
   }
   // 4. if balance is not enough,  check the payer balance
-  const currentAccountAddress = await aptosWallet.account.address;
+  const currentAccountAddress = await aptosWallet.account!.address;
 
   const currentAccountBalance = await aptosClient().getAccountAPTAmount({
     accountAddress: currentAccountAddress,
   });
-  const payerBalance = currentAccountBalance / 1e8;
+
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
-  if (payerBalance > priceConverted) {
-    await fundNode(aptosWallet, priceConverted);
+  if (currentAccountBalance > costToUpload.toNumber()) {
+    await fundNode(aptosWallet, costToUpload.toNumber());
     return true;
   }
   // 6. if payer balance < the amount, replenish the payer balance*/
   return false;
 };
 
-export const fundNode = async (aptosWallet: any, amount?: number) => {
+export const fundNode = async (
+  aptosWallet: WalletContextState,
+  amount?: number
+) => {
   const webIrys = await getWebIrys(aptosWallet);
 
   try {
@@ -65,7 +70,7 @@ export const fundNode = async (aptosWallet: any, amount?: number) => {
 };
 
 export const uploadFile = async (
-  aptosWallet: any,
+  aptosWallet: WalletContextState,
   fileToUpload: File
 ): Promise<string> => {
   const webIrys = await getWebIrys(aptosWallet);
@@ -77,8 +82,11 @@ export const uploadFile = async (
     return "";
   }
 };
-// TODO aptosWallet:WalletContextState
-export const uploadFolder = async (aptosWallet: any, files: File[]) => {
+
+export const uploadFolder = async (
+  aptosWallet: WalletContextState,
+  files: File[]
+) => {
   const webIrys = await getWebIrys(aptosWallet);
 
   try {

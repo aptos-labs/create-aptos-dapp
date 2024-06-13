@@ -96,7 +96,7 @@ export function CreateFungibleAsset() {
   const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const file = event.target.files[0];
-      const funded = await checkIfFund(aptosWallet, file);
+      const funded = await checkIfFund(aptosWallet, file.size);
       if (funded) {
         const uploadFileResponse = await uploadFile(aptosWallet, file);
         setIconURL(uploadFileResponse);
@@ -177,15 +177,6 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Mint fee per fungible asset in APT</Label>
-              <Input
-                type="number"
-                onChange={(e) => {
-                  setMintFeePerFA(parseFloat(e.target.value));
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
               <Label>Max mint per account</Label>
               <Input
                 type="number"
@@ -209,6 +200,15 @@ export function CreateFungibleAsset() {
                 type="text"
                 onChange={(e) => {
                   setProjectURL(e.target.value);
+                }}
+              />
+            </div>
+            <div className="mb-5 flex flex-col item-center space-y-4">
+              <Label>Mint fee per fungible asset in APT (Optional)</Label>
+              <Input
+                type="number"
+                onChange={(e) => {
+                  setMintFeePerFA(parseFloat(e.target.value));
                 }}
               />
             </div>
