@@ -328,7 +328,7 @@ export function CreateCollection() {
             />
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
-            <Label>Mint fee per NFT in APT</Label>
+            <Label>Mint fee per NFT in APT (optional)</Label>
             <Input
               type="number"
               value={mintFeePerNFT}

@@ -34,7 +34,7 @@ export const checkIfFund = async (
   });
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
   if (currentAccountBalance > costToUpload.toNumber()) {
-    await fundNode(aptosWallet, costToUpload);
+    await fundNode(aptosWallet, costToUpload.toNumber());
     return true;
   }
   // 6. if payer balance < the amount, replenish the payer balance*/
@@ -43,7 +43,7 @@ export const checkIfFund = async (
 
 export const fundNode = async (
   aptosWallet: WalletContextState,
-  amount?: any
+  amount?: number
 ) => {
   const webIrys = await getWebIrys(aptosWallet);
 
@@ -74,7 +74,7 @@ export const uploadFile = async (
     return "";
   }
 };
-// TODO aptosWallet:WalletContextState
+
 export const uploadFolder = async (
   aptosWallet: WalletContextState,
   files: File[]
