@@ -223,7 +223,6 @@ export function CreateFungibleAsset() {
               <Label>Project URL</Label>
               <Input
                 type="text"
-                value={projectURL}
                 onChange={(e) => {
                   setProjectURL(e.target.value);
                 }}
