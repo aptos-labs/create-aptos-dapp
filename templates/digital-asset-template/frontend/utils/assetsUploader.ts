@@ -126,7 +126,7 @@ export const uploadCollectionData = async (
   const funded = await checkIfFund(aptosWallet, files);
 
   if (funded) {
-    let imageFolderReceipt;
+    let imageFolderReceipt: string;
     try {
       // Upload collection thumbnail image and all NFT images as a folder
       imageFolderReceipt = await uploadFolder(aptosWallet, [
