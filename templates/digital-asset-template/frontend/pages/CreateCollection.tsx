@@ -28,6 +28,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
 
 import { dateToSeconds } from "../utils/helpers";
+import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 
 export function CreateCollection() {
   // Wallet connect providers
@@ -157,177 +158,182 @@ export function CreateCollection() {
   };
 
   return (
-    <div className="flex items-center justify-between px-6 py-2">
-      <div className="w-2/4">
-        {!account && (
-          <Alert variant="warning">
-            <AlertOctagon className="w-4 h-5" />
-            <AlertTitle className="body-md-semibold">Connect wallet</AlertTitle>
-            <AlertDescription className="body-sm">
-              To continue with creating your collection, first connect your
-              wallet.
-            </AlertDescription>
-          </Alert>
-        )}
+    <>
+      <LaunchpadHeader />
+      <div className="flex items-center justify-between px-6 py-2">
+        <div className="w-2/4">
+          {!account && (
+            <Alert variant="warning">
+              <AlertOctagon className="w-4 h-5" />
+              <AlertTitle className="body-md-semibold">
+                Connect wallet
+              </AlertTitle>
+              <AlertDescription className="body-sm">
+                To continue with creating your collection, first connect your
+                wallet by copy the private_key from the .aptos/config.yaml file
+                and import it into the wallet.
+              </AlertDescription>
+            </Alert>
+          )}
 
-        <h3 className="font-bold leading-none tracking-tight md:text-xl dark:text-white py-2">
-          Create NFT Collection
-        </h3>
-        <div className="py-2">
-          <div className="mb-5 flex flex-col item-center space-y-4">
-            <Card>
-              <CardHeader>
-                <CardDescription>{uploadStatus}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center justify-between">
-                  <Input
-                    ref={inputRef}
-                    multiple
-                    type="file"
-                    placeholder="Upload Assets"
-                    onChange={(event) => onUploadFile(event)}
-                  />
+          <h3 className="font-bold leading-none tracking-tight md:text-xl dark:text-white py-2">
+            Create NFT Collection
+          </h3>
+          <div className="py-2">
+            <div className="mb-5 flex flex-col item-center space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardDescription>{uploadStatus}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center justify-between">
+                    <Input
+                      ref={inputRef}
+                      multiple
+                      type="file"
+                      placeholder="Upload Assets"
+                      onChange={(event) => onUploadFile(event)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="mb-5 flex flex-col item-center space-y-4">
+              <Label>Royalty Percentage</Label>
+              <Input
+                type="text"
+                onChange={(e) => {
+                  setRoyaltyPercentage(parseInt(e.target.value));
+                }}
+              />
+            </div>
+
+            <div className="mb-5 flex flex-col item-center space-y-4">
+              <div className="flex flex-row space-between">
+                <div className="flex flex-col mr-4">
+                  <Label className="mb-4">Public mint start date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[280px] justify-start text-left font-normal",
+                          !publicMintStartDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {publicMintStartDate ? (
+                          format(publicMintStartDate, "MM/dd/yyyy hh:mm a")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={publicMintStartDate}
+                        onSelect={setPublicMintStartDate}
+                        initialFocus
+                        footer={
+                          <Input
+                            type="time"
+                            className="w-max py-6"
+                            value={publicMintStartTime}
+                            onChange={(event) => onPublicMintStartTime(event)}
+                          />
+                        }
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="mb-5 flex flex-col item-center space-y-4">
-            <Label>Royalty Percentage</Label>
-            <Input
-              type="text"
-              onChange={(e) => {
-                setRoyaltyPercentage(parseInt(e.target.value));
-              }}
-            />
-          </div>
 
-          <div className="mb-5 flex flex-col item-center space-y-4">
-            <div className="flex flex-row space-between">
-              <div className="flex flex-col mr-4">
-                <Label className="mb-4">Public mint start date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[280px] justify-start text-left font-normal",
-                        !publicMintStartDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {publicMintStartDate ? (
-                        format(publicMintStartDate, "MM/dd/yyyy hh:mm a")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={publicMintStartDate}
-                      onSelect={setPublicMintStartDate}
-                      initialFocus
-                      footer={
-                        <Input
-                          type="time"
-                          className="w-max py-6"
-                          value={publicMintStartTime}
-                          onChange={(event) => onPublicMintStartTime(event)}
-                        />
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="flex flex-col">
-                <Label className="mb-4">Public mint end date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[280px] justify-start text-left font-normal",
-                        !publicMintEndDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {publicMintEndDate ? (
-                        format(publicMintEndDate, "MM/dd/yyyy hh:mm a")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={publicMintEndDate}
-                      onSelect={setPublicMintEndDate}
-                      initialFocus
-                      footer={
-                        <Input
-                          type="time"
-                          className="w-max py-6"
-                          value={publicMintEndTime}
-                          onChange={(event) => onPublicMintEndTime(event)}
-                        />
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="flex flex-col">
+                  <Label className="mb-4">Public mint end date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[280px] justify-start text-left font-normal",
+                          !publicMintEndDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {publicMintEndDate ? (
+                          format(publicMintEndDate, "MM/dd/yyyy hh:mm a")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={publicMintEndDate}
+                        onSelect={setPublicMintEndDate}
+                        initialFocus
+                        footer={
+                          <Input
+                            type="time"
+                            className="w-max py-6"
+                            value={publicMintEndTime}
+                            onChange={(event) => onPublicMintEndTime(event)}
+                          />
+                        }
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
             </div>
           </div>
+          <div className="mb-5 flex flex-col item-center space-y-4">
+            <Label>Limit mint per address</Label>
+            <Input
+              type="number"
+              value={mintLimitPerAccount}
+              onChange={(e) => {
+                setMintLimitPerAccount(parseInt(e.target.value));
+              }}
+            />
+          </div>
+          <div className="mb-5 flex flex-col item-center space-y-4">
+            <Label>Mint fee per NFT</Label>
+            <Input
+              type="number"
+              value={mintFeePerNFT}
+              onChange={(e) => {
+                setMintFeePerNFT(parseInt(e.target.value));
+              }}
+            />
+          </div>
+          <div className="mb-5 flex flex-col item-center space-y-4">
+            <Label>Mint for myself (optional)</Label>
+            <Input
+              type="number"
+              value={preMintAmount}
+              onChange={(e) => {
+                setPreMintAmount(parseInt(e.target.value));
+              }}
+            />
+          </div>
+          <Button
+            disabled={
+              !maxSupply ||
+              !royaltyPercentage ||
+              !account ||
+              !publicMintStartDate ||
+              !royaltyPercentage ||
+              !mintLimitPerAccount
+            }
+            className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            onClick={createCollection}
+          >
+            Create Collection
+          </Button>
         </div>
-        <div className="mb-5 flex flex-col item-center space-y-4">
-          <Label>Limit mint per address</Label>
-          <Input
-            type="number"
-            value={mintLimitPerAccount}
-            onChange={(e) => {
-              setMintLimitPerAccount(parseInt(e.target.value));
-            }}
-          />
-        </div>
-        <div className="mb-5 flex flex-col item-center space-y-4">
-          <Label>Mint fee per NFT</Label>
-          <Input
-            type="number"
-            value={mintFeePerNFT}
-            onChange={(e) => {
-              setMintFeePerNFT(parseInt(e.target.value));
-            }}
-          />
-        </div>
-        <div className="mb-5 flex flex-col item-center space-y-4">
-          <Label>Mint for myself (optional)</Label>
-          <Input
-            type="number"
-            value={preMintAmount}
-            onChange={(e) => {
-              setPreMintAmount(parseInt(e.target.value));
-            }}
-          />
-        </div>
-        <Button
-          disabled={
-            !maxSupply ||
-            !royaltyPercentage ||
-            !account ||
-            !publicMintStartDate ||
-            !royaltyPercentage ||
-            !mintLimitPerAccount ||
-            !mintFeePerNFT
-          }
-          className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-          onClick={createCollection}
-        >
-          Create Collection
-        </Button>
       </div>
-    </div>
+    </>
   );
 }

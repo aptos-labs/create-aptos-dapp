@@ -9,6 +9,7 @@ import { FAQSection } from "./components/FAQSection";
 import { useMintData } from "./hooks/useMintData";
 import { Socials } from "./components/Socials";
 import { ConnectWalletAler } from "./components/ConnectWalletAlert";
+import { Header } from "@/components/Header";
 
 export function Mint() {
   const { data, isLoading } = useMintData();
@@ -22,22 +23,25 @@ export function Mint() {
   }
 
   return (
-    <div style={{ overflow: "hidden" }} className="overflow-hidden">
-      <main className="flex flex-col gap-10 md:gap-16 mt-6">
-        <ConnectWalletAler />
-        <HeroSection />
-        <StatsSection />
-        <OurStorySection />
-        <HowToMintSection />
-        <BannerSection />
-        <OurTeamSection />
-        <FAQSection />
-      </main>
+    <>
+      <Header />
+      <div style={{ overflow: "hidden" }} className="overflow-hidden">
+        <main className="flex flex-col gap-10 md:gap-16 mt-6">
+          <ConnectWalletAler />
+          <HeroSection />
+          <StatsSection />
+          <OurStorySection />
+          <HowToMintSection />
+          <BannerSection />
+          <OurTeamSection />
+          <FAQSection />
+        </main>
 
-      <footer className="footer-container px-6 pb-6 w-full max-w-screen-xl mx-auto mt-6 md:mt-16 flex items-center justify-between">
-        <p>{data?.collection.collection_name}</p>
-        <Socials />
-      </footer>
-    </div>
+        <footer className="footer-container px-6 pb-6 w-full max-w-screen-xl mx-auto mt-6 md:mt-16 flex items-center justify-between">
+          <p>{data?.collection.collection_name}</p>
+          <Socials />
+        </footer>
+      </div>
+    </>
   );
 }

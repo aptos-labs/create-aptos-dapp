@@ -5,6 +5,7 @@ import { OurStorySection } from "./components/OurStorySection";
 import { useMintData } from "./hooks/useMintData";
 import { Socials } from "./components/Socials";
 import { ConnectWalletAlert } from "./components/ConnectWalletAlert";
+import { Header } from "@/components/Header";
 
 export function Mint() {
   const { data, isLoading } = useMintData();
@@ -19,6 +20,7 @@ export function Mint() {
 
   return (
     <>
+      <Header />
       <div style={{ overflow: "hidden" }} className="overflow-hidden">
         <main className="flex flex-col gap-10 md:gap-16 mt-6">
           <ConnectWalletAlert />

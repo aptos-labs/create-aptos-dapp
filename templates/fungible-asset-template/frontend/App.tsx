@@ -1,6 +1,5 @@
 import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 
-import { Header } from "./components/Header";
 import { Mint } from "./pages/Mint";
 import { CreateFungibleAsset } from "./pages/CreateFungibleAsset";
 import { MyFungibleAssets } from "./pages/MyFungibleAssets";
@@ -8,7 +7,6 @@ import { MyFungibleAssets } from "./pages/MyFungibleAssets";
 function Layout() {
   return (
     <>
-      <Header />
       <Outlet />
     </>
   );
