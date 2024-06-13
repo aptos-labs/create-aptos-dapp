@@ -15,7 +15,7 @@ import {
   useWallet,
 } from "@aptos-labs/wallet-adapter-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { aptosClient } from "@/utils/aptosClient";
 import {
   APT_DECIMALS,
@@ -39,31 +39,15 @@ export function CreateFungibleAsset() {
   const [iconURL, setIconURL] = useState<string>();
   const [projectURL, setProjectURL] = useState<string>();
   const [mintForMyself, setMintForMyself] = useState<number>();
-  const [disableCreateAssetButton, setDisableCreateAssetButton] =
-    useState<boolean>(true);
 
-  useEffect(() => {
-    if (
-      name &&
-      symbol &&
-      maxSupply &&
-      mintFeePerFA &&
-      decimal &&
-      iconURL &&
-      projectURL
-    ) {
-      setDisableCreateAssetButton(false);
-    }
-  }, [
-    name,
-    symbol,
-    maxSupply,
-    mintFeePerFA,
-    decimal,
-    iconURL,
-    projectURL,
-    maxMintPerAccount,
-  ]);
+  const disableCreateAssetButton =
+    !name ||
+    !symbol ||
+    !maxSupply ||
+    (mintFeePerFA ?? 0) < 0 ||
+    !decimal ||
+    !iconURL ||
+    !projectURL;
 
   const createAsset = async () => {
     if (!account) return;
