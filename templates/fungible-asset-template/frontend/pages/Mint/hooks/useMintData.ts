@@ -35,6 +35,7 @@ interface MintData {
   yourBalance: number;
   totalAbleToMint: number;
   asset: FungibleAsset;
+  isMintActive: boolean;
 }
 
 async function getMintLimit(asset_id: string): Promise<number> {
@@ -118,6 +119,7 @@ export function useMintData(asset_id: string = config.asset_id) {
           res.current_fungible_asset_balances[0]?.amount ?? 0,
           asset.decimals
         ),
+        isMintActive: asset.maximum_v2 > asset.supply_v2,
       } satisfies MintData;
     },
   });

@@ -39,6 +39,10 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
       return setError("Asset not found");
     }
 
+    if (!data?.isMintActive) {
+      return setError("Minting is not available");
+    }
+
     const amount = parseFloat(assetCount);
     if (Number.isNaN(amount) || amount <= 0) {
       return setError("Invalid amount");
