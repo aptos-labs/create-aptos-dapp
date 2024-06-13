@@ -139,7 +139,7 @@ export function CreateCollection() {
           dateToSeconds(publicMintStartDate), // public mint start time (in seconds)
           dateToSeconds(publicMintEndDate), // public mint end time (in seconds)
           mintLimitPerAccount, // mint limit per address in the public mint
-          mintFeePerNFT ? mintFeePerNFT / 1e8 : 0, // mint fee per NFT for the public mint
+          mintFeePerNFT ? mintFeePerNFT * 1e8 : 0, // mint fee per NFT for the public mint, on chain stored in smallest unit of APT (i.e. 1e8 oAPT = 1 APT)
         ],
       },
     };
@@ -213,7 +213,8 @@ export function CreateCollection() {
                       className={cn(
                         "w-[280px] justify-start text-left font-normal",
                         !publicMintStartDate && "text-muted-foreground"
-                      )}>
+                      )}
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {publicMintStartDate ? (
                         format(publicMintStartDate, "MM/dd/yyyy hh:mm a")
@@ -250,7 +251,8 @@ export function CreateCollection() {
                       className={cn(
                         "w-[280px] justify-start text-left font-normal",
                         !publicMintEndDate && "text-muted-foreground"
-                      )}>
+                      )}
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {publicMintEndDate ? (
                         format(publicMintEndDate, "MM/dd/yyyy hh:mm a")
@@ -321,7 +323,8 @@ export function CreateCollection() {
             !mintFeePerNFT
           }
           className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-          onClick={createCollection}>
+          onClick={createCollection}
+        >
           Create Collection
         </Button>
       </div>

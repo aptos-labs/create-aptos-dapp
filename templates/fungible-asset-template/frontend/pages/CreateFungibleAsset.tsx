@@ -14,7 +14,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
 
 import { checkIfFund, uploadFile } from "@/utils/Irys";
 import {
@@ -32,7 +31,7 @@ export function CreateFungibleAsset() {
   const [name, setName] = useState<string>();
   const [symbol, setSymbol] = useState<string>();
   const [maxSupply, setMaxSupply] = useState<string>();
-  const [costToMint, setCostToMint] = useState<string>();
+  const [mintFeePerFA, setMintFeePerFA] = useState<number>();
   const [maxMintPerAccount, setMaxMintPerAccount] = useState<string>();
   const [decimal, setDecimal] = useState<string>();
   const [iconURL, setIconURL] = useState<string>();
@@ -46,7 +45,7 @@ export function CreateFungibleAsset() {
       name &&
       symbol &&
       maxSupply &&
-      costToMint &&
+      mintFeePerFA &&
       decimal &&
       iconURL &&
       projectURL &&
@@ -54,7 +53,16 @@ export function CreateFungibleAsset() {
     ) {
       setDisableCreateAssetButton(false);
     }
-  }, [name, symbol, maxSupply, costToMint, decimal, iconURL, projectURL]);
+  }, [
+    name,
+    symbol,
+    maxSupply,
+    mintFeePerFA,
+    decimal,
+    iconURL,
+    projectURL,
+    maxMintPerAccount,
+  ]);
 
   const createAsset = async () => {
     if (!account) return;
@@ -72,7 +80,7 @@ export function CreateFungibleAsset() {
           decimal,
           iconURL,
           projectURL,
-          costToMint,
+          mintFeePerFA ? mintFeePerFA * 1e8 : 0,
           mintForMyself,
           maxMintPerAccount,
         ],
@@ -141,11 +149,11 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Cost to mint</Label>
+              <Label>Mint fee per fungible asset</Label>
               <Input
                 type="number"
                 onChange={(e) => {
-                  setCostToMint(e.target.value);
+                  setMintFeePerFA(parseInt(e.target.value));
                 }}
               />
             </div>
