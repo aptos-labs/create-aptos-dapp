@@ -9,7 +9,7 @@ module launchpad_addr::launchpad {
 
     use aptos_framework::aptos_account;
     use aptos_framework::event;
-    use aptos_framework::object::{Self, Object};
+    use aptos_framework::object::{Self, Object, ObjectCore};
     use aptos_framework::timestamp;
 
     use aptos_token_objects::collection::{Self, Collection};
@@ -20,8 +20,8 @@ module launchpad_addr::launchpad {
     use minter::mint_stage;
     use minter::collection_components;
 
-    /// Sender is not admin
-    const ENOT_ADMIN: u64 = 1;
+    /// Only admin can set pending admin
+    const EONLY_ADMIN_CAN_SET_PENDING_ADMIN: u64 = 1;
     /// Sender is not pending admin
     const ENOT_PENDING_ADMIN: u64 = 2;
     /// Only admin can update mint fee collector
@@ -137,14 +137,14 @@ module launchpad_addr::launchpad {
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), ENOT_ADMIN);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_SET_PENDING_ADMIN);
         config.pending_admin_addr = option::some(new_admin);
     }
 
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_pending_admin(config, sender_addr), ENOT_PENDING_ADMIN);
+        assert!(config.pending_admin_addr == option::some(sender_addr), ENOT_PENDING_ADMIN);
         config.admin_addr = sender_addr;
         config.pending_admin_addr = option::none();
     }
@@ -393,16 +393,12 @@ module launchpad_addr::launchpad {
             true
         } else {
             if (object::is_object(@launchpad_addr)) {
-                let obj = object::address_to_object<object::ObjectCore>(@launchpad_addr);
+                let obj = object::address_to_object<ObjectCore>(@launchpad_addr);
                 object::is_owner(obj, sender)
             } else {
                 false
             }
         }
-    }
-
-    fun is_pending_admin(config: &Config, sender: address): bool {
-        config.pending_admin_addr == option::some(sender)
     }
 
     fun add_allowlist_stage(
