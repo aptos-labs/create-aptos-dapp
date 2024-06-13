@@ -34,11 +34,6 @@ interface MintData {
   yourBalance: number;
   totalAbleToMint: number;
   asset: FungibleAsset;
-
-  startDate: Date;
-  endDate: Date;
-  isMintActive: boolean;
-  isMintInfinite: boolean;
 }
 
 async function getMintLimit(asset_id: string): Promise<number> {
@@ -64,11 +59,6 @@ export function useMintData(asset_id: string = config.asset_id) {
     queryFn: async () => {
       try {
         if (!asset_id) return null;
-
-        // const [startDate, endDate] = await getStartAndEndTime(asset_id);
-        const startDate = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000);
-        const endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        const oneYearLater = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
 
         const res = await aptosClient().queryIndexer<MintQueryResult>({
           query: {
@@ -115,10 +105,6 @@ export function useMintData(asset_id: string = config.asset_id) {
           uniqueHolders:
             res.current_fungible_asset_balances_aggregate.aggregate.count ?? 0,
           asset,
-          endDate,
-          startDate,
-          isMintActive: new Date() >= startDate && new Date() <= endDate,
-          isMintInfinite: endDate >= oneYearLater,
           totalAbleToMint: await getMintLimit(asset_id),
           yourBalance: res.current_fungible_asset_balances[0]?.amount ?? 0,
         } satisfies MintData;
