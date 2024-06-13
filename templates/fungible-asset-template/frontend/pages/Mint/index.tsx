@@ -6,9 +6,18 @@ import { useMintData } from "./hooks/useMintData";
 import { Socials } from "./components/Socials";
 import { ConnectWalletAlert } from "./components/ConnectWalletAlert";
 import { Header } from "@/components/Header";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function Mint() {
   const { data, isLoading } = useMintData();
+
+  const queryClient = useQueryClient();
+  const { account } = useWallet();
+  useEffect(() => {
+    queryClient.invalidateQueries();
+  }, [account, queryClient]);
 
   if (isLoading) {
     return (

@@ -144,7 +144,10 @@ export function useMintData(collection_id: string = config.collection_id) {
         collection,
         endDate,
         startDate,
-        isMintActive: new Date() >= startDate && new Date() <= endDate,
+        isMintActive:
+          new Date() >= startDate &&
+          new Date() <= endDate &&
+          collection.max_supply > collection.current_supply,
         isMintInfinite: endDate >= oneYearLater,
       } satisfies MintData;
     },

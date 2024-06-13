@@ -9,10 +9,7 @@ import Copy from "@/assets/icons/copy.svg";
 import ExternalLink from "@/assets/icons/external-link.svg";
 import { Socials } from "./Socials";
 import { MODULE_ADDRESS, NETWORK } from "@/constants";
-import {
-  InputTransactionData,
-  useWallet,
-} from "@aptos-labs/wallet-adapter-react";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { useQueryClient } from "@tanstack/react-query";
 import Placeholder1 from "@/assets/placeholders/asset.png";
@@ -25,27 +22,44 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
   const { data } = useMintData();
   const queryClient = useQueryClient();
   const { account, signAndSubmitTransaction } = useWallet();
-  const [assetCount, setAssetCount] = useState(1);
+  const [assetCount, setAssetCount] = useState<string>("1");
+  const [error, setError] = useState<string | null>(null);
 
   const { asset, totalAbleToMint = 0, yourBalance = 0 } = data ?? {};
 
   const mintNft = async (e: FormEvent) => {
     e.preventDefault();
-    if (!account || !asset) return;
+    setError(null);
 
-    const transaction: InputTransactionData = {
+    if (!account) {
+      return setError("Please connect your wallet");
+    }
+
+    if (!asset) {
+      return setError("Asset not found");
+    }
+
+    if (!data?.isMintActive) {
+      return setError("Minting is not available");
+    }
+
+    const amount = parseFloat(assetCount);
+    if (Number.isNaN(amount) || amount <= 0) {
+      return setError("Invalid amount");
+    }
+
+    const response = await signAndSubmitTransaction({
       data: {
         function: `${MODULE_ADDRESS}::launchpad::mint_fa`,
         functionArguments: [
           asset.asset_type,
-          convertAmountFromHumanReadableToOnChain(assetCount, asset.decimals),
+          convertAmountFromHumanReadableToOnChain(amount, asset.decimals),
         ],
       },
-    };
-    const response = await signAndSubmitTransaction(transaction);
+    });
     await aptosClient().waitForTransaction({ transactionHash: response.hash });
     queryClient.invalidateQueries();
-    setAssetCount(1);
+    setAssetCount("1");
   };
 
   return (
@@ -62,15 +76,15 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
         <Card>
           <CardContent
             fullPadding
-            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center"
-          >
+            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center">
             <form onSubmit={mintNft} className="flex gap-4 basis-1/3">
               <Input
-                type="number"
+                type="text"
+                name="amount"
                 value={assetCount}
-                onChange={(e) =>
-                  setAssetCount(parseInt(e.currentTarget.value, 10))
-                }
+                onChange={(e) => {
+                  setAssetCount(e.target.value);
+                }}
               />
               <Button type="submit">Mint</Button>
             </form>
@@ -91,6 +105,8 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
           </CardContent>
         </Card>
 
+        {error && <p className="body-sm text-destructive">{error}</p>}
+
         <div className="flex gap-x-2 items-center flex-wrap justify-between">
           <p className="whitespace-nowrap body-sm-semibold">Address</p>
 
@@ -99,8 +115,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             <a
               className={buttonVariants({ variant: "link" })}
               target="_blank"
-              href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=${NETWORK}`}
-            >
+              href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=${NETWORK}`}>
               View on Explorer <Image src={ExternalLink} />
             </a>
           </div>
