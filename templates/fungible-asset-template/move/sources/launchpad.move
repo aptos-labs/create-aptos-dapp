@@ -19,6 +19,9 @@ module launchpad_addr::launchpad {
     /// Mint limit reached
     const E_MINT_LIMIT_REACHED: u64 = 3;
 
+    const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
+    const DEFAULT_MINT_FEE_PER_FA: u64 = 0;
+
     #[event]
     struct CreateFAEvent has store, drop {
         creator_addr: address,
@@ -31,7 +34,7 @@ module launchpad_addr::launchpad {
         icon_uri: String,
         project_uri: String,
         mint_fee_per_fa: u64,
-        pre_mint_amount: Option<u64>,
+        pre_mint_amount: u64,
         mint_limit_per_addr: Option<u64>,
     }
 
@@ -116,7 +119,7 @@ module launchpad_addr::launchpad {
         decimals: u8,
         icon_uri: String,
         project_uri: String,
-        mint_fee_per_fa: u64,
+        mint_fee_per_fa: Option<u64>,
         pre_mint_amount: Option<u64>,
         mint_limit_per_addr: Option<u64>,
     ) acquires Registry, Config, FAController {
@@ -155,7 +158,7 @@ module launchpad_addr::launchpad {
             transfer_ref,
         });
         move_to(fa_obj_signer, FAConfig {
-            mint_fee_per_fa,
+            mint_fee_per_fa: *option::borrow_with_default(&mint_fee_per_fa, &DEFAULT_MINT_FEE_PER_FA),
             mint_limit: if (option::is_some(&mint_limit_per_addr)) {
                 option::some(MintLimit {
                     limit: *option::borrow(&mint_limit_per_addr),
@@ -180,12 +183,12 @@ module launchpad_addr::launchpad {
             decimals,
             icon_uri,
             project_uri,
-            mint_fee_per_fa,
-            pre_mint_amount,
+            mint_fee_per_fa: *option::borrow_with_default(&mint_fee_per_fa, &DEFAULT_MINT_FEE_PER_FA),
+            pre_mint_amount: *option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT),
             mint_limit_per_addr,
         });
 
-        if (*option::borrow_with_default(&pre_mint_amount, &0) > 0) {
+        if (*option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT) > 0) {
             let amount = *option::borrow(&pre_mint_amount);
             mint_fa_internal(sender, fa_obj, amount, 0);
         }
@@ -356,7 +359,7 @@ module launchpad_addr::launchpad {
             2,
             string::utf8(b"icon_url"),
             string::utf8(b"project_url"),
-            0,
+            option::none(),
             option::none(),
             option::some(500)
         );
@@ -378,7 +381,7 @@ module launchpad_addr::launchpad {
             3,
             string::utf8(b"icon_url"),
             string::utf8(b"project_url"),
-            1,
+            option::some(1),
             option::none(),
             option::some(500)
         );

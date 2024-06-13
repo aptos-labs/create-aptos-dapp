@@ -38,8 +38,9 @@ module launchpad_addr::launchpad {
     const EEND_TIME_MUST_BE_SET_FOR_STAGE: u64 = 8;
     /// Mint limit per address must be set for stage
     const EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE: u64 = 9;
-    /// Mint fee per nft must be set for stage
-    const EMINT_FEE_PER_NFT_MUST_BE_SET_FOR_STAGE: u64 = 10;
+
+    const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
+    const DEFAULT_MINT_FEE_PER_NFT: u64 = 0;
 
     const ONE_HUNDRED_YEARS_IN_SECONDS: u64 = 100 * 365 * 24 * 60 * 60;
 
@@ -259,7 +260,7 @@ module launchpad_addr::launchpad {
         });
 
         let nft_objs = vector[];
-        for (i in 0..*option::borrow_with_default(&pre_mint_amount, &0)) {
+        for (i in 0..*option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT)) {
             let nft_obj = mint_nft_internal(sender_addr, collection_obj);
             vector::push_back(&mut nft_objs, nft_obj);
         };
@@ -422,7 +423,6 @@ module launchpad_addr::launchpad {
         assert!(option::is_some(&allowlist_start_time), ESTART_TIME_MUST_BE_SET_FOR_STAGE);
         assert!(option::is_some(&allowlist_end_time), EEND_TIME_MUST_BE_SET_FOR_STAGE);
         assert!(option::is_some(&allowlist_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
-        assert!(option::is_some(&allowlist_mint_fee_per_nft), EMINT_FEE_PER_NFT_MUST_BE_SET_FOR_STAGE);
 
         let allowlist = *option::borrow(&allowlist);
         let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
@@ -447,7 +447,7 @@ module launchpad_addr::launchpad {
         simple_map::upsert(
             &mut collection_config.mint_fee_per_nft_by_stages,
             stage,
-            *option::borrow(&allowlist_mint_fee_per_nft)
+            *option::borrow_with_default(&allowlist_mint_fee_per_nft, &DEFAULT_MINT_FEE_PER_NFT)
         );
     }
 
@@ -466,7 +466,6 @@ module launchpad_addr::launchpad {
         };
 
         assert!(option::is_some(&public_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
-        assert!(option::is_some(&public_mint_fee_per_nft), EMINT_FEE_PER_NFT_MUST_BE_SET_FOR_STAGE);
 
         let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
         mint_stage::create(
@@ -491,7 +490,7 @@ module launchpad_addr::launchpad {
         simple_map::upsert(
             &mut collection_config.mint_fee_per_nft_by_stages,
             stage,
-            *option::borrow(&public_mint_fee_per_nft)
+            *option::borrow_with_default(&public_mint_fee_per_nft, &DEFAULT_MINT_FEE_PER_NFT),
         );
     }
 
@@ -622,7 +621,10 @@ module launchpad_addr::launchpad {
 
         let active_or_next_stage = get_active_or_next_mint_stage(collection_1);
         assert!(active_or_next_stage == option::some(string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY)), 3);
-        let (start_time, end_time) = get_mint_stage_start_and_end_time(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY));
+        let (start_time, end_time) = get_mint_stage_start_and_end_time(
+            collection_1,
+            string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY)
+        );
         assert!(start_time == 0, 4);
         assert!(end_time == 100, 5);
 
@@ -630,7 +632,10 @@ module launchpad_addr::launchpad {
         timestamp::update_global_time_for_test_secs(150);
         let active_or_next_stage = get_active_or_next_mint_stage(collection_1);
         assert!(active_or_next_stage == option::some(string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY)), 6);
-        let (start_time, end_time) = get_mint_stage_start_and_end_time(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
+        let (start_time, end_time) = get_mint_stage_start_and_end_time(
+            collection_1,
+            string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY)
+        );
         assert!(start_time == 200, 7);
         assert!(end_time == 300, 8);
 
@@ -638,7 +643,10 @@ module launchpad_addr::launchpad {
         timestamp::update_global_time_for_test_secs(250);
         let active_or_next_stage = get_active_or_next_mint_stage(collection_1);
         assert!(active_or_next_stage == option::some(string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY)), 9);
-        let (start_time, end_time) = get_mint_stage_start_and_end_time(collection_1, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY));
+        let (start_time, end_time) = get_mint_stage_start_and_end_time(
+            collection_1,
+            string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY)
+        );
         assert!(start_time == 200, 10);
         assert!(end_time == 300, 11);
 
