@@ -91,6 +91,9 @@ const getCollections = async (objects: Array<string>) => {
         collection_id
         total_minted_v2
         max_supply
+        cdn_asset_uris {
+          cdn_image_uri
+        }
       }
     }`,
         },
