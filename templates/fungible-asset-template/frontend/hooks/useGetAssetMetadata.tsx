@@ -36,7 +36,7 @@ const getRegistry = async () => {
     payload: {
       function: `${AccountAddress.from(
         import.meta.env.VITE_MODULE_ADDRESS
-      )}::fa_launchpad::get_registry`,
+      )}::launchpad::get_registry`,
     },
   });
   return registry[0];

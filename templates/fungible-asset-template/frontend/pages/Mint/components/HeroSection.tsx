@@ -34,8 +34,11 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
 
     const transaction: InputTransactionData = {
       data: {
-        function: `${MODULE_ADDRESS}::fa_launchpad::mint_fa`,
-        functionArguments: [asset.asset_type, assetCount],
+        function: `${MODULE_ADDRESS}::launchpad::mint_fa`,
+        functionArguments: [
+          asset.asset_type,
+          assetCount * Math.pow(10, asset.decimals),
+        ],
       },
     };
     const response = await signAndSubmitTransaction(transaction);

@@ -67,7 +67,7 @@ export function CreateFungibleAsset() {
       data: {
         function: `${
           import.meta.env.VITE_MODULE_ADDRESS
-        }::fa_launchpad::create_fa`,
+        }::launchpad::create_fa`,
         typeArguments: [],
         functionArguments: [
           maxSupply,

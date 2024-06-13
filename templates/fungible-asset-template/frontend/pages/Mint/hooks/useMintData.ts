@@ -41,42 +41,12 @@ interface MintData {
   isMintInfinite: boolean;
 }
 
-// async function getStartAndEndTime(
-//   collection_id: string
-// ): Promise<[start: Date, end: Date]> {
-//   const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
-//     payload: {
-//       function: `${AccountAddress.from(
-//         MODULE_ADDRESS
-//       )}::launchpad::get_active_or_next_mint_stage`,
-//       functionArguments: [collection_id],
-//     },
-//   });
-
-//   const mintStage = mintStageRes[0].vec[0];
-
-//   const startAndEndRes = await aptosClient().view<[string, string]>({
-//     payload: {
-//       function: `${AccountAddress.from(
-//         MODULE_ADDRESS
-//       )}::launchpad::get_mint_stage_start_and_end_time`,
-//       functionArguments: [collection_id, mintStage],
-//     },
-//   });
-
-//   const [start, end] = startAndEndRes;
-//   return [
-//     new Date(parseInt(start, 10) * 1000),
-//     new Date(parseInt(end, 10) * 1000),
-//   ];
-// }
-
 async function getMintLimit(asset_id: string): Promise<number> {
   const mintLimitRes = await aptosClient().view<[{ vec: [string] }]>({
     payload: {
       function: `${AccountAddress.from(
         MODULE_ADDRESS
-      )}::fa_launchpad::get_mint_limit`,
+      )}::launchpad::get_mint_limit`,
       functionArguments: [asset_id],
     },
   });
