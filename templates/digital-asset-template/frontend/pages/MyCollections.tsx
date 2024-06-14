@@ -43,7 +43,7 @@ export function MyCollections() {
                   <TableCell className="font-medium">
                     <div className="flex items-center">
                       <img
-                        src={collection.cdn_asset_uris.cdn_image_uri}
+                        src={collection.cdn_asset_uris?.cdn_image_uri}
                         style={{ width: "40px" }}
                         className="mr-2"
                       ></img>

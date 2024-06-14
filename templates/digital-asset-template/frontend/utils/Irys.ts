@@ -15,13 +15,16 @@ const getWebIrys = async (aptosWallet: WalletContextState) => {
 
 export const checkIfFund = async (
   aptosWallet: WalletContextState,
-  totalFileSize: number
+  files: File[]
 ) => {
   // 1. estimate the gas cost based on the data size https://docs.irys.xyz/developer-docs/irys-sdk/api/getPrice
   const webIrys = await getWebIrys(aptosWallet);
-  const costToUpload = await webIrys.getPrice(totalFileSize);
+  const costToUpload = await webIrys.utils.estimateFolderPrice(
+    files.map((f) => f.size)
+  );
   // 2. check the wallet balance on the irys node: irys.getLoadedBalance()
   const irysBalance = await webIrys.getLoadedBalance();
+
   // 3. if balance is enough, then upload without funding
   if (irysBalance.toNumber() > costToUpload.toNumber()) {
     return true;
@@ -32,10 +35,16 @@ export const checkIfFund = async (
   const currentAccountBalance = await aptosClient().getAccountAPTAmount({
     accountAddress: currentAccountAddress,
   });
+
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
   if (currentAccountBalance > costToUpload.toNumber()) {
-    await fundNode(aptosWallet, costToUpload.toNumber());
-    return true;
+    try {
+      await fundNode(aptosWallet, costToUpload.toNumber());
+      return true;
+    } catch (error: any) {
+      alert(`Error funding node ${error}`);
+      return;
+    }
   }
   // 6. if payer balance < the amount, replenish the payer balance*/
   return false;
@@ -69,9 +78,9 @@ export const uploadFile = async (
   try {
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });
     return `https://gateway.irys.xyz/${receipt.id}`;
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error uploading file ", e);
-    return "";
+    throw new Error(e);
   }
 };
 
@@ -89,7 +98,8 @@ export const uploadFolder = async (
       access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`
     );
     return `https://gateway.irys.xyz/${receipt.manifestId}`;
-  } catch (e) {
-    console.log("Error uploading file ", e);
+  } catch (e: any) {
+    console.log("Error uploading folder ", e);
+    throw new Error(e);
   }
 };

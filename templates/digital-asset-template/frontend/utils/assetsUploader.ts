@@ -123,14 +123,20 @@ export const uploadCollectionData = async (
   }
 
   // Check if need to first fund an Irys node
-  const funded = await checkIfFund(aptosWallet, totalFileSize);
+  const funded = await checkIfFund(aptosWallet, files);
 
   if (funded) {
-    // Upload collection thumbnail image and all NFT images as a folder
-    const imageFolderReceipt = await uploadFolder(aptosWallet, [
-      ...imageFiles,
-      collectionCover,
-    ]);
+    let imageFolderReceipt: string;
+    try {
+      // Upload collection thumbnail image and all NFT images as a folder
+      imageFolderReceipt = await uploadFolder(aptosWallet, [
+        ...imageFiles,
+        collectionCover,
+      ]);
+    } catch (error: any) {
+      alert(`Error uploading collection image and NFT images ${error}`);
+      throw new Error(error);
+    }
 
     // Update collection metadata with the cover image
     const parsedCollectionMetadata: CollectionMetadata = JSON.parse(
@@ -164,14 +170,19 @@ export const uploadCollectionData = async (
     );
 
     // Upload collection metadata and all NFTs' metadata as a folder
-    const metadataFolderReceipt = await uploadFolder(aptosWallet, [
-      ...updatedImageMetadatas,
-      updatedCollectionMetadata,
-    ]);
-    setProjectUri(`${metadataFolderReceipt}/collection.json`);
-    setMaxSupply(imageFiles.length);
+    try {
+      const metadataFolderReceipt = await uploadFolder(aptosWallet, [
+        ...updatedImageMetadatas,
+        updatedCollectionMetadata,
+      ]);
+      setProjectUri(`${metadataFolderReceipt}/collection.json`);
+      setMaxSupply(imageFiles.length);
 
-    setUploadStatus("Files uploaded successfully");
+      setUploadStatus("Files uploaded successfully");
+    } catch (error: any) {
+      alert(`Error uploading collection metadata and NFTs' metadata ${error}`);
+      throw new Error(error);
+    }
   } else {
     alert(
       "Current account balance is not enough to fund a decentrelized asset node"
