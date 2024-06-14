@@ -8,6 +8,7 @@ import App from "./App";
 // CSS files
 import "./index.css";
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +23,9 @@ root.render(
         console.log(error);
       }}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
       </QueryClientProvider>
     </AptosWalletAdapterProvider>
   </React.StrictMode>

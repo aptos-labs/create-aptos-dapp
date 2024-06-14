@@ -7,6 +7,7 @@ import App from "./App.tsx";
 
 import "./index.css";
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+import { TooltipProvider } from "./components/ui/tooltip.tsx";
 
 const queryClient = new QueryClient();
 
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         console.log("Custom error handling", error);
       }}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <TooltipProvider delayDuration={100}>
+          <App />
+        </TooltipProvider>
       </QueryClientProvider>
     </AptosWalletAdapterProvider>
   </React.StrictMode>
