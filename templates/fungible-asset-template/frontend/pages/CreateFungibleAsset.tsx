@@ -185,7 +185,7 @@ export function CreateFungibleAsset() {
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
-                tooltip="The total amount of the asset that can be created."
+                tooltip="The total amount of the asset that can be minted."
                 htmlFor="max-supply">
                 Max Supply
               </Label>
