@@ -8,7 +8,7 @@ import { OurTeamSection } from "./components/OurTeamSection";
 import { FAQSection } from "./components/FAQSection";
 import { useMintData } from "./hooks/useMintData";
 import { Socials } from "./components/Socials";
-import { ConnectWalletAler } from "./components/ConnectWalletAlert";
+import { ConnectWalletAlert } from "./components/ConnectWalletAlert";
 import { Header } from "@/components/Header";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
@@ -36,7 +36,7 @@ export function Mint() {
       <Header />
       <div style={{ overflow: "hidden" }} className="overflow-hidden">
         <main className="flex flex-col gap-10 md:gap-16 mt-6">
-          <ConnectWalletAler />
+          <ConnectWalletAlert />
           <HeroSection />
           <StatsSection />
           <OurStorySection />
