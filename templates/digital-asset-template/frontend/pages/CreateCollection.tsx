@@ -335,7 +335,7 @@ export function CreateCollection() {
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               htmlFor="mint-limit"
-              tooltip="How many NFTs an individual account is allowed to mint.">
+              tooltip="How many NFTs an individual address is allowed to mint.">
               Limit mint per address
             </Label>
             <Input
