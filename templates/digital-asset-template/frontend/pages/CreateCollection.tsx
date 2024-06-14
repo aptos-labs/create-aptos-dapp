@@ -350,7 +350,7 @@ export function CreateCollection() {
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               htmlFor="mint-fee"
-              tooltip="The fee the nft minter is paying the collection creator when they mint a NFT">
+              tooltip="The fee the nft minter is paying the collection creator when they mint an NFT">
               Mint fee per NFT in APT (optional)
             </Label>
             <Input
