@@ -244,7 +244,7 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 htmlFor="mint-fee"
-                tooltip="The fee cost for the minter to pay for every asset mint. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee.">
+                tooltip="The fee cost for the minter to pay to mint one asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee.">
                 Mint fee per fungible asset in APT (Optional)
               </Label>
               <Input
