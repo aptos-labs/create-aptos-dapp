@@ -70,7 +70,6 @@ module.exports = {
       },
       fontFamily: {
         sans: ["sans-serif"],
-        display: ["Holtwood One SC", "serif"],
         inter: ["Inter", "sans-serif"],
       },
       fontSize: {
@@ -172,13 +171,10 @@ module.exports = {
 
         // Display Text Styles
         ".display": {
-          fontFamily: theme("fontFamily.display"),
+          fontFamily: theme("fontFamily.inter"),
           fontSize: "32px",
           lineHeight: "52px",
-          background:
-            "conic-gradient(from -63.47deg at 62.85% 143.27%, #F5088C 0deg, #FFC700 61.2deg, #C330F4 149.4deg, #154EFF 237.6deg, #F5088C 329.4deg, #F5088C 360deg)",
-          "-webkit-background-clip": "text",
-          "-webkit-text-fill-color": "transparent",
+          fontWeight: theme("fontWeight.bold"),
         },
       });
     }),
