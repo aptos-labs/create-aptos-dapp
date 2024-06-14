@@ -14,10 +14,19 @@ export const config: Config = {
   },
 
   defaultCollection: {
-    name: "Forest Friends",
+    name: "Lorem Ipsum",
     description:
-      "A collection of meticulously designed animal portraits, each reflecting a unique emotion and vibrant personality.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris congue convallis augue in pharetra.",
     image: Placeholder1,
+  },
+
+  ourStory: {
+    title: "Our Story",
+    subTitle: "Proin lorem",
+    description:
+      "Phasellus pellentesque malesuada pretium. Vestibulum sed justo at velit rhoncus finibus nec quis urna. Aenean rutrum congue tincidunt. Praesent id urna quis risus sodales feugiat vitae quis orci. Proin tincidunt eu nisi quis sollicitudin. Nulla facilisis eget tellus quis fermentum. Nunc vel neque at erat dictum tempus. Aliquam in mollis lacus, non fringilla lacus. Nunc blandit iaculis ante vitae pulvinar.",
+    discordLink: "https://discord.com",
+    images: [Placeholder1, Placeholder2, Placeholder3],
   },
 
   ourTeam: {
@@ -47,20 +56,12 @@ export const config: Config = {
     ],
   },
 
-  ourStory: {
-    title: "Our Story",
-    subTitle: "About Us",
-    description: `"Forest Friends" began as a heartfelt project inspired by the serene beauty and diverse life found in the world's forests. Created by a passionate artist with a deep love for nature, this NFT collection brings together a series of meticulously designed animal portraits, each reflecting a unique emotion and vibrant personality. The collection aims to capture the essence of the wild and remind us of the importance of preserving our natural habitats. Through "Forest Friends," collectors are invited to embark on a journey into a whimsical forest, where every animal tells a story of wonder, joy, and the delicate balance of nature.`,
-    discordLink: "https://discord.com",
-    images: [Placeholder1, Placeholder2, Placeholder3],
-  },
-
   faqs: {
     title: "F.A.Q.",
 
     questions: [
       {
-        title: "Who are Forest Friends?",
+        title: "What is Lorem Ipsum?",
         description:
           "Exercitation tempor id ex aute duis laboris dolore est elit fugiat consequat exercitation ullamco. Labore sint laborum anim sunt labore commodo proident adipisicing minim eu duis velit. Est ipsum nisi labore ullamco velit laborum qui in. Fugiat cillum tempor proident occaecat do ipsum Lorem eu labore duis do ex anim. Ullamco incididunt irure officia ex reprehenderit. Voluptate tempor reprehenderit elit exercitation consequat labore ipsum duis reprehenderit. Ex qui aliqua ex aute sunt.",
       },
