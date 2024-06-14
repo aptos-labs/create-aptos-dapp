@@ -23,24 +23,22 @@ export function Header() {
   }, [isRoot, data?.asset]);
 
   return (
-    <div className="flex items-center justify-between px-6 py-2 max-w-screen-xl mx-auto w-full">
+    <div className="flex items-center justify-between px-6 py-2 max-w-screen-xl mx-auto w-full flex-wrap">
       <h1 className="display">
         <Link to="/">{title}</Link>
       </h1>
 
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center flex-wrap">
         {IS_DEV && (
           <>
             <Link
               className={buttonVariants({ variant: "secondary" })}
-              to={"/my-assets"}
-            >
+              to={"/my-assets"}>
               My Assets
             </Link>
             <Link
               className={buttonVariants({ variant: "secondary" })}
-              to={"/create-asset"}
-            >
+              to={"/create-asset"}>
               Create Asset
             </Link>
           </>

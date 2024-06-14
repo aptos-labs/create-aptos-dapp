@@ -56,7 +56,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
           Placeholder1
         }
         rounded
-        className="basis-2/5"
+        className="basis-2/5 aspect-square object-cover self-center"
       />
       <div className="basis-3/5 flex flex-col gap-4">
         <h1 className="title-md">

@@ -87,17 +87,18 @@ export function useMintData(collection_id: string = config.collection_id) {
     queryKey: ["app-state", collection_id],
     refetchInterval: 1000 * 30,
     queryFn: async () => {
-      if (!collection_id) return null;
+      try {
+        if (!collection_id) return null;
 
-      const [startDate, endDate] = await getStartAndEndTime(collection_id);
-      const oneYearLater = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        const [startDate, endDate] = await getStartAndEndTime(collection_id);
+        const oneYearLater = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
 
-      const res = await aptosClient().queryIndexer<MintQueryResult>({
-        query: {
-          variables: {
-            collection_id,
-          },
-          query: `
+        const res = await aptosClient().queryIndexer<MintQueryResult>({
+          query: {
+            variables: {
+              collection_id,
+            },
+            query: `
 						query TokenQuery($collection_id: String) {
 							current_collections_v2(
 								where: { collection_id: { _eq: $collection_id } }
@@ -129,27 +130,31 @@ export function useMintData(collection_id: string = config.collection_id) {
 								}
 							}
 						}`,
-        },
-      });
+          },
+        });
 
-      const collection = res.current_collections_v2[0];
-      if (!collection) return null;
+        const collection = res.current_collections_v2[0];
+        if (!collection) return null;
 
-      return {
-        maxSupply: collection.max_supply ?? 0,
-        totalMinted: collection.current_supply ?? 0,
-        uniqueHolders:
-          res.current_collection_ownership_v2_view_aggregate.aggregate?.count ??
-          0,
-        collection,
-        endDate,
-        startDate,
-        isMintActive:
-          new Date() >= startDate &&
-          new Date() <= endDate &&
-          collection.max_supply > collection.current_supply,
-        isMintInfinite: endDate >= oneYearLater,
-      } satisfies MintData;
+        return {
+          maxSupply: collection.max_supply ?? 0,
+          totalMinted: collection.current_supply ?? 0,
+          uniqueHolders:
+            res.current_collection_ownership_v2_view_aggregate.aggregate
+              ?.count ?? 0,
+          collection,
+          endDate,
+          startDate,
+          isMintActive:
+            new Date() >= startDate &&
+            new Date() <= endDate &&
+            collection.max_supply > collection.current_supply,
+          isMintInfinite: endDate >= oneYearLater,
+        } satisfies MintData;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
     },
   });
 }
