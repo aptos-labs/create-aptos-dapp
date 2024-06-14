@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 import { Info as InfoIcon } from "lucide-react";
-// import { cn } from "@/lib/utils";
 
 export interface InfoProps {
   description: string;
