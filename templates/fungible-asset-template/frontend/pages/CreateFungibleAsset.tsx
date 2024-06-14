@@ -154,8 +154,13 @@ export function CreateFungibleAsset() {
           </h3>
           <div className="py-2">
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Asset Name</Label>
+              <Label
+                tooltip="The name of the asset, e.g. Bitcoin, Ethereum, etc."
+                htmlFor="asset-name">
+                Asset Name
+              </Label>
               <Input
+                id="asset-name"
                 type="text"
                 required
                 onChange={(e) => {
@@ -164,8 +169,13 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Asset Symbol</Label>
+              <Label
+                tooltip="The symbol of the asset, e.g. BTC, ETH, etc."
+                htmlFor="asset-symbol">
+                Asset Symbol
+              </Label>
               <Input
+                id="asset-symbol"
                 type="text"
                 required
                 onChange={(e) => {
@@ -174,9 +184,14 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Max Supply</Label>
+              <Label
+                tooltip="The total amount of the asset that can be created."
+                htmlFor="max-supply">
+                Max Supply
+              </Label>
               <Input
                 type="number"
+                id="max-supply"
                 required
                 onChange={(e) => {
                   setMaxSupply(e.target.value);
@@ -184,8 +199,13 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Max mint per account</Label>
+              <Label
+                tooltip="The maximum any single individual address can mint."
+                htmlFor="max-mint">
+                Max mint per account
+              </Label>
               <Input
+                id="max-mint"
                 type="number"
                 required
                 onChange={(e) => {
@@ -194,8 +214,13 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Decimal</Label>
+              <Label
+                tooltip="How many 0's constitute one full unit of the asset. For example, APT has 8."
+                htmlFor="decimal">
+                Decimal
+              </Label>
               <Input
+                id="decimal"
                 type="number"
                 required
                 onChange={(e) => {
@@ -204,8 +229,11 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Project URL</Label>
+              <Label tooltip="Your website address" htmlFor="project-url">
+                Project URL
+              </Label>
               <Input
+                id="project-url"
                 type="text"
                 required
                 onChange={(e) => {
@@ -214,8 +242,13 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Mint fee per fungible asset in APT (Optional)</Label>
+              <Label
+                htmlFor="mint-fee"
+                tooltip="The fee cost for the minter to pay for every asset mint. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee.">
+                Mint fee per fungible asset in APT (Optional)
+              </Label>
               <Input
+                id="mint-fee"
                 type="number"
                 onChange={(e) => {
                   setMintFeePerFA(parseFloat(e.target.value));
@@ -223,8 +256,13 @@ export function CreateFungibleAsset() {
               />
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Mint for myself (Optional)</Label>
+              <Label
+                tooltip="How many assets to mint right away and send to your address."
+                htmlFor="for-myself">
+                Mint for myself (Optional)
+              </Label>
               <Input
+                id="for-myself"
                 type="number"
                 value={mintForMyself}
                 onChange={(e) => {

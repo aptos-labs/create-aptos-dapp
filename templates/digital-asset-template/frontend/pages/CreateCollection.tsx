@@ -228,8 +228,13 @@ export function CreateCollection() {
               </Card>
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label>Royalty Percentage</Label>
+              <Label
+                tooltip="The royalty the collection creator gets when an NFT is being sold on marketplaces."
+                htmlFor="royalty-percentage">
+                Royalty Percentage
+              </Label>
               <Input
+                id="royalty-percentage"
                 type="text"
                 onChange={(e) => {
                   setRoyaltyPercentage(parseInt(e.target.value));
@@ -240,16 +245,21 @@ export function CreateCollection() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <div className="flex flex-row space-between">
                 <div className="flex flex-col mr-4">
-                  <Label className="mb-4">Public mint start date</Label>
+                  <Label
+                    htmlFor="mint-start"
+                    tooltip="When minting becomes active"
+                    className="mb-4">
+                    Public mint start date
+                  </Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
+                        id="mint-start"
                         variant={"outline"}
                         className={cn(
                           "w-[280px] justify-start text-left font-normal",
                           !publicMintStartDate && "text-muted-foreground"
-                        )}
-                      >
+                        )}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {publicMintStartDate ? (
                           format(publicMintStartDate, "MM/dd/yyyy hh:mm a")
@@ -278,16 +288,21 @@ export function CreateCollection() {
                 </div>
 
                 <div className="flex flex-col">
-                  <Label className="mb-4">Public mint end date</Label>
+                  <Label
+                    htmlFor="mint-end"
+                    tooltip="When minting finishes."
+                    className="mb-4">
+                    Public mint end date
+                  </Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
+                        id="mint-end"
                         variant={"outline"}
                         className={cn(
                           "w-[280px] justify-start text-left font-normal",
                           !publicMintEndDate && "text-muted-foreground"
-                        )}
-                      >
+                        )}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {publicMintEndDate ? (
                           format(publicMintEndDate, "MM/dd/yyyy hh:mm a")
@@ -318,8 +333,13 @@ export function CreateCollection() {
             </div>
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
-            <Label>Limit mint per address</Label>
+            <Label
+              htmlFor="mint-limit"
+              tooltip="How many NFTs an individual account is allowed to mint.">
+              Limit mint per address
+            </Label>
             <Input
+              id="mint-limit"
               type="number"
               value={mintLimitPerAccount}
               onChange={(e) => {
@@ -328,9 +348,14 @@ export function CreateCollection() {
             />
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
-            <Label>Mint fee per NFT in APT (optional)</Label>
+            <Label
+              htmlFor="mint-fee"
+              tooltip="The fee the nft minter is paying the collection creator when they mint a NFT">
+              Mint fee per NFT in APT (optional)
+            </Label>
             <Input
               type="number"
+              id="mint-fee"
               value={mintFeePerNFT}
               onChange={(e) => {
                 setMintFeePerNFT(parseFloat(e.target.value));
@@ -338,9 +363,14 @@ export function CreateCollection() {
             />
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
-            <Label>Mint for myself (optional)</Label>
+            <Label
+              htmlFor="for-myself"
+              tooltip="How many NFTs to mint immediately for the creator.">
+              Mint for myself (optional)
+            </Label>
             <Input
               type="number"
+              id="for-myself"
               value={preMintAmount}
               onChange={(e) => {
                 setPreMintAmount(parseInt(e.target.value));
@@ -357,8 +387,7 @@ export function CreateCollection() {
               !mintLimitPerAccount
             }
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-            onClick={createCollection}
-          >
+            onClick={createCollection}>
             Create Collection
           </Button>
         </div>
