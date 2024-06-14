@@ -229,7 +229,7 @@ export function CreateCollection() {
             </div>
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
-                tooltip="The royalty the collection creator gets when an NFT is being sold on marketplaces."
+                tooltip="The percentage of trading fee that collection creator gets when an NFT is traded on marketplaces."
                 htmlFor="royalty-percentage">
                 Royalty Percentage
               </Label>
