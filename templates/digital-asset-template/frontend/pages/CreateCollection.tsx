@@ -227,20 +227,6 @@ export function CreateCollection() {
                 </CardContent>
               </Card>
             </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="The percentage of trading value that collection creator gets when an NFT is sold on marketplaces."
-                htmlFor="royalty-percentage">
-                Royalty Percentage
-              </Label>
-              <Input
-                id="royalty-percentage"
-                type="text"
-                onChange={(e) => {
-                  setRoyaltyPercentage(parseInt(e.target.value));
-                }}
-              />
-            </div>
 
             <div className="mb-5 flex flex-col item-center space-y-4">
               <div className="flex flex-row space-between">
@@ -348,6 +334,20 @@ export function CreateCollection() {
             />
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
+              <Label
+                tooltip="The percentage of trading value that collection creator gets when an NFT is sold on marketplaces."
+                htmlFor="royalty-percentage">
+                Royalty Percentage (optional)
+              </Label>
+              <Input
+                id="royalty-percentage"
+                type="number"
+                onChange={(e) => {
+                  setRoyaltyPercentage(parseInt(e.target.value));
+                }}
+              />
+            </div>
+          <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               htmlFor="mint-fee"
               tooltip="The fee the nft minter is paying the collection creator when they mint an NFT">
@@ -380,10 +380,8 @@ export function CreateCollection() {
           <Button
             disabled={
               !maxSupply ||
-              !royaltyPercentage ||
               !account ||
               !publicMintStartDate ||
-              !royaltyPercentage ||
               !mintLimitPerAccount
             }
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
