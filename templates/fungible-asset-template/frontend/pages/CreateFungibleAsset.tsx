@@ -52,6 +52,7 @@ export function CreateFungibleAsset() {
     !iconURL ||
     !projectURL ||
     !maxMintPerAccount ||
+    !account ||
     isUploading;
 
   const createAsset = async () => {
@@ -188,7 +189,7 @@ export function CreateFungibleAsset() {
               </Label>
               <Input
                 id="asset-name"
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 type="text"
                 required
                 onChange={(e) => {
@@ -204,7 +205,7 @@ export function CreateFungibleAsset() {
                 Asset Symbol
               </Label>
               <Input
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 id="asset-symbol"
                 type="text"
                 required
@@ -221,7 +222,7 @@ export function CreateFungibleAsset() {
                 Max Supply
               </Label>
               <Input
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 type="number"
                 id="max-supply"
                 required
@@ -238,7 +239,7 @@ export function CreateFungibleAsset() {
                 Max mint per account
               </Label>
               <Input
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 id="max-mint"
                 type="number"
                 required
@@ -255,7 +256,7 @@ export function CreateFungibleAsset() {
                 Decimal
               </Label>
               <Input
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 id="decimal"
                 type="number"
                 required
@@ -269,7 +270,7 @@ export function CreateFungibleAsset() {
                 Project URL
               </Label>
               <Input
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 id="project-url"
                 type="text"
                 required
@@ -286,7 +287,7 @@ export function CreateFungibleAsset() {
                 Mint fee per fungible asset in APT (Optional)
               </Label>
               <Input
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 id="mint-fee"
                 type="number"
                 onChange={(e) => {
@@ -302,7 +303,7 @@ export function CreateFungibleAsset() {
                 Mint for myself (Optional)
               </Label>
               <Input
-                disabled={isUploading}
+                disabled={isUploading || !account}
                 id="for-myself"
                 type="number"
                 value={mintForMyself}
@@ -332,6 +333,7 @@ export function CreateFungibleAsset() {
             <CardContent>
               <div className="flex flex-col items-center justify-between">
                 <Input
+                  disabled={isUploading || !account}
                   type="file"
                   placeholder="Upload Image"
                   onChange={onUploadFile}
