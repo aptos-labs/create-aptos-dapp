@@ -35,12 +35,12 @@ export function CreateFungibleAsset() {
   const [name, setName] = useState<string>();
   const [symbol, setSymbol] = useState<string>();
   const [maxSupply, setMaxSupply] = useState<string>();
-  const [mintFeePerFA, setMintFeePerFA] = useState<number>();
   const [maxMintPerAccount, setMaxMintPerAccount] = useState<number>();
   const [decimal, setDecimal] = useState<number>();
   const [iconURL, setIconURL] = useState<string>();
   const [projectURL, setProjectURL] = useState<string>();
-  const [mintForMyself, setMintForMyself] = useState<number>();
+  const [mintFeePerFA, setMintFeePerFA] = useState<string>();
+  const [mintForMyself, setMintForMyself] = useState<string>();
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -48,7 +48,6 @@ export function CreateFungibleAsset() {
     !name ||
     !symbol ||
     !maxSupply ||
-    (mintFeePerFA ?? 0) < 0 ||
     !decimal ||
     !iconURL ||
     !projectURL ||
@@ -76,7 +75,7 @@ export function CreateFungibleAsset() {
           projectURL,
           mintFeePerFA
             ? convertAmountFromHumanReadableToOnChain(
-                mintFeePerFA,
+                parseInt(mintFeePerFA),
                 APT_DECIMALS
               )
             : 0,
@@ -90,7 +89,7 @@ export function CreateFungibleAsset() {
         ],
       },
     };
-    console.log("transaction", transaction);
+
     const response = await signAndSubmitTransaction(transaction);
 
     const committedTransactionResponse = await aptosClient().waitForTransaction(
@@ -291,7 +290,7 @@ export function CreateFungibleAsset() {
                 id="mint-fee"
                 type="number"
                 onChange={(e) => {
-                  setMintFeePerFA(parseFloat(e.target.value));
+                  setMintFeePerFA(e.target.value);
                 }}
               />
             </div>
@@ -308,7 +307,7 @@ export function CreateFungibleAsset() {
                 type="number"
                 value={mintForMyself}
                 onChange={(e) => {
-                  setMintForMyself(parseInt(e.target.value));
+                  setMintForMyself(e.target.value);
                 }}
               />
             </div>
