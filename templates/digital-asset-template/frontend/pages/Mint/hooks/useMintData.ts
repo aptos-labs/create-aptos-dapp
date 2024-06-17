@@ -1,7 +1,5 @@
 import { config } from "@/config";
-import { MODULE_ADDRESS } from "@/constants";
-import { aptosClient } from "@/utils/aptosClient";
-import { AccountAddress } from "@aptos-labs/ts-sdk";
+import { aptosClient, surfClient } from "@/utils/aptosClient";
 import { useQuery } from "@tanstack/react-query";
 
 export interface Token {
@@ -55,25 +53,18 @@ interface MintData {
 async function getStartAndEndTime(
   collection_id: string
 ): Promise<[start: Date, end: Date]> {
-  const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
-    payload: {
-      function: `${AccountAddress.from(
-        MODULE_ADDRESS
-      )}::launchpad::get_active_or_next_mint_stage`,
-      functionArguments: [collection_id],
-    },
-  });
+  const mintStageRes = (await surfClient().view.get_active_or_next_mint_stage({
+    typeArguments: [],
+    functionArguments: [collection_id as `0x{string}`],
+  })) as [{ vec: [string] }];
 
   const mintStage = mintStageRes[0].vec[0];
 
-  const startAndEndRes = await aptosClient().view<[string, string]>({
-    payload: {
-      function: `${AccountAddress.from(
-        MODULE_ADDRESS
-      )}::launchpad::get_mint_stage_start_and_end_time`,
-      functionArguments: [collection_id, mintStage],
-    },
-  });
+  const startAndEndRes =
+    await surfClient().view.get_mint_stage_start_and_end_time({
+      typeArguments: [],
+      functionArguments: [collection_id as `0x{string}`, mintStage],
+    });
 
   const [start, end] = startAndEndRes;
   return [
