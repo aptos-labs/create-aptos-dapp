@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 import { checkIfFund, uploadFile } from "@/utils/Irys";
 import {
@@ -25,6 +26,7 @@ import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
 import { MODULE_ADDRESS } from "@/constants";
+import { cn } from "@/lib/utils";
 
 export function CreateFungibleAsset() {
   const aptosWallet = useWallet();
@@ -40,6 +42,8 @@ export function CreateFungibleAsset() {
   const [projectURL, setProjectURL] = useState<string>();
   const [mintForMyself, setMintForMyself] = useState<number>();
 
+  const [isUploading, setIsUploading] = useState(false);
+
   const disableCreateAssetButton =
     !name ||
     !symbol ||
@@ -48,7 +52,8 @@ export function CreateFungibleAsset() {
     !decimal ||
     !iconURL ||
     !projectURL ||
-    !maxMintPerAccount;
+    !maxMintPerAccount ||
+    isUploading;
 
   const createAsset = async () => {
     if (!account) return;
@@ -85,6 +90,7 @@ export function CreateFungibleAsset() {
         ],
       },
     };
+    console.log("transaction", transaction);
     const response = await signAndSubmitTransaction(transaction);
 
     const committedTransactionResponse = await aptosClient().waitForTransaction(
@@ -98,17 +104,25 @@ export function CreateFungibleAsset() {
   };
 
   const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const file = event.target.files[0];
-      const funded = await checkIfFund(aptosWallet, file.size);
-      if (funded) {
-        const uploadFileResponse = await uploadFile(aptosWallet, file);
-        setIconURL(uploadFileResponse);
-      } else {
-        alert(
-          "Current account balance is not enough to fund a decentrelized asset node"
-        );
+    try {
+      if (event.target.files) {
+        setIsUploading(true);
+        const file = event.target.files[0];
+        alert(`The upload process requires at least 1 message signatures to upload the asset image file into Irys.
+
+        In the case we need to fund a node on Irys, a transfer transaction submission is required also.`);
+        const funded = await checkIfFund(aptosWallet, file.size);
+        if (funded) {
+          const uploadFileResponse = await uploadFile(aptosWallet, file);
+          setIconURL(uploadFileResponse);
+        } else {
+          alert(
+            "Current account balance is not enough to fund a decentrelized asset node"
+          );
+        }
       }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -149,6 +163,19 @@ export function CreateFungibleAsset() {
               </AlertDescription>
             </Alert>
           )}
+
+          <div
+            className={cn(
+              "top-0 left-0 fixed w-full h-full bg-gray-500 bg-opacity-30 flex justify-center items-center flex-col transition-all",
+              isUploading
+                ? "opacity-100 z-10"
+                : "opacity-0 z-0 pointer-events-none"
+            )}
+          >
+            <p className="display">Uploading Files...</p>
+            <Spinner size="lg" />
+          </div>
+
           <h3 className="font-bold leading-none tracking-tight md:text-xl dark:text-white py-2">
             Create Asset
           </h3>
@@ -156,11 +183,13 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 tooltip="The name of the asset, e.g. Bitcoin, Ethereum, etc."
-                htmlFor="asset-name">
+                htmlFor="asset-name"
+              >
                 Asset Name
               </Label>
               <Input
                 id="asset-name"
+                disabled={isUploading}
                 type="text"
                 required
                 onChange={(e) => {
@@ -171,10 +200,12 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 tooltip="The symbol of the asset, e.g. BTC, ETH, etc."
-                htmlFor="asset-symbol">
+                htmlFor="asset-symbol"
+              >
                 Asset Symbol
               </Label>
               <Input
+                disabled={isUploading}
                 id="asset-symbol"
                 type="text"
                 required
@@ -186,10 +217,12 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 tooltip="The total amount of the asset that can be minted."
-                htmlFor="max-supply">
+                htmlFor="max-supply"
+              >
                 Max Supply
               </Label>
               <Input
+                disabled={isUploading}
                 type="number"
                 id="max-supply"
                 required
@@ -201,10 +234,12 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 tooltip="The maximum any single individual address can mint."
-                htmlFor="max-mint">
+                htmlFor="max-mint"
+              >
                 Max mint per account
               </Label>
               <Input
+                disabled={isUploading}
                 id="max-mint"
                 type="number"
                 required
@@ -216,10 +251,12 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 tooltip="How many 0's constitute one full unit of the asset. For example, APT has 8."
-                htmlFor="decimal">
+                htmlFor="decimal"
+              >
                 Decimal
               </Label>
               <Input
+                disabled={isUploading}
                 id="decimal"
                 type="number"
                 required
@@ -233,6 +270,7 @@ export function CreateFungibleAsset() {
                 Project URL
               </Label>
               <Input
+                disabled={isUploading}
                 id="project-url"
                 type="text"
                 required
@@ -244,10 +282,12 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 htmlFor="mint-fee"
-                tooltip="The fee cost for the minter to pay to mint one asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee.">
+                tooltip="The fee cost for the minter to pay to mint one asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
+              >
                 Mint fee per fungible asset in APT (Optional)
               </Label>
               <Input
+                disabled={isUploading}
                 id="mint-fee"
                 type="number"
                 onChange={(e) => {
@@ -258,10 +298,12 @@ export function CreateFungibleAsset() {
             <div className="mb-5 flex flex-col item-center space-y-4">
               <Label
                 tooltip="How many assets to mint right away and send to your address."
-                htmlFor="for-myself">
+                htmlFor="for-myself"
+              >
                 Mint for myself (Optional)
               </Label>
               <Input
+                disabled={isUploading}
                 id="for-myself"
                 type="number"
                 value={mintForMyself}
@@ -274,7 +316,8 @@ export function CreateFungibleAsset() {
           <Button
             disabled={disableCreateAssetButton}
             onClick={createAsset}
-            className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+            className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+          >
             Create Asset
           </Button>
         </div>
