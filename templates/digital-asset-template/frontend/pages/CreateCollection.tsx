@@ -46,8 +46,8 @@ export function CreateCollection() {
   if (import.meta.env.PROD) navigate("/", { replace: true });
 
   // Collection data entered by the user on UI
-  const [royaltyPercentage, setRoyaltyPercentage] = useState<number>();
-  const [preMintAmount, setPreMintAmount] = useState<number>();
+  const [royaltyPercentage, setRoyaltyPercentage] = useState<string>();
+  const [preMintAmount, setPreMintAmount] = useState<string>();
   const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
   const [publicMintStartTime, setPublicMintStartTime] = useState<string>();
   const [publicMintEndDate, setPublicMintEndDate] = useState<Date>();
@@ -143,7 +143,7 @@ export function CreateCollection() {
           projectUri,
           maxSupply,
           royaltyPercentage,
-          preMintAmount ?? 0, // amount of NFT to premint for myself
+          preMintAmount, // amount of NFT to premint for myself
           undefined, // addresses in the allow list
           undefined, // allow list start time (in seconds)
           undefined, // allow list end time (in seconds)
@@ -218,7 +218,8 @@ export function CreateCollection() {
               isUploading
                 ? "opacity-100 z-10"
                 : "opacity-0 z-0 pointer-events-none"
-            )}>
+            )}
+          >
             <p className="display">Uploading Files...</p>
             <Spinner size="lg" />
           </div>
@@ -253,7 +254,8 @@ export function CreateCollection() {
                   <Label
                     htmlFor="mint-start"
                     tooltip="When minting becomes active"
-                    className="mb-4">
+                    className="mb-4"
+                  >
                     Public mint start date
                   </Label>
                   <Popover>
@@ -264,7 +266,8 @@ export function CreateCollection() {
                         className={cn(
                           "w-[280px] justify-start text-left font-normal",
                           !publicMintStartDate && "text-muted-foreground"
-                        )}>
+                        )}
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {publicMintStartDate ? (
                           format(publicMintStartDate, "MM/dd/yyyy hh:mm a")
@@ -297,7 +300,8 @@ export function CreateCollection() {
                   <Label
                     htmlFor="mint-end"
                     tooltip="When minting finishes."
-                    className="mb-4">
+                    className="mb-4"
+                  >
                     Public mint end date
                   </Label>
                   <Popover>
@@ -308,7 +312,8 @@ export function CreateCollection() {
                         className={cn(
                           "w-[280px] justify-start text-left font-normal",
                           !publicMintEndDate && "text-muted-foreground"
-                        )}>
+                        )}
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {publicMintEndDate ? (
                           format(publicMintEndDate, "MM/dd/yyyy hh:mm a")
@@ -342,7 +347,8 @@ export function CreateCollection() {
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               htmlFor="mint-limit"
-              tooltip="How many NFTs an individual address is allowed to mint.">
+              tooltip="How many NFTs an individual address is allowed to mint."
+            >
               Limit mint per address
             </Label>
             <Input
@@ -358,22 +364,23 @@ export function CreateCollection() {
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               tooltip="The percentage of trading value that collection creator gets when an NFT is sold on marketplaces."
-              htmlFor="royalty-percentage">
+              htmlFor="royalty-percentage"
+            >
               Royalty Percentage (optional)
             </Label>
             <Input
-              disabled={isUploading}
               id="royalty-percentage"
               type="number"
               onChange={(e) => {
-                setRoyaltyPercentage(parseInt(e.target.value));
+                setRoyaltyPercentage(e.target.value);
               }}
             />
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               htmlFor="mint-fee"
-              tooltip="The fee the nft minter is paying the collection creator when they mint an NFT">
+              tooltip="The fee the nft minter is paying the collection creator when they mint an NFT"
+            >
               Mint fee per NFT in APT (optional)
             </Label>
             <Input
@@ -389,7 +396,8 @@ export function CreateCollection() {
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               htmlFor="for-myself"
-              tooltip="How many NFTs to mint immediately for the creator.">
+              tooltip="How many NFTs to mint immediately for the creator."
+            >
               Mint for myself (optional)
             </Label>
             <Input
@@ -398,7 +406,7 @@ export function CreateCollection() {
               id="for-myself"
               value={preMintAmount}
               onChange={(e) => {
-                setPreMintAmount(parseInt(e.target.value));
+                setPreMintAmount(e.target.value);
               }}
             />
           </div>
@@ -411,7 +419,8 @@ export function CreateCollection() {
               isUploading
             }
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-            onClick={createCollection}>
+            onClick={createCollection}
+          >
             Create Collection
           </Button>
         </div>
