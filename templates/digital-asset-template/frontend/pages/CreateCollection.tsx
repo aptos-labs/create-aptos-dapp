@@ -34,6 +34,7 @@ import { AlertOctagon } from "lucide-react";
 import { dateToSeconds } from "../utils/helpers";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { MODULE_ADDRESS } from "@/constants";
+import { Spinner } from "@/components/ui/spinner";
 
 export function CreateCollection() {
   // Wallet connect providers
@@ -53,6 +54,7 @@ export function CreateCollection() {
   const [publicMintEndTime, setPublicMintEndTime] = useState<string>();
   const [mintLimitPerAccount, setMintLimitPerAccount] = useState<number>();
   const [mintFeePerNFT, setMintFeePerNFT] = useState<number>();
+  const [isUploading, setIsUploading] = useState(false);
 
   // Collection data from collection metadata upload by the user
   const [maxSupply, setMaxSupply] = useState<number>();
@@ -102,22 +104,27 @@ export function CreateCollection() {
 
   // Function to upload Collection data to Irys - a decentralized asset server
   const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const files = event.target.files;
-      alert(`The upload process requires at least 2 message signatures
-      1. To upload collection cover image file and NFT image files into Irys
-      2. To upload collection metadata file and NFT metadata files into Irys
+    try {
+      if (event.target.files) {
+        setIsUploading(true);
+        const files = event.target.files;
+        alert(`The upload process requires at least 2 message signatures
+        1. To upload collection cover image file and NFT image files into Irys
+        2. To upload collection metadata file and NFT metadata files into Irys
 
-      In the case we need to fund a node on Irys, a transfer transaction submission is required also.`);
-      await uploadCollectionData(
-        aptosWallet,
-        files,
-        setCollectionName,
-        setCollectionDescription,
-        setMaxSupply,
-        setProjectUri,
-        setUploadStatus
-      );
+        In the case we need to fund a node on Irys, a transfer transaction submission is required also.`);
+        await uploadCollectionData(
+          aptosWallet,
+          files,
+          setCollectionName,
+          setCollectionDescription,
+          setMaxSupply,
+          setProjectUri,
+          setUploadStatus
+        );
+      }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -205,6 +212,17 @@ export function CreateCollection() {
             </Alert>
           )}
 
+          <div
+            className={cn(
+              "top-0 left-0 fixed w-full h-full bg-gray-500 bg-opacity-30 flex justify-center items-center flex-col transition-all",
+              isUploading
+                ? "opacity-100 z-10"
+                : "opacity-0 z-0 pointer-events-none"
+            )}>
+            <p className="display">Uploading Files...</p>
+            <Spinner size="lg" />
+          </div>
+
           <h3 className="font-bold leading-none tracking-tight md:text-xl dark:text-white py-2">
             Create NFT Collection
           </h3>
@@ -217,6 +235,7 @@ export function CreateCollection() {
                 <CardContent>
                   <div className="flex flex-col items-center justify-between">
                     <Input
+                      disabled={isUploading}
                       ref={inputRef}
                       multiple
                       type="file"
@@ -262,6 +281,7 @@ export function CreateCollection() {
                         initialFocus
                         footer={
                           <Input
+                            disabled={isUploading}
                             type="time"
                             className="w-max py-6"
                             value={publicMintStartTime}
@@ -305,6 +325,7 @@ export function CreateCollection() {
                         initialFocus
                         footer={
                           <Input
+                            disabled={isUploading}
                             type="time"
                             className="w-max py-6"
                             value={publicMintEndTime}
@@ -325,6 +346,7 @@ export function CreateCollection() {
               Limit mint per address
             </Label>
             <Input
+              disabled={isUploading}
               id="mint-limit"
               type="number"
               value={mintLimitPerAccount}
@@ -334,19 +356,20 @@ export function CreateCollection() {
             />
           </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="The percentage of trading value that collection creator gets when an NFT is sold on marketplaces."
-                htmlFor="royalty-percentage">
-                Royalty Percentage (optional)
-              </Label>
-              <Input
-                id="royalty-percentage"
-                type="number"
-                onChange={(e) => {
-                  setRoyaltyPercentage(parseInt(e.target.value));
-                }}
-              />
-            </div>
+            <Label
+              tooltip="The percentage of trading value that collection creator gets when an NFT is sold on marketplaces."
+              htmlFor="royalty-percentage">
+              Royalty Percentage (optional)
+            </Label>
+            <Input
+              disabled={isUploading}
+              id="royalty-percentage"
+              type="number"
+              onChange={(e) => {
+                setRoyaltyPercentage(parseInt(e.target.value));
+              }}
+            />
+          </div>
           <div className="mb-5 flex flex-col item-center space-y-4">
             <Label
               htmlFor="mint-fee"
@@ -354,6 +377,7 @@ export function CreateCollection() {
               Mint fee per NFT in APT (optional)
             </Label>
             <Input
+              disabled={isUploading}
               type="number"
               id="mint-fee"
               value={mintFeePerNFT}
@@ -369,6 +393,7 @@ export function CreateCollection() {
               Mint for myself (optional)
             </Label>
             <Input
+              disabled={isUploading}
               type="number"
               id="for-myself"
               value={preMintAmount}
@@ -382,7 +407,8 @@ export function CreateCollection() {
               !maxSupply ||
               !account ||
               !publicMintStartDate ||
-              !mintLimitPerAccount
+              !mintLimitPerAccount ||
+              isUploading
             }
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
             onClick={createCollection}>
