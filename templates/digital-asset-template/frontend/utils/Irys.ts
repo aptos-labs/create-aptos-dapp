@@ -32,12 +32,16 @@ export const checkIfFund = async (
   // 4. if balance is not enough,  check the payer balance
   const currentAccountAddress = await aptosWallet.account!.address;
 
-  const currentAccountBalance = await aptosClient().getAccountAPTAmount({
-    accountAddress: currentAccountAddress,
+  const currentAccountBalance = await aptosClient().view<[number]>({
+    payload: {
+      function: "0x1::coin::balance",
+      typeArguments: ["0x1::aptos_coin::AptosCoin"],
+      functionArguments: [currentAccountAddress],
+    },
   });
 
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
-  if (currentAccountBalance > costToUpload.toNumber()) {
+  if (currentAccountBalance[0] > costToUpload.toNumber()) {
     try {
       await fundNode(aptosWallet, costToUpload.toNumber());
       return true;
