@@ -2,6 +2,7 @@
   "name": "fungible-asset-template",
   "private": true,
   "version": "0.0.0",
+  "license": "Apache-2.0",
   "scripts": {
     "move:init": "node ./scripts/init && node ./scripts/update_env",
     "move:test": "node ./scripts/move/test",
