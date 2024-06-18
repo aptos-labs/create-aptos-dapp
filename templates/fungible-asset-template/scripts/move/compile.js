@@ -16,7 +16,7 @@ async function compile() {
       // Publish module to account address
       launchpad_addr: accountAddress,
       // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
-      initial_creator_addr: "to_fill",
+      initial_creator_addr: process.env.VITE_CREATOR_ADDRESS,
     },
   });
 }

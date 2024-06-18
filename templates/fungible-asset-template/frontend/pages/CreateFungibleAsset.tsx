@@ -25,7 +25,7 @@ import {
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
-import { MODULE_ADDRESS } from "@/constants";
+import { CREATOR_ADDRESS } from "@/constants";
 import { cn } from "@/lib/utils";
 
 export function CreateFungibleAsset() {
@@ -146,7 +146,7 @@ export function CreateFungibleAsset() {
               </AlertDescription>
             </Alert>
           )}
-          {account && account.address !== MODULE_ADDRESS && (
+          {account && account.address !== CREATOR_ADDRESS && (
             <Alert variant="warning">
               <AlertOctagon className="w-4 h-5" />
               <AlertTitle className="body-md-semibold">

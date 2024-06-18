@@ -33,7 +33,7 @@ import { AlertOctagon } from "lucide-react";
 
 import { dateToSeconds } from "../utils/helpers";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
-import { MODULE_ADDRESS } from "@/constants";
+import { CREATOR_ADDRESS } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
 
 export function CreateCollection() {
@@ -195,7 +195,7 @@ export function CreateCollection() {
               </AlertDescription>
             </Alert>
           )}
-          {account && account.address !== MODULE_ADDRESS && (
+          {account && account.address !== CREATOR_ADDRESS && (
             <Alert variant="warning">
               <AlertOctagon className="w-4 h-5" />
               <AlertTitle className="body-md-semibold">
