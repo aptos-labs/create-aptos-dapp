@@ -1,15 +1,6 @@
 import { aptosClient } from "@/utils/aptosClient";
-import { AccountAddress } from "@aptos-labs/ts-sdk";
+import { AccountAddress, GetCollectionDataResponse } from "@aptos-labs/ts-sdk";
 import { useState, useEffect } from "react";
-
-export type CollectionData = {
-  collection_name: string;
-  description: string;
-  uri: string;
-  collection_id: string;
-  total_minted_v2: string;
-  max_supply: string;
-};
 
 /**
  * A react hook to get all collections under the current contract.
@@ -19,7 +10,9 @@ export type CollectionData = {
  *
  */
 export function useGetCollections() {
-  const [collections, setCollections] = useState<Array<CollectionData>>([]);
+  const [collections, setCollections] = useState<
+    Array<GetCollectionDataResponse>
+  >([]);
 
   useEffect(() => {
     // fetch the contract registry address
@@ -52,21 +45,11 @@ const getObjects = async (registry: [{ inner: string }]) => {
   const objects = await Promise.all(
     registry.map(async (register: { inner: string }) => {
       const formattedRegistry = AccountAddress.from(register.inner).toString();
-      // TODO use aptos api function once a new release is out
-      const object = await aptosClient().queryIndexer<{
-        current_objects: [{ owner_address: string }];
-      }>({
-        query: {
-          query: `query MyQuery {
-      current_objects(
-        where: {object_address: {_eq: "${formattedRegistry}"}}
-      ) {
-        owner_address
-      }
-    }`,
-        },
+      const object = await aptosClient().getObjectDataByObjectAddress({
+        objectAddress: formattedRegistry,
       });
-      return object.current_objects[0].owner_address;
+
+      return object.owner_address;
     })
   );
   return objects;
@@ -77,28 +60,11 @@ const getCollections = async (objects: Array<string>) => {
     objects.map(async (object: string) => {
       const formattedObjectAddress = AccountAddress.from(object).toString();
 
-      const collection = await aptosClient().queryIndexer<{
-        current_collections_v2: Array<CollectionData>;
-      }>({
-        query: {
-          query: `query MyQuery {
-            current_collections_v2(
-        where: {creator_address: {_eq: "${formattedObjectAddress}"}}
-      ) {
-        collection_name
-        description
-        uri
-        collection_id
-        total_minted_v2
-        max_supply
-        cdn_asset_uris {
-          cdn_image_uri
-        }
-      }
-    }`,
-        },
+      const collection = await aptosClient().getCollectionDataByCreatorAddress({
+        creatorAddress: formattedObjectAddress,
       });
-      return collection.current_collections_v2[0];
+
+      return collection;
     })
   );
   return collections;
