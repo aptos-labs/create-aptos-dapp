@@ -20,30 +20,28 @@ type ImageMetadata = {
 };
 
 export const uploadCollectionData = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   aptosWallet: any,
-  fileList: FileList,
-  setCollectionName: React.Dispatch<React.SetStateAction<string | undefined>>,
-  setCollectionDescription: React.Dispatch<
-    React.SetStateAction<string | undefined>
-  >,
-  setMaxSupply: React.Dispatch<React.SetStateAction<number | undefined>>,
-  setProjectUri: React.Dispatch<React.SetStateAction<string | undefined>>,
-  setUploadStatus: React.Dispatch<React.SetStateAction<string>>
-) => {
+  fileList: FileList
+): Promise<{
+  collectionName: string;
+  collectionDescription: string;
+  maxSupply: number;
+  projectUri: string;
+}> => {
   // Convert FileList type into a File[] type
   const files: File[] = [];
   for (let i = 0; i < fileList.length; i++) {
     files.push(fileList[i]);
   }
 
-  let collectionFiles = files.filter((file) =>
+  const collectionFiles = files.filter((file) =>
     file.name.includes("collection")
   );
   if (collectionFiles.length !== 2) {
-    alert(
+    throw new Error(
       "Please make sure you include both collection.json and collection image file"
     );
-    return;
   }
 
   // Check collection.json file exists
@@ -51,29 +49,26 @@ export const uploadCollectionData = async (
     (file) => file.name === "collection.json"
   );
   if (!collectionMetadata) {
-    alert(
+    throw new Error(
       "Collection metadata not found, please make sure you include collection.json file"
     );
-    return;
   }
 
   const collectionCover = collectionFiles.find((file) =>
     VALID_MEDIA_EXTENSIONS.some((ext) => file.name.endsWith(`.${ext}`))
   );
   if (!collectionCover) {
-    alert(
+    throw new Error(
       "Collection cover not found, please make sure you include the collection image file"
     );
-    return;
   }
 
   const mediaExt = collectionCover?.name.split(".").pop();
 
   if (!collectionCover) {
-    alert(
+    throw new Error(
       "Collection cover not found, please make sure you include the collection image file"
     );
-    return;
   }
 
   // Check nft metadata json files exist
@@ -82,10 +77,9 @@ export const uploadCollectionData = async (
   );
 
   if (nftImageMetadatas.length === 0) {
-    alert(
+    throw new Error(
       "Image metadata not found, please make sure you include the NFT json files"
     );
-    return;
   }
 
   // Check NFT image files exist
@@ -95,16 +89,16 @@ export const uploadCollectionData = async (
   );
 
   if (imageFiles.length === 0) {
-    alert(
+    throw new Error(
       "Image files not found, please make sure you include the NFT image files"
     );
-    return;
   }
 
   // Check nft metadata json files amount is the same as the nft image files
   if (nftImageMetadatas.length !== imageFiles.length) {
-    alert("Mismatch between NFT metadata json files and images files");
-    return;
+    throw new Error(
+      "Mismatch between NFT metadata json files and images files"
+    );
   }
 
   // Calculate total files cost to upload to Irys
@@ -114,12 +108,11 @@ export const uploadCollectionData = async (
     imageFiles.reduce((acc, file) => acc + file.size, 0) +
     nftImageMetadatas.reduce((acc, file) => acc + file.size, 0);
 
-  // Check total file size doesnt exceed 2GB due to a Browse constraints
+  // Check total file size doesn't exceed 2GB due to a Browse constraints
   const GIGABYTE = Math.pow(1024, 3);
   const MAX_SIZE = 2 * GIGABYTE;
   if (totalFileSize > MAX_SIZE) {
-    alert("Files size should not exceed 2GB");
-    return;
+    throw new Error("Files size should not exceed 2GB");
   }
 
   // Check if need to first fund an Irys node
@@ -133,17 +126,17 @@ export const uploadCollectionData = async (
         ...imageFiles,
         collectionCover,
       ]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      alert(`Error uploading collection image and NFT images ${error}`);
-      throw new Error(error);
+      throw new Error(
+        `Error uploading collection image and NFT images ${error}`
+      );
     }
 
     // Update collection metadata with the cover image
     const parsedCollectionMetadata: CollectionMetadata = JSON.parse(
       await collectionMetadata.text()
     );
-    setCollectionName(parsedCollectionMetadata.name);
-    setCollectionDescription(parsedCollectionMetadata.description);
     parsedCollectionMetadata.image = `${imageFolderReceipt}/collection.${mediaExt}`;
     const updatedCollectionMetadata = new File(
       [JSON.stringify(parsedCollectionMetadata)],
@@ -175,17 +168,22 @@ export const uploadCollectionData = async (
         ...updatedImageMetadatas,
         updatedCollectionMetadata,
       ]);
-      setProjectUri(`${metadataFolderReceipt}/collection.json`);
-      setMaxSupply(imageFiles.length);
 
-      setUploadStatus("Files uploaded successfully");
+      return {
+        projectUri: `${metadataFolderReceipt}/collection.json`,
+        maxSupply: imageFiles.length,
+        collectionName: parsedCollectionMetadata.name,
+        collectionDescription: parsedCollectionMetadata.description,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      alert(`Error uploading collection metadata and NFTs' metadata ${error}`);
-      throw new Error(error);
+      throw new Error(
+        `Error uploading collection metadata and NFTs' metadata ${error}`
+      );
     }
   } else {
-    alert(
-      "Current account balance is not enough to fund a decentrelized asset node"
+    throw new Error(
+      "Current account balance is not enough to fund a decentralized asset node"
     );
   }
 };

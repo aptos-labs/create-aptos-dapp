@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,12 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { checkIfFund, uploadFile } from "@/utils/Irys";
-import {
-  InputTransactionData,
-  useWallet,
-} from "@aptos-labs/wallet-adapter-react";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { aptosClient } from "@/utils/aptosClient";
 import {
   APT_DECIMALS,
@@ -25,6 +22,8 @@ import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { CREATOR_ADDRESS } from "@/constants";
 import { WarningAlert } from "@/components/ui/warning-alert";
 import { UploadSpinner } from "@/components/UploadSpinner";
+import { LabeledInput } from "@/components/ui/labeled-input";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 
 export function CreateFungibleAsset() {
   const aptosWallet = useWallet();
@@ -35,90 +34,80 @@ export function CreateFungibleAsset() {
   const [maxSupply, setMaxSupply] = useState<string>();
   const [maxMintPerAccount, setMaxMintPerAccount] = useState<number>();
   const [decimal, setDecimal] = useState<number>();
-  const [iconURL, setIconURL] = useState<string>();
+  const [image, setImage] = useState<File | null>(null);
   const [projectURL, setProjectURL] = useState<string>();
   const [mintFeePerFA, setMintFeePerFA] = useState<string>();
   const [mintForMyself, setMintForMyself] = useState<string>();
-
   const [isUploading, setIsUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const disableCreateAssetButton =
     !name ||
     !symbol ||
     !maxSupply ||
     !decimal ||
-    !iconURL ||
     !projectURL ||
     !maxMintPerAccount ||
     !account ||
     isUploading;
 
   const createAsset = async () => {
-    if (!account) return;
-
-    const transaction: InputTransactionData = {
-      data: {
-        function: `${
-          import.meta.env.VITE_MODULE_ADDRESS
-        }::launchpad::create_fa`,
-        typeArguments: [],
-        functionArguments: [
-          convertAmountFromHumanReadableToOnChain(
-            Number(maxSupply),
-            Number(decimal)
-          ),
-          name,
-          symbol,
-          decimal,
-          iconURL,
-          projectURL,
-          mintFeePerFA
-            ? convertAmountFromHumanReadableToOnChain(
-                parseInt(mintFeePerFA),
-                APT_DECIMALS
-              )
-            : 0,
-          mintForMyself,
-          maxMintPerAccount
-            ? convertAmountFromHumanReadableToOnChain(
-                maxMintPerAccount,
-                decimal!
-              )
-            : 0,
-        ],
-      },
-    };
-
-    const response = await signAndSubmitTransaction(transaction);
-
-    const committedTransactionResponse = await aptosClient().waitForTransaction(
-      {
-        transactionHash: response.hash,
-      }
-    );
-    if (committedTransactionResponse.success) {
-      navigate(`/my-assets`, { replace: true });
-    }
-  };
-
-  const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      if (event.target.files) {
-        setIsUploading(true);
-        const file = event.target.files[0];
-        alert(`The upload process requires at least 1 message signatures to upload the asset image file into Irys.
+      if (!account) throw new Error("Connect wallet first");
+      if (!image) throw new Error("Select image first");
 
-        In the case we need to fund a node on Irys, a transfer transaction submission is required also.`);
-        const funded = await checkIfFund(aptosWallet, file.size);
-        if (funded) {
-          const uploadFileResponse = await uploadFile(aptosWallet, file);
-          setIconURL(uploadFileResponse);
-        } else {
-          alert(
-            "Current account balance is not enough to fund a decentrelized asset node"
-          );
-        }
+      setIsUploading(true);
+
+      const funded = await checkIfFund(aptosWallet, image.size);
+      if (!funded)
+        throw new Error(
+          "Current account balance is not enough to fund a decentralized asset node"
+        );
+
+      const iconURL = await uploadFile(aptosWallet, image);
+
+      const response = await signAndSubmitTransaction({
+        data: {
+          function: `${
+            import.meta.env.VITE_MODULE_ADDRESS
+          }::launchpad::create_fa`,
+          typeArguments: [],
+          functionArguments: [
+            convertAmountFromHumanReadableToOnChain(
+              Number(maxSupply),
+              Number(decimal)
+            ),
+            name,
+            symbol,
+            decimal,
+            iconURL,
+            projectURL,
+            mintFeePerFA
+              ? convertAmountFromHumanReadableToOnChain(
+                  parseInt(mintFeePerFA),
+                  APT_DECIMALS
+                )
+              : 0,
+            mintForMyself,
+            maxMintPerAccount
+              ? convertAmountFromHumanReadableToOnChain(
+                  maxMintPerAccount,
+                  decimal!
+                )
+              : 0,
+          ],
+        },
+      });
+
+      const committedTransactionResponse =
+        await aptosClient().waitForTransaction({
+          transactionHash: response.hash,
+        });
+      if (committedTransactionResponse.success) {
+        navigate(`/my-assets`, { replace: true });
       }
+    } catch (error) {
+      alert(error);
     } finally {
       setIsUploading(false);
     }
@@ -147,153 +136,8 @@ export function CreateFungibleAsset() {
 
           <UploadSpinner on={isUploading} />
 
-          <h3 className="font-bold leading-none tracking-tight md:text-xl dark:text-white py-2">
-            Create Asset
-          </h3>
-          <div className="py-2">
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="The name of the asset, e.g. Bitcoin, Ethereum, etc."
-                htmlFor="asset-name"
-              >
-                Asset Name
-              </Label>
-              <Input
-                id="asset-name"
-                disabled={isUploading || !account}
-                type="text"
-                required
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="The symbol of the asset, e.g. BTC, ETH, etc."
-                htmlFor="asset-symbol"
-              >
-                Asset Symbol
-              </Label>
-              <Input
-                disabled={isUploading || !account}
-                id="asset-symbol"
-                type="text"
-                required
-                onChange={(e) => {
-                  setSymbol(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="The total amount of the asset that can be minted."
-                htmlFor="max-supply"
-              >
-                Max Supply
-              </Label>
-              <Input
-                disabled={isUploading || !account}
-                type="number"
-                id="max-supply"
-                required
-                onChange={(e) => {
-                  setMaxSupply(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="The maximum any single individual address can mint."
-                htmlFor="max-mint"
-              >
-                Max mint per account
-              </Label>
-              <Input
-                disabled={isUploading || !account}
-                id="max-mint"
-                type="number"
-                required
-                onChange={(e) => {
-                  setMaxMintPerAccount(parseInt(e.target.value));
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="How many 0's constitute one full unit of the asset. For example, APT has 8."
-                htmlFor="decimal"
-              >
-                Decimal
-              </Label>
-              <Input
-                disabled={isUploading || !account}
-                id="decimal"
-                type="number"
-                required
-                onChange={(e) => {
-                  setDecimal(parseInt(e.target.value));
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label tooltip="Your website address" htmlFor="project-url">
-                Project URL
-              </Label>
-              <Input
-                disabled={isUploading || !account}
-                id="project-url"
-                type="text"
-                required
-                onChange={(e) => {
-                  setProjectURL(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                htmlFor="mint-fee"
-                tooltip="The fee cost for the minter to pay to mint one asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
-              >
-                Mint fee per fungible asset in APT (Optional)
-              </Label>
-              <Input
-                disabled={isUploading || !account}
-                id="mint-fee"
-                type="number"
-                onChange={(e) => {
-                  setMintFeePerFA(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mb-5 flex flex-col item-center space-y-4">
-              <Label
-                tooltip="How many assets to mint right away and send to your address."
-                htmlFor="for-myself"
-              >
-                Mint for myself (Optional)
-              </Label>
-              <Input
-                disabled={isUploading || !account}
-                id="for-myself"
-                type="number"
-                value={mintForMyself}
-                onChange={(e) => {
-                  setMintForMyself(e.target.value);
-                }}
-              />
-            </div>
-          </div>
-          <Button
-            disabled={disableCreateAssetButton}
-            onClick={createAsset}
-            className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-          >
-            Create Asset
-          </Button>
-        </div>
+          <h3 className="display">Create Asset</h3>
 
-        <div className="w-1/3">
           <Card>
             <CardHeader>
               <CardTitle>Asset Image</CardTitle>
@@ -302,17 +146,146 @@ export function CreateFungibleAsset() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center justify-between">
+              <div className="flex flex-col items-start justify-between">
+                {!image && (
+                  <Label
+                    htmlFor="upload"
+                    className={buttonVariants({
+                      variant: "outline",
+                      className: "cursor-pointer",
+                    })}
+                  >
+                    Choose Image
+                  </Label>
+                )}
                 <Input
                   disabled={isUploading || !account}
                   type="file"
+                  className="hidden"
+                  ref={inputRef}
+                  id="upload"
                   placeholder="Upload Image"
-                  onChange={onUploadFile}
+                  onChange={(e) => {
+                    setImage(e.target.files![0]);
+                  }}
                 />
-                <img src={iconURL}></img>
+                {image && (
+                  <>
+                    <img src={URL.createObjectURL(image)} />
+                    <p className="body-sm">
+                      {image.name}
+                      <Button
+                        variant="link"
+                        className="text-destructive"
+                        onClick={() => {
+                          setImage(null);
+                          inputRef.current!.value = "";
+                        }}
+                      >
+                        Clear
+                      </Button>
+                    </p>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
+
+          <LabeledInput
+            id="asset-name"
+            label="Asset Name"
+            tooltip="The name of the asset, e.g. Bitcoin, Ethereum, etc."
+            required
+            onChange={(e) => setName(e.target.value)}
+            disabled={isUploading || !account}
+            type="text"
+          />
+
+          <LabeledInput
+            id="asset-symbol"
+            label="Asset Symbol"
+            tooltip="The symbol of the asset, e.g. BTC, ETH, etc."
+            required
+            onChange={(e) => setSymbol(e.target.value)}
+            disabled={isUploading || !account}
+            type="text"
+          />
+
+          <LabeledInput
+            id="max-supply"
+            label="Max Supply"
+            tooltip="The total amount of the asset that can be minted."
+            required
+            onChange={(e) => setMaxSupply(e.target.value)}
+            disabled={isUploading || !account}
+            type="number"
+          />
+
+          <LabeledInput
+            id="max-mint"
+            label="Max mint per account"
+            tooltip="The maximum any single individual address can mint"
+            required
+            onChange={(e) => setMaxMintPerAccount(parseInt(e.target.value))}
+            disabled={isUploading || !account}
+            type="number"
+          />
+
+          <LabeledInput
+            id="decimal"
+            label="Decimal"
+            tooltip="How many 0's constitute one full unit of the asset. For example, APT has 8."
+            required
+            onChange={(e) => setDecimal(parseInt(e.target.value))}
+            disabled={isUploading || !account}
+            type="number"
+          />
+
+          <LabeledInput
+            id="project-url"
+            label="Project URL"
+            tooltip="Your website address"
+            required
+            onChange={(e) => setProjectURL(e.target.value)}
+            disabled={isUploading || !account}
+            type="text"
+          />
+
+          <LabeledInput
+            id="mint-fee"
+            label="Mint fee per fungible asset in APT"
+            tooltip="The fee cost for the minter to pay to mint one asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
+            onChange={(e) => setMintFeePerFA(e.target.value)}
+            disabled={isUploading || !account}
+            type="number"
+          />
+
+          <LabeledInput
+            id="for-myself"
+            label="Mint for myself"
+            tooltip="How many assets to mint right away and send to your address."
+            onChange={(e) => setMintForMyself(e.target.value)}
+            disabled={isUploading || !account}
+            type="number"
+          />
+
+          <ConfirmButton
+            title="Create Asset"
+            onSubmit={createAsset}
+            disabled={disableCreateAssetButton}
+            confirmMessage={
+              <>
+                <p>
+                  The upload process requires at least 1 message signatures to
+                  upload the asset image file into Irys.
+                </p>
+                <p>
+                  In the case we need to fund a node on Irys, a transfer
+                  transaction submission is required also.
+                </p>
+              </>
+            }
+          />
         </div>
       </div>
     </>

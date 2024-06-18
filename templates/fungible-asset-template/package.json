@@ -18,6 +18,7 @@
     "@aptos-labs/wallet-adapter-react": "^3.3.0",
     "@irys/sdk": "^0.2.1",
     "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.5",

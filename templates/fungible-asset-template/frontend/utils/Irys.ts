@@ -2,6 +2,7 @@ import { WebIrys } from "@irys/sdk";
 import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "./aptosClient";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getWebIrys = async (aptosWallet: any) => {
   const network = "devnet"; // Irys network
   const token = "aptos";
@@ -68,8 +69,7 @@ export const fundNode = async (
     );
     return true;
   } catch (e) {
-    console.log("Error uploading data ", e);
-    return false;
+    throw new Error(`Error uploading data ${e}`);
   }
 };
 
@@ -82,8 +82,7 @@ export const uploadFile = async (
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });
     return `https://gateway.irys.xyz/${receipt.id}`;
   } catch (e) {
-    console.log("Error uploading file ", e);
-    return "";
+    throw new Error(`Error uploading file ${e}`);
   }
 };
 
@@ -97,10 +96,10 @@ export const uploadFolder = async (
     const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
 
     console.log(
-      `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${receipt.id} 
+      `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${receipt.id}
       access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`
     );
   } catch (e) {
-    console.log("Error uploading file ", e);
+    throw new Error(`Error uploading folder ${e}`);
   }
 };
