@@ -17,7 +17,7 @@ export const Socials: FC = () => {
             target="_blank"
             href={config.socials.twitter}
             className={buttonVariants({ variant: "icon", size: "icon" })}>
-            <Image src={Twitter} />
+            <Image src={Twitter} className="dark:invert" />
           </a>
         </li>
       )}
@@ -27,7 +27,7 @@ export const Socials: FC = () => {
             target="_blank"
             href={config.socials.discord}
             className={buttonVariants({ variant: "icon", size: "icon" })}>
-            <Image src={Discord} />
+            <Image src={Discord} className="dark:invert" />
           </a>
         </li>
       )}
@@ -37,7 +37,7 @@ export const Socials: FC = () => {
             target="_blank"
             href={config.socials.homepage}
             className={buttonVariants({ variant: "icon", size: "icon" })}>
-            <Image src={Link} />
+            <Image src={Link} className="dark:invert" />
           </a>
         </li>
       )}

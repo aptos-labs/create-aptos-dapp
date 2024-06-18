@@ -159,7 +159,7 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
       ) : (
         <>
           {truncateAddress(address)}
-          <Image src={Copy} />
+          <Image src={Copy} className="dark:invert" />
         </>
       )}
     </Button>
