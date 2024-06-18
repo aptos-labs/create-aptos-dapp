@@ -13,7 +13,9 @@ async function publish() {
   await move.publish({
     packageDirectoryPath: "move",
     namedAddresses: {
-      launchpad_addr: accountAddress, // make module_addr generic and fetch from Move.toml file
+      launchpad_addr: accountAddress,
+      // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
+      initial_creator_address: "to_fill",
     },
     profile: process.env.VITE_APP_NETWORK,
   });

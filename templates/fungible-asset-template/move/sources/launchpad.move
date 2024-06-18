@@ -3,7 +3,7 @@ module launchpad_addr::launchpad {
     use std::signer;
     use std::string::{Self, String};
     use std::vector;
-    
+
     use aptos_std::table::{Self, Table};
 
     use aptos_framework::aptos_account;
@@ -12,18 +12,20 @@ module launchpad_addr::launchpad {
     use aptos_framework::object::{Self, Object, ObjectCore};
     use aptos_framework::primary_fungible_store;
 
+    /// Only admin can update creator
+    const EONLY_ADMIN_CAN_UPDATE_CREATOR: u64 = 1;
     /// Only admin can set pending admin
-    const EONLY_ADMIN_CAN_SET_PENDING_ADMIN: u64 = 1;
+    const EONLY_ADMIN_CAN_SET_PENDING_ADMIN: u64 = 2;
     /// Sender is not pending admin
-    const ENOT_PENDING_ADMIN: u64 = 2;
+    const ENOT_PENDING_ADMIN: u64 = 3;
     /// Only admin can update mint fee collector
-    const EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
-    /// Only admin can create fungible asset
-    const EONLY_ADMIN_CAN_CREATE_FA: u64 = 4;
+    const EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 4;
+    /// Only admin or creator can create fungible asset
+    const EONLY_ADMIN_OR_CREATOR_CAN_CREATE_FA: u64 = 5;
     /// No mint limit
-    const ENO_MINT_LIMIT: u64 = 5;
+    const ENO_MINT_LIMIT: u64 = 6;
     /// Mint limit reached
-    const EMINT_LIMIT_REACHED: u64 = 6;
+    const EMINT_LIMIT_REACHED: u64 = 7;
 
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
     const DEFAULT_MINT_FEE_PER_FA: u64 = 0;
@@ -88,6 +90,9 @@ module launchpad_addr::launchpad {
 
     /// Global per contract
     struct Config has key {
+        // creator can only create FA
+        creator_addr: address,
+        // admin can set pending admin, accept admin, update mint fee collector, create FA and update creator
         admin_addr: address,
         pending_admin_addr: Option<address>,
         mint_fee_collector_addr: address,
@@ -100,6 +105,7 @@ module launchpad_addr::launchpad {
             fa_objects: vector::empty()
         });
         move_to(sender, Config {
+            creator_addr: @initial_creator_addr,
             admin_addr: signer::address_of(sender),
             pending_admin_addr: option::none(),
             mint_fee_collector_addr: signer::address_of(sender),
@@ -107,6 +113,14 @@ module launchpad_addr::launchpad {
     }
 
     // ================================= Entry Functions ================================= //
+
+    // Update creator address
+    public entry fun update_creator(sender: &signer, new_creator: address) acquires Config {
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_CREATOR);
+        config.creator_addr = new_creator;
+    }
 
     // Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
@@ -148,7 +162,7 @@ module launchpad_addr::launchpad {
     ) acquires Registry, Config, FAController {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_CREATE_FA);
+        assert!(is_admin(config, sender_addr) || is_creator(config, sender_addr), EONLY_ADMIN_OR_CREATOR_CAN_CREATE_FA);
 
         let fa_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
         let fa_owner_obj_signer = &object::generate_signer(fa_owner_obj_constructor_ref);
@@ -233,6 +247,13 @@ module launchpad_addr::launchpad {
 
     // ================================= View Functions ================================== //
 
+    // Get creator, creator is the address that is allowed to create FAs
+    #[view]
+    public fun get_creator(): address acquires Config {
+        let config = borrow_global<Config>(@launchpad_addr);
+        config.creator_addr
+    }
+
     // Get contract admin
     #[view]
     public fun get_admin(): address acquires Config {
@@ -264,8 +285,8 @@ module launchpad_addr::launchpad {
     // Get fungible asset metadata
     #[view]
     public fun get_fa_objects_metadatas(
-        collection_obj: Object<Metadata> 
-    ): (String,String,u8) {
+        collection_obj: Object<Metadata>
+    ): (String, String, u8) {
         let name = fungible_asset::name(collection_obj);
         let symbol = fungible_asset::symbol(collection_obj);
         let decimals = fungible_asset::decimals(collection_obj);
@@ -320,6 +341,10 @@ module launchpad_addr::launchpad {
                 false
             }
         }
+    }
+
+    fun is_creator(config: &Config, sender: address): bool {
+        sender == config.creator_addr
     }
 
     fun check_mint_limit_and_update_mint_tracker(

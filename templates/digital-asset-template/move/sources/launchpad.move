@@ -20,24 +20,26 @@ module launchpad_addr::launchpad {
     use minter::mint_stage;
     use minter::collection_components;
 
+    /// Only admin can update creator
+    const EONLY_ADMIN_CAN_UPDATE_CREATOR: u64 = 1;
     /// Only admin can set pending admin
-    const EONLY_ADMIN_CAN_SET_PENDING_ADMIN: u64 = 1;
+    const EONLY_ADMIN_CAN_SET_PENDING_ADMIN: u64 = 2;
     /// Sender is not pending admin
-    const ENOT_PENDING_ADMIN: u64 = 2;
+    const ENOT_PENDING_ADMIN: u64 = 3;
     /// Only admin can update mint fee collector
-    const EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 3;
-    /// Only admin can create collection
-    const EONLY_ADMIN_CAN_CREATE_COLLECTION: u64 = 4;
+    const EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 4;
+    /// Only admin or creator can create collection
+    const EONLY_ADMIN_OR_CREATOR_CAN_CREATE_COLLECTION: u64 = 5;
     /// No active mint stages
-    const ENO_ACTIVE_STAGES: u64 = 5;
+    const ENO_ACTIVE_STAGES: u64 = 6;
     /// Creator must set at least one mint stage
-    const EAT_LEAST_ONE_STAGE_IS_REQUIRED: u64 = 6;
+    const EAT_LEAST_ONE_STAGE_IS_REQUIRED: u64 = 7;
     /// Start time must be set for stage
-    const ESTART_TIME_MUST_BE_SET_FOR_STAGE: u64 = 7;
+    const ESTART_TIME_MUST_BE_SET_FOR_STAGE: u64 = 8;
     /// End time must be set for stage
-    const EEND_TIME_MUST_BE_SET_FOR_STAGE: u64 = 8;
+    const EEND_TIME_MUST_BE_SET_FOR_STAGE: u64 = 9;
     /// Mint limit per address must be set for stage
-    const EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE: u64 = 9;
+    const EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE: u64 = 10;
 
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
     const DEFAULT_MINT_FEE_PER_NFT: u64 = 0;
@@ -114,6 +116,9 @@ module launchpad_addr::launchpad {
 
     /// Global per contract
     struct Config has key {
+        // creator can only create collection
+        creator_addr: address,
+        // admin can set pending admin, accept admin, update mint fee collector, create FA and update creator
         admin_addr: address,
         pending_admin_addr: Option<address>,
         mint_fee_collector_addr: address,
@@ -126,6 +131,7 @@ module launchpad_addr::launchpad {
             collection_objects: vector::empty()
         });
         move_to(sender, Config {
+            creator_addr: @initial_creator_addr,
             admin_addr: signer::address_of(sender),
             pending_admin_addr: option::none(),
             mint_fee_collector_addr: signer::address_of(sender),
@@ -133,6 +139,14 @@ module launchpad_addr::launchpad {
     }
 
     // ================================= Entry Functions ================================= //
+
+    // Update creator address
+    public entry fun update_creator(sender: &signer, new_creator: address) acquires Config {
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_CREATOR);
+        config.creator_addr = new_creator;
+    }
 
     // Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
@@ -180,7 +194,10 @@ module launchpad_addr::launchpad {
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_CREATE_COLLECTION);
+        assert!(
+            is_admin(config, sender_addr) || is_creator(config, sender_addr),
+            EONLY_ADMIN_OR_CREATOR_CAN_CREATE_COLLECTION
+        );
 
         let royalty = royalty(&mut royalty_percentage, sender_addr);
 
@@ -333,6 +350,13 @@ module launchpad_addr::launchpad {
 
     // ================================= View  ================================= //
 
+    // Get creator, creator is the address that is allowed to create collections
+    #[view]
+    public fun get_creator(): address acquires Config {
+        let config = borrow_global<Config>(@launchpad_addr);
+        config.creator_addr
+    }
+
     // Get contract admin
     #[view]
     public fun get_admin(): address acquires Config {
@@ -416,6 +440,10 @@ module launchpad_addr::launchpad {
                 false
             }
         }
+    }
+
+    fun is_creator(config: &Config, sender: address): bool {
+        sender == config.creator_addr
     }
 
     fun add_allowlist_stage(
