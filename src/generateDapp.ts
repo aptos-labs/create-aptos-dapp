@@ -29,7 +29,7 @@ export async function generateDapp(selection: Selections) {
   const templateDir = path.resolve(
     fileURLToPath(import.meta.url),
     "../../templates",
-    selection.template
+    selection.template.path
   );
 
   // current working directory
@@ -94,7 +94,7 @@ export async function generateDapp(selection: Selections) {
 
     // create .env file
     const network = selection.network || "testnet";
-    await write(".env", `VITE_APP_NETWORK=${network}`);
+    await write(".env", `VITE_APP_NETWORK=${network}\nVITE_CREATOR_ADDRESS=""`);
 
     // Log next steps
     console.log(
@@ -102,37 +102,15 @@ export async function generateDapp(selection: Selections) {
     );
 
     console.log(bold("\nNext steps:") + "\n");
-    console.log(
-      green(`1. run ${white(`cd ${projectName}`)} to your dapp directory.`) +
-        "\n"
-    );
-    console.log(
-      green(
-        `2. run ${white("npm run move:init")} to initialize a new CLI Profile.`
-      ) + "\n"
-    );
-    console.log(
-      green(
-        `2. run ${white("npm run move:test")} to run move module unit tests.`
-      ) + "\n"
-    );
-    console.log(
-      green(
-        `3. run ${white("npm run move:compile")} to compile your move contract.`
-      ) + "\n"
-    );
-    console.log(
-      green(
-        `4. run ${white("npm run move:publish")} to publish your contract.`
-      ) + "\n"
-    );
-    console.log(
-      green(`5. run ${white("npm run dev")} to run your dapp.`) + "\n"
-    );
 
+    console.log(green(`1. cd ${projectName}`) + "\n");
+    console.log(green(`2. npm run dev`) + "\n");
     console.log(
-      green(`6. open up your project in your favorite IDE and start coding!`) +
-        "\n"
+      green(
+        `3. Follow the instructions for the ${
+          selection.template.name
+        } template on ${white(selection.template.doc)}`
+      )
     );
   } catch (error: any) {
     currentSpinner?.fail(`Failed to scaffold project: ${error.message}`);
