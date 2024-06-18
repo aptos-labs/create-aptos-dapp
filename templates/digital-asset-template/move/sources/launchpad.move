@@ -116,7 +116,7 @@ module launchpad_addr::launchpad {
 
     /// Global per contract
     struct Config has key {
-        // creator can only create collection
+        // creator can create collection
         creator_addr: address,
         // admin can set pending admin, accept admin, update mint fee collector, create FA and update creator
         admin_addr: address,
