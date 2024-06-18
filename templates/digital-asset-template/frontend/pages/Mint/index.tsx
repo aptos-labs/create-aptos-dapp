@@ -1,4 +1,3 @@
-import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
 import { BannerSection } from "./components/BannerSection";
 import { HeroSection } from "./components/HeroSection";
 import { StatsSection } from "./components/StatsSection";

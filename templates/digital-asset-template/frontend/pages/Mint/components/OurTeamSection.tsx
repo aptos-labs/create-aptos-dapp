@@ -41,12 +41,22 @@ const TeamCard: FC<{ member: ConfigTeamMember }> = ({ member }) => {
           {member.name}
           {member.socials?.twitter && (
             <a target="_blank" href={member.socials.twitter}>
-              <Image width={16} height={16} src={Twitter} />
+              <Image
+                width={16}
+                height={16}
+                src={Twitter}
+                className="dark:invert"
+              />
             </a>
           )}
           {member.socials?.discord && (
             <a target="_blank" href={member.socials.discord}>
-              <Image width={16} height={16} src={Discord} />
+              <Image
+                width={16}
+                height={16}
+                src={Discord}
+                className="dark:invert"
+              />
             </a>
           )}
         </CardTitle>
