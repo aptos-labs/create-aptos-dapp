@@ -16,7 +16,7 @@ async function publish() {
       // Publish module to account address
       launchpad_addr: accountAddress,
       // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
-      initial_creator_address: "to_fill",
+      initial_creator_addr: "to_fill",
       // Our contract depends on the token-minter contract to provide some common functionalities like managing refs and mint stages
       // You can read the source code of it here: https://github.com/aptos-labs/token-minter/
       // Please find it on the network you are using, This is testnet deployment
