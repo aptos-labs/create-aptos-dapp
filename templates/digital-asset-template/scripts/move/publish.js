@@ -17,7 +17,7 @@ async function publish() {
       // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
       initial_creator_address: "to_fill",
       // Please find it on the network you are using
-      // This is my own deployed version on testnet
+      // This is testnet deployment
       minter:
         "0x93f379226ae424367346b2803b340b1eda36cb2416037a7e71a6761e3a551e5c",
     },
