@@ -236,7 +236,7 @@ export function CreateCollection() {
                 <CardContent>
                   <div className="flex flex-col items-center justify-between">
                     <Input
-                      disabled={isUploading}
+                      disabled={isUploading || !account}
                       ref={inputRef}
                       multiple
                       type="file"
@@ -261,6 +261,7 @@ export function CreateCollection() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
+                        disabled={isUploading || !account}
                         id="mint-start"
                         variant={"outline"}
                         className={cn(
@@ -284,7 +285,6 @@ export function CreateCollection() {
                         initialFocus
                         footer={
                           <Input
-                            disabled={isUploading}
                             type="time"
                             className="w-max py-6"
                             value={publicMintStartTime}
@@ -307,6 +307,7 @@ export function CreateCollection() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
+                        disabled={isUploading || !account}
                         id="mint-end"
                         variant={"outline"}
                         className={cn(
@@ -330,7 +331,6 @@ export function CreateCollection() {
                         initialFocus
                         footer={
                           <Input
-                            disabled={isUploading}
                             type="time"
                             className="w-max py-6"
                             value={publicMintEndTime}
@@ -352,7 +352,7 @@ export function CreateCollection() {
               Limit mint per address
             </Label>
             <Input
-              disabled={isUploading}
+              disabled={isUploading || !account}
               id="mint-limit"
               type="number"
               value={mintLimitPerAccount}
@@ -369,6 +369,7 @@ export function CreateCollection() {
               Royalty Percentage (optional)
             </Label>
             <Input
+              disabled={isUploading || !account}
               id="royalty-percentage"
               type="number"
               onChange={(e) => {
@@ -384,7 +385,7 @@ export function CreateCollection() {
               Mint fee per NFT in APT (optional)
             </Label>
             <Input
-              disabled={isUploading}
+              disabled={isUploading || !account}
               type="number"
               id="mint-fee"
               value={mintFeePerNFT}
@@ -401,7 +402,7 @@ export function CreateCollection() {
               Mint for myself (optional)
             </Label>
             <Input
-              disabled={isUploading}
+              disabled={isUploading || !account}
               type="number"
               id="for-myself"
               value={preMintAmount}
@@ -416,6 +417,7 @@ export function CreateCollection() {
               !account ||
               !publicMintStartDate ||
               !mintLimitPerAccount ||
+              !account ||
               isUploading
             }
             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
