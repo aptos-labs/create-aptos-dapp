@@ -5,6 +5,7 @@ authors = []
 
 [addresses]
 launchpad_addr = "_"
+initial_creator_addr = "_"
 minter = "_"
 
 [dependencies]

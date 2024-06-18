@@ -9,7 +9,8 @@ async function test() {
     packageDirectoryPath: "move",
     namedAddresses: {
       launchpad_addr: "0x100",
-      minter: "0x101",
+      initial_creator_addr: "0x101",
+      minter: "0x102",
     },
   });
 }

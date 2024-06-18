@@ -13,7 +13,10 @@ async function compile() {
   await move.compile({
     packageDirectoryPath: "move",
     namedAddresses: {
-      launchpad_addr: accountAddress, // make launchpad_addr generic and fetch from Move.toml file
+      // Publish module to account address
+      launchpad_addr: accountAddress,
+      // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
+      initial_creator_addr: process.env.VITE_CREATOR_ADDRESS,
     },
   });
 }

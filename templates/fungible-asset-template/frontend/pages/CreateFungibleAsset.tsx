@@ -25,7 +25,7 @@ import {
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertOctagon } from "lucide-react";
-import { MODULE_ADDRESS } from "@/constants";
+import { CREATOR_ADDRESS } from "@/constants";
 import { cn } from "@/lib/utils";
 
 export function CreateFungibleAsset() {
@@ -147,7 +147,7 @@ export function CreateFungibleAsset() {
               </AlertDescription>
             </Alert>
           )}
-          {account && account.address !== MODULE_ADDRESS && (
+          {account && account.address !== CREATOR_ADDRESS && (
             <Alert variant="warning">
               <AlertOctagon className="w-4 h-5" />
               <AlertTitle className="body-md-semibold">
@@ -155,9 +155,10 @@ export function CreateFungibleAsset() {
               </AlertTitle>
               <AlertDescription className="body-sm">
                 To continue with creating your asset, make sure you are
-                connected with the same profile account as in your
+                connected with the same profile account as in your creator
+                address in{" "}
                 <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-                  .aptos/config.yaml
+                  .env
                 </code>{" "}
                 file
               </AlertDescription>
