@@ -15,13 +15,21 @@ export const workflowOptions = {
     choices: [
       {
         title: "Digital Asset",
-        value: "digital-asset-template",
-        description: "A dapp to mint a digital asset",
+        value: {
+          path: "digital-asset-template",
+          name: "Digital Asset",
+          doc: "https://aptos.dev/digital", // TODO fill with real url once doc is live
+        },
+        description: "A NFT minting dapp",
       },
       {
         title: "Fungible Asset",
-        value: "fungible-asset-template",
-        description: "A dapp to mint a fungible asset",
+        value: {
+          path: "fungible-asset-template",
+          name: "Fungible Asset",
+          doc: "https://aptos.dev/fungible", // TODO fill with real url once doc is live
+        },
+        description: "A fungible asset minting dapp",
       },
     ],
     initial: 0,
