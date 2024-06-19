@@ -47,8 +47,13 @@ export const checkIfFund = async (
 
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
   if (currentAccountBalance[0] > costToUpload.toNumber()) {
-    await fundNode(aptosWallet, costToUpload.toNumber());
-    return true;
+    try {
+      await fundNode(aptosWallet, costToUpload.toNumber());
+      return true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      throw new Error(`Error funding node ${error}`);
+    }
   }
   // 6. if payer balance < the amount, replenish the payer balance*/
   return false;
@@ -83,23 +88,5 @@ export const uploadFile = async (
     return `https://gateway.irys.xyz/${receipt.id}`;
   } catch (e) {
     throw new Error(`Error uploading file ${e}`);
-  }
-};
-
-export const uploadFolder = async (
-  aptosWallet: WalletContextState,
-  files: File[]
-) => {
-  const webIrys = await getWebIrys(aptosWallet);
-
-  try {
-    const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
-
-    console.log(
-      `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${receipt.id}
-      access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`
-    );
-  } catch (e) {
-    throw new Error(`Error uploading folder ${e}`);
   }
 };
