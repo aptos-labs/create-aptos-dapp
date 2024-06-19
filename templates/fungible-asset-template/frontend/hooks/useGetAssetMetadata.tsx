@@ -46,21 +46,11 @@ const getObjects = async (registry: [{ inner: string }]) => {
   const objects = await Promise.all(
     registry.map(async (register: { inner: string }) => {
       const formattedRegistry = AccountAddress.from(register.inner).toString();
-      // TODO use aptos api function once a new release is out
-      const object = await aptosClient().queryIndexer<{
-        current_objects: [{ owner_address: string }];
-      }>({
-        query: {
-          query: `query MyQuery {
-      current_objects(
-        where: {object_address: {_eq: "${formattedRegistry}"}}
-      ) {
-        owner_address
-      }
-    }`,
-        },
+      const object = await aptosClient().getObjectDataByObjectAddress({
+        objectAddress: formattedRegistry,
       });
-      return object.current_objects[0].owner_address;
+
+      return object.owner_address;
     })
   );
   return objects;
