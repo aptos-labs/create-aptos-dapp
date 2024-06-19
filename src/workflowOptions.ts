@@ -18,7 +18,7 @@ export const workflowOptions = {
         value: {
           path: "digital-asset-template",
           name: "Digital Asset",
-          doc: "https://aptos.dev/digital", // TODO fill with real url once doc is live
+          doc: "https://aptos.dev/create-aptos-dapp/templates/digital-asset",
         },
         description: "A NFT minting dapp",
       },
@@ -27,7 +27,7 @@ export const workflowOptions = {
         value: {
           path: "fungible-asset-template",
           name: "Fungible Asset",
-          doc: "https://aptos.dev/fungible", // TODO fill with real url once doc is live
+          doc: "https://aptos.dev/create-aptos-dapp/templates/fungible-asset",
         },
         description: "A fungible asset minting dapp",
       },
