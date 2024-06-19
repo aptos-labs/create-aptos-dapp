@@ -22,7 +22,7 @@ export const LabeledInput: FC<{
   type = "number",
 }) => {
   return (
-    <div className="flex flex-col item-center space-y-4">
+    <div className="flex flex-col item-center space-y-4 mt-4">
       <Label htmlFor={id} tooltip={tooltip}>
         {label} {required ? "" : "(optional)"}
       </Label>
