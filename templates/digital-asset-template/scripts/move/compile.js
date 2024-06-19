@@ -21,7 +21,7 @@ async function compile() {
       // You can read the source code of it here: https://github.com/aptos-labs/token-minter/
       // Please find it on the network you are using, This is testnet deployment
       minter:
-        "0x93f379226ae424367346b2803b340b1eda36cb2416037a7e71a6761e3a551e5c",
+        "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
     },
   });
 }
