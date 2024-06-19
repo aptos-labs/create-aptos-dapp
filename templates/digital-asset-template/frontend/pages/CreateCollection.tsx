@@ -209,7 +209,7 @@ export function CreateCollection() {
             </CardContent>
           </Card>
 
-          <div className="flex item-center gap-4">
+          <div className="flex item-center gap-4 mt-4">
             <DateTimeInput
               id="mint-start"
               label="Public mint start date"
