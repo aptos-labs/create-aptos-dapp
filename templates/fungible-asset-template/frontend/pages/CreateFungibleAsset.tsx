@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
 
 import { checkIfFund, uploadFile } from "@/utils/Irys";
 import {
@@ -23,10 +22,9 @@ import {
   convertAmountFromHumanReadableToOnChain,
 } from "@/utils/helpers";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertOctagon } from "lucide-react";
 import { CREATOR_ADDRESS } from "@/constants";
-import { cn } from "@/lib/utils";
+import { WarningAlert } from "@/components/ui/warning-alert";
+import { UploadSpinner } from "@/components/UploadSpinner";
 
 export function CreateFungibleAsset() {
   const aptosWallet = useWallet();
@@ -131,51 +129,23 @@ export function CreateFungibleAsset() {
       <LaunchpadHeader />
       <div className="flex items-center justify-between px-6 py-2">
         <div className="w-2/4">
-          {!account && (
-            <Alert variant="warning">
-              <AlertOctagon className="w-4 h-5" />
-              <AlertTitle className="body-md-semibold">
-                Connect wallet
-              </AlertTitle>
-              <AlertDescription className="body-sm">
-                To continue with creating your asset, first connect your wallet
-                by copy the private_key from the{" "}
-                <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-                  .aptos/config.yaml
-                </code>{" "}
-                file and import it into the wallet.
-              </AlertDescription>
-            </Alert>
-          )}
-          {account && account.address !== CREATOR_ADDRESS && (
-            <Alert variant="warning">
-              <AlertOctagon className="w-4 h-5" />
-              <AlertTitle className="body-md-semibold">
-                Wrong account connected
-              </AlertTitle>
-              <AlertDescription className="body-sm">
-                To continue with creating your asset, make sure you are
-                connected with the same profile account as in your creator
-                address in{" "}
-                <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-                  .env
-                </code>{" "}
-                file
-              </AlertDescription>
-            </Alert>
+          {(!account || account.address !== CREATOR_ADDRESS) && (
+            <WarningAlert
+              title={
+                account ? "Wrong account connected" : "No account connected"
+              }
+            >
+              To continue with creating your collection, make sure you are
+              connected with a Wallet and with the same profile account as in
+              your CREATOR_ADDRESS in{" "}
+              <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+                .env
+              </code>{" "}
+              file
+            </WarningAlert>
           )}
 
-          <div
-            className={cn(
-              "top-0 left-0 fixed w-full h-full bg-gray-500 bg-opacity-30 flex justify-center items-center flex-col transition-all",
-              isUploading
-                ? "opacity-100 z-10"
-                : "opacity-0 z-0 pointer-events-none"
-            )}
-          >
-            <p className="display">Uploading Files...</p>
-            <Spinner size="lg" />
-          </div>
+          <UploadSpinner on={isUploading} />
 
           <h3 className="font-bold leading-none tracking-tight md:text-xl dark:text-white py-2">
             Create Asset
