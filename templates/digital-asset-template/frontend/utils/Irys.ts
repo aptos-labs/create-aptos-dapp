@@ -50,7 +50,7 @@ export const checkIfFund = async (
       return;
     }
   }
-  // 6. if payer balance < the amount, replenish the payer balance*/
+  // 6. if payer balance < the amount, replenish the payer balance
   return false;
 };
 
