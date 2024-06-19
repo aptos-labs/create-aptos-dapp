@@ -1,3 +1,4 @@
+import { useWalletClient } from "@thalalabs/surf/hooks";
 import { FC, FormEvent, useState } from "react";
 import { truncateAddress } from "@/utils/truncateAddress";
 import { Image } from "@/components/ui/image";
@@ -10,38 +11,32 @@ import { useMintData } from "../hooks/useMintData";
 import Copy from "@/assets/icons/copy.svg";
 import ExternalLink from "@/assets/icons/external-link.svg";
 import { Socials } from "./Socials";
-import { MODULE_ADDRESS, NETWORK } from "@/constants";
-import {
-  InputTransactionData,
-  useWallet,
-} from "@aptos-labs/wallet-adapter-react";
+import { NETWORK } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 import { useQueryClient } from "@tanstack/react-query";
 import Placeholder1 from "@/assets/placeholders/bear-1.png";
 import { config } from "@/config";
 import { formatDate } from "@/utils/formatDate";
+import { ABI } from "@/utils/abi";
 
 interface HeroSectionProps {}
 
 export const HeroSection: React.FC<HeroSectionProps> = () => {
   const { data } = useMintData();
   const queryClient = useQueryClient();
-  const { account, signAndSubmitTransaction } = useWallet();
+  const { client: walletClient } = useWalletClient();
   const [nftCount, setNftCount] = useState(1);
 
   const { collection, totalMinted = 0, maxSupply = 1 } = data ?? {};
 
   const mintNft = async (e: FormEvent) => {
     e.preventDefault();
-    if (!account || !data?.isMintActive) return;
+    if (!walletClient || !data?.isMintActive || !collection) return;
 
-    const transaction: InputTransactionData = {
-      data: {
-        function: `${MODULE_ADDRESS}::launchpad::batch_mint_nft`,
-        functionArguments: [collection?.collection_id, nftCount],
-      },
-    };
-    const response = await signAndSubmitTransaction(transaction);
+    const response = await walletClient.useABI(ABI).batch_mint_nft({
+      type_arguments: [],
+      arguments: [collection.collection_id as `0x${string}`, nftCount],
+    });
     await aptosClient().waitForTransaction({ transactionHash: response.hash });
     queryClient.invalidateQueries();
     setNftCount(1);
@@ -70,7 +65,8 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
         <Card>
           <CardContent
             fullPadding
-            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center flex-wrap">
+            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center flex-wrap"
+          >
             <form onSubmit={mintNft} className="flex gap-4">
               <Input
                 type="number"
@@ -107,7 +103,8 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             <a
               className={buttonVariants({ variant: "link" })}
               target="_blank"
-              href={`https://explorer.aptoslabs.com/account/${collection?.collection_id}?network=${NETWORK}`}>
+              href={`https://explorer.aptoslabs.com/account/${collection?.collection_id}?network=${NETWORK}`}
+            >
               View on Explorer <Image src={ExternalLink} />
             </a>
           </div>
@@ -153,7 +150,8 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
     <Button
       onClick={onCopy}
       className="whitespace-nowrap flex gap-1 px-0 py-0"
-      variant="link">
+      variant="link"
+    >
       {copied ? (
         "Copied!"
       ) : (

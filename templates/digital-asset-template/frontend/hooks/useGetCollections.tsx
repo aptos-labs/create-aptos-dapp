@@ -1,4 +1,4 @@
-import { aptosClient } from "@/utils/aptosClient";
+import { aptosClient, surfClient } from "@/utils/aptosClient";
 import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { useState, useEffect } from "react";
 
@@ -38,14 +38,11 @@ export function useGetCollections() {
 }
 
 const getRegistry = async () => {
-  const registry = await aptosClient().view<[[{ inner: string }]]>({
-    payload: {
-      function: `${AccountAddress.from(
-        import.meta.env.VITE_MODULE_ADDRESS
-      )}::launchpad::get_registry`,
-    },
+  const registry = await surfClient().view.get_registry({
+    typeArguments: [],
+    functionArguments: [],
   });
-  return registry[0];
+  return registry[0] as [{ inner: string }];
 };
 
 const getObjects = async (registry: [{ inner: string }]) => {
