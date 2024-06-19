@@ -45,9 +45,9 @@ export const checkIfFund = async (
     try {
       await fundNode(aptosWallet, costToUpload.toNumber());
       return true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      alert(`Error funding node ${error}`);
-      return;
+      throw new Error(`Error funding node ${error}`);
     }
   }
   // 6. if payer balance < the amount, replenish the payer balance*/
@@ -69,12 +69,12 @@ export const fundNode = async (
     );
     return true;
   } catch (e) {
-    console.log("Error uploading data ", e);
-    return false;
+    throw new Error(`Error uploading data ${e}`);
   }
 };
 
 export const uploadFile = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   aptosWallet: any,
   fileToUpload: File
 ): Promise<string> => {
@@ -82,9 +82,9 @@ export const uploadFile = async (
   try {
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });
     return `https://gateway.irys.xyz/${receipt.id}`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    console.log("Error uploading file ", e);
-    throw new Error(e);
+    throw new Error(`Error uploading file ${e}`);
   }
 };
 
@@ -98,12 +98,12 @@ export const uploadFolder = async (
     const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
 
     console.log(
-      `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${receipt.id} 
+      `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${receipt.id}
       access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`
     );
     return `https://gateway.irys.xyz/${receipt.manifestId}`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    console.log("Error uploading folder ", e);
-    throw new Error(e);
+    throw new Error(`Error uploading folder ${e}`);
   }
 };
