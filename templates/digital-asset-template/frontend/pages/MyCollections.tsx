@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { GetCollectionDataResponse } from "@aptos-labs/ts-sdk";
 import {
   Table,
   TableBody,
@@ -8,12 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CollectionData, useGetCollections } from "@/hooks/useGetCollections";
+import { useGetCollections } from "@/hooks/useGetCollections";
 import { NETWORK } from "@/constants";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 
 export function MyCollections() {
-  const collections: Array<CollectionData> = useGetCollections();
+  const collections: Array<GetCollectionDataResponse> = useGetCollections();
 
   // If we are on Production mode, redierct to the mint page
   const navigate = useNavigate();
