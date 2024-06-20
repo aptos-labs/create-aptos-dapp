@@ -10,7 +10,7 @@ export const StatsSection: React.FC<StatsSectionProps> = () => {
   const { maxSupply, totalMinted, uniqueHolders } = data;
 
   return (
-    <section className="stats-container px-6 max-w-screen-xl mx-auto w-full">
+    <section className="stats-container px-4 max-w-screen-xl mx-auto w-full">
       <ul className="flex flex-col md:flex-row gap-6">
         {[
           { title: "Created NFTs", value: maxSupply },
@@ -18,7 +18,7 @@ export const StatsSection: React.FC<StatsSectionProps> = () => {
           { title: "Unique Holders", value: uniqueHolders },
         ].map(({ title, value }) => (
           <li className="basis-1/3" key={title + " " + value}>
-            <Card className="p-2" shadow="md">
+            <Card className="py-2 px-4" shadow="md">
               <p className="label-sm">{title}</p>
               <p className="heading-sm">{clampNumber(value)}</p>
             </Card>

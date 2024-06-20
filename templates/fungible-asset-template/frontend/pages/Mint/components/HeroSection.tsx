@@ -63,7 +63,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
   };
 
   return (
-    <section className="hero-container flex flex-col md:flex-row gap-6 px-6 max-w-screen-xl mx-auto w-full">
+    <section className="hero-container flex flex-col md:flex-row gap-6 px-4 max-w-screen-xl mx-auto w-full">
       <Image
         src={asset?.icon_uri ?? Placeholder1}
         rounded="full"
@@ -77,7 +77,9 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
           <CardContent
             fullPadding
             className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center">
-            <form onSubmit={mintNft} className="flex gap-4 basis-1/3">
+            <form
+              onSubmit={mintNft}
+              className="flex flex-col md:flex-row gap-4 w-full md:basis-1/4">
               <Input
                 type="text"
                 name="amount"
@@ -86,18 +88,20 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
                   setAssetCount(e.target.value);
                 }}
               />
-              <Button type="submit">Mint</Button>
+              <Button className="h-16 md:h-auto" type="submit">
+                Mint
+              </Button>
             </form>
 
             <div className="flex flex-col basis-1/3">
-              <p className="body-sm">You can mint up to</p>
+              <p className="label-sm">You can mint up to</p>
               <p className="body-md">
                 {totalAbleToMint} {asset?.symbol}
               </p>
             </div>
 
             <div className="flex flex-col basis-1/3">
-              <p className="body-sm">Your Balance</p>
+              <p className="label-sm">Your Balance</p>
               <p className="body-md">
                 {yourBalance} {asset?.symbol}
               </p>

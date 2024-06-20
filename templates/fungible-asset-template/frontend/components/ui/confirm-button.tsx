@@ -15,12 +15,13 @@ export const ConfirmButton: FC<{
   title: string;
   disabled?: boolean;
   onSubmit: () => void;
+  className?: string;
   confirmMessage: React.ReactNode;
-}> = ({ onSubmit, disabled, title, confirmMessage }) => {
+}> = ({ className, onSubmit, disabled, title, confirmMessage }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="green" disabled={disabled}>
+        <Button className={className} variant="green" disabled={disabled}>
           {title}
         </Button>
       </AlertDialogTrigger>

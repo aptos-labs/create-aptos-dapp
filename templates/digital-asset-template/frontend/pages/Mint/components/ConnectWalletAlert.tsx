@@ -7,7 +7,7 @@ export const ConnectWalletAlert: FC = () => {
   if (config.collection_id) return null;
 
   return (
-    <div className="px-6">
+    <div className="px-4">
       <Alert className="max-w-screen-xl w-full mx-auto" variant="warning">
         <AlertOctagon className="w-4 h-5" />
         <AlertTitle className="body-md-semibold">

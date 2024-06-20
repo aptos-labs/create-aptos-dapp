@@ -15,7 +15,7 @@ import {
   APT_DECIMALS,
   convertAmountFromHumanReadableToOnChain,
 } from "@/utils/helpers";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { dateToSeconds } from "../utils/helpers";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
@@ -134,15 +134,15 @@ export function CreateCollection() {
 
   return (
     <>
-      <LaunchpadHeader />
-      <div className="flex items-center justify-between px-6 py-2">
-        <div className="w-2/4">
+      <LaunchpadHeader title="Create New Collection" />
+
+      <div className="flex flex-col md:flex-row items-start justify-between px-4 py-2 gap-4 max-w-screen-xl mx-auto">
+        <div className="w-full md:w-2/3 flex flex-col gap-y-4 order-2 md:order-1">
           {(!account || account.address !== CREATOR_ADDRESS) && (
             <WarningAlert
               title={
                 account ? "Wrong account connected" : "No account connected"
-              }
-            >
+              }>
               To continue with creating your collection, make sure you are
               connected with a Wallet and with the same profile account as in
               your CREATOR_ADDRESS in{" "}
@@ -154,8 +154,6 @@ export function CreateCollection() {
           )}
 
           <UploadSpinner on={isUploading} />
-
-          <h3 className="display">Create NFT Collection</h3>
 
           <Card>
             <CardHeader>
@@ -171,8 +169,7 @@ export function CreateCollection() {
                     className={buttonVariants({
                       variant: "outline",
                       className: "cursor-pointer",
-                    })}
-                  >
+                    })}>
                     Choose Files to Upload
                   </Label>
                 )}
@@ -199,8 +196,7 @@ export function CreateCollection() {
                       onClick={() => {
                         setFiles(null);
                         inputRef.current!.value = "";
-                      }}
-                    >
+                      }}>
                       Clear
                     </Button>
                   </div>
@@ -278,6 +274,7 @@ export function CreateCollection() {
 
           <ConfirmButton
             title="Create Collection"
+            className="self-start"
             onSubmit={createCollection}
             disabled={
               !account ||
@@ -308,6 +305,19 @@ export function CreateCollection() {
               </>
             }
           />
+        </div>
+        <div className="w-full md:w-1/3 order-1 md:order-2">
+          <Card>
+            <CardHeader className="body-md-semibold">Learn More</CardHeader>
+            <CardContent>
+              <Link
+                to="https://aptos.dev/standards/digital-asset"
+                className="body-sm underline"
+                target="_blank">
+                Find out more about Digital Assets on Aptos
+              </Link>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

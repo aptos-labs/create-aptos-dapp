@@ -16,11 +16,13 @@ export function MyFungibleAssets() {
 
   return (
     <>
-      <LaunchpadHeader />
-      <Table>
-        <TableCaption>
-          A list of the fungible assets created under the current contract.
-        </TableCaption>
+      <LaunchpadHeader title="My Assets" />
+      <Table className="max-w-screen-xl mx-auto">
+        {!fas.length && (
+          <TableCaption>
+            A list of the fungible assets created under the current contract.
+          </TableCaption>
+        )}
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Symbol</TableHead>
@@ -41,8 +43,7 @@ export function MyFungibleAssets() {
                       <img
                         src={fa.icon_uri}
                         style={{ width: "40px" }}
-                        className="mr-2"
-                      ></img>
+                        className="mr-2"></img>
                       <span>{fa.symbol}</span>
                     </div>
                   </TableCell>
@@ -53,8 +54,7 @@ export function MyFungibleAssets() {
                         fa.asset_type
                       }?network=${import.meta.env.VITE_APP_NETWORK}`}
                       target="_blank"
-                      style={{ textDecoration: "underline" }}
-                    >
+                      style={{ textDecoration: "underline" }}>
                       {fa.asset_type}
                     </Link>
                   </TableCell>

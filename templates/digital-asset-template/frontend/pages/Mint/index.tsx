@@ -45,7 +45,7 @@ export function Mint() {
           <FAQSection />
         </main>
 
-        <footer className="footer-container px-6 pb-6 w-full max-w-screen-xl mx-auto mt-6 md:mt-16 flex items-center justify-between">
+        <footer className="footer-container px-4 pb-6 w-full max-w-screen-xl mx-auto mt-6 md:mt-16 flex items-center justify-between">
           <p>{data?.collection.collection_name}</p>
           <Socials />
         </footer>
