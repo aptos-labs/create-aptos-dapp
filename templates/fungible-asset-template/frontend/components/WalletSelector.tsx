@@ -11,6 +11,7 @@ import {
 } from "@aptos-labs/wallet-adapter-react";
 import { ChevronDown, Copy, LogOut, User } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import {
   Collapsible,
@@ -101,6 +102,10 @@ interface ConnectWalletDialogProps {
 function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
   const { wallets = [] } = useWallet();
 
+  const location = useLocation();
+
+  const isPublicMintPage = location.pathname === "/";
+
   const {
     /** Wallets that use social login to create an account on the blockchain */
     aptosConnectWallets,
@@ -117,26 +122,37 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
 
   return (
     <DialogContent className="max-h-screen overflow-auto">
-      <DialogHeader className="flex flex-col items-center">
-        <DialogTitle className="flex flex-col text-center leading-snug">
-          <span>Log in or sign up</span>
-          <span>with Social + Aptos Connect</span>
-        </DialogTitle>
-      </DialogHeader>
-      <div className="flex flex-col gap-3 pt-3">
-        {aptosConnectWallets.map((wallet) => (
-          <AptosConnectWalletRow
-            key={wallet.name}
-            wallet={wallet}
-            onConnect={close}
-          />
-        ))}
-      </div>
-      <div className="flex items-center gap-3 pt-4 text-muted-foreground">
-        <div className="h-px w-full bg-secondary" />
-        Or
-        <div className="h-px w-full bg-secondary" />
-      </div>
+      {/* AptosConnect does not support file uploads, so we only show it on the public mint page when people want to mint an NFT */}
+      {isPublicMintPage ? (
+        <>
+          <DialogHeader className="flex flex-col items-center">
+            <DialogTitle className="flex flex-col text-center leading-snug">
+              <span>Log in or sign up</span>
+              <span>with Social + Aptos Connect</span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 pt-3">
+            {aptosConnectWallets.map((wallet) => (
+              <AptosConnectWalletRow
+                key={wallet.name}
+                wallet={wallet}
+                onConnect={close}
+              />
+            ))}
+          </div>
+          <div className="flex items-center gap-3 pt-4 text-muted-foreground">
+            <div className="h-px w-full bg-secondary" />
+            Or
+            <div className="h-px w-full bg-secondary" />
+          </div>
+        </>
+      ) : (
+        <DialogHeader className="flex flex-col items-center">
+          <DialogTitle className="flex flex-col text-center leading-snug">
+            <span>Connect a Wallet</span>
+          </DialogTitle>
+        </DialogHeader>
+      )}
       <div className="flex flex-col gap-3 pt-3">
         {defaultWallets.map((wallet) => (
           <WalletRow key={wallet.name} wallet={wallet} onConnect={close} />
