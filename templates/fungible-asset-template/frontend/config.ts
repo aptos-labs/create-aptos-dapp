@@ -12,13 +12,13 @@ export const config: Config = {
   },
 
   defaultAsset: {
-    name: "ABC Fungible Asset",
+    name: "Tempor Ea Sunt",
     image: Placeholder1,
   },
 
   ourStory: {
-    title: "About",
-    description: `ABC Meme Coin is the latest sensation in the crypto world, bringing a playful twist to digital currency. Born from a love of internet culture and humor, ABC Meme Coin combines the excitement of cryptocurrency with the infectious joy of memes. With a community-driven approach, this coin aims to create a fun, engaging, and supportive ecosystem for meme enthusiasts and crypto investors alike. Join us in this whimsical financial revolution, where laughter and innovation go hand in hand, and let's make crypto a bit more fun together!`,
+    title: "Reprehenderit Do Anim In",
+    description: `Veniam ut aliqua quis non dolore nostrud labore elit proident dolore. Elit non consectetur dolore est nostrud cupidatat dolore incididunt elit veniam pariatur irure pariatur. Consectetur incididunt tempor aute dolore deserunt et enim occaecat non excepteur labore magna. Laboris commodo nostrud dolore Lorem ex occaecat sunt id id sint proident amet Lorem Lorem.`,
     discordLink: "https://discord.com",
   },
 };
