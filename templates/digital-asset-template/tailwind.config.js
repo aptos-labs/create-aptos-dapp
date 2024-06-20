@@ -27,6 +27,7 @@ module.exports = {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+          text: "hsl(var(--secondary-text))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -94,6 +95,7 @@ module.exports = {
         22: "1.375rem",
         24: "1.5rem",
         26: "1.625rem",
+        28: "1.75rem",
         32: "2rem",
         34: "2.125rem",
         42: "2.625rem",
@@ -141,8 +143,8 @@ module.exports = {
         ".label-sm": {
           fontFamily: theme("fontFamily.inter"),
           fontSize: theme("fontSize.14"),
-          lineHeight: theme("lineHeight.14"),
-          fontWeight: theme("fontWeight.semibold"),
+          lineHeight: theme("lineHeight.24"),
+          color: theme("colors.secondary.text"),
         },
 
         // Title Text Styles

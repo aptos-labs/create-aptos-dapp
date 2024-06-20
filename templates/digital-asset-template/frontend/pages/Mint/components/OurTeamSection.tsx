@@ -17,7 +17,7 @@ export const OurTeamSection: React.FC<OurTeamSectionProps> = () => {
   if (!config.ourTeam) return null;
 
   return (
-    <section className="team-container px-6 max-w-screen-xl mx-auto w-full">
+    <section className="team-container px-4 max-w-screen-xl mx-auto w-full">
       <h2 className="text-center heading-md">{config.ourTeam.title}</h2>
       <ul className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap mt-4">
         {config.ourTeam.members.map((member, i) => (
@@ -60,7 +60,9 @@ const TeamCard: FC<{ member: ConfigTeamMember }> = ({ member }) => {
             </a>
           )}
         </CardTitle>
-        <CardDescription className="text-center">{member.role}</CardDescription>
+        <CardDescription className="text-center text-secondary-text">
+          {member.role}
+        </CardDescription>
       </CardContent>
     </Card>
   );

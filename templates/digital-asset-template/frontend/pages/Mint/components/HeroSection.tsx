@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { clampNumber } from "@/utils/clampNumber";
-import { Progress } from "@radix-ui/react-progress";
 import { useMintData } from "../hooks/useMintData";
 import Copy from "@/assets/icons/copy.svg";
 import ExternalLink from "@/assets/icons/external-link.svg";
@@ -20,6 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import Placeholder1 from "@/assets/placeholders/bear-1.png";
 import { config } from "@/config";
 import { formatDate } from "@/utils/formatDate";
+import { Progress } from "@/components/ui/progress";
 
 interface HeroSectionProps {}
 
@@ -48,7 +48,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
   };
 
   return (
-    <section className="hero-container flex flex-col md:flex-row gap-6 px-6 max-w-screen-xl mx-auto w-full">
+    <section className="hero-container flex flex-col md:flex-row gap-6 px-4 max-w-screen-xl mx-auto w-full">
       <Image
         src={
           collection?.cdn_asset_uris.cdn_image_uri ??
@@ -56,7 +56,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
           Placeholder1
         }
         rounded
-        className="basis-2/5 aspect-square object-cover self-center"
+        className="w-full md:basis-2/5 aspect-square object-cover self-center"
       />
       <div className="basis-3/5 flex flex-col gap-4">
         <h1 className="title-md">
@@ -71,7 +71,9 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
           <CardContent
             fullPadding
             className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center flex-wrap">
-            <form onSubmit={mintNft} className="flex gap-4">
+            <form
+              onSubmit={mintNft}
+              className="flex flex-col md:flex-row gap-4 w-full md:basis-1/4">
               <Input
                 type="number"
                 disabled={!data?.isMintActive}
@@ -80,13 +82,16 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
                   setNftCount(parseInt(e.currentTarget.value, 10))
                 }
               />
-              <Button type="submit" disabled={!data?.isMintActive}>
+              <Button
+                className="h-16 md:h-auto"
+                type="submit"
+                disabled={!data?.isMintActive}>
                 Mint
               </Button>
             </form>
 
-            <div className="flex flex-col gap-2">
-              <p className="body-sm">
+            <div className="flex flex-col gap-2 w-full md:basis-1/2">
+              <p className="label-sm text-secondary-text">
                 {clampNumber(totalMinted)} / {clampNumber(maxSupply)} Minted
               </p>
               <Progress

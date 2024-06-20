@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 
 import { checkIfFund, uploadFile } from "@/utils/Irys";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { aptosClient } from "@/utils/aptosClient";
 import {
@@ -115,15 +115,14 @@ export function CreateFungibleAsset() {
 
   return (
     <>
-      <LaunchpadHeader />
-      <div className="flex items-center justify-between px-6 py-2">
-        <div className="w-2/4">
+      <LaunchpadHeader title="Create Asset" />
+      <div className="flex flex-col md:flex-row items-start justify-between px-4 py-2 gap-4 max-w-screen-xl mx-auto">
+        <div className="w-full md:w-2/3 flex flex-col gap-y-4 order-2 md:order-1">
           {(!account || account.address !== CREATOR_ADDRESS) && (
             <WarningAlert
               title={
                 account ? "Wrong account connected" : "No account connected"
-              }
-            >
+              }>
               To continue with creating your collection, make sure you are
               connected with a Wallet and with the same profile account as in
               your CREATOR_ADDRESS in{" "}
@@ -135,8 +134,6 @@ export function CreateFungibleAsset() {
           )}
 
           <UploadSpinner on={isUploading} />
-
-          <h3 className="display">Create Asset</h3>
 
           <Card>
             <CardHeader>
@@ -153,8 +150,7 @@ export function CreateFungibleAsset() {
                     className={buttonVariants({
                       variant: "outline",
                       className: "cursor-pointer",
-                    })}
-                  >
+                    })}>
                     Choose Image
                   </Label>
                 )}
@@ -180,8 +176,7 @@ export function CreateFungibleAsset() {
                         onClick={() => {
                           setImage(null);
                           inputRef.current!.value = "";
-                        }}
-                      >
+                        }}>
                         Clear
                       </Button>
                     </p>
@@ -271,6 +266,7 @@ export function CreateFungibleAsset() {
 
           <ConfirmButton
             title="Create Asset"
+            className="self-start"
             onSubmit={createAsset}
             disabled={disableCreateAssetButton}
             confirmMessage={
@@ -287,7 +283,22 @@ export function CreateFungibleAsset() {
             }
           />
         </div>
+
+        <div className="w-full md:w-1/3 order-1 md:order-2">
+          <Card>
+            <CardHeader className="body-md-semibold">Learn More</CardHeader>
+            <CardContent>
+              <Link
+                to="https://aptos.dev/standards/fungible-asset"
+                style={{ textDecoration: "underline" }}
+                target="_blank">
+                Find out more about Fungible Assets on Aptos
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );
 }
+
