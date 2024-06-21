@@ -96,7 +96,11 @@ export async function generateDapp(selection: Selections) {
     const network = selection.network || "testnet";
     await write(
       ".env",
-      `VITE_APP_NETWORK=${network}\nVITE_COLLECTION_CREATOR_ADDRESS=""`
+      `VITE_APP_NETWORK=${network}\nVITE_${
+        selection.template.path === "digital-asset-template"
+          ? "COLLECTION"
+          : "FA"
+      }_CREATOR_ADDRESS=""`
     );
 
     // Log next steps
