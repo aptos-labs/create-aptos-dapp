@@ -33,7 +33,7 @@ export function CreateFungibleAsset() {
   const [symbol, setSymbol] = useState<string>();
   const [maxSupply, setMaxSupply] = useState<string>();
   const [maxMintPerAccount, setMaxMintPerAccount] = useState<number>();
-  const [decimal, setDecimal] = useState<number>();
+  const [decimal, setDecimal] = useState<string>();
   const [image, setImage] = useState<File | null>(null);
   const [projectURL, setProjectURL] = useState<string>();
   const [mintFeePerFA, setMintFeePerFA] = useState<string>();
@@ -92,7 +92,7 @@ export function CreateFungibleAsset() {
             maxMintPerAccount
               ? convertAmountFromHumanReadableToOnChain(
                   maxMintPerAccount,
-                  decimal!
+                  parseInt(decimal!)
                 )
               : 0,
           ],
@@ -231,7 +231,7 @@ export function CreateFungibleAsset() {
             label="Decimal"
             tooltip="How many 0's constitute one full unit of the asset. For example, APT has 8."
             required
-            onChange={(e) => setDecimal(parseInt(e.target.value))}
+            onChange={(e) => setDecimal(e.target.value)}
             disabled={isUploading || !account}
             type="number"
           />
