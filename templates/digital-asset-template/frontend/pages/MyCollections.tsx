@@ -25,7 +25,7 @@ export function MyCollections() {
     <>
       <LaunchpadHeader title="My Collections" />
       <Table className="max-w-screen-xl mx-auto">
-        {!collections?.length && (
+        {!collections.length && (
           <TableCaption>
             A list of the collections created under the current contract.
           </TableCaption>
@@ -39,8 +39,7 @@ export function MyCollections() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {collections &&
-            collections.length > 0 &&
+          {collections.length > 0 &&
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             collections.map((collection: any) => {
               return (
