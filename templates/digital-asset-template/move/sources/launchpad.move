@@ -234,28 +234,32 @@ module launchpad_addr::launchpad {
             EAT_LEAST_ONE_STAGE_IS_REQUIRED
         );
 
-        add_allowlist_stage(
-            collection_obj,
-            collection_obj_addr,
-            collection_obj_signer,
-            collection_owner_obj_signer,
-            allowlist,
-            allowlist_start_time,
-            allowlist_end_time,
-            allowlist_mint_limit_per_addr,
-            allowlist_mint_fee_per_nft,
-        );
+        if (option::is_some(&allowlist)) {
+            add_allowlist_stage(
+                collection_obj,
+                collection_obj_addr,
+                collection_obj_signer,
+                collection_owner_obj_signer,
+                *option::borrow(&allowlist),
+                allowlist_start_time,
+                allowlist_end_time,
+                allowlist_mint_limit_per_addr,
+                allowlist_mint_fee_per_nft,
+            );
+        };
 
-        add_public_mint_stage(
-            collection_obj,
-            collection_obj_addr,
-            collection_obj_signer,
-            collection_owner_obj_signer,
-            public_mint_start_time,
-            public_mint_end_time,
-            public_mint_limit_per_addr,
-            public_mint_fee_per_nft,
-        );
+        if (option::is_some(&public_mint_start_time)) {
+            add_public_mint_stage(
+                collection_obj,
+                collection_obj_addr,
+                collection_obj_signer,
+                collection_owner_obj_signer,
+                *option::borrow(&public_mint_start_time),
+                public_mint_end_time,
+                public_mint_limit_per_addr,
+                public_mint_fee_per_nft,
+            );
+        };
 
         let registry = borrow_global_mut<Registry>(@launchpad_addr);
         vector::push_back(&mut registry.collection_objects, collection_obj);
@@ -451,21 +455,16 @@ module launchpad_addr::launchpad {
         collection_obj_addr: address,
         collection_obj_signer: &signer,
         collection_owner_obj_signer: &signer,
-        allowlist: Option<vector<address>>,
+        allowlist: vector<address>,
         allowlist_start_time: Option<u64>,
         allowlist_end_time: Option<u64>,
         allowlist_mint_limit_per_addr: Option<u64>,
         allowlist_mint_fee_per_nft: Option<u64>,
     ) acquires CollectionConfig {
-        if (option::is_none(&allowlist)) {
-            return
-        };
-
         assert!(option::is_some(&allowlist_start_time), ESTART_TIME_MUST_BE_SET_FOR_STAGE);
         assert!(option::is_some(&allowlist_end_time), EEND_TIME_MUST_BE_SET_FOR_STAGE);
         assert!(option::is_some(&allowlist_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
 
-        let allowlist = *option::borrow(&allowlist);
         let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
         mint_stage::create(
             collection_obj_signer,
@@ -497,23 +496,22 @@ module launchpad_addr::launchpad {
         collection_obj_addr: address,
         collection_obj_signer: &signer,
         collection_owner_obj_signer: &signer,
-        public_mint_start_time: Option<u64>,
+        public_mint_start_time: u64,
         public_mint_end_time: Option<u64>,
         public_mint_limit_per_addr: Option<u64>,
         public_mint_fee_per_nft: Option<u64>,
     ) acquires CollectionConfig {
-        if (option::is_none(&public_mint_start_time)) {
-            return
-        };
-
         assert!(option::is_some(&public_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
 
         let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
         mint_stage::create(
             collection_obj_signer,
             stage,
-            *option::borrow(&public_mint_start_time),
-            *option::borrow_with_default(&public_mint_end_time, &ONE_HUNDRED_YEARS_IN_SECONDS),
+            public_mint_start_time,
+            *option::borrow_with_default(
+                &public_mint_end_time,
+                &(ONE_HUNDRED_YEARS_IN_SECONDS + public_mint_start_time)
+            ),
         );
 
         let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
