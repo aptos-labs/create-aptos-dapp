@@ -12,6 +12,7 @@ import {
 import { useGetCollections } from "@/hooks/useGetCollections";
 import { NETWORK } from "@/constants";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
+import { Image } from "@/components/ui/image";
 
 export function MyCollections() {
   const collections: Array<GetCollectionDataResponse> = useGetCollections();
@@ -42,26 +43,27 @@ export function MyCollections() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             collections.map((collection: any) => {
               return (
-                <TableRow key={collection.collection_id}>
+                <TableRow key={collection?.collection_id}>
                   <TableCell className="font-medium">
-                    <div className="flex items-center">
-                      <img
-                        src={collection.cdn_asset_uris?.cdn_image_uri}
-                        style={{ width: "40px" }}
-                        className="mr-2"></img>
-                      <span>{collection.collection_name}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Image
+                        src={collection?.cdn_asset_uris?.cdn_image_uri ?? ""}
+                        rounded
+                        className="w-10 h-10 bg-gray-100 shrink-0"
+                      />
+                      <span>{collection?.collection_name}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Link
-                      to={`https://explorer.aptoslabs.com/object/${collection.collection_id}?network=${NETWORK}`}
+                      to={`https://explorer.aptoslabs.com/object/${collection?.collection_id}?network=${NETWORK}`}
                       target="_blank"
                       style={{ textDecoration: "underline" }}>
-                      {collection.collection_id}
+                      {collection?.collection_id}
                     </Link>
                   </TableCell>
-                  <TableCell>{collection.total_minted_v2}</TableCell>
-                  <TableCell>{collection.max_supply}</TableCell>
+                  <TableCell>{collection?.total_minted_v2}</TableCell>
+                  <TableCell>{collection?.max_supply}</TableCell>
                 </TableRow>
               );
             })}

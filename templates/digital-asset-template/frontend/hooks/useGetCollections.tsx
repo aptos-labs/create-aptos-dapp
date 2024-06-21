@@ -15,16 +15,17 @@ export function useGetCollections() {
   >([]);
 
   useEffect(() => {
-    // fetch the contract registry address
-    getRegistry().then((registry) => {
+    async function run() {
+      // fetch the contract registry address
+      const registry = await getRegistry();
       // fetch collections objects created under that contract registry address
-      getObjects(registry).then((objects) => {
-        // get each collection object data
-        getCollections(objects).then((data) => {
-          setCollections(data);
-        });
-      });
-    });
+      const objects = await getObjects(registry);
+      // get each collection object data
+      const collections = await getCollections(objects);
+      setCollections(collections);
+    }
+
+    run();
   }, []);
 
   return collections;
