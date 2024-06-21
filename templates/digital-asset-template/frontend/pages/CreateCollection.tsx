@@ -99,7 +99,7 @@ export function CreateCollection() {
             projectUri,
             maxSupply,
             royaltyPercentage,
-            preMintAmount, // amount of NFT to premint for myself
+            preMintAmount, // amount of NFT to pre-mint for myself
             undefined, // addresses in the allow list
             undefined, // allow list start time (in seconds)
             undefined, // allow list end time (in seconds)
