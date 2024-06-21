@@ -1,6 +1,6 @@
 ## Create Aptos Dapp
 
-`create-aptos-dapp` provides a starter kit for dapp developers to easily bootstrap a dapp on the Aptos network.
+`create-aptos-dapp` provides a starter kit for dapp developers to easily bootstrap on the Aptos network
 
 > **_NOTE:_** No need to clone: run `npx create-aptos-dapp` in your terminal to get started
 
@@ -16,28 +16,25 @@ Then follow the prompts!
 
 ([npx](https://medium.com/@maybekatz/introducing-npx-an-npm-package-runner-55f7d4bd282b) comes with npm 5.2+ and higher, [see instructions for older npm versions](https://gist.github.com/gaearon/4064d3c23a77c74a3614c498a8bb1c5f))
 
-### What is create-aptos-dapp?
-
-`create-aptos-dapp` simplifies the initial setup and configuration process, provides a modern development workflow, and offers a range of benefits that save time and effort, enabling developers to focus on building dapps on Aptos effectively.
-
-`create-aptos-dapp` streamlines the initial setup of a dapp development project, provides a solid foundation, and allows developers to start coding quickly without getting bogged down by configuration and boilerplate code
-
-### Why use create-aptos-dapp?
-
-- **Boilerplate Setup**: `create-aptos-dapp` tool generates a predefined project structure and configuration files for you. This saves you from manually setting up the basic project structure, which can be time-consuming and error-prone.
-- **Dependencies Management**: `create-aptos-dapp` tool manages project dependencies for you. It generates a `package.json` file with the required packages and their versions, ensuring that your project uses compatible libraries.
-- **Move Folder:** `create-aptos-dapp` generates a `move` folder that includes the basic structure for move modules. It creates a `Move.toml` and `sources` folder with a move module (smart contract) in it.
-- **Best Practices**: `create-aptos-dapp` tool incorporates best practices and structure recommendations to develop for the Aptos network. This ensures that your project starts with a solid foundation.
-- **Built-in Scripts**: `create-aptos-dapp` tool includes built-in scripts for common tasks like initialize default profile, compile move module and publish smart contract to chain. This simplifies common development workflows.
-
 ### Prerequisites
 
 - [node and npm](https://nodejs.org/en) (npm ≥ 5.2.0)
 
+### What is create-aptos-dapp?
+
+`create-aptos-dapp` simplifies the initial setup and configuration process, provides a modern development workflow, gives pre-made e2e dapp templates, and offers a range of benefits that save time and effort. Using create-aptos-dapp enables developers to build dapps quicker on Aptos.
+
+### Why use create-aptos-dapp?
+
+- **Template Setup:** create-aptos-dapp generates predefined end-to-end dapp templates and configuration files for you. It saves manual setup of the project structure, which can be time-consuming and error-prone.
+- **Dependencies Management:** create-aptos-dapp manages project dependencies for you. It generates a npm (or pnpm, etc.) package with the required packages. This ensures that the libraries used by your project are compatible.
+- **Move Directory:** create-aptos-dapp generates a move directory that includes the basic structure for Move modules (smart contracts). Additionally, it adds a basic Move module and associated files.
+- **Best Practices:** create-aptos-dapp incorporates best practices and structure recommendations to develop for the Aptos network. This ensures that your project starts with a solid foundation.
+- **Built-in Move Commands:** create-aptos-dapp includes built-in commands for common tasks, such as initializing the Move compiler, compiling, and publishing smart contracts on-chain. This abstracts Move development workflows for the average dapp developer.
+
 ### Templates
 
-`create-aptos-dapp` generates a predefined template structure and configuration files for you
+`create-aptos-dapp` provides you with pre-made end-to-end dapp templates, i.e a ready dapp with configurations and a beautiful UI to get you started with creating a dapp on Aptos.
 
-- **web dapp boilerplate**: A simple and light-weight web based dapp template that includes the basic structure needed for starting a dapp
-- **node dapp boilerplate**: A simple and light-weight node template that includes the basic structure needed for starting a node project on Aptos.
-- **todolist dapp boilerplate**: A fully working todo list dapp with a pre-implemented smart contract and UI
+- **Digital Asset Template:** A minting NFT dapp
+- **Fungible Asset Template:** A minting fungible asset dapp
