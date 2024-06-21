@@ -8,9 +8,9 @@ const accountAddress =
   config["profiles"][process.env.VITE_APP_NETWORK]["account"];
 
 async function publish() {
-  if (!process.env.VITE_COLLECTION_CREATOR_ADDRESS) {
+  if (!process.env.VITE_FA_CREATOR_ADDRESS) {
     throw new Error(
-      "VITE_COLLECTION_CREATOR_ADDRESS variable is not set, make sure you set it on the .env file"
+      "VITE_FA_CREATOR_ADDRESS variable is not set, make sure you set it on the .env file"
     );
   }
   const move = new cli.Move();
@@ -21,7 +21,7 @@ async function publish() {
       // Publish module to account address
       launchpad_addr: accountAddress,
       // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
-      initial_creator_addr: process.env.VITE_COLLECTION_CREATOR_ADDRESS,
+      initial_creator_addr: process.env.VITE_FA_CREATOR_ADDRESS,
     },
     profile: process.env.VITE_APP_NETWORK,
   });

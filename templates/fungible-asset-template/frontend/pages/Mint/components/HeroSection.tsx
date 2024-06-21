@@ -27,7 +27,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
 
   const { asset, totalAbleToMint = 0, yourBalance = 0 } = data ?? {};
 
-  const mintNft = async (e: FormEvent) => {
+  const mintFA = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -51,10 +51,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
     const response = await signAndSubmitTransaction({
       data: {
         function: `${MODULE_ADDRESS}::launchpad::mint_fa`,
-        functionArguments: [
-          asset.asset_type,
-          convertAmountFromHumanReadableToOnChain(amount, asset.decimals),
-        ],
+        functionArguments: [asset.asset_type, convertAmountFromHumanReadableToOnChain(amount, asset.decimals)],
       },
     });
     await aptosClient().waitForTransaction({ transactionHash: response.hash });
@@ -76,10 +73,9 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
         <Card>
           <CardContent
             fullPadding
-            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center">
-            <form
-              onSubmit={mintNft}
-              className="flex flex-col md:flex-row gap-4 w-full md:basis-1/4">
+            className="flex flex-col md:flex-row gap-4 md:justify-between items-start md:items-center"
+          >
+            <form onSubmit={mintFA} className="flex flex-col md:flex-row gap-4 w-full md:basis-1/4">
               <Input
                 type="text"
                 name="amount"
@@ -119,7 +115,8 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             <a
               className={buttonVariants({ variant: "link" })}
               target="_blank"
-              href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=${NETWORK}`}>
+              href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=${NETWORK}`}
+            >
               View on Explorer <Image src={ExternalLink} />
             </a>
           </div>
@@ -140,11 +137,7 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
   }
 
   return (
-    <Button
-      onClick={onCopy}
-      className="whitespace-nowrap flex gap-1 px-0 py-0"
-      variant="link"
-    >
+    <Button onClick={onCopy} className="whitespace-nowrap flex gap-1 px-0 py-0" variant="link">
       {copied ? (
         "Copied!"
       ) : (

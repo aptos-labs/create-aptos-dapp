@@ -28,7 +28,7 @@ module launchpad_addr::launchpad {
     const EMINT_LIMIT_REACHED: u64 = 7;
 
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
-    const DEFAULT_MINT_FEE_PER_FA: u64 = 0;
+    const DEFAULT_mint_fee_per_smallest_unit_of_fa: u64 = 0;
 
     #[event]
     struct CreateFAEvent has store, drop {
@@ -41,7 +41,7 @@ module launchpad_addr::launchpad {
         decimals: u8,
         icon_uri: String,
         project_uri: String,
-        mint_fee_per_fa: u64,
+        mint_fee_per_smallest_unit_of_fa: u64,
         pre_mint_amount: u64,
         mint_limit_per_addr: Option<u64>,
     }
@@ -78,7 +78,7 @@ module launchpad_addr::launchpad {
     /// Unique per FA
     struct FAConfig has key {
         /// Mint fee per FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
-        mint_fee_per_fa: u64,
+        mint_fee_per_smallest_unit_of_fa: u64,
         mint_limit: Option<MintLimit>,
         fa_owner_obj: Object<FAOwnerObjConfig>,
     }
@@ -153,11 +153,15 @@ module launchpad_addr::launchpad {
         max_supply: Option<u128>,
         name: String,
         symbol: String,
+        // Number of decimal places, i.e. APT has 8 decimal places, so decimals = 8, 1 APT = 1e-8 oapt
         decimals: u8,
         icon_uri: String,
         project_uri: String,
-        mint_fee_per_fa: Option<u64>,
+        // Mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        mint_fee_per_smallest_unit_of_fa: Option<u64>,
+        // Amount in smallest unit of FA
         pre_mint_amount: Option<u64>,
+        // Limit of minting per address in smallest unit of FA
         mint_limit_per_addr: Option<u64>,
     ) acquires Registry, Config, FAController {
         let sender_addr = signer::address_of(sender);
@@ -196,7 +200,7 @@ module launchpad_addr::launchpad {
             transfer_ref,
         });
         move_to(fa_obj_signer, FAConfig {
-            mint_fee_per_fa: *option::borrow_with_default(&mint_fee_per_fa, &DEFAULT_MINT_FEE_PER_FA),
+            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(&mint_fee_per_smallest_unit_of_fa, &DEFAULT_mint_fee_per_smallest_unit_of_fa),
             mint_limit: if (option::is_some(&mint_limit_per_addr)) {
                 option::some(MintLimit {
                     limit: *option::borrow(&mint_limit_per_addr),
@@ -221,7 +225,7 @@ module launchpad_addr::launchpad {
             decimals,
             icon_uri,
             project_uri,
-            mint_fee_per_fa: *option::borrow_with_default(&mint_fee_per_fa, &DEFAULT_MINT_FEE_PER_FA),
+            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(&mint_fee_per_smallest_unit_of_fa, &DEFAULT_mint_fee_per_smallest_unit_of_fa),
             pre_mint_amount: *option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT),
             mint_limit_per_addr,
         });
@@ -240,7 +244,7 @@ module launchpad_addr::launchpad {
     ) acquires FAController, FAConfig, Config {
         let sender_addr = signer::address_of(sender);
         check_mint_limit_and_update_mint_tracker(sender_addr, fa_obj, amount);
-        let total_mint_fee = amount * get_mint_fee_per_fa(fa_obj);
+        let total_mint_fee = get_mint_fee(fa_obj, amount);
         pay_for_mint(sender, total_mint_fee);
         mint_fa_internal(sender, fa_obj, amount, total_mint_fee);
     }
@@ -319,13 +323,15 @@ module launchpad_addr::launchpad {
         *table::borrow_with_default(mint_tracker, addr, &0)
     }
 
-    // Get mint fee per FA
+    // Get mint fee denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     #[view]
-    public fun get_mint_fee_per_fa(
+    public fun get_mint_fee(
         fa_obj: Object<Metadata>,
+        // Amount in smallest unit of FA
+        amount: u64,
     ): u64 acquires FAConfig {
         let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
-        fa_config.mint_fee_per_fa
+        amount * fa_config.mint_fee_per_smallest_unit_of_fa
     }
 
     // ================================= Helper Functions ================================== //
@@ -457,7 +463,7 @@ module launchpad_addr::launchpad {
 
         account::create_account_for_test(sender_addr);
         coin::register<aptos_coin::AptosCoin>(sender);
-        let mint_fee = 300 * get_mint_fee_per_fa(fa_2);
+        let mint_fee = get_mint_fee(fa_2, 300);
         aptos_coin::mint(aptos_framework, sender_addr, mint_fee);
         mint_fa(sender, fa_2, 300);
         assert!(fungible_asset::supply(fa_2) == option::some(300), 5);
