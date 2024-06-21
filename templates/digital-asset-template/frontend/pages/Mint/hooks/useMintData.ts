@@ -52,7 +52,7 @@ interface MintData {
   isMintInfinite: boolean;
 }
 
-async function getStartAndEndTime(collection_id: string): Promise<[start: Date, end: Date]> {
+async function getStartAndEndTime(collection_id: string): Promise<[start: Date, end: Date, isMintInfinite: boolean]> {
   const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
     payload: {
       function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_active_or_next_mint_stage`,
@@ -70,7 +70,12 @@ async function getStartAndEndTime(collection_id: string): Promise<[start: Date, 
   });
 
   const [start, end] = startAndEndRes;
-  return [new Date(parseInt(start, 10) * 1000), new Date(parseInt(end, 10) * 1000)];
+  return [
+    new Date(parseInt(start, 10) * 1000),
+    new Date(parseInt(end, 10) * 1000),
+    // isMintInfinite is true if the mint stage is 100 years later
+    parseInt(end, 10) === parseInt(start, 10) + 100 * 365 * 24 * 60 * 60,
+  ];
 }
 
 export function useMintData(collection_id: string = config.collection_id) {
@@ -81,8 +86,7 @@ export function useMintData(collection_id: string = config.collection_id) {
       try {
         if (!collection_id) return null;
 
-        const [startDate, endDate] = await getStartAndEndTime(collection_id);
-        const oneYearLater = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        const [startDate, endDate, isMintInfinite] = await getStartAndEndTime(collection_id);
 
         const res = await aptosClient().queryIndexer<MintQueryResult>({
           query: {
@@ -136,7 +140,7 @@ export function useMintData(collection_id: string = config.collection_id) {
           startDate,
           isMintActive:
             new Date() >= startDate && new Date() <= endDate && collection.max_supply > collection.current_supply,
-          isMintInfinite: endDate >= oneYearLater,
+          isMintInfinite,
         } satisfies MintData;
       } catch (error) {
         console.error(error);
