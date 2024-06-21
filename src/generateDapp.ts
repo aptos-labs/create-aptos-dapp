@@ -94,7 +94,10 @@ export async function generateDapp(selection: Selections) {
 
     // create .env file
     const network = selection.network || "testnet";
-    await write(".env", `VITE_APP_NETWORK=${network}\nVITE_CREATOR_ADDRESS=""`);
+    await write(
+      ".env",
+      `VITE_APP_NETWORK=${network}\nVITE_COLLECTION_CREATOR_ADDRESS=""`
+    );
 
     // Log next steps
     console.log(

@@ -3,8 +3,7 @@ import { aptosClient } from "./aptosClient";
 import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
 
 const getWebIrys = async (aptosWallet: WalletContextState) => {
-  const network =
-    import.meta.env.VITE_APP_NETWORK === "testnet" ? "devnet" : "mainnet"; // Irys network
+  const network = import.meta.env.VITE_APP_NETWORK === "testnet" ? "devnet" : "mainnet"; // Irys network
   const token = "aptos";
   const rpcUrl = import.meta.env.VITE_APP_NETWORK; // Aptos network "mainnet" || "testnet"
   const wallet = { rpcUrl: rpcUrl, name: "aptos", provider: aptosWallet };
@@ -13,15 +12,10 @@ const getWebIrys = async (aptosWallet: WalletContextState) => {
   return webIrys;
 };
 
-export const checkIfFund = async (
-  aptosWallet: WalletContextState,
-  files: File[]
-) => {
+export const checkIfFund = async (aptosWallet: WalletContextState, files: File[]) => {
   // 1. estimate the gas cost based on the data size https://docs.irys.xyz/developer-docs/irys-sdk/api/getPrice
   const webIrys = await getWebIrys(aptosWallet);
-  const costToUpload = await webIrys.utils.estimateFolderPrice(
-    files.map((f) => f.size)
-  );
+  const costToUpload = await webIrys.utils.estimateFolderPrice(files.map((f) => f.size));
   // 2. check the wallet balance on the irys node: irys.getLoadedBalance()
   const irysBalance = await webIrys.getLoadedBalance();
 
@@ -54,19 +48,12 @@ export const checkIfFund = async (
   return false;
 };
 
-export const fundNode = async (
-  aptosWallet: WalletContextState,
-  amount?: number
-) => {
+export const fundNode = async (aptosWallet: WalletContextState, amount?: number) => {
   const webIrys = await getWebIrys(aptosWallet);
 
   try {
     const fundTx = await webIrys.fund(amount ?? 1000000);
-    console.log(
-      `Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${
-        webIrys.token
-      }`
-    );
+    console.log(`Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${webIrys.token}`);
     return true;
   } catch (e) {
     throw new Error(`Error uploading data ${e}`);
@@ -76,7 +63,7 @@ export const fundNode = async (
 export const uploadFile = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   aptosWallet: any,
-  fileToUpload: File
+  fileToUpload: File,
 ): Promise<string> => {
   const webIrys = await getWebIrys(aptosWallet);
   try {
@@ -88,10 +75,7 @@ export const uploadFile = async (
   }
 };
 
-export const uploadFolder = async (
-  aptosWallet: WalletContextState,
-  files: File[]
-) => {
+export const uploadFolder = async (aptosWallet: WalletContextState, files: File[]) => {
   const webIrys = await getWebIrys(aptosWallet);
 
   try {
@@ -99,7 +83,7 @@ export const uploadFolder = async (
 
     console.log(
       `Files uploaded. Manifest Id=${receipt.manifestId} Receipt Id=${receipt.id}
-      access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`
+      access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`,
     );
     return `https://gateway.irys.xyz/${receipt.manifestId}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

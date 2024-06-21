@@ -52,14 +52,10 @@ interface MintData {
   isMintInfinite: boolean;
 }
 
-async function getStartAndEndTime(
-  collection_id: string
-): Promise<[start: Date, end: Date]> {
+async function getStartAndEndTime(collection_id: string): Promise<[start: Date, end: Date]> {
   const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
     payload: {
-      function: `${AccountAddress.from(
-        MODULE_ADDRESS
-      )}::launchpad::get_active_or_next_mint_stage`,
+      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_active_or_next_mint_stage`,
       functionArguments: [collection_id],
     },
   });
@@ -68,18 +64,13 @@ async function getStartAndEndTime(
 
   const startAndEndRes = await aptosClient().view<[string, string]>({
     payload: {
-      function: `${AccountAddress.from(
-        MODULE_ADDRESS
-      )}::launchpad::get_mint_stage_start_and_end_time`,
+      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_stage_start_and_end_time`,
       functionArguments: [collection_id, mintStage],
     },
   });
 
   const [start, end] = startAndEndRes;
-  return [
-    new Date(parseInt(start, 10) * 1000),
-    new Date(parseInt(end, 10) * 1000),
-  ];
+  return [new Date(parseInt(start, 10) * 1000), new Date(parseInt(end, 10) * 1000)];
 }
 
 export function useMintData(collection_id: string = config.collection_id) {
@@ -139,16 +130,12 @@ export function useMintData(collection_id: string = config.collection_id) {
         return {
           maxSupply: collection.max_supply ?? 0,
           totalMinted: collection.current_supply ?? 0,
-          uniqueHolders:
-            res.current_collection_ownership_v2_view_aggregate.aggregate
-              ?.count ?? 0,
+          uniqueHolders: res.current_collection_ownership_v2_view_aggregate.aggregate?.count ?? 0,
           collection,
           endDate,
           startDate,
           isMintActive:
-            new Date() >= startDate &&
-            new Date() <= endDate &&
-            collection.max_supply > collection.current_supply,
+            new Date() >= startDate && new Date() <= endDate && collection.max_supply > collection.current_supply,
           isMintInfinite: endDate >= oneYearLater,
         } satisfies MintData;
       } catch (error) {

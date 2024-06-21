@@ -169,8 +169,9 @@ export function CreateCollection() {
                     className={buttonVariants({
                       variant: "outline",
                       className: "cursor-pointer",
-                    })}>
-                    Choose Files to Upload
+                    })}
+                  >
+                    Choose Folder to Upload
                   </Label>
                 )}
                 <Input
