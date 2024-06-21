@@ -15,8 +15,7 @@ export const config: Config = {
 
   defaultCollection: {
     name: "Lorem Ipsum",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris congue convallis augue in pharetra.",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris congue convallis augue in pharetra.",
     image: Placeholder1,
   },
 

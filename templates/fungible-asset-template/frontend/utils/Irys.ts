@@ -21,10 +21,7 @@ const getWebIrys = async (aptosWallet: any) => {
 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
 6. if payer balance < the amount, replenish the payer balance*/
 
-export const checkIfFund = async (
-  aptosWallet: WalletContextState,
-  fileSize: number
-) => {
+export const checkIfFund = async (aptosWallet: WalletContextState, fileSize: number) => {
   // 1. estimate the gas cost based on the data size https://docs.irys.xyz/developer-docs/irys-sdk/api/getPrice
   const webIrys = await getWebIrys(aptosWallet);
   const costToUpload = await webIrys.getPrice(fileSize);
@@ -59,29 +56,19 @@ export const checkIfFund = async (
   return false;
 };
 
-export const fundNode = async (
-  aptosWallet: WalletContextState,
-  amount?: number
-) => {
+export const fundNode = async (aptosWallet: WalletContextState, amount?: number) => {
   const webIrys = await getWebIrys(aptosWallet);
 
   try {
     const fundTx = await webIrys.fund(amount ?? 1000000);
-    console.log(
-      `Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${
-        webIrys.token
-      }`
-    );
+    console.log(`Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${webIrys.token}`);
     return true;
   } catch (e) {
     throw new Error(`Error uploading data ${e}`);
   }
 };
 
-export const uploadFile = async (
-  aptosWallet: WalletContextState,
-  fileToUpload: File
-): Promise<string> => {
+export const uploadFile = async (aptosWallet: WalletContextState, fileToUpload: File): Promise<string> => {
   const webIrys = await getWebIrys(aptosWallet);
   try {
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });

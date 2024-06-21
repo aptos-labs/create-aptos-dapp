@@ -11,7 +11,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "_fmt": "prettier 'frontend/**/*.ts'",
+    "fmt": "npm run _fmt -- --write"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "1.20.0",
@@ -65,6 +67,7 @@
     "typescript": "^5.2.2",
     "vite": "^5.2.0",
     "vite-plugin-node-polyfills": "^0.21.0",
-    "vite-plugin-notifier": "^0.1.5"
+    "vite-plugin-notifier": "^0.1.5",
+    "prettier": "^3.3.2"
   }
 }
