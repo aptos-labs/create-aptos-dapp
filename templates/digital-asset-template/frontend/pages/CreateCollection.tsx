@@ -125,7 +125,7 @@ export function CreateCollection() {
           {(!account || account.address !== CREATOR_ADDRESS) && (
             <WarningAlert title={account ? "Wrong account connected" : "No account connected"}>
               To continue with creating your collection, make sure you are connected with a Wallet and with the same
-              profile account as in your CREATOR_ADDRESS in{" "}
+              profile account as in your COLLECTION_CREATOR_ADDRESS in{" "}
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
                 .env
               </code>{" "}
@@ -238,7 +238,7 @@ export function CreateCollection() {
             tooltip="The fee the nft minter is paying the collection creator when they mint an NFT, denominated in APT"
             disabled={isUploading || !account}
             onChange={(e) => {
-              setMintFeePerNFT(parseInt(e.target.value));
+              setMintFeePerNFT(Number(e.target.value));
             }}
           />
 

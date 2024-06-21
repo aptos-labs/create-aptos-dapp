@@ -64,11 +64,11 @@ export function CreateFungibleAsset() {
             projectURL,
             mintFeePerFA
               ? convertAmountFromOnChainToHumanReadable(
-                  convertAmountFromHumanReadableToOnChain(parseInt(mintFeePerFA), APT_DECIMALS),
+                  convertAmountFromHumanReadableToOnChain(Number(mintFeePerFA), APT_DECIMALS),
                   Number(decimal),
                 )
               : 0,
-            mintForMyself ? convertAmountFromHumanReadableToOnChain(parseInt(mintForMyself), Number(decimal)) : 0,
+            mintForMyself ? convertAmountFromHumanReadableToOnChain(Number(mintForMyself), Number(decimal)) : 0,
             maxMintPerAccount ? convertAmountFromHumanReadableToOnChain(maxMintPerAccount, Number(decimal)) : 0,
           ],
         },
@@ -95,7 +95,7 @@ export function CreateFungibleAsset() {
           {(!account || account.address !== CREATOR_ADDRESS) && (
             <WarningAlert title={account ? "Wrong account connected" : "No account connected"}>
               To continue with creating your collection, make sure you are connected with a Wallet and with the same
-              profile account as in your CREATOR_ADDRESS in{" "}
+              profile account as in your FA_CREATOR_ADDRESS in{" "}
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
                 .env
               </code>{" "}
@@ -179,7 +179,7 @@ export function CreateFungibleAsset() {
           <LabeledInput
             id="max-supply"
             label="Max Supply"
-            tooltip="The total amount of the asset that can be minted."
+            tooltip="The total amount of the asset in full unit that can be minted."
             required
             onChange={(e) => setMaxSupply(e.target.value)}
             disabled={isUploading || !account}
@@ -188,10 +188,10 @@ export function CreateFungibleAsset() {
 
           <LabeledInput
             id="max-mint"
-            label="Max mint in full unit of an asset per account"
-            tooltip="The maximum any single individual address can mint"
+            label="Max amount an address can mint"
+            tooltip="The maximum amount in full unit that any single individual address can mint"
             required
-            onChange={(e) => setMaxMintPerAccount(parseInt(e.target.value))}
+            onChange={(e) => setMaxMintPerAccount(Number(e.target.value))}
             disabled={isUploading || !account}
             type="number"
           />
@@ -218,8 +218,8 @@ export function CreateFungibleAsset() {
 
           <LabeledInput
             id="mint-fee"
-            label="Mint fee per one full unit of fungible asset in APT"
-            tooltip="The fee cost for the minter to pay to mint one full unit of an asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
+            label="Mint fee per fungible asset in APT"
+            tooltip="The fee cost for the minter to pay to mint one full unit of an asset, denominated in APT. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
             onChange={(e) => setMintFeePerFA(e.target.value)}
             disabled={isUploading || !account}
             type="number"
@@ -228,7 +228,7 @@ export function CreateFungibleAsset() {
           <LabeledInput
             id="for-myself"
             label="Mint for myself"
-            tooltip="How many assets to mint right away and send to your address."
+            tooltip="How many assets in full unit to mint right away and send to your address."
             onChange={(e) => setMintForMyself(e.target.value)}
             disabled={isUploading || !account}
             type="number"
