@@ -1,20 +1,12 @@
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRef, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { uploadCollectionData } from "@/utils/assetsUploader";
-import {
-  APT_DECIMALS,
-  convertAmountFromHumanReadableToOnChain,
-} from "@/utils/helpers";
+import { APT_DECIMALS, convertAmountFromHumanReadableToOnChain } from "@/utils/helpers";
 import { Link, useNavigate } from "react-router-dom";
 
 import { dateToSeconds } from "../utils/helpers";
@@ -49,9 +41,7 @@ export function CreateCollection() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const onPublicMintStartTime = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const onPublicMintStartTime = (event: React.ChangeEvent<HTMLInputElement>) => {
     const timeValue = event.target.value;
     setPublicMintStartTime(timeValue);
 
@@ -84,14 +74,14 @@ export function CreateCollection() {
 
       setIsUploading(true);
 
-      const { collectionName, collectionDescription, maxSupply, projectUri } =
-        await uploadCollectionData(aptosWallet, files);
+      const { collectionName, collectionDescription, maxSupply, projectUri } = await uploadCollectionData(
+        aptosWallet,
+        files,
+      );
 
       const response = await signAndSubmitTransaction({
         data: {
-          function: `${
-            import.meta.env.VITE_MODULE_ADDRESS
-          }::launchpad::create_collection`,
+          function: `${import.meta.env.VITE_MODULE_ADDRESS}::launchpad::create_collection`,
           typeArguments: [],
           functionArguments: [
             collectionDescription,
@@ -108,20 +98,14 @@ export function CreateCollection() {
             dateToSeconds(publicMintStartDate), // public mint start time (in seconds)
             dateToSeconds(publicMintEndDate), // public mint end time (in seconds)
             mintLimitPerAccount, // mint limit per address in the public mint
-            mintFeePerNFT
-              ? convertAmountFromHumanReadableToOnChain(
-                  mintFeePerNFT,
-                  APT_DECIMALS
-                )
-              : 0, // mint fee per NFT for the public mint, on chain stored in smallest unit of APT (i.e. 1e8 oAPT = 1 APT)
+            mintFeePerNFT ? convertAmountFromHumanReadableToOnChain(mintFeePerNFT, APT_DECIMALS) : 0, // mint fee per NFT for the public mint, on chain stored in smallest unit of APT (i.e. 1e8 oAPT = 1 APT)
           ],
         },
       });
 
-      const committedTransactionResponse =
-        await aptosClient().waitForTransaction({
-          transactionHash: response.hash,
-        });
+      const committedTransactionResponse = await aptosClient().waitForTransaction({
+        transactionHash: response.hash,
+      });
       if (committedTransactionResponse.success) {
         navigate(`/my-collections`, { replace: true });
       }
@@ -139,13 +123,9 @@ export function CreateCollection() {
       <div className="flex flex-col md:flex-row items-start justify-between px-4 py-2 gap-4 max-w-screen-xl mx-auto">
         <div className="w-full md:w-2/3 flex flex-col gap-y-4 order-2 md:order-1">
           {(!account || account.address !== CREATOR_ADDRESS) && (
-            <WarningAlert
-              title={
-                account ? "Wrong account connected" : "No account connected"
-              }>
-              To continue with creating your collection, make sure you are
-              connected with a Wallet and with the same profile account as in
-              your CREATOR_ADDRESS in{" "}
+            <WarningAlert title={account ? "Wrong account connected" : "No account connected"}>
+              To continue with creating your collection, make sure you are connected with a Wallet and with the same
+              profile account as in your CREATOR_ADDRESS in{" "}
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
                 .env
               </code>{" "}
@@ -157,9 +137,7 @@ export function CreateCollection() {
 
           <Card>
             <CardHeader>
-              <CardDescription>
-                Uploads collection files to Irys, a decentralized storage
-              </CardDescription>
+              <CardDescription>Uploads collection files to Irys, a decentralized storage</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-start justify-between">
@@ -197,7 +175,8 @@ export function CreateCollection() {
                       onClick={() => {
                         setFiles(null);
                         inputRef.current!.value = "";
-                      }}>
+                      }}
+                    >
                       Clear
                     </Button>
                   </div>
@@ -256,7 +235,7 @@ export function CreateCollection() {
           <LabeledInput
             id="mint-fee"
             label="Mint fee per NFT in APT"
-            tooltip="The fee the nft minter is paying the collection creator when they mint an NFT"
+            tooltip="The fee the nft minter is paying the collection creator when they mint an NFT, denominated in APT"
             disabled={isUploading || !account}
             onChange={(e) => {
               setMintFeePerNFT(parseInt(e.target.value));
@@ -278,31 +257,17 @@ export function CreateCollection() {
             className="self-start"
             onSubmit={createCollection}
             disabled={
-              !account ||
-              !files?.length ||
-              !publicMintStartDate ||
-              !mintLimitPerAccount ||
-              !account ||
-              isUploading
+              !account || !files?.length || !publicMintStartDate || !mintLimitPerAccount || !account || isUploading
             }
             confirmMessage={
               <>
                 <p>The upload process requires at least 2 message signatures</p>
                 <ol className="list-decimal list-inside">
-                  <li>
-                    To upload collection cover image file and NFT image files
-                    into Irys.
-                  </li>
+                  <li>To upload collection cover image file and NFT image files into Irys.</li>
 
-                  <li>
-                    To upload collection metadata file and NFT metadata files
-                    into Irys.
-                  </li>
+                  <li>To upload collection metadata file and NFT metadata files into Irys.</li>
                 </ol>
-                <p>
-                  In the case we need to fund a node on Irys, a transfer
-                  transaction submission is required also.
-                </p>
+                <p>In the case we need to fund a node on Irys, a transfer transaction submission is required also.</p>
               </>
             }
           />
@@ -311,10 +276,7 @@ export function CreateCollection() {
           <Card>
             <CardHeader className="body-md-semibold">Learn More</CardHeader>
             <CardContent>
-              <Link
-                to="https://aptos.dev/standards/digital-asset"
-                className="body-sm underline"
-                target="_blank">
+              <Link to="https://aptos.dev/standards/digital-asset" className="body-sm underline" target="_blank">
                 Find out more about Digital Assets on Aptos
               </Link>
             </CardContent>

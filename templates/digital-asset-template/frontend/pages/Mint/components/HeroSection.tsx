@@ -37,7 +37,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
 
     const transaction: InputTransactionData = {
       data: {
-        function: `${MODULE_ADDRESS}::launchpad::batch_mint_nft`,
+        function: `${MODULE_ADDRESS}::launchpad::mint_nft`,
         functionArguments: [collection?.collection_id, nftCount],
       },
     };

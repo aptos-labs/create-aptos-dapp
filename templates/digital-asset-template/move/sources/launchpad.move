@@ -71,14 +71,6 @@ module launchpad_addr::launchpad {
     }
 
     #[event]
-    struct MintNftEvent has store, drop {
-        collection_obj: Object<Collection>,
-        nft_obj: Object<Token>,
-        recipient_addr: address,
-        mint_fee: u64,
-    }
-
-    #[event]
     struct BatchMintNftsEvent has store, drop {
         collection_obj: Object<Collection>,
         nft_objs: vector<Object<Token>>,
@@ -186,10 +178,12 @@ module launchpad_addr::launchpad {
         allowlist_start_time: Option<u64>,
         allowlist_end_time: Option<u64>,
         allowlist_mint_limit_per_addr: Option<u64>,
+        // Allowlist mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         allowlist_mint_fee_per_nft: Option<u64>,
         public_mint_start_time: Option<u64>,
         public_mint_end_time: Option<u64>,
         public_mint_limit_per_addr: Option<u64>,
+        // Public mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         public_mint_fee_per_nft: Option<u64>,
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
@@ -297,33 +291,8 @@ module launchpad_addr::launchpad {
         });
     }
 
-    // Mint a single NFT
+    // Mint NFT
     public entry fun mint_nft(
-        sender: &signer,
-        collection_obj: Object<Collection>
-    ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
-        let sender_addr = signer::address_of(sender);
-
-        let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, 1);
-        assert!(option::is_some(stage_idx), ENO_ACTIVE_STAGES);
-
-        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
-        let stage_name = mint_stage::mint_stage_name(stage_obj);
-        let mint_fee = get_mint_fee_per_nft(collection_obj, stage_name);
-        pay_for_mint(sender, mint_fee);
-
-        let nft_obj = mint_nft_internal(sender_addr, collection_obj);
-
-        event::emit(MintNftEvent {
-            recipient_addr: sender_addr,
-            mint_fee,
-            collection_obj,
-            nft_obj,
-        });
-    }
-
-    // Mint multiple NFTs
-    public entry fun batch_mint_nft(
         sender: &signer,
         collection_obj: Object<Collection>,
         amount: u64,
@@ -335,7 +304,7 @@ module launchpad_addr::launchpad {
 
         let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
         let stage_name = mint_stage::mint_stage_name(stage_obj);
-        let total_mint_fee = amount * get_mint_fee_per_nft(collection_obj, stage_name);
+        let total_mint_fee = get_mint_fee(collection_obj, stage_name, amount);
         pay_for_mint(sender, total_mint_fee);
 
         let nft_objs = vector[];
@@ -389,15 +358,16 @@ module launchpad_addr::launchpad {
         registry.collection_objects
     }
 
-    // Get mint fee per NFT for a specific stage
+    // Get mint fee for a specific stage, denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     #[view]
-    public fun get_mint_fee_per_nft(
+    public fun get_mint_fee(
         collection_obj: Object<Collection>,
         stage_name: String,
+        amount: u64,
     ): u64 acquires CollectionConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
         let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage_name);
-        fee
+        amount * fee
     }
 
     // Get the name of the current active mint stage or the next mint stage if there is no active mint stage
@@ -650,10 +620,10 @@ module launchpad_addr::launchpad {
         let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(collection::count(collection_1) == option::some(3), 1);
 
-        let mint_fee = get_mint_fee_per_nft(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY));
+        let mint_fee = get_mint_fee(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY), 1);
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
-        mint_nft(user1, collection_1);
+        mint_nft(user1, collection_1, 1);
 
         let nft = mint_nft_internal(user1_addr, collection_1);
         assert!(token::uri(nft) == string::utf8(b"https://gateway.irys.xyz/manifest_id/5.json"), 2);

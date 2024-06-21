@@ -1,11 +1,5 @@
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -17,6 +11,7 @@ import { aptosClient } from "@/utils/aptosClient";
 import {
   APT_DECIMALS,
   convertAmountFromHumanReadableToOnChain,
+  convertAmountFromOnChainToHumanReadable,
 } from "@/utils/helpers";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { CREATOR_ADDRESS } from "@/constants";
@@ -42,14 +37,7 @@ export function CreateFungibleAsset() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const disableCreateAssetButton =
-    !name ||
-    !symbol ||
-    !maxSupply ||
-    !decimal ||
-    !projectURL ||
-    !maxMintPerAccount ||
-    !account ||
-    isUploading;
+    !name || !symbol || !maxSupply || !decimal || !projectURL || !maxMintPerAccount || !account || isUploading;
 
   const createAsset = async () => {
     try {
@@ -59,50 +47,36 @@ export function CreateFungibleAsset() {
       setIsUploading(true);
 
       const funded = await checkIfFund(aptosWallet, image.size);
-      if (!funded)
-        throw new Error(
-          "Current account balance is not enough to fund a decentralized asset node"
-        );
+      if (!funded) throw new Error("Current account balance is not enough to fund a decentralized asset node");
 
       const iconURL = await uploadFile(aptosWallet, image);
 
       const response = await signAndSubmitTransaction({
         data: {
-          function: `${
-            import.meta.env.VITE_MODULE_ADDRESS
-          }::launchpad::create_fa`,
+          function: `${import.meta.env.VITE_MODULE_ADDRESS}::launchpad::create_fa`,
           typeArguments: [],
           functionArguments: [
-            convertAmountFromHumanReadableToOnChain(
-              Number(maxSupply),
-              Number(decimal)
-            ),
+            convertAmountFromHumanReadableToOnChain(Number(maxSupply), Number(decimal)),
             name,
             symbol,
             decimal,
             iconURL,
             projectURL,
             mintFeePerFA
-              ? convertAmountFromHumanReadableToOnChain(
-                  parseInt(mintFeePerFA),
-                  APT_DECIMALS
+              ? convertAmountFromOnChainToHumanReadable(
+                  convertAmountFromHumanReadableToOnChain(parseInt(mintFeePerFA), APT_DECIMALS),
+                  Number(decimal),
                 )
               : 0,
-            mintForMyself,
-            maxMintPerAccount
-              ? convertAmountFromHumanReadableToOnChain(
-                  maxMintPerAccount,
-                  parseInt(decimal!)
-                )
-              : 0,
+            mintForMyself ? convertAmountFromHumanReadableToOnChain(parseInt(mintForMyself), Number(decimal)) : 0,
+            maxMintPerAccount ? convertAmountFromHumanReadableToOnChain(maxMintPerAccount, Number(decimal)) : 0,
           ],
         },
       });
 
-      const committedTransactionResponse =
-        await aptosClient().waitForTransaction({
-          transactionHash: response.hash,
-        });
+      const committedTransactionResponse = await aptosClient().waitForTransaction({
+        transactionHash: response.hash,
+      });
       if (committedTransactionResponse.success) {
         navigate(`/my-assets`, { replace: true });
       }
@@ -119,13 +93,9 @@ export function CreateFungibleAsset() {
       <div className="flex flex-col md:flex-row items-start justify-between px-4 py-2 gap-4 max-w-screen-xl mx-auto">
         <div className="w-full md:w-2/3 flex flex-col gap-y-4 order-2 md:order-1">
           {(!account || account.address !== CREATOR_ADDRESS) && (
-            <WarningAlert
-              title={
-                account ? "Wrong account connected" : "No account connected"
-              }>
-              To continue with creating your collection, make sure you are
-              connected with a Wallet and with the same profile account as in
-              your CREATOR_ADDRESS in{" "}
+            <WarningAlert title={account ? "Wrong account connected" : "No account connected"}>
+              To continue with creating your collection, make sure you are connected with a Wallet and with the same
+              profile account as in your CREATOR_ADDRESS in{" "}
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
                 .env
               </code>{" "}
@@ -138,9 +108,7 @@ export function CreateFungibleAsset() {
           <Card>
             <CardHeader>
               <CardTitle>Asset Image</CardTitle>
-              <CardDescription>
-                Uploads asset to a decentralized storage
-              </CardDescription>
+              <CardDescription>Uploads asset to a decentralized storage</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-start justify-between">
@@ -150,7 +118,8 @@ export function CreateFungibleAsset() {
                     className={buttonVariants({
                       variant: "outline",
                       className: "cursor-pointer",
-                    })}>
+                    })}
+                  >
                     Choose Image
                   </Label>
                 )}
@@ -176,7 +145,8 @@ export function CreateFungibleAsset() {
                         onClick={() => {
                           setImage(null);
                           inputRef.current!.value = "";
-                        }}>
+                        }}
+                      >
                         Clear
                       </Button>
                     </p>
@@ -218,7 +188,7 @@ export function CreateFungibleAsset() {
 
           <LabeledInput
             id="max-mint"
-            label="Max mint per account"
+            label="Max mint in full unit of an asset per account"
             tooltip="The maximum any single individual address can mint"
             required
             onChange={(e) => setMaxMintPerAccount(parseInt(e.target.value))}
@@ -248,8 +218,8 @@ export function CreateFungibleAsset() {
 
           <LabeledInput
             id="mint-fee"
-            label="Mint fee per fungible asset in APT"
-            tooltip="The fee cost for the minter to pay to mint one asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
+            label="Mint fee per one full unit of fungible asset in APT"
+            tooltip="The fee cost for the minter to pay to mint one full unit of an asset. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
             onChange={(e) => setMintFeePerFA(e.target.value)}
             disabled={isUploading || !account}
             type="number"
@@ -272,13 +242,9 @@ export function CreateFungibleAsset() {
             confirmMessage={
               <>
                 <p>
-                  The upload process requires at least 1 message signatures to
-                  upload the asset image file into Irys.
+                  The upload process requires at least 1 message signatures to upload the asset image file into Irys.
                 </p>
-                <p>
-                  In the case we need to fund a node on Irys, a transfer
-                  transaction submission is required also.
-                </p>
+                <p>In the case we need to fund a node on Irys, a transfer transaction submission is required also.</p>
               </>
             }
           />
@@ -291,7 +257,8 @@ export function CreateFungibleAsset() {
               <Link
                 to="https://aptos.dev/standards/fungible-asset"
                 style={{ textDecoration: "underline" }}
-                target="_blank">
+                target="_blank"
+              >
                 Find out more about Fungible Assets on Aptos
               </Link>
             </CardContent>
@@ -301,4 +268,3 @@ export function CreateFungibleAsset() {
     </>
   );
 }
-
