@@ -8,6 +8,11 @@ const accountAddress =
   config["profiles"][process.env.VITE_APP_NETWORK]["account"];
 
 async function publish() {
+  if (!process.env.VITE_CREATOR_ADDRESS) {
+    throw new Error(
+      "VITE_CREATOR_ADDRESS variable is not set, make sure you set it on the .env file"
+    );
+  }
   const move = new cli.Move();
 
   await move.publish({
