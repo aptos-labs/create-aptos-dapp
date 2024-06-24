@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "scripts": {
-    "move:init": "node ./scripts/init && node ./scripts/update_env",
+    "move:init": "node ./scripts/init",
     "move:test": "node ./scripts/move/test",
     "move:compile": "node ./scripts/move/compile",
     "move:publish": "node ./scripts/move/publish",
+    "move:upgrade": "node ./scripts/move/upgrade",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -16,7 +17,7 @@
     "fmt": "npm run _fmt -- --write"
   },
   "dependencies": {
-    "@aptos-labs/ts-sdk": "^1.20.0",
+    "@aptos-labs/ts-sdk": "1.22.1",
     "@aptos-labs/wallet-adapter-react": "^3.3.0",
     "@irys/sdk": "^0.2.1",
     "@radix-ui/react-accordion": "^1.1.2",
