@@ -7,7 +7,7 @@ async function init() {
 
   await move.init({
     network: process.env.VITE_APP_NETWORK,
-    profile: process.env.PROFILE_NAME,
+    profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
   });
 }
 init();
