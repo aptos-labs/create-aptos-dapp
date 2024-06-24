@@ -1,10 +1,10 @@
 import { FC } from "react";
-
+// Internal components
 import { buttonVariants } from "@/components/ui/button";
 import { Image } from "@/components/ui/image";
-
+// Internal config
 import { config } from "@/config";
-
+// Internal assets
 import Twitter from "@/assets/icons/twitter.svg";
 import Link from "@/assets/icons/link.svg";
 import Discord from "@/assets/icons/discord.svg";

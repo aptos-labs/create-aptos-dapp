@@ -1,9 +1,9 @@
 import { FC } from "react";
-
+// Internal components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Image } from "@/components/ui/image";
 import { ConfigTeamMember, config } from "@/config";
-
+// Internal assets
 import Twitter from "@/assets/icons/twitter.svg";
 import Discord from "@/assets/icons/discord.svg";
 

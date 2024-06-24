@@ -27,7 +27,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, files: File[]
   const currentAccountAddress = await aptosWallet.account!.address;
 
   const currentAccountBalance = await accountAPTBalance({ accountAddress: currentAccountAddress });
-  console.log("currentAccountBalance", currentAccountBalance);
+
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
   if (currentAccountBalance > costToUpload.toNumber()) {
     try {

@@ -1,7 +1,9 @@
 import { useMemo } from "react";
-
+// Internal components
 import { Image } from "@/components/ui/image";
+// Internal utils
 import { cn } from "@/lib/utils";
+// Internal config
 import { config } from "@/config";
 
 interface BannerSectionProps {

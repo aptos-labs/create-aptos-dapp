@@ -1,5 +1,8 @@
+// Internal components
 import { Card } from "@/components/ui/card";
+// Internal utils
 import { clampNumber } from "@/utils/clampNumber";
+// Internal hooks
 import { useGetCollectionData } from "@/hooks/useGetCollectionData";
 
 interface StatsSectionProps {}

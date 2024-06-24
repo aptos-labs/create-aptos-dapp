@@ -1,8 +1,6 @@
 import { FC } from "react";
-
 // Internal components
 import { WarningAlert } from "@/components/ui/warning-alert";
-
 // Internal config
 import { config } from "@/config";
 

@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { GetCollectionDataResponse } from "@aptos-labs/ts-sdk";
-
+// Internal components
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Image } from "@/components/ui/image";
-
+// Internal hooks
 import { useGetCollections } from "@/hooks/useGetCollections";
-
+// Internal constants
 import { NETWORK } from "@/constants";
 
 export function MyCollections() {

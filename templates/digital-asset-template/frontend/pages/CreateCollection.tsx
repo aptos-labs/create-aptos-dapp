@@ -2,11 +2,9 @@
 import { useRef, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link, useNavigate } from "react-router-dom";
-
 // Internal utils
 import { aptosClient } from "@/utils/aptosClient";
 import { uploadCollectionData } from "@/utils/assetsUploader";
-
 // Internal components
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +17,6 @@ import { UploadSpinner } from "@/components/UploadSpinner";
 import { LabeledInput } from "@/components/ui/labeled-input";
 import { DateTimeInput } from "@/components/ui/date-time-input";
 import { ConfirmButton } from "@/components/ui/confirm-button";
-
 // Entry functions
 import { createCollection } from "@/entry-functions/create_collection";
 
