@@ -1,20 +1,23 @@
-import { BannerSection } from "./components/BannerSection";
-import { HeroSection } from "./components/HeroSection";
-import { StatsSection } from "./components/StatsSection";
-import { OurStorySection } from "./components/OurStorySection";
-import { HowToMintSection } from "./components/HowToMintSection";
-import { OurTeamSection } from "./components/OurTeamSection";
-import { FAQSection } from "./components/FAQSection";
-import { useMintData } from "./hooks/useMintData";
-import { Socials } from "./components/Socials";
-import { ConnectWalletAlert } from "./components/ConnectWalletAlert";
-import { Header } from "@/components/Header";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useEffect } from "react";
 
+import { BannerSection } from "@/pages/Mint/components/BannerSection";
+import { HeroSection } from "@/pages/Mint/components/HeroSection";
+import { StatsSection } from "@/pages/Mint/components/StatsSection";
+import { OurStorySection } from "@/pages/Mint/components/OurStorySection";
+import { HowToMintSection } from "@/pages/Mint/components/HowToMintSection";
+import { OurTeamSection } from "@/pages/Mint/components/OurTeamSection";
+import { FAQSection } from "@/pages/Mint/components/FAQSection";
+import { Socials } from "@/pages/Mint/components/Socials";
+import { ConnectWalletAlert } from "@/pages/Mint/components/ConnectWalletAlert";
+
+import { useGetCollectionData } from "@/hooks/useGetCollectionData";
+
+import { Header } from "@/components/Header";
+
 export function Mint() {
-  const { data, isLoading } = useMintData();
+  const { data, isLoading } = useGetCollectionData();
 
   const queryClient = useQueryClient();
   const { account } = useWallet();

@@ -1,13 +1,9 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { FC } from "react";
+// Internal components
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Image } from "@/components/ui/image";
 import { ConfigTeamMember, config } from "@/config";
-import { FC } from "react";
+// Internal assets
 import Twitter from "@/assets/icons/twitter.svg";
 import Discord from "@/assets/icons/discord.svg";
 
@@ -41,28 +37,16 @@ const TeamCard: FC<{ member: ConfigTeamMember }> = ({ member }) => {
           {member.name}
           {member.socials?.twitter && (
             <a target="_blank" href={member.socials.twitter}>
-              <Image
-                width={16}
-                height={16}
-                src={Twitter}
-                className="dark:invert"
-              />
+              <Image width={16} height={16} src={Twitter} className="dark:invert" />
             </a>
           )}
           {member.socials?.discord && (
             <a target="_blank" href={member.socials.discord}>
-              <Image
-                width={16}
-                height={16}
-                src={Discord}
-                className="dark:invert"
-              />
+              <Image width={16} height={16} src={Discord} className="dark:invert" />
             </a>
           )}
         </CardTitle>
-        <CardDescription className="text-center text-secondary-text">
-          {member.role}
-        </CardDescription>
+        <CardDescription className="text-center text-secondary-text">{member.role}</CardDescription>
       </CardContent>
     </Card>
   );

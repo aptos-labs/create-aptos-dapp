@@ -8,3 +8,4 @@ node_modules
 package-lock.json
 
 templates/*/move/build
+templates/*/build

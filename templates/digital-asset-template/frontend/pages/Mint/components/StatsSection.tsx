@@ -1,13 +1,15 @@
+// Internal components
 import { Card } from "@/components/ui/card";
+// Internal utils
 import { clampNumber } from "@/utils/clampNumber";
-import { useMintData } from "../hooks/useMintData";
+// Internal hooks
+import { useGetCollectionData } from "@/hooks/useGetCollectionData";
 
 interface StatsSectionProps {}
 
 export const StatsSection: React.FC<StatsSectionProps> = () => {
-  const { data } = useMintData();
-  if (!data) return null;
-  const { maxSupply, totalMinted, uniqueHolders } = data;
+  const { data } = useGetCollectionData();
+  const { maxSupply = 0, totalMinted = 0, uniqueHolders = 0 } = data ?? {};
 
   return (
     <section className="stats-container px-4 max-w-screen-xl mx-auto w-full">

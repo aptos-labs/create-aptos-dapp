@@ -1,13 +1,8 @@
 import { useMemo } from "react";
+// Internal components
 import { Image } from "@/components/ui/image";
 
-export function TriImageBanner({
-  images,
-  className,
-}: {
-  images: string[];
-  className?: string;
-}) {
+export function TriImageBanner({ images, className }: { images: string[]; className?: string }) {
   const threeImages = useMemo(() => {
     return images.slice(0, 3);
   }, [images]);

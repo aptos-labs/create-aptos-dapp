@@ -1,4 +1,4 @@
-import { checkIfFund, uploadFolder } from "./Irys";
+import { checkIfFund, uploadFolder } from "@/utils/Irys";
 
 const VALID_MEDIA_EXTENSIONS = ["png", "jpg", "jpeg", "gltf"];
 type CollectionMetadata = {

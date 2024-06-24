@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { WalletSelector } from "./WalletSelector";
-import { buttonVariants } from "./ui/button";
 import { FC } from "react";
+
+import { WalletSelector } from "@/components/WalletSelector";
+import { buttonVariants } from "@/components/ui/button";
 
 interface LaunchpadHeaderProps {
   title: string;
@@ -19,15 +20,11 @@ export const LaunchpadHeader: FC<LaunchpadHeaderProps> = ({ title }) => {
           Mint Page
         </Link>
         {location.pathname === "/create-collection" ? (
-          <Link
-            className={buttonVariants({ variant: "link" })}
-            to={"/my-collections"}>
+          <Link className={buttonVariants({ variant: "link" })} to={"/my-collections"}>
             My Collections
           </Link>
         ) : (
-          <Link
-            className={buttonVariants({ variant: "link" })}
-            to={"/create-collection"}>
+          <Link className={buttonVariants({ variant: "link" })} to={"/create-collection"}>
             Create Collection
           </Link>
         )}

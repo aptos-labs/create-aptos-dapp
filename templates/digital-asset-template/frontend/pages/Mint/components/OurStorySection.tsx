@@ -1,6 +1,8 @@
+// Internal components
 import { buttonVariants } from "@/components/ui/button";
+import { TriImageBanner } from "@/pages/Mint/components/TriImageBanner";
+// Internal config
 import { config } from "@/config";
-import { TriImageBanner } from "./TriImageBanner";
 
 interface OurStorySectionProps {}
 
@@ -20,7 +22,8 @@ export const OurStorySection: React.FC<OurStorySectionProps> = () => {
             className={buttonVariants({
               variant: "outline",
               className: "mt-4",
-            })}>
+            })}
+          >
             Join Our Discord
           </a>
         )}

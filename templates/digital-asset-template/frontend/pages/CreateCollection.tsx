@@ -1,46 +1,52 @@
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// External packages
 import { useRef, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { Link, useNavigate } from "react-router-dom";
+// Internal utils
 import { aptosClient } from "@/utils/aptosClient";
 import { uploadCollectionData } from "@/utils/assetsUploader";
-import { APT_DECIMALS, convertAmountFromHumanReadableToOnChain } from "@/utils/helpers";
-import { Link, useNavigate } from "react-router-dom";
-
-import { dateToSeconds } from "../utils/helpers";
+// Internal components
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { CREATOR_ADDRESS } from "@/constants";
 import { WarningAlert } from "@/components/ui/warning-alert";
 import { UploadSpinner } from "@/components/UploadSpinner";
-import { LabeledInput } from "../components/ui/labeled-input";
+import { LabeledInput } from "@/components/ui/labeled-input";
 import { DateTimeInput } from "@/components/ui/date-time-input";
 import { ConfirmButton } from "@/components/ui/confirm-button";
+// Entry functions
+import { createCollection } from "@/entry-functions/create_collection";
 
 export function CreateCollection() {
-  // Wallet connect providers
+  // Wallet Adapter provider
   const aptosWallet = useWallet();
   const { account, signAndSubmitTransaction } = useWallet();
 
-  // If we are on Production mode, redierct to the mint page
+  // If we are on Production mode, redierct to the public mint page
   const navigate = useNavigate();
   if (import.meta.env.PROD) navigate("/", { replace: true });
 
   // Collection data entered by the user on UI
-  const [royaltyPercentage, setRoyaltyPercentage] = useState<string>();
-  const [preMintAmount, setPreMintAmount] = useState<string>();
+  const [royaltyPercentage, setRoyaltyPercentage] = useState<number>();
+  const [preMintAmount, setPreMintAmount] = useState<number>();
   const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
   const [publicMintStartTime, setPublicMintStartTime] = useState<string>();
   const [publicMintEndDate, setPublicMintEndDate] = useState<Date>();
   const [publicMintEndTime, setPublicMintEndTime] = useState<string>();
-  const [mintLimitPerAccount, setMintLimitPerAccount] = useState<number>();
-  const [mintFeePerNFT, setMintFeePerNFT] = useState<number>();
+  const [publicMintLimitPerAccount, setPublicMintLimitPerAccount] = useState<number>(1);
+  const [publicMintFeePerNFT, setPublicMintFeePerNFT] = useState<number>();
   const [files, setFiles] = useState<FileList | null>(null);
+
+  // Internal state
   const [isUploading, setIsUploading] = useState(false);
 
+  // Local Ref
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // On publish mint start date selected
   const onPublicMintStartTime = (event: React.ChangeEvent<HTMLInputElement>) => {
     const timeValue = event.target.value;
     setPublicMintStartTime(timeValue);
@@ -53,6 +59,7 @@ export function CreateCollection() {
     setPublicMintStartDate(publicMintStartDate);
   };
 
+  // On publish mint end date selected
   const onPublicMintEndTime = (event: React.ChangeEvent<HTMLInputElement>) => {
     const timeValue = event.target.value;
     setPublicMintEndTime(timeValue);
@@ -65,47 +72,50 @@ export function CreateCollection() {
     setPublicMintEndDate(publicMintEndDate);
   };
 
-  const createCollection = async () => {
+  // On create collection button clicked
+  const onCreateCollection = async () => {
     try {
       if (!account) throw new Error("Please connect your wallet");
       if (!files) throw new Error("Please upload files");
       if (account.address !== CREATOR_ADDRESS) throw new Error("Wrong account");
       if (isUploading) throw new Error("Uploading in progress");
 
+      // Set internal isUploading state
       setIsUploading(true);
 
+      // Upload collection files to Irys
       const { collectionName, collectionDescription, maxSupply, projectUri } = await uploadCollectionData(
         aptosWallet,
         files,
       );
 
-      const response = await signAndSubmitTransaction({
-        data: {
-          function: `${import.meta.env.VITE_MODULE_ADDRESS}::launchpad::create_collection`,
-          typeArguments: [],
-          functionArguments: [
-            collectionDescription,
-            collectionName,
-            projectUri,
-            maxSupply,
-            royaltyPercentage,
-            preMintAmount, // amount of NFT to pre-mint for myself
-            undefined, // addresses in the allow list
-            undefined, // allow list start time (in seconds)
-            undefined, // allow list end time (in seconds)
-            undefined, // mint limit per address in the allow list
-            undefined, // mint fee per NFT for the allow list
-            dateToSeconds(publicMintStartDate), // public mint start time (in seconds)
-            dateToSeconds(publicMintEndDate), // public mint end time (in seconds)
-            mintLimitPerAccount, // mint limit per address in the public mint
-            mintFeePerNFT ? convertAmountFromHumanReadableToOnChain(mintFeePerNFT, APT_DECIMALS) : 0, // mint fee per NFT for the public mint, on chain stored in smallest unit of APT (i.e. 1e8 oAPT = 1 APT)
-          ],
-        },
-      });
+      // Submit a create_collection entry function transaction
+      const response = await signAndSubmitTransaction(
+        createCollection({
+          collectionDescription,
+          collectionName,
+          projectUri,
+          maxSupply,
+          royaltyPercentage,
+          preMintAmount,
+          allowList: undefined,
+          allowListStartDate: undefined,
+          allowListEndDate: undefined,
+          allowListLimitPerAccount: undefined,
+          allowListFeePerNFT: undefined,
+          publicMintStartDate,
+          publicMintEndDate,
+          publicMintLimitPerAccount,
+          publicMintFeePerNFT,
+        }),
+      );
 
+      // Wait for the transaction to be commited to chain
       const committedTransactionResponse = await aptosClient().waitForTransaction({
         transactionHash: response.hash,
       });
+
+      // Once the transaction has been successfully commited to chain, navigate to the `my-collection` page
       if (committedTransactionResponse.success) {
         navigate(`/my-collections`, { replace: true });
       }
@@ -218,7 +228,7 @@ export function CreateCollection() {
             tooltip="How many NFTs an individual address is allowed to mint"
             disabled={isUploading || !account}
             onChange={(e) => {
-              setMintLimitPerAccount(parseInt(e.target.value));
+              setPublicMintLimitPerAccount(parseInt(e.target.value));
             }}
           />
 
@@ -228,7 +238,7 @@ export function CreateCollection() {
             tooltip="The percentage of trading value that collection creator gets when an NFT is sold on marketplaces"
             disabled={isUploading || !account}
             onChange={(e) => {
-              setRoyaltyPercentage(e.target.value);
+              setRoyaltyPercentage(parseInt(e.target.value));
             }}
           />
 
@@ -238,7 +248,7 @@ export function CreateCollection() {
             tooltip="The fee the nft minter is paying the collection creator when they mint an NFT, denominated in APT"
             disabled={isUploading || !account}
             onChange={(e) => {
-              setMintFeePerNFT(Number(e.target.value));
+              setPublicMintFeePerNFT(Number(e.target.value));
             }}
           />
 
@@ -248,16 +258,21 @@ export function CreateCollection() {
             tooltip="How many NFTs to mint immediately for the creator"
             disabled={isUploading || !account}
             onChange={(e) => {
-              setPreMintAmount(e.target.value);
+              setPreMintAmount(parseInt(e.target.value));
             }}
           />
 
           <ConfirmButton
             title="Create Collection"
             className="self-start"
-            onSubmit={createCollection}
+            onSubmit={onCreateCollection}
             disabled={
-              !account || !files?.length || !publicMintStartDate || !mintLimitPerAccount || !account || isUploading
+              !account ||
+              !files?.length ||
+              !publicMintStartDate ||
+              !publicMintLimitPerAccount ||
+              !account ||
+              isUploading
             }
             confirmMessage={
               <>

@@ -1,20 +1,16 @@
-import { useMintData } from "@/pages/Mint/hooks/useMintData";
+import { useGetCollectionData } from "@/hooks/useGetCollectionData";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { WalletSelector } from "./WalletSelector";
 import { IS_DEV } from "@/constants";
-import { buttonVariants } from "./ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { config } from "@/config";
 
 export function Header() {
-  const { data } = useMintData();
+  const { data } = useGetCollectionData();
 
   const title = useMemo(() => {
-    return (
-      data?.collection.collection_name ??
-      config.defaultCollection?.name ??
-      "NFT Collection Launchpad"
-    );
+    return data?.collection.collection_name ?? config.defaultCollection?.name ?? "NFT Collection Launchpad";
   }, [data?.collection]);
 
   return (
@@ -26,14 +22,10 @@ export function Header() {
       <div className="flex gap-2 items-center flex-wrap">
         {IS_DEV && (
           <>
-            <Link
-              className={buttonVariants({ variant: "link" })}
-              to={"/my-collections"}>
+            <Link className={buttonVariants({ variant: "link" })} to={"/my-collections"}>
               My Collections
             </Link>
-            <Link
-              className={buttonVariants({ variant: "link" })}
-              to={"/create-collection"}>
+            <Link className={buttonVariants({ variant: "link" })} to={"/create-collection"}>
               Create Collection
             </Link>
           </>
