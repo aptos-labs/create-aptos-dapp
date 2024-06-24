@@ -27,7 +27,7 @@ async function publish() {
       // Please find it on the network you are using, This is testnet deployment
       minter: "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
     },
-    profile: process.env.PROFILE_NAME,
+      profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
   });
 }
 publish();
