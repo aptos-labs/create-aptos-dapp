@@ -5,7 +5,7 @@ const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 
 const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
 const accountAddress =
-  config["profiles"][process.env.VITE_APP_NETWORK]["account"];
+  config["profiles"][process.env.PROFILE_NAME]["account"];
 
 async function publish() {
   if (!process.env.VITE_FA_CREATOR_ADDRESS) {
@@ -23,7 +23,7 @@ async function publish() {
       // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
       initial_creator_addr: process.env.VITE_FA_CREATOR_ADDRESS,
     },
-    profile: process.env.VITE_APP_NETWORK,
+    profile: process.env.PROFILE_NAME,
   });
 }
 publish();

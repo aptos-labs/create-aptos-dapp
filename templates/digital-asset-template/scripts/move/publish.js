@@ -5,7 +5,7 @@ const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 
 const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
 const accountAddress =
-  config["profiles"][process.env.VITE_APP_NETWORK]["account"];
+  config["profiles"][process.env.PROFILE_NAME]["account"];
 
 async function publish() {
   if (!process.env.VITE_COLLECTION_CREATOR_ADDRESS) {
@@ -29,7 +29,7 @@ async function publish() {
       minter:
         "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
     },
-    profile: process.env.VITE_APP_NETWORK,
+    profile: process.env.PROFILE_NAME,
   });
 }
 publish();
