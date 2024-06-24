@@ -29,7 +29,7 @@ module launchpad_addr::launchpad {
 
     /// Default to mint 0 amount to creator when creating FA
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
-    // Default mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+    /// Default mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     const DEFAULT_mint_fee_per_smallest_unit_of_fa: u64 = 0;
 
     #[event]
@@ -60,7 +60,7 @@ module launchpad_addr::launchpad {
     /// We need this object to own the FA object instead of contract directly owns the FA object
     /// This helps us avoid address collision when we create multiple FAs with same name
     struct FAOwnerObjConfig has key {
-        /// Only thing it stores is the link to FA object
+        // Only thing it stores is the link to FA object
         fa_obj: Object<Metadata>
     }
 
@@ -79,7 +79,7 @@ module launchpad_addr::launchpad {
 
     /// Unique per FA
     struct FAConfig has key {
-        /// Mint fee per FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        // Mint fee per FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         mint_fee_per_smallest_unit_of_fa: u64,
         mint_limit: Option<MintLimit>,
         fa_owner_obj: Object<FAOwnerObjConfig>,
@@ -155,15 +155,15 @@ module launchpad_addr::launchpad {
         max_supply: Option<u128>,
         name: String,
         symbol: String,
-        /// Number of decimal places, i.e. APT has 8 decimal places, so decimals = 8, 1 APT = 1e-8 oapt
+        // Number of decimal places, i.e. APT has 8 decimal places, so decimals = 8, 1 APT = 1e-8 oapt
         decimals: u8,
         icon_uri: String,
         project_uri: String,
-        /// Mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        // Mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         mint_fee_per_smallest_unit_of_fa: Option<u64>,
-        /// Amount in smallest unit of FA
+        // Amount in smallest unit of FA
         pre_mint_amount: Option<u64>,
-        /// Limit of minting per address in smallest unit of FA
+        // Limit of minting per address in smallest unit of FA
         mint_limit_per_addr: Option<u64>,
     ) acquires Registry, Config, FAController {
         let sender_addr = signer::address_of(sender);
@@ -253,43 +253,43 @@ module launchpad_addr::launchpad {
 
     // ================================= View Functions ================================== //
 
-    /// Get creator, creator is the address that is allowed to create FAs
     #[view]
+    /// Get creator, creator is the address that is allowed to create FAs
     public fun get_creator(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.creator_addr
     }
 
-    /// Get contract admin
     #[view]
+    /// Get contract admin
     public fun get_admin(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.admin_addr
     }
 
-    /// Get contract pending admin
     #[view]
+    /// Get contract pending admin
     public fun get_pendingadmin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
 
-    /// Get mint fee collector address
     #[view]
+    /// Get mint fee collector address
     public fun get_mint_fee_collector(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.mint_fee_collector_addr
     }
 
-    /// Get all fungible assets created using this contract
     #[view]
+    /// Get all fungible assets created using this contract
     public fun get_registry(): vector<Object<Metadata>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.fa_objects
     }
 
-    /// Get fungible asset metadata
     #[view]
+    /// Get fungible asset metadata
     public fun get_fa_objects_metadatas(
         collection_obj: Object<Metadata>
     ): (String, String, u8) {
@@ -299,8 +299,8 @@ module launchpad_addr::launchpad {
         (symbol, name, decimals)
     }
 
-    /// Get mint limit per address
     #[view]
+    /// Get mint limit per address
     public fun get_mint_limit(
         fa_obj: Object<Metadata>,
     ): Option<u64> acquires FAConfig {
@@ -312,8 +312,8 @@ module launchpad_addr::launchpad {
         }
     }
 
-    /// Get current minted amount by an address
     #[view]
+    /// Get current minted amount by an address
     public fun get_current_minted_amount(
         fa_obj: Object<Metadata>,
         addr: address
@@ -325,8 +325,8 @@ module launchpad_addr::launchpad {
         *table::borrow_with_default(mint_tracker, addr, &0)
     }
 
-    /// Get mint fee denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     #[view]
+    /// Get mint fee denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     public fun get_mint_fee(
         fa_obj: Object<Metadata>,
         // Amount in smallest unit of FA

@@ -94,14 +94,14 @@ module launchpad_addr::launchpad {
     /// We need this object to own the collection object instead of contract directly owns the collection object
     /// This helps us avoid address collision when we create multiple collections with same name
     struct CollectionOwnerObjConfig has key {
-        /// Only thing it stores is the link to collection object
+        // Only thing it stores is the link to collection object
         collection_obj: Object<Collection>,
         extend_ref: object::ExtendRef,
     }
 
     /// Unique per collection
     struct CollectionConfig has key {
-        /// Key is stage, value is mint fee denomination
+        // Key is stage, value is mint fee denomination
         mint_fee_per_nft_by_stages: SimpleMap<String, u64>,
         collection_owner_obj: Object<CollectionOwnerObjConfig>,
     }
@@ -121,7 +121,7 @@ module launchpad_addr::launchpad {
         mint_fee_collector_addr: address,
     }
 
-    //. If you deploy the module under an object, sender is the object's signer
+    /// If you deploy the module under an object, sender is the object's signer
     /// If you deploy the module under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
@@ -178,21 +178,21 @@ module launchpad_addr::launchpad {
         uri: String,
         max_supply: u64,
         royalty_percentage: Option<u64>,
-        /// Pre mint amount to creator
+        // Pre mint amount to creator
         pre_mint_amount: Option<u64>,
-        /// Allowlist of addresses that can mint NFTs in allowlist stage
+        // Allowlist of addresses that can mint NFTs in allowlist stage
         allowlist: Option<vector<address>>,
         allowlist_start_time: Option<u64>,
         allowlist_end_time: Option<u64>,
-        /// Allowlist mint limit per address
+        // Allowlist mint limit per address
         allowlist_mint_limit_per_addr: Option<u64>,
-        /// Allowlist mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        // Allowlist mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         allowlist_mint_fee_per_nft: Option<u64>,
         public_mint_start_time: Option<u64>,
         public_mint_end_time: Option<u64>,
-        /// Public mint limit per address
+        // Public mint limit per address
         public_mint_limit_per_addr: Option<u64>,
-        /// Public mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        // Public mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         public_mint_fee_per_nft: Option<u64>,
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
@@ -333,43 +333,43 @@ module launchpad_addr::launchpad {
 
     // ================================= View  ================================= //
 
-    /// Get creator, creator is the address that is allowed to create collections
     #[view]
+    /// Get creator, creator is the address that is allowed to create collections
     public fun get_creator(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.creator_addr
     }
 
-    /// Get contract admin
     #[view]
+    /// Get contract admin
     public fun get_admin(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.admin_addr
     }
 
-    /// Get contract pending admin
     #[view]
+    /// Get contract pending admin
     public fun get_pendingadmin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
 
-    /// Get mint fee collector address
     #[view]
+    /// Get mint fee collector address
     public fun get_mint_fee_collector(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.mint_fee_collector_addr
     }
 
-    /// Get all collections created using this contract
     #[view]
+    /// Get all collections created using this contract
     public fun get_registry(): vector<Object<Collection>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.collection_objects
     }
 
-    /// Get mint fee for a specific stage, denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     #[view]
+    /// Get mint fee for a specific stage, denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     public fun get_mint_fee(
         collection_obj: Object<Collection>,
         stage_name: String,
@@ -380,8 +380,8 @@ module launchpad_addr::launchpad {
         amount * fee
     }
 
-    /// Get the name of the current active mint stage or the next mint stage if there is no active mint stage
     #[view]
+    /// Get the name of the current active mint stage or the next mint stage if there is no active mint stage
     public fun get_active_or_next_mint_stage(collection_obj: Object<Collection>): Option<String> {
         let active_stage_idx = mint_stage::ccurent_active_stage(collection_obj);
         if (option::is_some(&active_stage_idx)) {
@@ -401,8 +401,8 @@ module launchpad_addr::launchpad {
         }
     }
 
-    /// Get the start and end time of a mint stage
     #[view]
+    /// Get the start and end time of a mint stage
     public fun get_mint_stage_start_and_end_time(collection_obj: Object<Collection>, stage_name: String): (u64, u64) {
         let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
         let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, stage_idx);
