@@ -54,12 +54,19 @@ export async function generateDapp(selection: Selections) {
     // write to file
     const write = async (file: string, content?: string) => {
       // file to copy to target directory
-      const targetPath = path.join(targetDirectory, file);
+      const targetPath = path.join(targetDirectory, renameFiles[file] ?? file);
+      //const targetPath = path.join(targetDirectory, file);
       if (content) {
         await fs.writeFile(targetPath, content);
       } else {
         await copy(path.join(templateDir, file), targetPath);
       }
+    };
+
+    // Map of files to rename on build time
+    const renameFiles: Record<string, string | undefined> = {
+      // `npm publish` doesnt include the .gitignore file
+      _gitignore: ".gitignore",
     };
 
     // loop over template files and write to target directory

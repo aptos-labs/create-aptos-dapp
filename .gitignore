@@ -2,3 +2,9 @@ dist
 node_modules
 .DS_Store
 .idea
+.env
+.aptos
+
+package-lock.json
+
+templates/*/move/build
