@@ -108,7 +108,7 @@ export async function generateDapp(selection: Selections) {
     await write(
       ".env",
       Object.entries({
-        PROFILE_NAME: `${projectName}-${network}`,
+        PROJECT_NAME: projectName,
         VITE_APP_NETWORK: network,
         [`VITE_${assetType}_CREATOR_ADDRESS`]: "",
       }).reduce((acc, [key, value]) => acc + `${key}=${value}` + "\n", "")
