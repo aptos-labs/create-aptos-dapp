@@ -14,22 +14,20 @@ async function publish() {
 
   const move = new cli.Move();
 
-  move
-    .upgradeObjectPackage({
-      packageDirectoryPath: "move",
-      objectAddress: process.env.VITE_MODULE_ADDRESS,
-      namedAddresses: {
-        // Upgrade module from an object
-        launchpad_addr: process.env.VITE_MODULE_ADDRESS,
-        // This is the address you want to use to create fungible asset with, e.g. an address in Petra so you can create fungible asset in UI using Petra
-        initial_creator_addr: process.env.VITE_FA_CREATOR_ADDRESS,
-        // Our contract depends on the token-minter contract to provide some common functionalities like managing refs and mint stages
-        // You can read the source code of it here: https://github.com/aptos-labs/token-minter/
-        // Please find it on the network you are using, This is testnet deployment
-        minter: "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
-      },
-      profile: process.env.VITE_APP_NETWORK,
-    })
-    .then(console.log);
+  move.upgradeObjectPackage({
+    packageDirectoryPath: "move",
+    objectAddress: process.env.VITE_MODULE_ADDRESS,
+    namedAddresses: {
+      // Upgrade module from an object
+      launchpad_addr: process.env.VITE_MODULE_ADDRESS,
+      // This is the address you want to use to create fungible asset with, e.g. an address in Petra so you can create fungible asset in UI using Petra
+      initial_creator_addr: process.env.VITE_FA_CREATOR_ADDRESS,
+      // Our contract depends on the token-minter contract to provide some common functionalities like managing refs and mint stages
+      // You can read the source code of it here: https://github.com/aptos-labs/token-minter/
+      // Please find it on the network you are using, This is testnet deployment
+      minter: "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
+    },
+    profile: process.env.VITE_APP_NETWORK,
+  });
 }
 publish();
