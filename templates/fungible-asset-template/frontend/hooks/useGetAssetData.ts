@@ -1,10 +1,13 @@
-import { config } from "@/config";
-import { aptosClient } from "@/utils/aptosClient";
-import { useQuery } from "@tanstack/react-query";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { AccountAddress } from "@aptos-labs/ts-sdk";
-import { MODULE_ADDRESS } from "@/constants";
+import { useQuery } from "@tanstack/react-query";
+// Internal config
+import { config } from "@/config";
+// Internal utils
+import { aptosClient } from "@/utils/aptosClient";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
+// Internal constants
+import { MODULE_ADDRESS } from "@/constants";
 
 export interface FungibleAsset {
   maximum_v2: number;
@@ -49,7 +52,10 @@ async function getMintLimit(asset_id: string): Promise<number> {
   return Number(mintLimitRes[0].vec[0]);
 }
 
-export function useMintData(asset_id: string = config.asset_id) {
+/**
+ * A react hook to get fungible asset data.
+ */
+export function useGetAssetData(asset_id: string = config.asset_id) {
   const { account } = useWallet();
 
   return useQuery({
