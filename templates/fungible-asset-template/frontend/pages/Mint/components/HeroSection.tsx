@@ -73,7 +73,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
       <Image
         src={asset?.icon_uri ?? Placeholder1}
         rounded="full"
-        className="basis-1/5 aspect-square object-cover self-center"
+        className="basis-1/5 aspect-square object-cover self-center max-w-[300px]"
       />
       <div className="basis-4/5 flex flex-col gap-4">
         <h1 className="title-md">{asset?.name ?? config.defaultAsset?.name}</h1>
