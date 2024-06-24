@@ -1,6 +1,7 @@
 import { PropsWithChildren } from "react";
-import { useToast } from "./ui/use-toast";
 import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
+
+import { useToast } from "@/components/ui/use-toast";
 import { NETWORK } from "@/constants";
 
 export function WalletProvider({ children }: PropsWithChildren) {

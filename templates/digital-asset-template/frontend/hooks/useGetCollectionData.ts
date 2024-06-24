@@ -1,8 +1,9 @@
+import { AccountAddress } from "@aptos-labs/ts-sdk";
+import { useQuery } from "@tanstack/react-query";
+
 import { config } from "@/config";
 import { MODULE_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
-import { AccountAddress } from "@aptos-labs/ts-sdk";
-import { useQuery } from "@tanstack/react-query";
 
 export interface Token {
   token_name: string;
@@ -78,7 +79,7 @@ async function getStartAndEndTime(collection_id: string): Promise<[start: Date, 
   ];
 }
 
-export function useMintData(collection_id: string = config.collection_id) {
+export function useGetCollectionData(collection_id: string = config.collection_id) {
   return useQuery({
     queryKey: ["app-state", collection_id],
     refetchInterval: 1000 * 30,

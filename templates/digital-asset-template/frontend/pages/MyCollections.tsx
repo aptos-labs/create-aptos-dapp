@@ -1,18 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { GetCollectionDataResponse } from "@aptos-labs/ts-sdk";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useGetCollections } from "@/hooks/useGetCollections";
-import { NETWORK } from "@/constants";
+
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Image } from "@/components/ui/image";
+
+import { useGetCollections } from "@/hooks/useGetCollections";
+
+import { NETWORK } from "@/constants";
 
 export function MyCollections() {
   const collections: Array<GetCollectionDataResponse> = useGetCollections();
@@ -26,9 +21,7 @@ export function MyCollections() {
       <LaunchpadHeader title="My Collections" />
       <Table className="max-w-screen-xl mx-auto">
         {!collections.length && (
-          <TableCaption>
-            A list of the collections created under the current contract.
-          </TableCaption>
+          <TableCaption>A list of the collections created under the current contract.</TableCaption>
         )}
         <TableHeader>
           <TableRow>
@@ -58,7 +51,8 @@ export function MyCollections() {
                     <Link
                       to={`https://explorer.aptoslabs.com/object/${collection?.collection_id}?network=${NETWORK}`}
                       target="_blank"
-                      style={{ textDecoration: "underline" }}>
+                      style={{ textDecoration: "underline" }}
+                    >
                       {collection?.collection_id}
                     </Link>
                   </TableCell>

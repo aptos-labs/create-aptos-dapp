@@ -1,6 +1,7 @@
-import { aptosClient } from "@/utils/aptosClient";
 import { AccountAddress, GetCollectionDataResponse } from "@aptos-labs/ts-sdk";
 import { useState, useEffect } from "react";
+
+import { aptosClient } from "@/utils/aptosClient";
 
 /**
  * A react hook to get all collections under the current contract.
@@ -10,9 +11,7 @@ import { useState, useEffect } from "react";
  *
  */
 export function useGetCollections() {
-  const [collections, setCollections] = useState<
-    Array<GetCollectionDataResponse>
-  >([]);
+  const [collections, setCollections] = useState<Array<GetCollectionDataResponse>>([]);
 
   useEffect(() => {
     async function run() {
@@ -34,9 +33,7 @@ export function useGetCollections() {
 const getRegistry = async () => {
   const registry = await aptosClient().view<[[{ inner: string }]]>({
     payload: {
-      function: `${AccountAddress.from(
-        import.meta.env.VITE_MODULE_ADDRESS
-      )}::launchpad::get_registry`,
+      function: `${AccountAddress.from(import.meta.env.VITE_MODULE_ADDRESS)}::launchpad::get_registry`,
     },
   });
   return registry[0];
@@ -51,7 +48,7 @@ const getObjects = async (registry: [{ inner: string }]) => {
       });
 
       return object.owner_address;
-    })
+    }),
   );
   return objects;
 };
@@ -66,7 +63,7 @@ const getCollections = async (objects: Array<string>) => {
       });
 
       return collection;
-    })
+    }),
   );
   return collections;
 };

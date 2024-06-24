@@ -1,6 +1,7 @@
+import { useMemo } from "react";
+
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
-import { useMemo } from "react";
 import { config } from "@/config";
 
 interface BannerSectionProps {
@@ -21,20 +22,9 @@ export const BannerSection: React.FC<BannerSectionProps> = ({ className }) => {
   if (!repeatedImages.length) return null;
 
   return (
-    <div
-      className={cn(
-        "w-full grid grid-cols-[repeat(30,minmax(136px,1fr))] grid-rows-2 gap-4 -mx-16",
-        className
-      )}>
+    <div className={cn("w-full grid grid-cols-[repeat(30,minmax(136px,1fr))] grid-rows-2 gap-4 -mx-16", className)}>
       {repeatedImages.slice(0, 60).map((image, i) => {
-        return (
-          <Image
-            rounded
-            className="aspect-square"
-            src={image}
-            key={`${i}-${image}`}
-          />
-        );
+        return <Image rounded className="aspect-square" src={image} key={`${i}-${image}`} />;
       })}
     </div>
   );

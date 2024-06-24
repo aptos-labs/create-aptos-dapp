@@ -1,8 +1,8 @@
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import { Mint } from "./pages/Mint";
-import { CreateCollection } from "./pages/CreateCollection";
-import { MyCollections } from "./pages/MyCollections";
+import { Mint } from "@/pages/Mint";
+import { CreateCollection } from "@/pages/CreateCollection";
+import { MyCollections } from "@/pages/MyCollections";
 
 function Layout() {
   return (
