@@ -4,6 +4,7 @@ import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 // Internal hooks
 import { useGetAssetMetadata } from "@/hooks/useGetAssetMetadata";
+import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
 
 export function MyFungibleAssets() {
   const fas = useGetAssetMetadata();
@@ -50,8 +51,8 @@ export function MyFungibleAssets() {
                       {fa.asset_type}
                     </Link>
                   </TableCell>
-                  <TableCell>{fa.maximum_v2}</TableCell>
-                  <TableCell>{fa.supply_v2}</TableCell>
+                  <TableCell>{convertAmountFromOnChainToHumanReadable(fa.maximum_v2, fa.decimals)}</TableCell>
+                  <TableCell>{convertAmountFromOnChainToHumanReadable(fa.supply_v2, fa.decimals)}</TableCell>
                   <TableCell>{fa.decimals}</TableCell>
                 </TableRow>
               );
