@@ -27,7 +27,9 @@ module launchpad_addr::launchpad {
     /// Mint limit reached
     const EMINT_LIMIT_REACHED: u64 = 7;
 
+    /// Default to mint 0 amount to creator when creating FA
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
+    // Default mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     const DEFAULT_mint_fee_per_smallest_unit_of_fa: u64 = 0;
 
     #[event]
@@ -98,8 +100,8 @@ module launchpad_addr::launchpad {
         mint_fee_collector_addr: address,
     }
 
-    // If you deploy the module under an object, sender is the object's signer
-    // If you deploy the moduelr under your own account, sender is your account's signer
+    /// If you deploy the module under an object, sender is the object's signer
+    /// If you deploy the moduelr under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
             fa_objects: vector::empty()
@@ -114,7 +116,7 @@ module launchpad_addr::launchpad {
 
     // ================================= Entry Functions ================================= //
 
-    // Update creator address
+    /// Update creator address
     public entry fun update_creator(sender: &signer, new_creator: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -122,7 +124,7 @@ module launchpad_addr::launchpad {
         config.creator_addr = new_creator;
     }
 
-    // Set pending admin of the contract, then pending admin can call accept_admin to become admin
+    /// Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -130,7 +132,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::some(new_admin);
     }
 
-    // Accept admin of the contract
+    /// Accept admin of the contract
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -139,7 +141,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::none();
     }
 
-    // Update mint fee collector address
+    /// Update mint fee collector address
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -147,21 +149,21 @@ module launchpad_addr::launchpad {
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
-    // Create a fungible asset
+    /// Create a fungible asset, only admin or creator can create FA
     public entry fun create_fa(
         sender: &signer,
         max_supply: Option<u128>,
         name: String,
         symbol: String,
-        // Number of decimal places, i.e. APT has 8 decimal places, so decimals = 8, 1 APT = 1e-8 oapt
+        /// Number of decimal places, i.e. APT has 8 decimal places, so decimals = 8, 1 APT = 1e-8 oapt
         decimals: u8,
         icon_uri: String,
         project_uri: String,
-        // Mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        /// Mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         mint_fee_per_smallest_unit_of_fa: Option<u64>,
-        // Amount in smallest unit of FA
+        /// Amount in smallest unit of FA
         pre_mint_amount: Option<u64>,
-        // Limit of minting per address in smallest unit of FA
+        /// Limit of minting per address in smallest unit of FA
         mint_limit_per_addr: Option<u64>,
     ) acquires Registry, Config, FAController {
         let sender_addr = signer::address_of(sender);
@@ -236,7 +238,7 @@ module launchpad_addr::launchpad {
         }
     }
 
-    // Mint fungible asset
+    /// Mint fungible asset, anyone with enough mint fee and has not reached mint limit can mint FA
     public entry fun mint_fa(
         sender: &signer,
         fa_obj: Object<Metadata>,
@@ -251,42 +253,42 @@ module launchpad_addr::launchpad {
 
     // ================================= View Functions ================================== //
 
-    // Get creator, creator is the address that is allowed to create FAs
+    /// Get creator, creator is the address that is allowed to create FAs
     #[view]
     public fun get_creator(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.creator_addr
     }
 
-    // Get contract admin
+    /// Get contract admin
     #[view]
     public fun get_admin(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.admin_addr
     }
 
-    // Get contract pending admin
+    /// Get contract pending admin
     #[view]
     public fun get_pendingadmin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
 
-    // Get mint fee collector address
+    /// Get mint fee collector address
     #[view]
     public fun get_mint_fee_collector(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.mint_fee_collector_addr
     }
 
-    // Get all fungible assets created using this contract
+    /// Get all fungible assets created using this contract
     #[view]
     public fun get_registry(): vector<Object<Metadata>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.fa_objects
     }
 
-    // Get fungible asset metadata
+    /// Get fungible asset metadata
     #[view]
     public fun get_fa_objects_metadatas(
         collection_obj: Object<Metadata>
@@ -297,7 +299,7 @@ module launchpad_addr::launchpad {
         (symbol, name, decimals)
     }
 
-    // Get mint limit per address
+    /// Get mint limit per address
     #[view]
     public fun get_mint_limit(
         fa_obj: Object<Metadata>,
@@ -310,7 +312,7 @@ module launchpad_addr::launchpad {
         }
     }
 
-    // Get current minted amount by an address
+    /// Get current minted amount by an address
     #[view]
     public fun get_current_minted_amount(
         fa_obj: Object<Metadata>,
@@ -323,7 +325,7 @@ module launchpad_addr::launchpad {
         *table::borrow_with_default(mint_tracker, addr, &0)
     }
 
-    // Get mint fee denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+    /// Get mint fee denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     #[view]
     public fun get_mint_fee(
         fa_obj: Object<Metadata>,
@@ -336,6 +338,7 @@ module launchpad_addr::launchpad {
 
     // ================================= Helper Functions ================================== //
 
+    /// Check if sender is admin or owner of the object when package is published to object
     fun is_admin(config: &Config, sender: address): bool {
         if (sender == config.admin_addr) {
             true
@@ -349,10 +352,12 @@ module launchpad_addr::launchpad {
         }
     }
 
+    /// Check if sender is allowed to create FA
     fun is_creator(config: &Config, sender: address): bool {
         sender == config.creator_addr
     }
 
+    /// Check mint limit and update mint tracker
     fun check_mint_limit_and_update_mint_tracker(
         sender: address,
         fa_obj: Object<Metadata>,
@@ -371,6 +376,7 @@ module launchpad_addr::launchpad {
         }
     }
 
+    /// ACtual implementation of minting FA
     fun mint_fa_internal(
         sender: &signer,
         fa_obj: Object<Metadata>,
@@ -391,6 +397,7 @@ module launchpad_addr::launchpad {
         });
     }
 
+    /// Pay for mint
     fun pay_for_mint(
         sender: &signer,
         total_mint_fee: u64

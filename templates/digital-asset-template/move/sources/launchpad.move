@@ -41,12 +41,17 @@ module launchpad_addr::launchpad {
     /// Mint limit per address must be set for stage
     const EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE: u64 = 10;
 
+    /// Default to mint 0 amount to creator when creating collection
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
+    /// Default mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     const DEFAULT_MINT_FEE_PER_NFT: u64 = 0;
 
+    /// 100 years in seconds, we consider mint end time to be infinite when it is set to 100 years after start time
     const ONE_HUNDRED_YEARS_IN_SECONDS: u64 = 100 * 365 * 24 * 60 * 60;
 
+    /// Category for allowlist mint stage
     const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
+    /// Category for public mint stage
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint stage";
 
     #[event]
@@ -116,8 +121,8 @@ module launchpad_addr::launchpad {
         mint_fee_collector_addr: address,
     }
 
-    // If you deploy the module under an object, sender is the object's signer
-    // If you deploy the module under your own account, sender is your account's signer
+    //. If you deploy the module under an object, sender is the object's signer
+    /// If you deploy the module under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
             collection_objects: vector::empty()
@@ -132,7 +137,7 @@ module launchpad_addr::launchpad {
 
     // ================================= Entry Functions ================================= //
 
-    // Update creator address
+    /// Update creator address
     public entry fun update_creator(sender: &signer, new_creator: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -140,7 +145,7 @@ module launchpad_addr::launchpad {
         config.creator_addr = new_creator;
     }
 
-    // Set pending admin of the contract, then pending admin can call accept_admin to become admin
+    /// Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -148,7 +153,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::some(new_admin);
     }
 
-    // Accept admin of the contract
+    /// Accept admin of the contract
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -157,7 +162,7 @@ module launchpad_addr::launchpad {
         config.pending_admin_addr = option::none();
     }
 
-    // Update mint fee collector address
+    /// Update mint fee collector address
     public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global_mut<Config>(@launchpad_addr);
@@ -165,7 +170,7 @@ module launchpad_addr::launchpad {
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
-    // Create a collection
+    /// Create a collection, only admin or creator can create collection
     public entry fun create_collection(
         sender: &signer,
         description: String,
@@ -173,17 +178,21 @@ module launchpad_addr::launchpad {
         uri: String,
         max_supply: u64,
         royalty_percentage: Option<u64>,
+        /// Pre mint amount to creator
         pre_mint_amount: Option<u64>,
+        /// Allowlist of addresses that can mint NFTs in allowlist stage
         allowlist: Option<vector<address>>,
         allowlist_start_time: Option<u64>,
         allowlist_end_time: Option<u64>,
+        /// Allowlist mint limit per address
         allowlist_mint_limit_per_addr: Option<u64>,
-        // Allowlist mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        /// Allowlist mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         allowlist_mint_fee_per_nft: Option<u64>,
         public_mint_start_time: Option<u64>,
         public_mint_end_time: Option<u64>,
+        /// Public mint limit per address
         public_mint_limit_per_addr: Option<u64>,
-        // Public mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        /// Public mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         public_mint_fee_per_nft: Option<u64>,
     ) acquires Registry, Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
@@ -291,7 +300,8 @@ module launchpad_addr::launchpad {
         });
     }
 
-    // Mint NFT
+    /// Mint NFT, anyone with enough mint fee and has not reached mint limit can mint FA
+    /// If we are in allowlist stage, only addresses in allowlist can mint FA
     public entry fun mint_nft(
         sender: &signer,
         collection_obj: Object<Collection>,
@@ -323,42 +333,42 @@ module launchpad_addr::launchpad {
 
     // ================================= View  ================================= //
 
-    // Get creator, creator is the address that is allowed to create collections
+    /// Get creator, creator is the address that is allowed to create collections
     #[view]
     public fun get_creator(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.creator_addr
     }
 
-    // Get contract admin
+    /// Get contract admin
     #[view]
     public fun get_admin(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.admin_addr
     }
 
-    // Get contract pending admin
+    /// Get contract pending admin
     #[view]
     public fun get_pendingadmin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
 
-    // Get mint fee collector address
+    /// Get mint fee collector address
     #[view]
     public fun get_mint_fee_collector(): address acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.mint_fee_collector_addr
     }
 
-    // Get all collections created using this contract
+    /// Get all collections created using this contract
     #[view]
     public fun get_registry(): vector<Object<Collection>> acquires Registry {
         let registry = borrow_global<Registry>(@launchpad_addr);
         registry.collection_objects
     }
 
-    // Get mint fee for a specific stage, denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+    /// Get mint fee for a specific stage, denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     #[view]
     public fun get_mint_fee(
         collection_obj: Object<Collection>,
@@ -370,7 +380,7 @@ module launchpad_addr::launchpad {
         amount * fee
     }
 
-    // Get the name of the current active mint stage or the next mint stage if there is no active mint stage
+    /// Get the name of the current active mint stage or the next mint stage if there is no active mint stage
     #[view]
     public fun get_active_or_next_mint_stage(collection_obj: Object<Collection>): Option<String> {
         let active_stage_idx = mint_stage::ccurent_active_stage(collection_obj);
@@ -391,7 +401,7 @@ module launchpad_addr::launchpad {
         }
     }
 
-    // Get the start and end time of a mint stage
+    /// Get the start and end time of a mint stage
     #[view]
     public fun get_mint_stage_start_and_end_time(collection_obj: Object<Collection>, stage_name: String): (u64, u64) {
         let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
@@ -403,6 +413,7 @@ module launchpad_addr::launchpad {
 
     // ================================= Helpers ================================= //
 
+    /// Check if sender is admin or owner of the object when package is published to object
     fun is_admin(config: &Config, sender: address): bool {
         if (sender == config.admin_addr) {
             true
@@ -416,10 +427,12 @@ module launchpad_addr::launchpad {
         }
     }
 
+    /// Check if sender is allowed to create collections
     fun is_creator(config: &Config, sender: address): bool {
         sender == config.creator_addr
     }
 
+    /// Add allowlist mint stage
     fun add_allowlist_stage(
         collection_obj: Object<Collection>,
         collection_obj_addr: address,
@@ -461,6 +474,7 @@ module launchpad_addr::launchpad {
         );
     }
 
+    /// Add public mint stage
     fun add_public_mint_stage(
         collection_obj: Object<Collection>,
         collection_obj_addr: address,
@@ -503,12 +517,14 @@ module launchpad_addr::launchpad {
         );
     }
 
+    /// Pay for mint
     fun pay_for_mint(sender: &signer, mint_fee: u64) acquires Config {
         if (mint_fee > 0) {
             aptos_account::transfer(sender, get_mint_fee_collector(), mint_fee);
         }
     }
 
+    /// Create royalty object
     fun royalty(
         royalty_numerator: &mut Option<u64>,
         admin_addr: address,
@@ -521,6 +537,7 @@ module launchpad_addr::launchpad {
         }
     }
 
+    /// ACtual implementation of minting NFT
     fun mint_nft_internal(
         sender_addr: address,
         collection_obj: Object<Collection>,
@@ -555,6 +572,7 @@ module launchpad_addr::launchpad {
         nft_obj
     }
 
+    /// Construct NFT metadata URI
     fun construct_nft_metadata_uri(
         collection_uri: &String,
         next_nft_id: u64,
