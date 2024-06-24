@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
 const accountAddress =
-  config["profiles"][process.env.VITE_APP_NETWORK]["account"];
+  config["profiles"][process.env.PROFILE_NAME]["account"];
 
 const filePath = ".env";
 let envContent = "";

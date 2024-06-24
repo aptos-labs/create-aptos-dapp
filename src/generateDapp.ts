@@ -101,13 +101,17 @@ export async function generateDapp(selection: Selections) {
 
     // create .env file
     const network = selection.network || "testnet";
+    const assetType =
+      selection.template.path === "digital-asset-template"
+        ? "COLLECTION"
+        : "FA";
     await write(
       ".env",
-      `VITE_APP_NETWORK=${network}\nVITE_${
-        selection.template.path === "digital-asset-template"
-          ? "COLLECTION"
-          : "FA"
-      }_CREATOR_ADDRESS=""`
+      Object.entries({
+        PROFILE_NAME: `${projectName}-${network}`,
+        VITE_APP_NETWORK: network,
+        [`VITE_${assetType}_CREATOR_ADDRESS`]: "",
+      }).reduce((acc, [key, value]) => acc + `${key}=${value}` + "\n", "")
     );
 
     // Log next steps
