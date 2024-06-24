@@ -1,8 +1,8 @@
 import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
-
-import { Mint } from "./pages/Mint";
-import { CreateFungibleAsset } from "./pages/CreateFungibleAsset";
-import { MyFungibleAssets } from "./pages/MyFungibleAssets";
+// Internal pages
+import { Mint } from "@/pages/Mint";
+import { CreateFungibleAsset } from "@/pages/CreateFungibleAsset";
+import { MyFungibleAssets } from "@/pages/MyFungibleAssets";
 
 function Layout() {
   return (

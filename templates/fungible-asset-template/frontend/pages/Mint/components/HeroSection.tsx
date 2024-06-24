@@ -1,25 +1,33 @@
 import { FC, FormEvent, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+// Internal utils
 import { truncateAddress } from "@/utils/truncateAddress";
+// Internal components
 import { Image } from "@/components/ui/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useMintData } from "../hooks/useMintData";
-import Copy from "@/assets/icons/copy.svg";
-import ExternalLink from "@/assets/icons/external-link.svg";
-import { Socials } from "./Socials";
-import { MODULE_ADDRESS, NETWORK } from "@/constants";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { Socials } from "@/pages/Mint/components/Socials";
+// Internal hooks
+import { useGetAssetData } from "../../../hooks/useGetAssetData";
+// Internal utils
 import { aptosClient } from "@/utils/aptosClient";
-import { useQueryClient } from "@tanstack/react-query";
+// Internal constants
+import { NETWORK } from "@/constants";
+// Internal assets
 import Placeholder1 from "@/assets/placeholders/asset.png";
+import ExternalLink from "@/assets/icons/external-link.svg";
+import Copy from "@/assets/icons/copy.svg";
+// Internal config
 import { config } from "@/config";
-import { convertAmountFromHumanReadableToOnChain } from "@/utils/helpers";
+// Internal enrty functions
+import { mintAsset } from "@/entry-functions/mint_asset";
 
 interface HeroSectionProps {}
 
 export const HeroSection: React.FC<HeroSectionProps> = () => {
-  const { data } = useMintData();
+  const { data } = useGetAssetData();
   const queryClient = useQueryClient();
   const { account, signAndSubmitTransaction } = useWallet();
   const [assetCount, setAssetCount] = useState<string>("1");
@@ -48,12 +56,13 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
       return setError("Invalid amount");
     }
 
-    const response = await signAndSubmitTransaction({
-      data: {
-        function: `${MODULE_ADDRESS}::launchpad::mint_fa`,
-        functionArguments: [asset.asset_type, convertAmountFromHumanReadableToOnChain(amount, asset.decimals)],
-      },
-    });
+    const response = await signAndSubmitTransaction(
+      mintAsset({
+        assetType: asset.asset_type,
+        amount,
+        decimals: asset.decimals,
+      }),
+    );
     await aptosClient().waitForTransaction({ transactionHash: response.hash });
     queryClient.invalidateQueries();
     setAssetCount("1");

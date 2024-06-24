@@ -1,7 +1,9 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { config } from "@/config";
 import { AlertOctagon } from "lucide-react";
 import { FC } from "react";
+// Internal components
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+// Internal config
+import { config } from "@/config";
 
 export const ConnectWalletAlert: FC = () => {
   if (config.asset_id) return null;
@@ -15,9 +17,8 @@ export const ConnectWalletAlert: FC = () => {
           This page is placeholder content, to render your fungible asset:
           <ol className="list-decimal list-inside">
             <li>
-              Make sure you have created a fungible asset, click the "My Assets"
-              button and verify a collection is created, if not, click "Create
-              Asset".
+              Make sure you have created a fungible asset, click the "My Assets" button and verify a collection is
+              created, if not, click "Create Asset".
             </li>
             <li>
               Fill in the{" "}

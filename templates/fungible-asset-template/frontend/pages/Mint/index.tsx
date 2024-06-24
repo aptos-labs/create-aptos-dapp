@@ -1,7 +1,7 @@
 import { HeroSection } from "./components/HeroSection";
 import { StatsSection } from "./components/StatsSection";
 import { OurStorySection } from "./components/OurStorySection";
-import { useMintData } from "./hooks/useMintData";
+import { useGetAssetData } from "../../hooks/useGetAssetData";
 import { Socials } from "./components/Socials";
 import { ConnectWalletAlert } from "./components/ConnectWalletAlert";
 import { Header } from "@/components/Header";
@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function Mint() {
-  const { data, isLoading } = useMintData();
+  const { data, isLoading } = useGetAssetData();
 
   const queryClient = useQueryClient();
   const { account } = useWallet();

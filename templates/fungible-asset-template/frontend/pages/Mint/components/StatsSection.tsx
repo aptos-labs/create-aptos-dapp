@@ -1,11 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { clampNumber } from "@/utils/clampNumber";
-import { useMintData } from "../hooks/useMintData";
+import { useGetAssetData } from "../../../hooks/useGetAssetData";
 
 interface StatsSectionProps {}
 
 export const StatsSection: React.FC<StatsSectionProps> = () => {
-  const { data } = useMintData();
+  const { data } = useGetAssetData();
   if (!data) return null;
   const { maxSupply, currentSupply, uniqueHolders } = data;
 

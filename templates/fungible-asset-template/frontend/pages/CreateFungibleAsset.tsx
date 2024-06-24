@@ -1,82 +1,90 @@
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
+// Internal components
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import { checkIfFund, uploadFile } from "@/utils/Irys";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
-import { aptosClient } from "@/utils/aptosClient";
-import {
-  APT_DECIMALS,
-  convertAmountFromHumanReadableToOnChain,
-  convertAmountFromOnChainToHumanReadable,
-} from "@/utils/helpers";
-import { LaunchpadHeader } from "@/components/LaunchpadHeader";
-import { CREATOR_ADDRESS } from "@/constants";
 import { WarningAlert } from "@/components/ui/warning-alert";
 import { UploadSpinner } from "@/components/UploadSpinner";
 import { LabeledInput } from "@/components/ui/labeled-input";
 import { ConfirmButton } from "@/components/ui/confirm-button";
+import { LaunchpadHeader } from "@/components/LaunchpadHeader";
+// Internal utils
+import { checkIfFund, uploadFile } from "@/utils/Irys";
+import { aptosClient } from "@/utils/aptosClient";
+// Internal constants
+import { CREATOR_ADDRESS } from "@/constants";
+// Entry functions
+import { createAsset } from "@/entry-functions/create_asset";
 
 export function CreateFungibleAsset() {
+  // Wallet Adapter provider
   const aptosWallet = useWallet();
   const { account, signAndSubmitTransaction } = useWallet();
+
+  // If we are on Production mode, redierct to the public mint page
   const navigate = useNavigate();
-  const [name, setName] = useState<string>();
-  const [symbol, setSymbol] = useState<string>();
+  if (import.meta.env.PROD) navigate("/", { replace: true });
+
+  // Collection data entered by the user on UI
+  const [name, setName] = useState<string>("");
+  const [symbol, setSymbol] = useState<string>("");
   const [maxSupply, setMaxSupply] = useState<string>();
   const [maxMintPerAccount, setMaxMintPerAccount] = useState<number>();
   const [decimal, setDecimal] = useState<string>();
   const [image, setImage] = useState<File | null>(null);
-  const [projectURL, setProjectURL] = useState<string>();
-  const [mintFeePerFA, setMintFeePerFA] = useState<string>();
-  const [mintForMyself, setMintForMyself] = useState<string>();
+  const [projectURL, setProjectURL] = useState<string>("");
+  const [mintFeePerFA, setMintFeePerFA] = useState<number>();
+  const [mintForMyself, setMintForMyself] = useState<number>();
+
+  // Internal state
   const [isUploading, setIsUploading] = useState(false);
+
+  // Local Ref
   const inputRef = useRef<HTMLInputElement>(null);
 
   const disableCreateAssetButton =
     !name || !symbol || !maxSupply || !decimal || !projectURL || !maxMintPerAccount || !account || isUploading;
 
-  const createAsset = async () => {
+  // On create asset button clicked
+  const onCreateAsset = async () => {
     try {
       if (!account) throw new Error("Connect wallet first");
       if (!image) throw new Error("Select image first");
 
+      // Set internal isUploading state
       setIsUploading(true);
 
+      // Check an Irys node has funded
       const funded = await checkIfFund(aptosWallet, image.size);
       if (!funded) throw new Error("Current account balance is not enough to fund a decentralized asset node");
 
+      // Upload asset file to Irys
       const iconURL = await uploadFile(aptosWallet, image);
 
-      const response = await signAndSubmitTransaction({
-        data: {
-          function: `${import.meta.env.VITE_MODULE_ADDRESS}::launchpad::create_fa`,
-          typeArguments: [],
-          functionArguments: [
-            convertAmountFromHumanReadableToOnChain(Number(maxSupply), Number(decimal)),
-            name,
-            symbol,
-            decimal,
-            iconURL,
-            projectURL,
-            mintFeePerFA
-              ? convertAmountFromOnChainToHumanReadable(
-                  convertAmountFromHumanReadableToOnChain(Number(mintFeePerFA), APT_DECIMALS),
-                  Number(decimal),
-                )
-              : 0,
-            mintForMyself ? convertAmountFromHumanReadableToOnChain(Number(mintForMyself), Number(decimal)) : 0,
-            maxMintPerAccount ? convertAmountFromHumanReadableToOnChain(maxMintPerAccount, Number(decimal)) : 0,
-          ],
-        },
-      });
+      // Submit a create_fa entry function transaction
+      const response = await signAndSubmitTransaction(
+        createAsset({
+          maxSupply: Number(maxSupply),
+          name,
+          symbol,
+          decimal: Number(decimal),
+          iconURL,
+          projectURL,
+          mintFeePerFA,
+          mintForMyself,
+          maxMintPerAccount,
+        }),
+      );
 
+      // Wait for the transaction to be commited to chain
       const committedTransactionResponse = await aptosClient().waitForTransaction({
         transactionHash: response.hash,
       });
+
+      // Once the transaction has been successfully commited to chain, navigate to the `my-assets` page
       if (committedTransactionResponse.success) {
         navigate(`/my-assets`, { replace: true });
       }
@@ -220,7 +228,7 @@ export function CreateFungibleAsset() {
             id="mint-fee"
             label="Mint fee per fungible asset in APT"
             tooltip="The fee cost for the minter to pay to mint one full unit of an asset, denominated in APT. For example, if a user mints 10 assets in a single transaction, they are charged 10x the mint fee."
-            onChange={(e) => setMintFeePerFA(e.target.value)}
+            onChange={(e) => setMintFeePerFA(Number(e.target.value))}
             disabled={isUploading || !account}
             type="number"
           />
@@ -229,7 +237,7 @@ export function CreateFungibleAsset() {
             id="for-myself"
             label="Mint for myself"
             tooltip="How many assets in full unit to mint right away and send to your address."
-            onChange={(e) => setMintForMyself(e.target.value)}
+            onChange={(e) => setMintForMyself(Number(e.target.value))}
             disabled={isUploading || !account}
             type="number"
           />
@@ -237,7 +245,7 @@ export function CreateFungibleAsset() {
           <ConfirmButton
             title="Create Asset"
             className="self-start"
-            onSubmit={createAsset}
+            onSubmit={onCreateAsset}
             disabled={disableCreateAssetButton}
             confirmMessage={
               <>

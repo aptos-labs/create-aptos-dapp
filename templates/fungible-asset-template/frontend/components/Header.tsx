@@ -1,5 +1,5 @@
 import { IS_DEV } from "@/constants";
-import { useMintData } from "@/pages/Mint/hooks/useMintData";
+import { useGetAssetData } from "@/hooks/useGetAssetData";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
@@ -8,18 +8,14 @@ import { buttonVariants } from "./ui/button";
 import { config } from "@/config";
 
 export function Header() {
-  const { data } = useMintData();
+  const { data } = useGetAssetData();
   const location = useLocation();
 
   const isRoot = location.pathname === "/";
 
   const title = useMemo(() => {
     if (!isRoot) return "Fungible Asset Launchpad";
-    return (
-      data?.asset.symbol.toUpperCase() ??
-      config.defaultAsset?.name ??
-      "Fungible Asset Launchpad"
-    );
+    return data?.asset.symbol.toUpperCase() ?? config.defaultAsset?.name ?? "Fungible Asset Launchpad";
   }, [isRoot, data?.asset]);
 
   return (
@@ -31,14 +27,10 @@ export function Header() {
       <div className="flex gap-2 items-center flex-wrap">
         {IS_DEV && (
           <>
-            <Link
-              className={buttonVariants({ variant: "link" })}
-              to={"/my-assets"}>
+            <Link className={buttonVariants({ variant: "link" })} to={"/my-assets"}>
               My Assets
             </Link>
-            <Link
-              className={buttonVariants({ variant: "link" })}
-              to={"/create-asset"}>
+            <Link className={buttonVariants({ variant: "link" })} to={"/create-asset"}>
               Create Asset
             </Link>
           </>
