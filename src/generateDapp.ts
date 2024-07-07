@@ -55,7 +55,7 @@ export async function generateDapp(selection: Selections) {
     const write = async (file: string, content?: string) => {
       // file to copy to target directory
       const targetPath = path.join(targetDirectory, renameFiles[file] ?? file);
-      //const targetPath = path.join(targetDirectory, file);
+
       if (content) {
         await fs.writeFile(targetPath, content);
       } else {
@@ -88,6 +88,32 @@ export async function generateDapp(selection: Selections) {
     // cd into target directory
     process.chdir(targetDirectory);
 
+    // create .env file
+    const generateEnvFile = async (additionalContent?: string) => {
+      const content = `PROJECT_NAME=${selection.projectName}\nVITE_APP_NETWORK=${selection.network}`;
+
+      await write(
+        ".env",
+        `${
+          additionalContent ? content.concat("\n", additionalContent) : content
+        }`
+      );
+    };
+
+    switch (selection.template.path) {
+      case "digital-asset-template":
+        await generateEnvFile(`VITE_COLLECTION_CREATOR_ADDRESS=""`);
+        break;
+      case "fungible-asset-template":
+        await generateEnvFile(`VITE_FA_CREATOR_ADDRESS=""`);
+        break;
+      case "boilerplate-template":
+        await generateEnvFile();
+        break;
+      default:
+        throw new Error("Unsupported template to generate an .env file for");
+    }
+
     scaffoldingSpinner.succeed();
 
     const npmSpinner = spinner("Installing dependencies.....").start();
@@ -99,21 +125,6 @@ export async function generateDapp(selection: Selections) {
     npmSpinner.succeed();
     currentSpinner = npmSpinner;
 
-    // create .env file
-    const network = selection.network || "testnet";
-    const assetType =
-      selection.template.path === "digital-asset-template"
-        ? "COLLECTION"
-        : "FA";
-    await write(
-      ".env",
-      Object.entries({
-        PROJECT_NAME: projectName,
-        VITE_APP_NETWORK: network,
-        [`VITE_${assetType}_CREATOR_ADDRESS`]: "",
-      }).reduce((acc, [key, value]) => acc + `${key}=${value}` + "\n", "")
-    );
-
     // Log next steps
     console.log(
       green("\nSuccess! You're ready to start building your dapp on Aptos.")
@@ -123,13 +134,15 @@ export async function generateDapp(selection: Selections) {
 
     console.log(green(`1. cd ${projectName}`) + "\n");
     console.log(green(`2. npm run dev`) + "\n");
-    console.log(
-      green(
-        `3. Follow the instructions for the ${
-          selection.template.name
-        } template on ${white(selection.template.doc)}`
-      )
-    );
+    if (selection.template.doc) {
+      console.log(
+        green(
+          `3. Follow the instructions for the ${
+            selection.template.name
+          } template on ${white(selection.template.doc)}`
+        )
+      );
+    }
   } catch (error: any) {
     currentSpinner?.fail(`Failed to scaffold project: ${error.message}`);
     console.error(error);
