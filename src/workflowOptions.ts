@@ -14,6 +14,14 @@ export const workflowOptions = {
     message: "Choose how to start",
     choices: [
       {
+        title: "Boilerplate Template",
+        value: {
+          path: "boilerplate-template",
+          name: "Boilerplate Template",
+        },
+        description: "A Boilerplate template to start an Aptos dapp with",
+      },
+      {
         title: "Digital Asset",
         value: {
           path: "digital-asset-template",
@@ -38,10 +46,19 @@ export const workflowOptions = {
     type: "select",
     name: "network",
     message: "Choose your network",
-    choices: [
-      { title: "Mainnet", value: "mainnet" },
-      { title: "Testnet", value: "testnet" },
-    ],
+    choices(prev, values, prompt) {
+      if (prev.path === "boilerplate-template") {
+        return [
+          { title: "Mainnet", value: "mainnet" },
+          { title: "Testnet", value: "testnet" },
+          { title: "Devnet", value: "devnet" },
+        ];
+      }
+      return [
+        { title: "Mainnet", value: "mainnet" },
+        { title: "Testnet", value: "testnet" },
+      ];
+    },
     initial: 0,
     hint: "- You can change this later",
   },

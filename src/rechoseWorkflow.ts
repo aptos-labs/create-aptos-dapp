@@ -44,6 +44,21 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
       break;
     case "template":
       result.template = (await prompts(workflowOptions.template)).template;
+      // For now, only boilerplate-template suports Devnet
+      if (
+        result.network === "devnet" &&
+        result.template.path !== "boilerplate-template"
+      ) {
+        result.network = (
+          await prompts({
+            ...workflowOptions.network,
+            choices: [
+              { title: "Mainnet", value: "mainnet" },
+              { title: "Testnet", value: "testnet" },
+            ],
+          })
+        ).network;
+      }
       break;
     case "network":
       result.network = (await prompts(workflowOptions.network)).network;
