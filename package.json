@@ -17,7 +17,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc && cp -r templates dist/templates",
+    "build": "npm run clean && tsc && cp -r templates dist/templates && cp -r examples dist/examples",
     "dev": "npm run build && node dist/index.js",
     "prepublish": "npm run build && npm publish"
   },
