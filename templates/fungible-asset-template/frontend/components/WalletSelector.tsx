@@ -99,7 +99,7 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
   return (
     <DialogContent className="max-h-screen overflow-auto">
       <AboutAptosConnect renderEducationScreen={renderEducationScreen}>
-        {/* AptosConnect does not support file uploads, so we only show it on the public mint page when people want to mint an NFT */}
+        {/* AptosConnect does not support file uploads, so we only show it on the public mint page when people want to mint an asset */}
         {isPublicMintPage ? (
           <>
             <DialogHeader className="flex flex-col items-center">

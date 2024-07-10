@@ -4,8 +4,13 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.12 (2024-07-10)
+
 - Add a `Boilerplate Template` option
 - Support `Devnet` as a network option for the boilerplate template
+- [`Fix`] `AptosConnect` to show on any public page
+- Move the template doc link prompt to show up before the `npm run dev` command on the `next steps` section
+- Add the `AptosConnect` educational screen on the wallet selector component on each template
 
 # 0.0.11 (2024-06-24)
 
