@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    concurrency: ci-${{ github.ref }}
+    concurrency: ci-${{ github.ref }}-${{ github.workflow }}
     defaults:
       run:
         working-directory: ./templates/fungible-asset-template
