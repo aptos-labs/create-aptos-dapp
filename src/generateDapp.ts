@@ -133,7 +133,7 @@ export async function generateDapp(selection: Selections) {
     console.log(bold("\nNext steps:") + "\n");
 
     console.log(green(`1. cd ${projectName}`) + "\n");
-    console.log(green(`2. npm run dev`) + "\n");
+
     if (selection.template.doc) {
       console.log(
         green(
@@ -143,6 +143,8 @@ export async function generateDapp(selection: Selections) {
         )
       );
     }
+
+    console.log(green(`2. npm run dev`) + "\n");
   } catch (error: any) {
     currentSpinner?.fail(`Failed to scaffold project: ${error.message}`);
     console.error(error);
