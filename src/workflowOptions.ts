@@ -18,6 +18,7 @@ export const workflowOptions = {
         value: {
           path: "boilerplate-template",
           name: "Boilerplate Template",
+          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate",
         },
         description: "A Boilerplate template to start an Aptos dapp with",
       },
