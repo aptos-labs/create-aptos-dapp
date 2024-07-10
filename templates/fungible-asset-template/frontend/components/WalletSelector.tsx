@@ -88,7 +88,7 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
 
   const location = useLocation();
 
-  const isPublicMintPage = location.pathname === "/";
+  const isPublicMintPage = location.pathname !== "/create-collection" && location.pathname !== "/my-collections";
 
   const {
     /** Wallets that use social login to create an account on the blockchain */
