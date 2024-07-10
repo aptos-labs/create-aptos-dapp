@@ -140,7 +140,7 @@ export async function generateDapp(selection: Selections) {
           `3. Follow the instructions for the ${
             selection.template.name
           } template on ${white(selection.template.doc)}`
-        )
+        ) + "\n"
       );
     }
 

@@ -90,7 +90,7 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
 
   const location = useLocation();
 
-  const isPublicMintPage = location.pathname !== "/create-collection" && location.pathname !== "/my-collections";
+  const isPublicMintPage = location.pathname !== "/create-asset" && location.pathname !== "/my-assets";
 
   const { aptosConnectWallets, availableWallets, installableWallets } = groupAndSortWallets(wallets);
 
