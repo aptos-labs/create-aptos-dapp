@@ -8,7 +8,9 @@ async function test() {
   await move.test({
     packageDirectoryPath: "move",
     namedAddresses: {
-      module_addr: "0x100",
+      staking_addr: "0x999",
+      staked_fa_obj_addr: "0x998",
+      reward_fa_obj_addr: "0x997",
     },
   });
 }
