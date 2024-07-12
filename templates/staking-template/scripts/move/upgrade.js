@@ -15,9 +15,11 @@ async function publish() {
     objectAddress: process.env.VITE_MODULE_ADDRESS,
     namedAddresses: {
       // Upgrade module from an object
-      module_addr: process.env.VITE_MODULE_ADDRESS,
+      staking_addr: process.env.VITE_MODULE_ADDRESS,
+      staked_fa_obj_addr: process.env.VITE_STAKED_FA_OBJ_ADDR,
+      reward_fa_obj_addr: process.env.VITE_REWARD_FA_OBJ_ADDR,
     },
-      profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+    profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
   });
 }
 publish();

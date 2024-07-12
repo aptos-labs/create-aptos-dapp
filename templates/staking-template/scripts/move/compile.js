@@ -16,6 +16,8 @@ async function compile() {
     namedAddresses: {
       // Compile module with account address
       module_addr: accountAddress,
+      staked_fa_obj_addr: process.env.VITE_STAKED_FA_OBJ_ADDR,
+      reward_fa_obj_addr: process.env.VITE_REWARD_FA_OBJ_ADDR,
     },
   });
 }
