@@ -13,10 +13,12 @@ async function publish() {
   move
     .createObjectAndPublishPackage({
       packageDirectoryPath: "move",
-      addressName: "module_addr",
+      addressName: "staking_addr",
       namedAddresses: {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
-        module_addr: accountAddress,
+        staking_addr: accountAddress,
+        staked_fa_obj_addr: process.env.VITE_STAKED_FA_OBJ_ADDR,
+        reward_fa_obj_addr: process.env.VITE_REWARD_FA_OBJ_ADDR,
       },
       profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
     })

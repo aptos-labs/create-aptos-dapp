@@ -7,7 +7,7 @@ module staking_addr::staking {
     use aptos_framework::object::{Self, Object};
     use aptos_framework::primary_fungible_store;
 
-    use staking_addr::reward;
+    friend staking_addr::reward;
 
     // ================================= Errors ================================= //
     /// user tries to stake more than owned
@@ -39,7 +39,7 @@ module staking_addr::staking {
 
     // ================================= Entry Functions ================================= //
 
-    public entry fun stake(sender: &signer, amount: u64) acquires Staking {
+    public(friend) fun stake(sender: &signer, amount: u64) acquires Staking {
         let sender_addr = signer::address_of(sender);
         let staked_fa_metadata_object = get_staked_fa_metadata_object();
         assert!(
@@ -50,9 +50,6 @@ module staking_addr::staking {
         let staking = borrow_global_mut<Staking>(@staking_addr);
         staking.total_stake = staking.total_stake + amount;
         let stakes = &mut staking.stakes;
-
-        // note must call this before transfer
-        reward::handle_stake(sender);
 
         if (table::contains(stakes, sender_addr)) {
             let fungible_store = *table::borrow(stakes, sender_addr);
@@ -78,7 +75,7 @@ module staking_addr::staking {
         };
     }
 
-    public entry fun unstake(sender: &signer, amount: u64) acquires Staking {
+    public(friend) fun unstake(sender: &signer, amount: u64) acquires Staking {
         let sender_addr = signer::address_of(sender);
         let staked_fa_metadata_object = get_staked_fa_metadata_object();
 
@@ -87,9 +84,6 @@ module staking_addr::staking {
 
         let fungible_store = *table::borrow(stakes, sender_addr);
         assert!(fungible_asset::balance(fungible_store) >= amount, ENOT_ENOUGH_BALANCE_TO_UNSTAKE);
-
-        // note must call this before transfer
-        reward::handle_unstake(sender);
 
         fungible_asset::transfer(
             sender,
@@ -110,8 +104,12 @@ module staking_addr::staking {
     #[view]
     public fun get_staked_balance(user_addr: address): u64 acquires Staking {
         let staking = borrow_global<Staking>(@staking_addr);
-        let fungible_store = *table::borrow(&staking.stakes, user_addr);
-        fungible_asset::balance(fungible_store)
+        if (table::contains(&staking.stakes, user_addr)) {
+            let fungible_store = *table::borrow(&staking.stakes, user_addr);
+            fungible_asset::balance(fungible_store)
+        } else {
+            0
+        }
     }
 
     #[view]
