@@ -4,6 +4,11 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.13 (2024-07-15)
+
+- Add `dotenv` dev dependency to the `Boilerplate` template
+- Add entry and view function examples to the `Boilerplate` template
+
 # 0.0.12 (2024-07-10)
 
 - Add a `Boilerplate Template` option
