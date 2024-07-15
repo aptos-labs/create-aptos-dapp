@@ -1,0 +1,17 @@
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
+
+export type TransferAPTArguments = {
+  to: string; // the account address to transfer the APT to
+  amount:number // the APT amount to transfer
+};
+
+export const trasnferAPT = async (args: TransferAPTArguments): InputTransactionData => {
+  const { to, amount } = args;
+  return {
+    data:{
+      function: "0x1::aptos_account::transfer",
+      functionArguments: [to, amount],
+    }
+  }
+};
+
