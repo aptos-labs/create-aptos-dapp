@@ -5,8 +5,10 @@ import fs from "fs/promises";
 import type { Ora } from "ora";
 import ora from "ora";
 import { exec } from "child_process";
+// internal files
 import { Selections } from "./types.js";
 import { copy } from "./utils/helpers.js";
+import { recordTelemetry } from "./telemetry.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout });
 let currentSpinner: Ora | null = null;
@@ -121,6 +123,11 @@ export async function generateDapp(selection: Selections) {
     // install dependencies
     const installRootDepsCommand = `npm install --silent --no-progress`;
     await runCommand(installRootDepsCommand);
+
+    // If approve telemetry
+    if (selection.telemetry) {
+      await recordTelemetry(selection);
+    }
 
     npmSpinner.succeed();
     currentSpinner = npmSpinner;

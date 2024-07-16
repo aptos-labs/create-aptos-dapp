@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add a telemetry tool integration
+
 # 0.0.13 (2024-07-15)
 
 - Add `dotenv` dev dependency to the `Boilerplate` template
