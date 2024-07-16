@@ -81,7 +81,6 @@ module staking_addr::staking_astro {
 
     struct StakePool has key {
         /// fungible asset stakers are staking
-        // TODO: need better naming
         staked_fa_metadata_object: Object<Metadata>,
         /// fungible asset reward is paid in
         reward_fa_metadata_object: Object<Metadata>,
