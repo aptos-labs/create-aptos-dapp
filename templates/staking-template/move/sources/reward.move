@@ -10,8 +10,6 @@ module staking_addr::reward {
 
     use staking_addr::staking;
 
-    use aptos_framework::block::get_current_block_height;
-
     /// Only admin can set pending admin
     const EONLY_ADMIN_CAN_SET_PENDING_ADMIN: u64 = 1;
     /// Sender is not pending admin
