@@ -23,7 +23,7 @@ export const copy = (src: string, dest: string) => {
   }
 };
 
-// Copr a source directory into a destination directory
+// Copy a source directory into a destination directory
 export const copyDir = (srcDir: string, destDir: string) => {
   fs.mkdirSync(destDir, { recursive: true });
   for (const file of fs.readdirSync(srcDir)) {
