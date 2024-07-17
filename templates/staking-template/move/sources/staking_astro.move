@@ -18,20 +18,18 @@ module staking_addr::staking_astro {
     const ENOT_PENDING_ADMIN: u64 = 2;
     /// Only reward creator can add reward
     const EONLY_REWARD_CREATOR_CAN_ADD_REWARD: u64 = 3;
-    /// Schedule duration must be normalized to 1 week
-    const ESCHEDULE_DURATION_MUST_BE_NORMALIZED: u64 = 4;
     /// Schedule duration must be greater than 0 and less than 6 months
-    const EINVALID_DURATION_LENGTH: u64 = 5;
+    const EINVALID_DURATION_LENGTH: u64 = 4;
     /// Reward per second must not be zero
-    const EREWARD_PER_SECOND_MUST_NOT_BE_ZERO: u64 = 6;
+    const EREWARD_PER_SECOND_MUST_NOT_BE_ZERO: u64 = 5;
     /// user tries to add more reward than owned
-    const ENOT_ENOUGH_BALANCE_TO_ADD_REWARD: u64 = 7;
+    const ENOT_ENOUGH_BALANCE_TO_ADD_REWARD: u64 = 6;
     /// user tries to stake more than owned
-    const ENOT_ENOUGH_BALANCE_TO_STAKE: u64 = 8;
+    const ENOT_ENOUGH_BALANCE_TO_STAKE: u64 = 7;
     /// user tries to unstake more than staked
-    const ENOT_ENOUGH_BALANCE_TO_UNSTAKE: u64 = 9;
+    const ENOT_ENOUGH_BALANCE_TO_UNSTAKE: u64 = 8;
     /// User does not have any stake
-    const EUSER_DOESN_NOT_HAVE_STAKE: u64 = 10;
+    const EUSER_DOESN_NOT_HAVE_STAKE: u64 = 9;
 
     /// incentives schedules must be normalized to 1 week
     const EPOCH_LENGTH: u64 = 86400 * 7;
@@ -40,13 +38,14 @@ module staking_addr::staking_astro {
     /// Maximum allowed reward schedule duration (~6 month)
     const MAX_PERIODS: u64 = 25;
 
-    struct IncentivesSchedule {
+    struct RewardSchedule {
         /// Schedule start time (matches with epoch start time i.e. on Monday)
         next_epoch_start_ts: u64,
         /// Schedule end time (matches with epoch start time i.e. on Monday)
         end_ts: u64,
         /// Reward per second for the whole schedule
         rps: u64,
+        total_reward_amount: u64,
     }
 
     struct UserLastReward has store {
@@ -79,6 +78,7 @@ module staking_addr::staking_astro {
         next_update_ts: u64,
     }
 
+    /// Global per contract
     struct StakePool has key {
         /// fungible asset stakers are staking
         staked_fa_metadata_object: Object<Metadata>,
@@ -109,6 +109,7 @@ module staking_addr::staking_astro {
         pending_admin: Option<address>,
     }
 
+    /// Global per contract
     struct RewardStoreController has key {
         extend_ref: ExtendRef,
     }
@@ -163,33 +164,48 @@ module staking_addr::staking_astro {
         config.pending_admin = option::none();
     }
 
-    public entry fun add_reward(
+    /// Only reward creator can create new reward schedule
+    public entry fun create_new_reward_schedule(
         sender: &signer,
         new_schedule_rps: u64,
-        new_schedule_duration_seconds: u64
+        new_schedule_duration_periods: u64
     ) acquires Config, StakePool {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@staking_addr);
         assert!(config.reward_creator == sender_addr, EONLY_REWARD_CREATOR_CAN_ADD_REWARD);
 
-        let new_schedule = convert_to_reward_schedule(new_schedule_duration_seconds, new_schedule_rps);
-
         let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
+        update_existing_reward(stake_pool);
 
-        let total_reward = new_schedule_rps * new_schedule_duration_seconds;
+        let new_schedule = convert_to_reward_schedule(new_schedule_duration_periods, new_schedule_rps);
+        add_reward_internal(stake_pool, new_schedule);
+
         assert!(
-            primary_fungible_store::balance(sender_addr, stake_pool.reward_fa_metadata_object) >= total_reward,
+            primary_fungible_store::balance(
+                sender_addr,
+                stake_pool.reward_fa_metadata_object
+            ) >= new_schedule.total_reward_amount,
             ENOT_ENOUGH_BALANCE_TO_ADD_REWARD
         );
         fungible_asset::transfer(
             sender,
             primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
             stake_pool.reward_store,
-            total_reward
+            new_schedule.total_reward_amount
         );
+    }
+
+    public entry fun claim_reward(sender: &signer) acquires StakePool, RewardStoreController {
+        let sender_addr = signer::address_of(sender);
+        let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
+        assert!(table::contains(&stake_pool.user_stakes, sender_addr), EUSER_DOESN_NOT_HAVE_STAKE);
+        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
 
         update_existing_reward(stake_pool);
-        add_reward_internal(stake_pool, new_schedule);
+
+        claim_reward_internal(stake_pool, sender_addr, user_info);
+        reset_user_index(stake_pool, user_info);
+        update_and_sync_positions(stake_pool, user_info);
     }
 
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
@@ -202,9 +218,10 @@ module staking_addr::staking_astro {
 
         let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
         let user_stakes = &mut stake_pool.user_stakes;
+        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
 
         if (table::contains(user_stakes, sender_addr)) {
-            let user_info = table::borrow_mut(user_stakes, sender_addr);
+            let user_info = table::borrow(user_stakes, sender_addr);
             fungible_asset::transfer(
                 sender,
                 primary_fungible_store::primary_store(sender_addr, staked_fa_metadata_object),
@@ -231,9 +248,11 @@ module staking_addr::staking_astro {
             });
         };
 
-        claim_reward_internal(stake_pool, sender_addr);
+        update_existing_reward(stake_pool);
 
-        let user_info = table::borrow_mut(user_stakes, sender_addr);
+        claim_reward_internal(stake_pool, sender_addr, user_info);
+        reset_user_index(stake_pool, user_info);
+
         stake_pool.total_stakes = stake_pool.total_stakes + amount;
         user_info.amount = user_info.amount + amount;
         update_and_sync_positions(stake_pool, user_info);
@@ -257,7 +276,11 @@ module staking_addr::staking_astro {
             amount
         );
 
-        claim_reward_internal(stake_pool, sender_addr);
+        update_existing_reward(stake_pool);
+
+        claim_reward_internal(stake_pool, sender_addr, user_info);
+        reset_user_index(stake_pool, user_info);
+
         stake_pool.total_stakes = stake_pool.total_stakes - amount;
         user_info.amount = user_info.amount - amount;
         update_and_sync_positions(stake_pool, user_info);
@@ -265,15 +288,6 @@ module staking_addr::staking_astro {
         if (user_info.amount == 0) {
             table::remove(user_stakes, sender_addr);
         };
-    }
-
-    public entry fun claim_reward(sender: &signer) acquires StakePool, RewardStoreController {
-        let sender_addr = signer::address_of(sender);
-        let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
-
-        assert!(table::contains(&stake_pool.user_stakes, sender_addr), EUSER_DOESN_NOT_HAVE_STAKE);
-
-        claim_reward_internal(stake_pool, sender_addr);
     }
 
     // ================================= View Functions ================================= //
@@ -300,6 +314,15 @@ module staking_addr::staking_astro {
         borrow_global<StakePool>(@staking_addr).total_stakes
     }
 
+    #[view]
+    public fun calculate_staker_reward(user_addr: address): (u64, u64) acquires StakePool {
+        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let user_info = table::borrow(&stake_pool.user_stakes, user_addr);
+        let finished_reward = calculate_staker_finished_reward(stake_pool, user_info);
+        let new_reward = calculate_staker_new_reward(stake_pool, user_info);
+        (finished_reward, new_reward)
+    }
+
     // ================================= Helper Functions ================================= //
 
     /// Check if sender is admin or owner of the object when package is published to object
@@ -316,13 +339,12 @@ module staking_addr::staking_astro {
         }
     }
 
-    fun convert_to_reward_schedule(duration_seconds: u64, rps: u64): IncentivesSchedule {
+    fun convert_to_reward_schedule(duration_periods: u64, rps: u64): RewardSchedule {
         let block_ts = timestamp::now_seconds();
-        assert!(duration_seconds % EPOCH_LENGTH == 0, ESCHEDULE_DURATION_MUST_BE_NORMALIZED);
-        assert!(duration_seconds > 0 && duration_seconds < MAX_PERIODS * 7 * 24 * 60 * 60, EINVALID_DURATION_LENGTH);
+        assert!(duration_periods > 0 && duration_periods <= MAX_PERIODS, EINVALID_DURATION_LENGTH);
         assert!(rps > 0, EREWARD_PER_SECOND_MUST_NOT_BE_ZERO);
 
-        let rem = block_ts % EPOCH_LENGTH;
+        let rem = block_ts % EPOCHS_START;
         let next_epoch_start_ts = if (rem % EPOCH_LENGTH == 0) {
             // Hit at the beginning of the current epoch
             block_ts
@@ -331,12 +353,13 @@ module staking_addr::staking_astro {
             // Partially distribute rewards for the current epoch and add input.duration_periods periods more
             EPOCHS_START + (rem / EPOCH_LENGTH + 1) * EPOCH_LENGTH
         };
-        let end_ts = next_epoch_start_ts + duration_seconds;
+        let end_ts = next_epoch_start_ts + duration_periods * EPOCH_LENGTH;
 
-        IncentivesSchedule {
+        RewardSchedule {
             next_epoch_start_ts,
             end_ts,
             rps,
+            total_reward_amount: (end_ts - block_ts) * rps,
         }
     }
 
@@ -350,12 +373,12 @@ module staking_addr::staking_astro {
             return;
         };
 
+        let need_remove = false;
         let collected_rewards = 0;
         let time_passed_inner = time_passed;
 
         let reward_info = option::borrow_mut(&mut stake_pool.current_reward);
         let next_update_ts = reward_info.next_update_ts;
-        let need_remove = false;
 
         // time to move to next schedule
         if (next_update_ts <= block_ts) {
@@ -405,7 +428,6 @@ module staking_addr::staking_astro {
         if (need_remove) {
             stake_pool.current_reward = option::none();
         };
-
         stake_pool.last_update_ts = timestamp::now_seconds();
     }
 
@@ -423,7 +445,7 @@ module staking_addr::staking_astro {
     ///   - Fetch all schedules from EXTERNAL_REWARD_SCHEDULES (array of pairs (end_s, rps_s)) where end_s > start_x;
     ///   - If end_s >= end_x then new schedule is fully covered by the first one. Set point (end_x, rps_s + rps_x);
     ///   - Otherwise loop over all schedules and update them until end_s >= end_x or until all schedules passed.
-    fun add_reward_internal(stake_pool: &mut StakePool, new_schedule: IncentivesSchedule) {
+    fun add_reward_internal(stake_pool: &mut StakePool, new_schedule: RewardSchedule) {
         if (option::is_none(&stake_pool.current_reward)) {
             stake_pool.current_reward = option::some(RewardInfo {
                 index: 0,
@@ -483,26 +505,13 @@ module staking_addr::staking_astro {
         active_schedule.rps = active_schedule.rps + new_schedule.rps;
     }
 
-    fun claim_reward_internal(stake_pool: &mut StakePool, sender_addr: address) acquires RewardStoreController {
-        update_existing_reward(stake_pool);
-
-        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
-        let finished_reward = claim_finished_reward(stake_pool, user_info);
-        reset_user_index(stake_pool, user_info);
-
-        let new_reward = if (option::is_none(&stake_pool.current_reward)) {
-            0
-        }
-        else {
-            calculate_reward(option::borrow(&stake_pool.current_reward), user_info);
-        };
-
-        update_and_sync_positions(stake_pool, user_info);
-
+    fun claim_reward_internal(stake_pool: &StakePool, user_addr: address, user_info: &UserInfo) acquires RewardStoreController {
+        let finished_reward = calculate_staker_finished_reward(stake_pool, user_info);
+        let new_reward = calculate_staker_new_reward(stake_pool, user_info);
         fungible_asset::transfer(
             &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
             stake_pool.reward_store,
-            primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
+            primary_fungible_store::primary_store(user_addr, stake_pool.reward_fa_metadata_object),
             finished_reward + new_reward
         );
     }
@@ -513,7 +522,7 @@ module staking_addr::staking_astro {
     /// - merge them with rewards_to_remove
     /// - iterate over all user indexes and find differences. If user doesn't have index for deregistered reward then
     /// they never claimed it and their index defaults to 0.
-    fun claim_finished_reward(stake_pool: &mut StakePool, user_info: &UserInfo): u64 {
+    fun calculate_staker_finished_reward(stake_pool: &StakePool, user_info: &UserInfo): u64 {
         let finished_reward_indexes = &vector::filter(
             simple_map::keys(&stake_pool.finished_reward_indexes),
             |ts| *ts > user_info.last_claim_time
@@ -541,6 +550,29 @@ module staking_addr::staking_astro {
         amount
     }
 
+    /// This function is tightly coupled with [`UserInfo`] structure. It iterates over all user's
+    /// reward indexes and tries to find the one that matches current reward info. If found, it
+    /// calculates the reward amount.
+    /// Otherwise it assumes user never claimed this particular reward and their reward index is 0.
+    /// Their position will be synced with pool indexes later on.
+    fun calculate_staker_new_reward(stake_pool: &StakePool, user_info: &UserInfo): u64 {
+        if (option::is_none(&stake_pool.current_reward)) {
+            0
+        } else {
+            let current_reward= option::borrow(&stake_pool.current_reward);
+            if (option::is_some(&user_info.last_reward_info)) {
+                let last_reward_info = option::borrow(&user_info.last_reward_info);
+                if (last_reward_info.index > current_reward.index) {
+                    (current_reward.index * (user_info.amount as u128) as u64)
+                } else {
+                    ((current_reward.index - last_reward_info.index) * (user_info.amount as u128) as u64)
+                }
+            } else {
+                (current_reward.index * (user_info.amount as u128) as u64)
+            }
+        }
+    }
+
     /// Reset user index for all finished rewards.
     /// This function is called after processing finished schedules and before processing active
     /// schedules for a specific user.
@@ -559,24 +591,6 @@ module staking_addr::staking_astro {
         if (option::is_some(&user_info.last_reward_info)) {
             let user_reward = option::borrow_mut(&mut user_info.last_reward_info);
             user_reward.index = 0;
-        }
-    }
-
-    /// This function is tightly coupled with [`UserInfo`] structure. It iterates over all user's
-    /// reward indexes and tries to find the one that matches current reward info. If found, it
-    /// calculates the reward amount.
-    /// Otherwise it assumes user never claimed this particular reward and their reward index is 0.
-    /// Their position will be synced with pool indexes later on.
-    fun calculate_reward(current_reward: &RewardInfo, user_info: &mut UserInfo): u64 {
-        if (option::is_some(&user_info.last_reward_info)) {
-            let last_reward_info = option::borrow(&user_info.last_reward_info);
-            if (last_reward_info.index > current_reward.index) {
-                (current_reward.index * (user_info.amount as u128) as u64)
-            } else {
-                ((current_reward.index - last_reward_info.index) * (user_info.amount as u128) as u64)
-            }
-        } else {
-            (current_reward.index * (user_info.amount as u128) as u64)
         }
     }
 
