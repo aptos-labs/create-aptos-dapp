@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import path from "path";
 import fs from "node:fs";
+import os from "node:os";
 
 export const runCommand = (command) => {
   try {
@@ -12,6 +13,7 @@ export const runCommand = (command) => {
   return true;
 };
 
+// Copy a full source directory into a destination directory
 export const copy = (src: string, dest: string) => {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
@@ -21,12 +23,28 @@ export const copy = (src: string, dest: string) => {
   }
 };
 
+// Copy a source directory into a destination directory
 export const copyDir = (srcDir: string, destDir: string) => {
   fs.mkdirSync(destDir, { recursive: true });
   for (const file of fs.readdirSync(srcDir)) {
     const srcFile = path.resolve(srcDir, file);
     const destFile = path.resolve(destDir, file);
     copy(srcFile, destFile);
+  }
+};
+
+// Get the user OS
+export const getOS = () => {
+  const platform = os.platform();
+  switch (platform) {
+    case "darwin":
+      return "MacOS";
+    case "linux":
+      return "Ubuntu";
+    case "win32":
+      return "Windows";
+    default:
+      return `Unsupported OS ${platform}`;
   }
 };
 

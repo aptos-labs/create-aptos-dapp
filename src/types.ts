@@ -16,4 +16,5 @@ export type Selections = {
   projectName: string;
   template: Template;
   network: Network;
+  telemetry: boolean;
 };
