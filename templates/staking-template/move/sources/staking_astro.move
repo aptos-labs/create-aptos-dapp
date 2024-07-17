@@ -168,6 +168,7 @@ module staking_addr::staking_astro {
     public entry fun create_new_reward_schedule(
         sender: &signer,
         new_schedule_rps: u64,
+        // in weeks
         new_schedule_duration_periods: u64
     ) acquires Config, StakePool {
         let sender_addr = signer::address_of(sender);
@@ -340,10 +341,10 @@ module staking_addr::staking_astro {
     }
 
     fun convert_to_reward_schedule(duration_periods: u64, rps: u64): RewardSchedule {
-        let block_ts = timestamp::now_seconds();
         assert!(duration_periods > 0 && duration_periods <= MAX_PERIODS, EINVALID_DURATION_LENGTH);
         assert!(rps > 0, EREWARD_PER_SECOND_MUST_NOT_BE_ZERO);
 
+        let block_ts = timestamp::now_seconds();
         let rem = block_ts % EPOCHS_START;
         let next_epoch_start_ts = if (rem % EPOCH_LENGTH == 0) {
             // Hit at the beginning of the current epoch
@@ -354,12 +355,13 @@ module staking_addr::staking_astro {
             EPOCHS_START + (rem / EPOCH_LENGTH + 1) * EPOCH_LENGTH
         };
         let end_ts = next_epoch_start_ts + duration_periods * EPOCH_LENGTH;
+        let total_reward_amount = (end_ts - block_ts) * rps;
 
         RewardSchedule {
             next_epoch_start_ts,
             end_ts,
             rps,
-            total_reward_amount: (end_ts - block_ts) * rps,
+            total_reward_amount,
         }
     }
 
