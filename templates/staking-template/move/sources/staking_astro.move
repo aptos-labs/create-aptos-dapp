@@ -178,7 +178,7 @@ module staking_addr::staking_astro {
         update_existing_reward(stake_pool);
 
         let new_schedule = convert_to_reward_schedule(new_schedule_duration_periods, new_schedule_rps);
-        add_reward_internal(stake_pool, new_schedule);
+        create_new_reward_schedule_internal(stake_pool, new_schedule);
 
         assert!(
             primary_fungible_store::balance(
@@ -445,7 +445,7 @@ module staking_addr::staking_astro {
     ///   - Fetch all schedules from EXTERNAL_REWARD_SCHEDULES (array of pairs (end_s, rps_s)) where end_s > start_x;
     ///   - If end_s >= end_x then new schedule is fully covered by the first one. Set point (end_x, rps_s + rps_x);
     ///   - Otherwise loop over all schedules and update them until end_s >= end_x or until all schedules passed.
-    fun add_reward_internal(stake_pool: &mut StakePool, new_schedule: RewardSchedule) {
+    fun create_new_reward_schedule_internal(stake_pool: &mut StakePool, new_schedule: RewardSchedule) {
         if (option::is_none(&stake_pool.current_reward)) {
             stake_pool.current_reward = option::some(RewardInfo {
                 index: 0,
@@ -505,17 +505,6 @@ module staking_addr::staking_astro {
         active_schedule.rps = active_schedule.rps + new_schedule.rps;
     }
 
-    fun claim_reward_internal(stake_pool: &StakePool, user_addr: address, user_info: &UserInfo) acquires RewardStoreController {
-        let finished_reward = calculate_staker_finished_reward(stake_pool, user_info);
-        let new_reward = calculate_staker_new_reward(stake_pool, user_info);
-        fungible_asset::transfer(
-            &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
-            stake_pool.reward_store,
-            primary_fungible_store::primary_store(user_addr, stake_pool.reward_fa_metadata_object),
-            finished_reward + new_reward
-        );
-    }
-
     /// This function calculates all outstanding rewards from finished schedules for a specific user position.
     /// The idea is as follows:
     /// - get all finished rewards from FINISHED_REWARDS_INDEXES which were deregistered after last claim time
@@ -571,6 +560,17 @@ module staking_addr::staking_astro {
                 (current_reward.index * (user_info.amount as u128) as u64)
             }
         }
+    }
+
+    fun claim_reward_internal(stake_pool: &StakePool, user_addr: address, user_info: &UserInfo) acquires RewardStoreController {
+        let finished_reward = calculate_staker_finished_reward(stake_pool, user_info);
+        let new_reward = calculate_staker_new_reward(stake_pool, user_info);
+        fungible_asset::transfer(
+            &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
+            stake_pool.reward_store,
+            primary_fungible_store::primary_store(user_addr, stake_pool.reward_fa_metadata_object),
+            finished_reward + new_reward
+        );
     }
 
     /// Reset user index for all finished rewards.
