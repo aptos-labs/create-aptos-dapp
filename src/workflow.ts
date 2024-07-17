@@ -43,7 +43,8 @@ export async function startWorkflow() {
           {
             type: "confirm",
             name: "confirm",
-            message: "Do you want to make any changes? (Default is No)",
+            message:
+              "Do you want to make any changes to your selections? (Default is No)",
             initial: false,
           },
         ],

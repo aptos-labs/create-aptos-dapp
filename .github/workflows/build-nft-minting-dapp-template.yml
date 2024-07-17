@@ -1,4 +1,4 @@
-name: Build Fungible Asset Template Frontend
+name: Build NFT Minting Dapp Template Frontend
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ jobs:
     concurrency: ci-${{ github.ref }}-${{ github.workflow }}
     defaults:
       run:
-        working-directory: ./templates/fungible-asset-template
+        working-directory: ./templates/nft-minting-dapp-template
     steps:
       - uses: actions/checkout@v3
 

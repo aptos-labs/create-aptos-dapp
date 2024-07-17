@@ -1,4 +1,4 @@
-name: Build Digital Asset Template Frontend
+name: Build Token Minting Dapp Template Frontend
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ jobs:
     concurrency: ci-${{ github.ref }}-${{ github.workflow }}
     defaults:
       run:
-        working-directory: ./templates/digital-asset-template
+        working-directory: ./templates/token-minting-dapp-template
     steps:
       - uses: actions/checkout@v3
 
