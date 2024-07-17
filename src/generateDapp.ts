@@ -101,10 +101,10 @@ export async function generateDapp(selection: Selections) {
     };
 
     switch (selection.template.path) {
-      case "digital-asset-template":
+      case "nft-minting-dapp-template":
         await generateEnvFile(`VITE_COLLECTION_CREATOR_ADDRESS=""`);
         break;
-      case "fungible-asset-template":
+      case "token-minting-dapp-template":
         await generateEnvFile(`VITE_FA_CREATOR_ADDRESS=""`);
         break;
       case "boilerplate-template":

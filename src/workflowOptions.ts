@@ -23,22 +23,24 @@ export const workflowOptions = {
         description: "A Boilerplate template to start an Aptos dapp with",
       },
       {
-        title: "Digital Asset",
+        title: "NFT minting dapp",
         value: {
-          path: "digital-asset-template",
-          name: "Digital Asset",
+          path: "nft-minting-dapp-template",
+          name: "NFT minting dapp",
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/digital-asset",
         },
-        description: "A NFT minting dapp",
+        description:
+          "A prodcution ready template to create an NFT collection minting dapp",
       },
       {
-        title: "Fungible Asset",
+        title: "Token minting dapp",
         value: {
-          path: "fungible-asset-template",
-          name: "Fungible Asset",
+          path: "token-minting-dapp-template",
+          name: "Token minting dapp",
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/fungible-asset",
         },
-        description: "A fungible asset minting dapp",
+        description:
+          "A prodcution ready template to create your own token minting dapp",
       },
     ],
     initial: 0,
