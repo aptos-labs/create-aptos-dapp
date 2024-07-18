@@ -228,7 +228,7 @@ module staking_addr::staking_astro {
         } else {
             let fungible_store = fungible_asset::create_store(
                 &object::create_object(sender_addr),
-                staked_fa_metadata_object
+                stake_pool.staked_fa_metadata_object
             );
             table::add(user_stakes, sender_addr, UserInfo {
                 staked_fa_store: fungible_store,
