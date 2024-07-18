@@ -31,6 +31,7 @@ module staking_addr::staking_astro {
     /// User does not have any stake
     const EUSER_DOESN_NOT_HAVE_STAKE: u64 = 9;
 
+    // TODO: can this be 1 day?
     /// incentives schedules must be normalized to 1 week
     const EPOCH_LENGTH: u64 = 86400 * 7;
     /// incentives schedules aligned to start on Monday. First date: Mon Oct 9 00:00:00 UTC 2023
@@ -171,6 +172,9 @@ module staking_addr::staking_astro {
         // duration periods in weeks
         new_schedule_duration_periods: u64
     ) acquires Config, StakePool {
+        assert!(new_schedule_duration_periods > 0 && new_schedule_duration_periods <= MAX_PERIODS, EINVALID_DURATION_LENGTH);
+        assert!(new_schedule_rps > 0, EREWARD_PER_SECOND_MUST_NOT_BE_ZERO);
+
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@staking_addr);
         assert!(config.reward_creator == sender_addr, EONLY_REWARD_CREATOR_CAN_ADD_REWARD);
@@ -211,13 +215,13 @@ module staking_addr::staking_astro {
 
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let sender_addr = signer::address_of(sender);
-        let staked_fa_metadata_object = get_staked_fa_metadata_object();
+        let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
+
         assert!(
-            primary_fungible_store::balance(sender_addr, staked_fa_metadata_object) >= amount,
+            primary_fungible_store::balance(sender_addr, stake_pool.staked_fa_metadata_object) >= amount,
             ENOT_ENOUGH_BALANCE_TO_STAKE
         );
 
-        let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
         let user_stakes = &mut stake_pool.user_stakes;
 
         let staked_fa_store = if (table::contains(user_stakes, sender_addr)) {
@@ -238,7 +242,7 @@ module staking_addr::staking_astro {
         };
         fungible_asset::transfer(
             sender,
-            primary_fungible_store::primary_store(sender_addr, staked_fa_metadata_object),
+            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
             staked_fa_store,
             amount
         );
@@ -256,8 +260,6 @@ module staking_addr::staking_astro {
 
     public entry fun unstake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let sender_addr = signer::address_of(sender);
-        let staked_fa_metadata_object = get_staked_fa_metadata_object();
-
         let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
         let user_stakes = &mut stake_pool.user_stakes;
         assert!(table::contains(user_stakes, sender_addr), EUSER_DOESN_NOT_HAVE_STAKE);
@@ -268,7 +270,7 @@ module staking_addr::staking_astro {
         fungible_asset::transfer(
             sender,
             user_info.staked_fa_store,
-            primary_fungible_store::primary_store(sender_addr, staked_fa_metadata_object),
+            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
             amount
         );
 
@@ -336,9 +338,6 @@ module staking_addr::staking_astro {
     }
 
     fun convert_to_reward_schedule(duration_periods: u64, rps: u64): RewardSchedule {
-        assert!(duration_periods > 0 && duration_periods <= MAX_PERIODS, EINVALID_DURATION_LENGTH);
-        assert!(rps > 0, EREWARD_PER_SECOND_MUST_NOT_BE_ZERO);
-
         let block_ts = timestamp::now_seconds();
         let rem = block_ts % EPOCHS_START;
         let next_epoch_start_ts = if (rem % EPOCH_LENGTH == 0) {
@@ -346,10 +345,14 @@ module staking_addr::staking_astro {
             block_ts
         } else {
             // Hit somewhere in the middle.
-            // Partially distribute rewards for the current epoch and add input.duration_periods periods more
+            // next epoch should start on nearest next epoch start
             EPOCHS_START + (rem / EPOCH_LENGTH + 1) * EPOCH_LENGTH
         };
+        // end will always be end of a specific epoch instead of middle of the epoch
         let end_ts = next_epoch_start_ts + duration_periods * EPOCH_LENGTH;
+        // when the schedule doesn't start from the beginning of the epoch
+        // reward creator needs to add extra reward to the partial epoch
+        // e.g. if the schedule starts on Tuesday, reward creator needs to add 6/7 of the reward
         let total_reward_amount = (end_ts - block_ts) * rps;
 
         RewardSchedule {
@@ -606,4 +609,16 @@ module staking_addr::staking_astro {
     }
 
     // ================================= Unit Tests ================================= //
+
+    #[test_only]
+    use aptos_framework::account;
+
+    #[test(aptos_framework = @0x1, sender = @staking_addr)]
+    fun test_happy_path(
+        aptos_framework: &signer,
+        sender: &signer,
+    ) acquires Config {
+        let _sender_addr = signer::address_of(sender);
+        init_module(sender);
+    }
 }
