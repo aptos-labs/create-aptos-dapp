@@ -168,7 +168,7 @@ module staking_addr::staking_astro {
     public entry fun create_new_reward_schedule(
         sender: &signer,
         new_schedule_rps: u64,
-        // in weeks
+        // duration periods in weeks
         new_schedule_duration_periods: u64
     ) acquires Config, StakePool {
         let sender_addr = signer::address_of(sender);
@@ -219,27 +219,14 @@ module staking_addr::staking_astro {
 
         let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
         let user_stakes = &mut stake_pool.user_stakes;
-        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
 
-        if (table::contains(user_stakes, sender_addr)) {
+        let staked_fa_store = if (table::contains(user_stakes, sender_addr)) {
             let user_info = table::borrow(user_stakes, sender_addr);
-            fungible_asset::transfer(
-                sender,
-                primary_fungible_store::primary_store(sender_addr, staked_fa_metadata_object),
-                user_info.staked_fa_store,
-                amount
-            );
+            user_info.staked_fa_store
         } else {
-            let fungible_store_object_constructor_ref = &object::create_object(sender_addr);
             let fungible_store = fungible_asset::create_store(
-                fungible_store_object_constructor_ref,
+                &object::create_object(sender_addr),
                 staked_fa_metadata_object
-            );
-            fungible_asset::transfer(
-                sender,
-                primary_fungible_store::primary_store(sender_addr, staked_fa_metadata_object),
-                fungible_store,
-                amount
             );
             table::add(user_stakes, sender_addr, UserInfo {
                 staked_fa_store: fungible_store,
@@ -247,8 +234,16 @@ module staking_addr::staking_astro {
                 last_reward_info: option::none(),
                 last_claim_time: timestamp::now_seconds(),
             });
+            fungible_store
         };
+        fungible_asset::transfer(
+            sender,
+            primary_fungible_store::primary_store(sender_addr, staked_fa_metadata_object),
+            staked_fa_store,
+            amount
+        );
 
+        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
         update_existing_reward(stake_pool);
 
         claim_reward_internal(stake_pool, sender_addr, user_info);

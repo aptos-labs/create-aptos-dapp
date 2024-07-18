@@ -5,5 +5,6 @@ const aptos = new Aptos(new AptosConfig({ network: NETWORK }));
 
 // Reuse same Aptos instance to utilize cookie based sticky routing
 export function aptosClient() {
+  aptos.getModuleEventsByEventType
   return aptos;
 }
