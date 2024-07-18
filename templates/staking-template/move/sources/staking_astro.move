@@ -183,8 +183,6 @@ module staking_addr::staking_astro {
         update_existing_reward(stake_pool);
 
         let new_schedule = convert_to_reward_schedule(new_schedule_duration_periods, new_schedule_rps);
-        create_new_reward_schedule_internal(stake_pool, new_schedule);
-
         assert!(
             primary_fungible_store::balance(
                 sender_addr,
@@ -192,6 +190,9 @@ module staking_addr::staking_astro {
             ) >= new_schedule.total_reward_amount,
             ENOT_ENOUGH_BALANCE_TO_ADD_REWARD
         );
+
+        create_new_reward_schedule_internal(stake_pool, new_schedule);
+
         fungible_asset::transfer(
             sender,
             primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
@@ -222,10 +223,7 @@ module staking_addr::staking_astro {
             ENOT_ENOUGH_BALANCE_TO_STAKE
         );
 
-        let staked_fa_store = if (table::contains(user_stakes, sender_addr)) {
-            let user_info = table::borrow(user_stakes, sender_addr);
-            user_info.staked_fa_store
-        } else {
+        if (!table::contains(user_stakes, sender_addr)) {
             let fungible_store = fungible_asset::create_store(
                 &object::create_object(sender_addr),
                 stake_pool.staked_fa_metadata_object
@@ -236,14 +234,7 @@ module staking_addr::staking_astro {
                 last_reward_info: option::none(),
                 last_claim_time: timestamp::now_seconds(),
             });
-            fungible_store
         };
-        fungible_asset::transfer(
-            sender,
-            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
-            staked_fa_store,
-            amount
-        );
 
         let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
         update_existing_reward(stake_pool);
@@ -254,6 +245,13 @@ module staking_addr::staking_astro {
         stake_pool.total_stakes = stake_pool.total_stakes + amount;
         user_info.amount = user_info.amount + amount;
         update_and_sync_positions(stake_pool, user_info);
+
+        fungible_asset::transfer(
+            sender,
+            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
+            user_info.staked_fa_store,
+            amount
+        );
     }
 
     public entry fun unstake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
@@ -264,13 +262,6 @@ module staking_addr::staking_astro {
 
         let user_info = table::borrow_mut(user_stakes, sender_addr);
         assert!(fungible_asset::balance(user_info.staked_fa_store) >= amount, ENOT_ENOUGH_BALANCE_TO_UNSTAKE);
-
-        fungible_asset::transfer(
-            sender,
-            user_info.staked_fa_store,
-            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
-            amount
-        );
 
         update_existing_reward(stake_pool);
 
@@ -284,6 +275,13 @@ module staking_addr::staking_astro {
         if (user_info.amount == 0) {
             table::remove(user_stakes, sender_addr);
         };
+
+        fungible_asset::transfer(
+            sender,
+            user_info.staked_fa_store,
+            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
+            amount
+        );
     }
 
     // ================================= View Functions ================================= //
