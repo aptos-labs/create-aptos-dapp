@@ -205,10 +205,10 @@ module staking_addr::staking_astro {
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
         assert!(table::contains(&stake_pool.user_stakes, sender_addr), EUSER_DOESN_NOT_HAVE_STAKE);
-        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
 
         update_existing_reward(stake_pool);
 
+        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
         claim_reward_internal(stake_pool, sender_addr, user_info);
         reset_user_index(stake_pool, user_info);
         update_and_sync_positions(stake_pool, user_info);
@@ -236,9 +236,9 @@ module staking_addr::staking_astro {
             });
         };
 
-        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
         update_existing_reward(stake_pool);
 
+        let user_info = table::borrow_mut(&mut stake_pool.user_stakes, sender_addr);
         claim_reward_internal(stake_pool, sender_addr, user_info);
         reset_user_index(stake_pool, user_info);
 
@@ -260,11 +260,10 @@ module staking_addr::staking_astro {
         let user_stakes = &mut stake_pool.user_stakes;
         assert!(table::contains(user_stakes, sender_addr), EUSER_DOESN_NOT_HAVE_STAKE);
 
-        let user_info = table::borrow_mut(user_stakes, sender_addr);
-        assert!(fungible_asset::balance(user_info.staked_fa_store) >= amount, ENOT_ENOUGH_BALANCE_TO_UNSTAKE);
-
         update_existing_reward(stake_pool);
 
+        let user_info = table::borrow_mut(user_stakes, sender_addr);
+        assert!(fungible_asset::balance(user_info.staked_fa_store) >= amount, ENOT_ENOUGH_BALANCE_TO_UNSTAKE);
         claim_reward_internal(stake_pool, sender_addr, user_info);
         reset_user_index(stake_pool, user_info);
 
