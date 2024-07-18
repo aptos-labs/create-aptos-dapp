@@ -1,4 +1,4 @@
-module staking_addr::staking {
+module staking_addr::staking2 {
     use std::option;
     use std::option::Option;
     use std::signer;
@@ -300,8 +300,40 @@ module staking_addr::staking {
     }
 
     #[view]
-    public fun get_total_stake(): u64 acquires StakePool {
-        borrow_global<StakePool>(@staking_addr).total_stake
+    public fun get_stake_pool_data(): (
+        Object<Metadata>,
+        Object<Metadata>,
+        Object<FungibleStore>,
+        u64
+    ) acquires StakePool {
+        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        (
+            stake_pool.staked_fa_metadata_object,
+            stake_pool.reward_fa_metadata_object,
+            stake_pool.reward_store,
+            stake_pool.total_stake
+        )
+    }
+
+    #[view]
+    public fun get_user_stake_data(user_addr: address): (
+        u64,
+        u64,
+        u128,
+        u64
+    ) acquires StakePool {
+        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        if (table::contains(&stake_pool.user_stakes, user_addr)) {
+            let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
+            (
+                user_stake.amount,
+                user_stake.last_claim_ts,
+                user_stake.index,
+                get_claimable_reward(user_addr)
+            )
+        } else {
+            (0, 0, 0, 0)
+        }
     }
 
     #[view]
@@ -359,15 +391,76 @@ module staking_addr::staking {
     }
 
     // ================================= Unit Tests ================================= //
-    // #[test_only]
-    // use aptos_framework::account;
 
-    #[test(aptos_framework = @0x1, sender = @staking_addr)]
-    fun test_happy_path(
-        aptos_framework: &signer,
+    #[test_only]
+    use std::string;
+
+    #[test_only]
+    public fun init_module_for_test(
         sender: &signer,
+        initial_reward_creator: &signer,
+        staker1: &signer,
+        staker2: &signer
     ) {
-        let _sender_addr = signer::address_of(sender);
-        init_module(sender);
+        let sender_addr = signer::address_of(sender);
+        let stake_fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
+        primary_fungible_store::create_primary_store_enabled_fungible_asset(
+            stake_fa_obj_constructor_ref,
+            option::none(),
+            string::utf8(b"Test FA for staking"),
+            string::utf8(b"TFAS"),
+            8,
+            string::utf8(b"url"),
+            string::utf8(b"url"),
+        );
+        primary_fungible_store::mint(
+            &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
+            signer::address_of(staker1),
+            100
+        );
+        primary_fungible_store::mint(
+            &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
+            signer::address_of(staker2),
+            200
+        );
+
+        let reward_fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
+        primary_fungible_store::create_primary_store_enabled_fungible_asset(
+            reward_fa_obj_constructor_ref,
+            option::none(),
+            string::utf8(b"Test FA for reward"),
+            string::utf8(b"TFAR"),
+            8,
+            string::utf8(b"url"),
+            string::utf8(b"url"),
+        );
+        primary_fungible_store::mint(
+            &fungible_asset::generate_mint_ref(reward_fa_obj_constructor_ref),
+            signer::address_of(initial_reward_creator),
+            50
+        );
+
+        move_to(sender, Config {
+            reward_creator: signer::address_of(initial_reward_creator),
+            admin: sender_addr,
+            pending_admin: option::none(),
+        });
+
+        let reward_store_constructor_ref = &object::create_object(sender_addr);
+        move_to(sender, RewardStoreController {
+            extend_ref: object::generate_extend_ref(reward_store_constructor_ref),
+        });
+
+        move_to(sender, StakePool {
+            staked_fa_metadata_object: object::object_from_constructor_ref(stake_fa_obj_constructor_ref),
+            reward_fa_metadata_object: object::object_from_constructor_ref(reward_fa_obj_constructor_ref),
+            reward_store: fungible_asset::create_store(
+                reward_store_constructor_ref,
+                object::object_from_constructor_ref<Metadata>(reward_fa_obj_constructor_ref),
+            ),
+            user_stakes: table::new(),
+            total_stake: 0,
+            reward_schedule: option::none(),
+        });
     }
 }
