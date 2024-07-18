@@ -4,7 +4,13 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.14 (2024-07-18)
+
 - Add a telemetry tool integration
+- Rename `Digital Asset Template` to `NFT minting dapp template`
+- Rename `Fungible Asset Template` to `Token minting dapp template`
+- Update template doc URLs
+- Fix type in Boilerplate template
 
 # 0.0.13 (2024-07-15)
 
