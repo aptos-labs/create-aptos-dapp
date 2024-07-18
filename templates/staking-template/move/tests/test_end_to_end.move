@@ -16,6 +16,6 @@ module staking_addr::test_end_to_end {
         let staker1_addr = signer::address_of(staker1);
         let staker2_addr = signer::address_of(staker2);
 
-        staking2::init_module_for_test(sender, initial_reward_creator, staker1, staker2);
+        staking2::init_module_for_test(aptos_framework, sender, initial_reward_creator, staker1, staker2);
     }
 }
