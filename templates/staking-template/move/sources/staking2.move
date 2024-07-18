@@ -397,11 +397,14 @@ module staking_addr::staking2 {
 
     #[test_only]
     public fun init_module_for_test(
+        aptos_framework: &signer,
         sender: &signer,
         initial_reward_creator: &signer,
         staker1: &signer,
         staker2: &signer
     ) {
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+
         let sender_addr = signer::address_of(sender);
         let stake_fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
         primary_fungible_store::create_primary_store_enabled_fungible_asset(
