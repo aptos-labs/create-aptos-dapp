@@ -39,24 +39,14 @@ module staking_addr::staking_astro {
     /// Maximum allowed reward schedule duration (~6 month)
     const MAX_PERIODS: u64 = 25;
 
-    struct RewardSchedule {
-        /// Schedule start time (matches with epoch start time i.e. on Monday)
-        next_epoch_start_ts: u64,
-        /// Schedule end time (matches with epoch start time i.e. on Monday)
-        end_ts: u64,
-        /// Reward per second for the whole schedule
-        rps: u64,
-        total_reward_amount: u64,
-    }
-
-    struct UserLastReward has store {
+    struct UserLastReward has store, drop {
         /// Time when next schedule should start
         next_update_ts: u64,
         /// Last checkpointed reward per LP token
         index: u128,
     }
 
-    struct UserInfo has store {
+    struct UserInfo has store, drop {
         /// Fungible asset store where user's tokens are staked
         staked_fa_store: Object<FungibleStore>,
         /// Amount of tokens staked
@@ -67,7 +57,7 @@ module staking_addr::staking_astro {
         last_claim_time: u64,
     }
 
-    struct RewardInfo has store {
+    struct RewardInfo has store, drop {
         /// Last checkpointed reward per LP token
         index: u128,
         /// Orphaned rewards might appear between the time when pool
@@ -172,7 +162,10 @@ module staking_addr::staking_astro {
         // duration periods in weeks
         new_schedule_duration_periods: u64
     ) acquires Config, StakePool {
-        assert!(new_schedule_duration_periods > 0 && new_schedule_duration_periods <= MAX_PERIODS, EINVALID_DURATION_LENGTH);
+        assert!(
+            new_schedule_duration_periods > 0 && new_schedule_duration_periods <= MAX_PERIODS,
+            EINVALID_DURATION_LENGTH
+        );
         assert!(new_schedule_rps > 0, EREWARD_PER_SECOND_MUST_NOT_BE_ZERO);
 
         let sender_addr = signer::address_of(sender);
@@ -182,22 +175,34 @@ module staking_addr::staking_astro {
         let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
         update_existing_reward(stake_pool);
 
-        let new_schedule = convert_to_reward_schedule(new_schedule_duration_periods, new_schedule_rps);
+        let (
+            // Schedule start time (matches with epoch start time i.e. on Monday)
+            new_schedule_next_epoch_start_ts,
+            // Schedule end time (matches with epoch start time i.e. on Monday)
+            new_schedule_end_ts,
+            new_schedule_rps,
+            total_reward_amount,
+        ) = convert_to_reward_schedule(new_schedule_duration_periods, new_schedule_rps);
         assert!(
             primary_fungible_store::balance(
                 sender_addr,
                 stake_pool.reward_fa_metadata_object
-            ) >= new_schedule.total_reward_amount,
+            ) >= total_reward_amount,
             ENOT_ENOUGH_BALANCE_TO_ADD_REWARD
         );
 
-        create_new_reward_schedule_internal(stake_pool, new_schedule);
+        create_new_reward_schedule_internal(
+            stake_pool,
+            new_schedule_rps,
+            new_schedule_end_ts,
+            new_schedule_next_epoch_start_ts
+        );
 
         fungible_asset::transfer(
             sender,
             primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
             stake_pool.reward_store,
-            new_schedule.total_reward_amount
+            total_reward_amount
         );
     }
 
@@ -271,9 +276,9 @@ module staking_addr::staking_astro {
         user_info.amount = user_info.amount - amount;
         update_and_sync_positions(stake_pool, user_info);
 
-        if (user_info.amount == 0) {
-            table::remove(user_stakes, sender_addr);
-        };
+        // if (user_info.amount == 0) {
+        //     table::remove(user_stakes, sender_addr);
+        // };
 
         fungible_asset::transfer(
             sender,
@@ -332,7 +337,7 @@ module staking_addr::staking_astro {
         }
     }
 
-    fun convert_to_reward_schedule(duration_periods: u64, rps: u64): RewardSchedule {
+    fun convert_to_reward_schedule(duration_periods: u64, rps: u64): (u64, u64, u64, u64) {
         let block_ts = timestamp::now_seconds();
         let rem = block_ts % EPOCHS_START;
         let next_epoch_start_ts = if (rem % EPOCH_LENGTH == 0) {
@@ -350,12 +355,12 @@ module staking_addr::staking_astro {
         // e.g. if the schedule starts on Tuesday, reward creator needs to add 6/7 of the reward
         let total_reward_amount = (end_ts - block_ts) * rps;
 
-        RewardSchedule {
+        (
             next_epoch_start_ts,
             end_ts,
             rps,
             total_reward_amount,
-        }
+        )
     }
 
     /// update reward index according to the amount of LP tokens staked and rewards per second.
@@ -365,7 +370,7 @@ module staking_addr::staking_astro {
         let block_ts = timestamp::now_seconds();
         let time_passed = block_ts - stake_pool.last_update_ts;
         if (time_passed == 0 || option::is_none(&stake_pool.current_reward)) {
-            return;
+            return
         };
 
         let need_remove = false;
@@ -393,7 +398,7 @@ module staking_addr::staking_astro {
                     reward_info.next_update_ts = update_ts;
                     time_passed_inner = block_ts - next_update_ts;
                     next_update_ts = update_ts;
-                    break;
+                    break
                 } else {
                     collected_rewards = collected_rewards + *simple_map::borrow(
                         &stake_pool.live_reward_schedules,
@@ -440,64 +445,71 @@ module staking_addr::staking_astro {
     ///   - Fetch all schedules from EXTERNAL_REWARD_SCHEDULES (array of pairs (end_s, rps_s)) where end_s > start_x;
     ///   - If end_s >= end_x then new schedule is fully covered by the first one. Set point (end_x, rps_s + rps_x);
     ///   - Otherwise loop over all schedules and update them until end_s >= end_x or until all schedules passed.
-    fun create_new_reward_schedule_internal(stake_pool: &mut StakePool, new_schedule: RewardSchedule) {
+    fun create_new_reward_schedule_internal(
+        stake_pool: &mut StakePool,
+        new_schedule_rps: u64,
+        new_schedule_end_ts: u64,
+        new_schedule_next_epoch_start_ts: u64
+    ) {
         if (option::is_none(&stake_pool.current_reward)) {
             stake_pool.current_reward = option::some(RewardInfo {
                 index: 0,
                 orphaned: 0,
-                rps: new_schedule.rps,
-                next_update_ts: new_schedule.end_ts,
+                rps: new_schedule_rps,
+                next_update_ts: new_schedule_end_ts,
             });
-            return;
+            return
         };
 
         let active_schedule = option::borrow_mut(&mut stake_pool.current_reward);
         let next_update_ts = active_schedule.next_update_ts;
-        let to_save = &mut vector[];
+        let to_save_next_update_ts = &mut vector[];
+        let to_save_rps = &mut vector[];
 
-        if (next_update_ts >= new_schedule.end_ts) {
-            if (next_update_ts > new_schedule.end_ts) {
-                vector::push_back(to_save, (next_update_ts, active_schedule.rps));
+        if (next_update_ts >= new_schedule_end_ts) {
+            if (next_update_ts > new_schedule_end_ts) {
+                vector::push_back(to_save_next_update_ts, next_update_ts);
+                vector::push_back(to_save_rps, active_schedule.rps);
             };
-            active_schedule.next_update_ts = new_schedule.end_ts;
+            active_schedule.next_update_ts = new_schedule_end_ts;
         } else {
             let overlapping_schedules = &vector::filter(
                 simple_map::keys(&stake_pool.live_reward_schedules),
-                |ts| *ts > new_schedule.next_epoch_start_ts
+                |ts| *ts > new_schedule_next_epoch_start_ts
             );
             // Add rps to next overlapping schedules.
             for (idx in 0..vector::length(overlapping_schedules)) {
                 let end_ts = *vector::borrow(overlapping_schedules, idx);
-                if (end_ts >= new_schedule.end_ts) {
+                if (end_ts >= new_schedule_end_ts) {
+                    vector::push_back(to_save_next_update_ts, new_schedule_end_ts);
                     vector::push_back(
-                        to_save,
-                        (new_schedule.end_ts, *simple_map::borrow(
-                            &stake_pool.live_reward_schedules,
-                            &end_ts
-                        ) + new_schedule.rps)
+                        to_save_rps,
+                        *simple_map::borrow(&stake_pool.live_reward_schedules, &end_ts) + new_schedule_rps
                     );
-                    break;
+                    break
                 } else {
+                    vector::push_back(to_save_next_update_ts, end_ts);
                     vector::push_back(
-                        to_save,
-                        (end_ts, *simple_map::borrow(
-                            &stake_pool.live_reward_schedules,
-                            &end_ts
-                        ) + new_schedule.rps)
+                        to_save_rps,
+                        *simple_map::borrow(&stake_pool.live_reward_schedules, &end_ts) + new_schedule_rps
                     );
                 }
             };
-            vector::push_back(to_save, (new_schedule.end_ts, new_schedule.rps));
+            vector::push_back(to_save_next_update_ts, new_schedule_end_ts);
+            vector::push_back(to_save_rps, new_schedule_rps);
         };
 
         // TODO: test do we need to empty all schedules then add to_save?
-        for (idx in 0..vector::length(to_save)) {
-            let (schedule_end_ts, reward_per_second) = *vector::borrow(to_save, idx);
-            simple_map::upsert(&mut stake_pool.live_reward_schedules, schedule_end_ts, reward_per_second);
+        for (idx in 0..vector::length(to_save_next_update_ts)) {
+            simple_map::upsert(
+                &mut stake_pool.live_reward_schedules,
+                *vector::borrow(to_save_next_update_ts, idx),
+                *vector::borrow(to_save_rps, idx),
+            );
         };
 
         // New schedule anyway hits an active one
-        active_schedule.rps = active_schedule.rps + new_schedule.rps;
+        active_schedule.rps = active_schedule.rps + new_schedule_rps;
     }
 
     /// This function calculates all outstanding rewards from finished schedules for a specific user position.
@@ -543,7 +555,7 @@ module staking_addr::staking_astro {
         if (option::is_none(&stake_pool.current_reward)) {
             0
         } else {
-            let current_reward= option::borrow(&stake_pool.current_reward);
+            let current_reward = option::borrow(&stake_pool.current_reward);
             if (option::is_some(&user_info.last_reward_info)) {
                 let last_reward_info = option::borrow(&user_info.last_reward_info);
                 if (last_reward_info.index > current_reward.index) {
@@ -557,7 +569,11 @@ module staking_addr::staking_astro {
         }
     }
 
-    fun claim_reward_internal(stake_pool: &StakePool, user_addr: address, user_info: &UserInfo) acquires RewardStoreController {
+    fun claim_reward_internal(
+        stake_pool: &mut StakePool,
+        user_addr: address,
+        user_info: &mut UserInfo
+    ) acquires RewardStoreController {
         let finished_reward = calculate_staker_finished_reward(stake_pool, user_info);
         let new_reward = calculate_staker_new_reward(stake_pool, user_info);
         fungible_asset::transfer(
@@ -581,7 +597,7 @@ module staking_addr::staking_astro {
             |ts| *ts > user_info.last_claim_time
         );
         if (vector::length(&finished_reward) == 0) {
-            return;
+            return
         };
         if (option::is_some(&user_info.last_reward_info)) {
             let user_reward = option::borrow_mut(&mut user_info.last_reward_info);
@@ -605,14 +621,14 @@ module staking_addr::staking_astro {
 
     // ================================= Unit Tests ================================= //
 
-    #[test_only]
-    use aptos_framework::account;
+    // #[test_only]
+    // use aptos_framework::account;
 
     #[test(aptos_framework = @0x1, sender = @staking_addr)]
     fun test_happy_path(
         aptos_framework: &signer,
         sender: &signer,
-    ) acquires Config {
+    ) {
         let _sender_addr = signer::address_of(sender);
         init_module(sender);
     }

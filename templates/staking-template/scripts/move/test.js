@@ -11,6 +11,7 @@ async function test() {
       staking_addr: "0x999",
       staked_fa_obj_addr: "0x998",
       reward_fa_obj_addr: "0x997",
+      initial_reward_creator_addr: "0x996",
     },
   });
 }
