@@ -144,14 +144,14 @@ export async function generateDapp(selection: Selections) {
     if (selection.template.doc) {
       console.log(
         green(
-          `3. Follow the instructions for the ${
+          `2. Follow the instructions for the ${
             selection.template.name
           } template on ${white(selection.template.doc)}`
         ) + "\n"
       );
     }
 
-    console.log(green(`2. npm run dev`) + "\n");
+    console.log(green(`3. npm run dev`) + "\n");
   } catch (error: any) {
     currentSpinner?.fail(`Failed to scaffold project: ${error.message}`);
     console.error(error);
