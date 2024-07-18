@@ -216,13 +216,11 @@ module staking_addr::staking_astro {
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global_mut<StakePool>(@staking_addr);
-
+        let user_stakes = &mut stake_pool.user_stakes;
         assert!(
             primary_fungible_store::balance(sender_addr, stake_pool.staked_fa_metadata_object) >= amount,
             ENOT_ENOUGH_BALANCE_TO_STAKE
         );
-
-        let user_stakes = &mut stake_pool.user_stakes;
 
         let staked_fa_store = if (table::contains(user_stakes, sender_addr)) {
             let user_info = table::borrow(user_stakes, sender_addr);
