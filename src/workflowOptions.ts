@@ -30,7 +30,7 @@ export const workflowOptions = {
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/nft-minting-dapp",
         },
         description:
-          "A prodcution ready template to create an NFT collection minting dapp",
+          "A production ready template to create an NFT collection minting dapp",
       },
       {
         title: "Token minting dapp",
@@ -40,7 +40,7 @@ export const workflowOptions = {
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/token-minting-dapp",
         },
         description:
-          "A prodcution ready template to create your own token minting dapp",
+          "A production ready template to create your own token minting dapp",
       },
     ],
     initial: 0,
