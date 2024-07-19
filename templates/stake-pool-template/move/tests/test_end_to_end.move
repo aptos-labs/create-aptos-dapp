@@ -1,5 +1,5 @@
 #[test_only]
-module staking_addr::test_end_to_end {
+module stake_pool_addr::test_end_to_end {
     use std::signer;
 
     use aptos_std::debug;
@@ -8,11 +8,11 @@ module staking_addr::test_end_to_end {
     use aptos_framework::primary_fungible_store;
     use aptos_framework::timestamp;
 
-    use staking_addr::stake_pool;
+    use stake_pool_addr::stake_pool;
 
     #[test(
         aptos_framework = @0x1,
-        sender = @staking_addr,
+        sender = @stake_pool_addr,
         initial_reward_creator = @0x100,
         staker1 = @0x101,
         staker2 = @0x102

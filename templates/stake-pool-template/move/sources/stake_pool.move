@@ -1,4 +1,4 @@
-module staking_addr::stake_pool {
+module stake_pool_addr::stake_pool {
     use std::option;
     use std::option::Option;
     use std::signer;
@@ -106,7 +106,7 @@ module staking_addr::stake_pool {
     /// Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
-        let config = borrow_global_mut<Config>(@staking_addr);
+        let config = borrow_global_mut<Config>(@stake_pool_addr);
         assert!(is_admin(config, sender_addr), ERR_ONLY_ADMIN_CAN_SET_PENDING_ADMIN);
         config.pending_admin = option::some(new_admin);
     }
@@ -114,7 +114,7 @@ module staking_addr::stake_pool {
     /// Accept admin of the contract
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
-        let config = borrow_global_mut<Config>(@staking_addr);
+        let config = borrow_global_mut<Config>(@stake_pool_addr);
         assert!(config.pending_admin == option::some(sender_addr), ERR_ONLY_PENDING_ADMIN_CAN_ACCEPT_ADMIN);
         config.admin = sender_addr;
         config.pending_admin = option::none();
@@ -127,11 +127,11 @@ module staking_addr::stake_pool {
     ) acquires StakePool, Config {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-        let config = borrow_global<Config>(@staking_addr);
+        let config = borrow_global<Config>(@stake_pool_addr);
         assert!(config.reward_creator == sender_addr, ERR_ONLY_REWARD_CREATOR_CAN_ADD_REWARD);
 
         let total_reward_amount  = rps * duration_seconds;
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         assert!(option::is_none(&stake_pool_mut.reward_schedule), ERR_REWARD_SCHEDULE_ALREADY_EXISTS);
         assert!(primary_fungible_store::balance(sender_addr, stake_pool_mut.reward_fa_metadata_object) >= total_reward_amount, ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD);
 
@@ -154,7 +154,7 @@ module staking_addr::stake_pool {
     public entry fun claim_reward(sender: &signer) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         let claimable_reward = get_claimable_reward_helper(stake_pool, sender_addr, current_ts);
         if (claimable_reward == 0) {
             return
@@ -166,7 +166,7 @@ module staking_addr::stake_pool {
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         let claimable_reward = get_claimable_reward_helper(stake_pool, sender_addr, current_ts);
         if (claimable_reward > 0) {
             transfer_reward_to_claimer(claimable_reward, sender_addr, stake_pool);
@@ -194,7 +194,7 @@ module staking_addr::stake_pool {
 
         update_reward_index_and_claim_ts(sender_addr, current_ts);
 
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
         user_stake_mut.amount = user_stake_mut.amount + amount;
         stake_pool_mut.total_stake = stake_pool_mut.total_stake + amount;
@@ -203,7 +203,7 @@ module staking_addr::stake_pool {
     public entry fun unstake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         assert!(table::contains(&stake_pool.user_stakes, sender_addr), ERR_USER_DOES_NOT_HAVE_STAKE);
         let claimable_reward = get_claimable_reward_helper(stake_pool, sender_addr, current_ts);
         if (claimable_reward > 0) {
@@ -221,7 +221,7 @@ module staking_addr::stake_pool {
 
         update_reward_index_and_claim_ts(sender_addr, current_ts);
 
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
         user_stake_mut.amount = user_stake_mut.amount - amount;
         stake_pool_mut.total_stake = stake_pool_mut.total_stake - amount;
@@ -235,7 +235,7 @@ module staking_addr::stake_pool {
 
     #[view]
     public fun get_staked_balance(user_addr: address): u64 acquires StakePool {
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         if (table::contains(&stake_pool.user_stakes, user_addr)) {
             table::borrow(&stake_pool.user_stakes, user_addr).amount
         } else {
@@ -250,7 +250,7 @@ module staking_addr::stake_pool {
         Object<FungibleStore>,
         u64
     ) acquires StakePool {
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         (
             stake_pool.staked_fa_metadata_object,
             stake_pool.reward_fa_metadata_object,
@@ -261,7 +261,7 @@ module staking_addr::stake_pool {
 
     #[view]
     public fun exists_reward_schedule(): bool acquires StakePool {
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         option::is_some(&stake_pool.reward_schedule)
     }
 
@@ -273,7 +273,7 @@ module staking_addr::stake_pool {
         u64,
         u64
     ) acquires StakePool {
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         let reward_schedule = option::borrow(&stake_pool.reward_schedule);
         (
             reward_schedule.index,
@@ -286,7 +286,7 @@ module staking_addr::stake_pool {
 
     #[view]
     public fun exists_user_stake(user_addr: address): bool acquires StakePool {
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         table::contains(&stake_pool.user_stakes, user_addr)
     }
 
@@ -296,7 +296,7 @@ module staking_addr::stake_pool {
         u64,
         FixedPoint64,
     ) acquires StakePool {
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
         (
             user_stake.amount,
@@ -307,7 +307,7 @@ module staking_addr::stake_pool {
 
     #[view]
     public fun get_claimable_reward(user_addr: address): u64 acquires StakePool {
-        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         get_claimable_reward_helper(stake_pool, user_addr, timestamp::now_seconds())
     }
 
@@ -318,8 +318,8 @@ module staking_addr::stake_pool {
         if (sender == config.admin) {
             true
         } else {
-            if (object::is_object(@staking_addr)) {
-                let obj = object::address_to_object<ObjectCore>(@staking_addr);
+            if (object::is_object(@stake_pool_addr)) {
+                let obj = object::address_to_object<ObjectCore>(@stake_pool_addr);
                 object::is_owner(obj, sender)
             } else {
                 false
@@ -396,7 +396,7 @@ module staking_addr::stake_pool {
     ) acquires RewardStoreController {
         primary_fungible_store::ensure_primary_store_exists(sender_addr, stake_pool.reward_fa_metadata_object);
         fungible_asset::transfer(
-            &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
+            &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@stake_pool_addr).extend_ref),
             stake_pool.reward_store,
             primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
             claimable_reward
@@ -404,7 +404,7 @@ module staking_addr::stake_pool {
     }
 
     fun update_reward_index_and_claim_ts(sender_addr: address, current_ts: u64) acquires StakePool {
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
         if (option::is_none(&stake_pool_mut.reward_schedule)) {
             return
@@ -428,7 +428,7 @@ module staking_addr::stake_pool {
         stake_store: Object<FungibleStore>,
         current_ts: u64
     ) acquires StakePool {
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         table::add(&mut stake_pool_mut.user_stakes, sender_addr, UserStake {
             stake_store,
             last_claim_ts: current_ts,

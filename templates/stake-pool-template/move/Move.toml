@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-staking_addr = "_"
+stake_pool_addr = "_"
 staked_fa_obj_addr = "_"
 reward_fa_obj_addr = "_"
 initial_reward_creator_addr = "_"
