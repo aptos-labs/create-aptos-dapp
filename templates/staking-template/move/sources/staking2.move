@@ -29,6 +29,8 @@ module staking_addr::staking2 {
     const ERR_ONLY_ADMIN_CAN_SET_PENDING_ADMIN: u64 = 6;
     /// Only pending admin can accept admin
     const ERR_ONLY_PENDING_ADMIN_CAN_ACCEPT_ADMIN: u64 = 7;
+    /// Not enough balance to add reward
+    const ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD: u64 = 8;
 
     struct UserStake has store, drop {
         stake_store: Object<FungibleStore>,
@@ -130,8 +132,10 @@ module staking_addr::staking2 {
         let config = borrow_global<Config>(@staking_addr);
         assert!(config.reward_creator == sender_addr, ERR_ONLY_REWARD_CREATOR_CAN_ADD_REWARD);
 
+        let total_reward_amount  = rps * duration_seconds;
         let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
         assert!(option::is_none(&stake_pool_mut.reward_schedule), ERR_REWARD_SCHEDULE_ALREADY_EXISTS);
+        assert!(primary_fungible_store::balance(sender_addr, stake_pool_mut.reward_fa_metadata_object) >= total_reward_amount, ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD);
 
         stake_pool_mut.reward_schedule = option::some(RewardSchedule {
             index: fixed_point64::create_from_u128(0),
@@ -145,7 +149,7 @@ module staking_addr::staking2 {
             sender,
             primary_fungible_store::primary_store(sender_addr, stake_pool_mut.reward_fa_metadata_object),
             stake_pool_mut.reward_store,
-            rps * duration_seconds,
+            total_reward_amount,
         );
     }
 
@@ -446,7 +450,10 @@ module staking_addr::staking2 {
         sender: &signer,
         initial_reward_creator: &signer,
         staker1: &signer,
-        staker2: &signer
+        staker2: &signer,
+        reward_amount: u64,
+        staker1_stake_amount: u64,
+        staker2_stake_amount: u64,
     ) {
         timestamp::set_time_has_started_for_testing(aptos_framework);
 
@@ -464,12 +471,12 @@ module staking_addr::staking2 {
         primary_fungible_store::mint(
             &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
             signer::address_of(staker1),
-            200
+            staker1_stake_amount
         );
         primary_fungible_store::mint(
             &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
             signer::address_of(staker2),
-            200
+            staker2_stake_amount
         );
 
         let reward_fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
@@ -485,7 +492,7 @@ module staking_addr::staking2 {
         primary_fungible_store::mint(
             &fungible_asset::generate_mint_ref(reward_fa_obj_constructor_ref),
             signer::address_of(initial_reward_creator),
-            100
+            reward_amount
         );
 
         move_to(sender, Config {
