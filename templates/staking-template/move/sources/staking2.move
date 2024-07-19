@@ -10,6 +10,7 @@ module staking_addr::staking2 {
     use aptos_std::table::{Self, Table};
 
     use aptos_framework::fungible_asset::{Self, Metadata, FungibleStore};
+    use aptos_framework::multisig_account;
     use aptos_framework::object::{Self, Object, ExtendRef, ObjectCore};
     use aptos_framework::primary_fungible_store;
     use aptos_framework::timestamp;
@@ -159,7 +160,6 @@ module staking_addr::staking2 {
         };
 
         let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
-        let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
 
         primary_fungible_store::create_primary_store(sender_addr, stake_pool_mut.reward_fa_metadata_object);
@@ -171,14 +171,17 @@ module staking_addr::staking2 {
         );
 
         let new_reward_index = calculate_new_reward_index(
-            reward_schedule_mut,
+            &stake_pool_mut.reward_schedule,
             current_ts,
             stake_pool_mut.total_stake
         );
         user_stake_mut.last_claim_ts = current_ts;
         user_stake_mut.index = new_reward_index;
-        reward_schedule_mut.last_update_ts = current_ts;
-        reward_schedule_mut.index = new_reward_index;
+        if (option::is_some(&stake_pool_mut.reward_schedule)) {
+            let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
+            reward_schedule_mut.last_update_ts = current_ts;
+            reward_schedule_mut.index = new_reward_index;
+        };
     }
 
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
@@ -217,16 +220,17 @@ module staking_addr::staking2 {
             });
         };
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
-        let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
-
         let new_reward_index = calculate_new_reward_index(
-            reward_schedule_mut,
+            &stake_pool_mut.reward_schedule,
             current_ts,
             stake_pool_mut.total_stake
         );
         stake_pool_mut.total_stake = stake_pool_mut.total_stake + amount;
-        reward_schedule_mut.last_update_ts = current_ts;
-        reward_schedule_mut.index = new_reward_index;
+        if (option::is_some(&stake_pool_mut.reward_schedule)) {
+            let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
+            reward_schedule_mut.last_update_ts = current_ts;
+            reward_schedule_mut.index = new_reward_index;
+        };
         user_stake_mut.last_claim_ts = current_ts;
         user_stake_mut.index = new_reward_index;
         user_stake_mut.amount = user_stake_mut.amount + amount;
@@ -260,16 +264,18 @@ module staking_addr::staking2 {
         let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
         assert!(user_stake_mut.amount >= amount, ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE);
-        let reward_schedule = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
 
         let new_reward_index = calculate_new_reward_index(
-            reward_schedule,
+            &stake_pool_mut.reward_schedule,
             current_ts,
             stake_pool_mut.total_stake
         );
         stake_pool_mut.total_stake = stake_pool_mut.total_stake - amount;
-        reward_schedule.last_update_ts = current_ts;
-        reward_schedule.index = new_reward_index;
+        if (option::is_some(&stake_pool_mut.reward_schedule)) {
+            let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
+            reward_schedule_mut.last_update_ts = current_ts;
+            reward_schedule_mut.index = new_reward_index;
+        };
         if (user_stake_mut.amount > amount) {
             user_stake_mut.last_claim_ts = current_ts;
             user_stake_mut.index = new_reward_index;
@@ -380,7 +386,7 @@ module staking_addr::staking2 {
         };
 
         let updated_reward_index = calculate_new_reward_index(
-            reward_schedule,
+            &stake_pool.reward_schedule,
             current_ts,
             stake_pool.total_stake
         );
@@ -410,19 +416,20 @@ module staking_addr::staking2 {
     }
 
     fun calculate_new_reward_index(
-        reward_schedule: &RewardSchedule,
+        reward_schedule: &Option<RewardSchedule>,
         current_ts: u64,
         total_stake: u64
     ): FixedPoint64 {
-        if (total_stake == 0) {
+        if (option::is_none(reward_schedule) || total_stake == 0) {
             fixed_point64::create_from_u128(0)
         } else {
+            let reward_schedule = option::borrow(reward_schedule);
             fixed_point64::add(
                 reward_schedule.index,
                 fixed_point64::create_from_rational(((math64::min(
                     current_ts,
                     reward_schedule.end_ts
-                ) - reward_schedule.last_update_ts) * reward_schedule.rps as u128), (total_stake as u128)))
+                ) - reward_schedule.last_update_ts + 1) * reward_schedule.rps as u128), (total_stake as u128)))
         }
     }
 
