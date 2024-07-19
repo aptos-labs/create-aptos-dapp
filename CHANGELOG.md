@@ -4,6 +4,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.15 (2024-07-18)
+
+- Add functionality that wasn't included in the previous release due to issue in a build (no changes)
+
 # 0.0.14 (2024-07-18)
 
 - Add a telemetry tool integration
