@@ -1,12 +1,10 @@
-module staking_addr::staking2 {
+module staking_addr::stake_pool {
     use std::option;
     use std::option::Option;
     use std::signer;
-    use aptos_std::debug;
 
     use aptos_std::fixed_point64::{Self, FixedPoint64};
     use aptos_std::math64;
-    use aptos_std::string_utils;
     use aptos_std::table::{Self, Table};
 
     use aptos_framework::fungible_asset::{Self, Metadata, FungibleStore};
