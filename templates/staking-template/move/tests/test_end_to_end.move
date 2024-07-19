@@ -24,7 +24,19 @@ module staking_addr::test_end_to_end {
         staker1: &signer,
         staker2: &signer,
     ) {
-        staking2::init_module_for_test(aptos_framework, sender, initial_reward_creator, staker1, staker2);
+        let reward_amount = 1000;
+        let staker1_stake_amount = 200;
+        let staker2_stake_amount = 300;
+        staking2::init_module_for_test(
+            aptos_framework,
+            sender,
+            initial_reward_creator,
+            staker1,
+            staker2,
+            reward_amount,
+            staker1_stake_amount,
+            staker2_stake_amount
+        );
 
         let sender_addr = signer::address_of(sender);
         let initial_reward_creator_addr = signer::address_of(initial_reward_creator);
@@ -33,16 +45,34 @@ module staking_addr::test_end_to_end {
 
         let (_, reward_fa_metadata_object, _, _) = staking2::get_stake_pool_data();
 
-        staking2::create_reward_schedule(initial_reward_creator, 1, 100);
+        staking2::create_reward_schedule(initial_reward_creator, 10, 100);
 
         timestamp::update_global_time_for_test_secs(20);
         staking2::stake(staker1, 200);
 
+        // staking2::claim_reward(staker1);
+        // staking2::claim_reward(staker2);
+
         timestamp::update_global_time_for_test_secs(60);
-        staking2::stake(staker2, 200);
-        staking2::unstake(staker1, 200);
+        staking2::stake(staker2, 300);
+
+        // staking2::claim_reward(staker1);
+        // staking2::claim_reward(staker2);
+
+        timestamp::update_global_time_for_test_secs(80);
+
+        // staking2::claim_reward(staker1);
+        // staking2::claim_reward(staker2);
+
+        staking2::unstake(staker1, 100);
+
+        // staking2::claim_reward(staker1);
+        // staking2::claim_reward(staker2);
 
         timestamp::update_global_time_for_test_secs(100);
+
+        staking2::claim_reward(staker1);
+        staking2::claim_reward(staker2);
 
         // let (
         //     user_staked_amount,
@@ -71,12 +101,9 @@ module staking_addr::test_end_to_end {
         // debug::print(&string_utils::format1( &b"reward_schedule_start_ts: {}", reward_schedule_start_ts));
         // debug::print(&string_utils::format1( &b"reward_schedule_end_ts: {}", reward_schedule_end_ts));
 
-        staking2::claim_reward(staker1);
-        staking2::claim_reward(staker2);
-
         let staker1_reward_balance = primary_fungible_store::balance(staker1_addr, reward_fa_metadata_object);
-        assert!(staker1_reward_balance == 39, staker1_reward_balance);
+        assert!(staker1_reward_balance == 529, staker1_reward_balance); // 529 = 400 + 80 + 50
         let staker2_reward_balance = primary_fungible_store::balance(staker2_addr, reward_fa_metadata_object);
-        assert!(staker2_reward_balance == 39, staker2_reward_balance);
+        assert!(staker2_reward_balance == 269, staker2_reward_balance); // 269 = 120 + 150
     }
 }
