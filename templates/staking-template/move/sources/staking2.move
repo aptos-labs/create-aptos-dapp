@@ -73,7 +73,6 @@ module staking_addr::staking2 {
         pending_admin: Option<address>,
     }
 
-
     /// If you deploy the module under an object, sender is the object's signer
     /// If you deploy the module under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
