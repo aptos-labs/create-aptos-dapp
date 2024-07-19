@@ -2,7 +2,7 @@
 
 `create-aptos-dapp` provides a starter kit for dapp developers to easily bootstrap on the Aptos network
 
-> **_NOTE:_** No need to clone: run `npx create-aptos-dapp` in your terminal to get started
+> **_NOTE:_** No need to clone: run `npx create-aptos-dapp@latest` in your terminal to get started
 
 ### Quick Start
 
