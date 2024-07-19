@@ -102,8 +102,8 @@ module stake_pool_addr::test_end_to_end {
         // debug::print(&string_utils::format1( &b"reward_schedule_end_ts: {}", reward_schedule_end_ts));
 
         let staker1_reward_balance = primary_fungible_store::balance(staker1_addr, reward_fa_metadata_object);
-        assert!(staker1_reward_balance == 529, staker1_reward_balance); // 529 = 400 + 80 + 50
+        assert!(staker1_reward_balance == 529, staker1_reward_balance); // 529 roughly =  400 + 80 + 50
         let staker2_reward_balance = primary_fungible_store::balance(staker2_addr, reward_fa_metadata_object);
-        assert!(staker2_reward_balance == 269, staker2_reward_balance); // 269 = 120 + 150
+        assert!(staker2_reward_balance == 269, staker2_reward_balance); // 269 roughly = 120 + 150
     }
 }
