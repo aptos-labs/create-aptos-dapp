@@ -8,7 +8,7 @@ module staking_addr::test_end_to_end {
     use aptos_framework::primary_fungible_store;
     use aptos_framework::timestamp;
 
-    use staking_addr::staking2;
+    use staking_addr::stake_pool;
 
     #[test(
         aptos_framework = @0x1,
@@ -27,7 +27,7 @@ module staking_addr::test_end_to_end {
         let reward_amount = 1000;
         let staker1_stake_amount = 200;
         let staker2_stake_amount = 300;
-        staking2::init_module_for_test(
+        stake_pool::init_module_for_test(
             aptos_framework,
             sender,
             initial_reward_creator,
@@ -43,18 +43,18 @@ module staking_addr::test_end_to_end {
         let staker1_addr = signer::address_of(staker1);
         let staker2_addr = signer::address_of(staker2);
 
-        let (_, reward_fa_metadata_object, _, _) = staking2::get_stake_pool_data();
+        let (_, reward_fa_metadata_object, _, _) = stake_pool::get_stake_pool_data();
 
-        staking2::create_reward_schedule(initial_reward_creator, 10, 100);
+        stake_pool::create_reward_schedule(initial_reward_creator, 10, 100);
 
         timestamp::update_global_time_for_test_secs(20);
-        staking2::stake(staker1, 200);
+        stake_pool::stake(staker1, 200);
 
         // staking2::claim_reward(staker1);
         // staking2::claim_reward(staker2);
 
         timestamp::update_global_time_for_test_secs(60);
-        staking2::stake(staker2, 300);
+        stake_pool::stake(staker2, 300);
 
         // staking2::claim_reward(staker1);
         // staking2::claim_reward(staker2);
@@ -64,15 +64,15 @@ module staking_addr::test_end_to_end {
         // staking2::claim_reward(staker1);
         // staking2::claim_reward(staker2);
 
-        staking2::unstake(staker1, 100);
+        stake_pool::unstake(staker1, 100);
 
         // staking2::claim_reward(staker1);
         // staking2::claim_reward(staker2);
 
         timestamp::update_global_time_for_test_secs(100);
 
-        staking2::claim_reward(staker1);
-        staking2::claim_reward(staker2);
+        stake_pool::claim_reward(staker1);
+        stake_pool::claim_reward(staker2);
 
         // let (
         //     user_staked_amount,
@@ -85,7 +85,7 @@ module staking_addr::test_end_to_end {
         // debug::print(&string_utils::format1( &b"user_index: {}", user_index));
         // debug::print(&string_utils::format1( &b"claimable_reward: {}", claimable_reward));
 
-        let (_, _, _, total_stakes) = staking2::get_stake_pool_data();
+        let (_, _, _, total_stakes) = stake_pool::get_stake_pool_data();
         debug::print(&string_utils::format1(&b"total_stakes: {}", total_stakes));
 
         // let (
