@@ -2,8 +2,11 @@ module staking_addr::staking2 {
     use std::option;
     use std::option::Option;
     use std::signer;
+    use aptos_std::debug;
 
+    use aptos_std::fixed_point64::{Self, FixedPoint64};
     use aptos_std::math64;
+    use aptos_std::string_utils;
     use aptos_std::table::{Self, Table};
 
     use aptos_framework::fungible_asset::{Self, Metadata, FungibleStore};
@@ -31,11 +34,11 @@ module staking_addr::staking2 {
         stake_store: Object<FungibleStore>,
         last_claim_ts: u64,
         amount: u64,
-        index: u128,
+        index: FixedPoint64,
     }
 
     struct RewardSchedule has store, drop {
-        index: u128,
+        index: FixedPoint64,
         rps: u64,
         last_update_ts: u64,
         start_ts: u64,
@@ -121,9 +124,9 @@ module staking_addr::staking2 {
     public entry fun create_reward_schedule(
         sender: &signer,
         rps: u64,
-        start_ts: u64,
-        end_ts: u64
+        duration_seconds: u64
     ) acquires StakePool, Config {
+        let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@staking_addr);
         assert!(config.reward_creator == sender_addr, ERR_ONLY_REWARD_CREATOR_CAN_ADD_REWARD);
@@ -132,12 +135,19 @@ module staking_addr::staking2 {
         assert!(option::is_none(&stake_pool_mut.reward_schedule), ERR_REWARD_SCHEDULE_ALREADY_EXISTS);
 
         stake_pool_mut.reward_schedule = option::some(RewardSchedule {
-            index: 0,
+            index: fixed_point64::create_from_u128(0),
             rps,
-            last_update_ts: start_ts,
-            start_ts,
-            end_ts,
+            last_update_ts: current_ts,
+            start_ts: current_ts,
+            end_ts: current_ts + duration_seconds,
         });
+
+        fungible_asset::transfer(
+            sender,
+            primary_fungible_store::primary_store(sender_addr, stake_pool_mut.reward_fa_metadata_object),
+            stake_pool_mut.reward_store,
+            rps * duration_seconds,
+        );
     }
 
     public entry fun claim_reward(sender: &signer) acquires StakePool, RewardStoreController {
@@ -152,6 +162,7 @@ module staking_addr::staking2 {
         let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
 
+        primary_fungible_store::create_primary_store(sender_addr, stake_pool_mut.reward_fa_metadata_object);
         fungible_asset::transfer(
             &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
             stake_pool_mut.reward_store,
@@ -173,15 +184,11 @@ module staking_addr::staking2 {
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-        assert!(
-            primary_fungible_store::balance(sender_addr, get_staked_fa_metadata_object()) >= amount,
-            ERR_NOT_ENOUGH_BALANCE_TO_STAKE
-        );
 
         let claimable_reward = get_claimable_reward(sender_addr);
-
         let stake_pool = borrow_global<StakePool>(@staking_addr);
         if (claimable_reward > 0) {
+            primary_fungible_store::create_primary_store(sender_addr, stake_pool.reward_fa_metadata_object);
             fungible_asset::transfer(
                 &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
                 stake_pool.reward_store,
@@ -189,6 +196,11 @@ module staking_addr::staking2 {
                 claimable_reward
             );
         };
+
+        assert!(
+            primary_fungible_store::balance(sender_addr, stake_pool.staked_fa_metadata_object) >= amount,
+            ERR_NOT_ENOUGH_BALANCE_TO_STAKE
+        );
 
         let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
         if (!table::contains(&stake_pool_mut.user_stakes, sender_addr)) {
@@ -201,7 +213,7 @@ module staking_addr::staking2 {
                 stake_store,
                 last_claim_ts: current_ts,
                 amount: 0,
-                index: 0,
+                index: fixed_point64::create_from_u128(0),
             });
         };
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
@@ -236,6 +248,7 @@ module staking_addr::staking2 {
         assert!(table::contains(&stake_pool.user_stakes, sender_addr), ERR_USER_DOESN_NOT_HAVE_STAKE);
 
         if (claimable_reward > 0) {
+            primary_fungible_store::create_primary_store(sender_addr, stake_pool.reward_fa_metadata_object);
             fungible_asset::transfer(
                 &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
                 stake_pool.reward_store,
@@ -278,18 +291,6 @@ module staking_addr::staking2 {
     // ================================= View Functions ================================= //
 
     #[view]
-    public fun get_staked_fa_metadata_object(): Object<Metadata> acquires StakePool {
-        let staking = borrow_global<StakePool>(@staking_addr);
-        staking.staked_fa_metadata_object
-    }
-
-    #[view]
-    public fun get_reward_fa_metadata_object(): Object<Metadata> acquires StakePool {
-        let staking = borrow_global<StakePool>(@staking_addr);
-        staking.reward_fa_metadata_object
-    }
-
-    #[view]
     public fun get_staked_balance(user_addr: address): u64 acquires StakePool {
         let stake_pool = borrow_global<StakePool>(@staking_addr);
         if (table::contains(&stake_pool.user_stakes, user_addr)) {
@@ -316,24 +317,51 @@ module staking_addr::staking2 {
     }
 
     #[view]
-    public fun get_user_stake_data(user_addr: address): (
+    public fun exists_reward_schedule(): bool acquires StakePool {
+        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        option::is_some(&stake_pool.reward_schedule)
+    }
+
+    #[view]
+    public fun get_reward_schedule(): (
+        FixedPoint64,
         u64,
         u64,
-        u128,
+        u64,
         u64
     ) acquires StakePool {
         let stake_pool = borrow_global<StakePool>(@staking_addr);
-        if (table::contains(&stake_pool.user_stakes, user_addr)) {
-            let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
-            (
-                user_stake.amount,
-                user_stake.last_claim_ts,
-                user_stake.index,
-                get_claimable_reward(user_addr)
-            )
-        } else {
-            (0, 0, 0, 0)
-        }
+        let reward_schedule = option::borrow(&stake_pool.reward_schedule);
+        (
+            reward_schedule.index,
+            reward_schedule.rps,
+            reward_schedule.last_update_ts,
+            reward_schedule.start_ts,
+            reward_schedule.end_ts
+        )
+    }
+
+    #[view]
+    public fun exists_user_stake(user_addr: address): bool acquires StakePool {
+        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        table::contains(&stake_pool.user_stakes, user_addr)
+    }
+
+    #[view]
+    public fun get_user_stake_data(user_addr: address): (
+        u64,
+        u64,
+        FixedPoint64,
+        u64
+    ) acquires StakePool {
+        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
+        (
+            user_stake.amount,
+            user_stake.last_claim_ts,
+            user_stake.index,
+            get_claimable_reward(user_addr)
+        )
     }
 
     #[view]
@@ -359,7 +387,10 @@ module staking_addr::staking2 {
 
         let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
 
-        (((user_stake.amount as u128) * (updated_reward_index - user_stake.index)) as u64)
+        (fixed_point64::multiply_u128(
+            (user_stake.amount as u128),
+            fixed_point64::sub(updated_reward_index, user_stake.index)
+        ) as u64)
     }
 
     // ================================= Helper Functions ================================= //
@@ -382,12 +413,17 @@ module staking_addr::staking2 {
         reward_schedule: &RewardSchedule,
         current_ts: u64,
         total_stake: u64
-    ): u128 {
-        reward_schedule.index +
-            (((math64::min(
-                current_ts,
-                reward_schedule.end_ts
-            ) - reward_schedule.last_update_ts) * reward_schedule.rps / total_stake) as u128)
+    ): FixedPoint64 {
+        if (total_stake == 0) {
+            fixed_point64::create_from_u128(0)
+        } else {
+            fixed_point64::add(
+                reward_schedule.index,
+                fixed_point64::create_from_rational(((math64::min(
+                    current_ts,
+                    reward_schedule.end_ts
+                ) - reward_schedule.last_update_ts) * reward_schedule.rps as u128), (total_stake as u128)))
+        }
     }
 
     // ================================= Unit Tests ================================= //
@@ -419,7 +455,7 @@ module staking_addr::staking2 {
         primary_fungible_store::mint(
             &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
             signer::address_of(staker1),
-            100
+            200
         );
         primary_fungible_store::mint(
             &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
@@ -440,7 +476,7 @@ module staking_addr::staking2 {
         primary_fungible_store::mint(
             &fungible_asset::generate_mint_ref(reward_fa_obj_constructor_ref),
             signer::address_of(initial_reward_creator),
-            50
+            100
         );
 
         move_to(sender, Config {
