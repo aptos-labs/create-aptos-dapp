@@ -31,6 +31,8 @@ module stake_pool_addr::stake_pool {
     const ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD: u64 = 8;
     /// Only admin can update reward creator
     const ERR_ONLY_ADMIN_CAN_UPDATE_REWARD_CREATOR: u64 = 9;
+    /// User does not have reward to claim
+    const ERR_USER_DOES_NOT_HAVE_REWARD_TO_CLAIM: u64 = 10;
 
     /// Unique per user
     struct UserStake has store, drop {
@@ -149,7 +151,9 @@ module stake_pool_addr::stake_pool {
     /// Abort if reward schedule already exists
     public entry fun create_reward_schedule(
         sender: &signer,
+        // Reward per second
         rps: u64,
+        // Duration in seconds
         duration_seconds: u64
     ) acquires StakePool, Config {
         let current_ts = timestamp::now_seconds();
@@ -439,7 +443,7 @@ module stake_pool_addr::stake_pool {
         );
     }
 
-    /// Update reward index and claim ts
+    /// Update global and user reward index, global and user claim ts
     fun update_reward_index_and_claim_ts(sender_addr: address, current_ts: u64) acquires StakePool {
         let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
