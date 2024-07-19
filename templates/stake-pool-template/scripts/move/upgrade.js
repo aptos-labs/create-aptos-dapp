@@ -18,6 +18,7 @@ async function publish() {
       staking_addr: process.env.VITE_MODULE_ADDRESS,
       staked_fa_obj_addr: process.env.VITE_STAKED_FA_OBJ_ADDR,
       reward_fa_obj_addr: process.env.VITE_REWARD_FA_OBJ_ADDR,
+      initial_reward_creator_addr: process.env.VITE_INITIAL_REWARD_CREATOR_ADDR,
     },
     profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
   });
