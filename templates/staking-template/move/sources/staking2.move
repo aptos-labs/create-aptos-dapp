@@ -10,7 +10,6 @@ module staking_addr::staking2 {
     use aptos_std::table::{Self, Table};
 
     use aptos_framework::fungible_asset::{Self, Metadata, FungibleStore};
-    use aptos_framework::multisig_account;
     use aptos_framework::object::{Self, Object, ExtendRef, ObjectCore};
     use aptos_framework::primary_fungible_store;
     use aptos_framework::timestamp;
@@ -21,7 +20,7 @@ module staking_addr::staking2 {
     /// user tries to unstake more than staked
     const ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE: u64 = 2;
     /// User does not have any stake
-    const ERR_USER_DOESN_NOT_HAVE_STAKE: u64 = 3;
+    const ERR_USER_DOES_NOT_HAVE_STAKE: u64 = 3;
     /// Reward schedule already exists
     const ERR_REWARD_SCHEDULE_ALREADY_EXISTS: u64 = 4;
     /// Only reward creator can add reward
@@ -154,142 +153,79 @@ module staking_addr::staking2 {
     public entry fun claim_reward(sender: &signer) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-        let claimable_reward = get_claimable_reward(sender_addr);
+        let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let claimable_reward = get_claimable_reward_helper(stake_pool, sender_addr, current_ts);
         if (claimable_reward == 0) {
             return
         };
-
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
-        let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
-
-        primary_fungible_store::create_primary_store(sender_addr, stake_pool_mut.reward_fa_metadata_object);
-        fungible_asset::transfer(
-            &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
-            stake_pool_mut.reward_store,
-            primary_fungible_store::primary_store(sender_addr, stake_pool_mut.reward_fa_metadata_object),
-            claimable_reward
-        );
-
-        let new_reward_index = calculate_new_reward_index(
-            &stake_pool_mut.reward_schedule,
-            current_ts,
-            stake_pool_mut.total_stake
-        );
-        user_stake_mut.last_claim_ts = current_ts;
-        user_stake_mut.index = new_reward_index;
-        if (option::is_some(&stake_pool_mut.reward_schedule)) {
-            let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
-            reward_schedule_mut.last_update_ts = current_ts;
-            reward_schedule_mut.index = new_reward_index;
-        };
+        transfer_reward_to_claimer(claimable_reward, sender_addr, stake_pool);
+        update_reward_index_and_claim_ts(sender_addr, current_ts);
     }
 
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-
-        let claimable_reward = get_claimable_reward(sender_addr);
         let stake_pool = borrow_global<StakePool>(@staking_addr);
+        let claimable_reward = get_claimable_reward_helper(stake_pool, sender_addr, current_ts);
         if (claimable_reward > 0) {
-            primary_fungible_store::create_primary_store(sender_addr, stake_pool.reward_fa_metadata_object);
-            fungible_asset::transfer(
-                &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
-                stake_pool.reward_store,
-                primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
-                claimable_reward
-            );
+            transfer_reward_to_claimer(claimable_reward, sender_addr, stake_pool);
         };
 
         assert!(
             primary_fungible_store::balance(sender_addr, stake_pool.staked_fa_metadata_object) >= amount,
             ERR_NOT_ENOUGH_BALANCE_TO_STAKE
         );
-
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
-        if (!table::contains(&stake_pool_mut.user_stakes, sender_addr)) {
-            let stake_store_object_constructor_ref = &object::create_object(sender_addr);
-            let stake_store = fungible_asset::create_store(
-                stake_store_object_constructor_ref,
-                stake_pool_mut.staked_fa_metadata_object,
-            );
-            table::add(&mut stake_pool_mut.user_stakes, sender_addr, UserStake {
-                stake_store,
-                last_claim_ts: current_ts,
-                amount: 0,
-                index: fixed_point64::create_from_u128(0),
-            });
-        };
-        let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
-        let new_reward_index = calculate_new_reward_index(
-            &stake_pool_mut.reward_schedule,
-            current_ts,
-            stake_pool_mut.total_stake
+        let (stake_store, is_new_stake_store) = get_or_create_user_stake_store(
+            &stake_pool.user_stakes,
+            stake_pool.staked_fa_metadata_object,
+            sender_addr,
         );
-        stake_pool_mut.total_stake = stake_pool_mut.total_stake + amount;
-        if (option::is_some(&stake_pool_mut.reward_schedule)) {
-            let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
-            reward_schedule_mut.last_update_ts = current_ts;
-            reward_schedule_mut.index = new_reward_index;
-        };
-        user_stake_mut.last_claim_ts = current_ts;
-        user_stake_mut.index = new_reward_index;
-        user_stake_mut.amount = user_stake_mut.amount + amount;
-
         fungible_asset::transfer(
             sender,
-            primary_fungible_store::primary_store(sender_addr, stake_pool_mut.staked_fa_metadata_object),
-            user_stake_mut.stake_store,
+            primary_fungible_store::primary_store(signer::address_of(sender), stake_pool.staked_fa_metadata_object),
+            stake_store,
             amount
         );
+
+        if (is_new_stake_store) {
+            create_new_user_stake_entry(sender_addr, stake_store, current_ts);
+        };
+
+        update_reward_index_and_claim_ts(sender_addr, current_ts);
+
+        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
+        user_stake_mut.amount = user_stake_mut.amount + amount;
+        stake_pool_mut.total_stake = stake_pool_mut.total_stake + amount;
     }
 
     public entry fun unstake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
-        let claimable_reward = get_claimable_reward(sender_addr);
-
         let stake_pool = borrow_global<StakePool>(@staking_addr);
-        assert!(table::contains(&stake_pool.user_stakes, sender_addr), ERR_USER_DOESN_NOT_HAVE_STAKE);
-
+        assert!(table::contains(&stake_pool.user_stakes, sender_addr), ERR_USER_DOES_NOT_HAVE_STAKE);
+        let claimable_reward = get_claimable_reward_helper(stake_pool, sender_addr, current_ts);
         if (claimable_reward > 0) {
-            primary_fungible_store::create_primary_store(sender_addr, stake_pool.reward_fa_metadata_object);
-            fungible_asset::transfer(
-                &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
-                stake_pool.reward_store,
-                primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
-                claimable_reward
-            );
+            transfer_reward_to_claimer(claimable_reward, sender_addr, stake_pool);
         };
 
-        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
-        let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
-        assert!(user_stake_mut.amount >= amount, ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE);
-
-        let new_reward_index = calculate_new_reward_index(
-            &stake_pool_mut.reward_schedule,
-            current_ts,
-            stake_pool_mut.total_stake
-        );
-        stake_pool_mut.total_stake = stake_pool_mut.total_stake - amount;
-        if (option::is_some(&stake_pool_mut.reward_schedule)) {
-            let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
-            reward_schedule_mut.last_update_ts = current_ts;
-            reward_schedule_mut.index = new_reward_index;
-        };
-        if (user_stake_mut.amount > amount) {
-            user_stake_mut.last_claim_ts = current_ts;
-            user_stake_mut.index = new_reward_index;
-            user_stake_mut.amount = user_stake_mut.amount - amount;
-        };
-
+        let user_stake = table::borrow(&stake_pool.user_stakes, sender_addr);
+        assert!(user_stake.amount >= amount, ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE);
         fungible_asset::transfer(
             sender,
-            user_stake_mut.stake_store,
-            primary_fungible_store::primary_store(signer::address_of(sender), stake_pool_mut.staked_fa_metadata_object),
+            user_stake.stake_store,
+            primary_fungible_store::primary_store(signer::address_of(sender), stake_pool.staked_fa_metadata_object),
             amount
         );
 
-        if (user_stake_mut.amount == amount) {
+        update_reward_index_and_claim_ts(sender_addr, current_ts);
+
+        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
+        user_stake_mut.amount = user_stake_mut.amount - amount;
+        stake_pool_mut.total_stake = stake_pool_mut.total_stake - amount;
+
+        if (user_stake_mut.amount == 0) {
             table::remove(&mut stake_pool_mut.user_stakes, sender_addr);
         };
     }
@@ -358,7 +294,6 @@ module staking_addr::staking2 {
         u64,
         u64,
         FixedPoint64,
-        u64
     ) acquires StakePool {
         let stake_pool = borrow_global<StakePool>(@staking_addr);
         let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
@@ -366,37 +301,13 @@ module staking_addr::staking2 {
             user_stake.amount,
             user_stake.last_claim_ts,
             user_stake.index,
-            get_claimable_reward(user_addr)
         )
     }
 
     #[view]
     public fun get_claimable_reward(user_addr: address): u64 acquires StakePool {
         let stake_pool = borrow_global<StakePool>(@staking_addr);
-        if (option::is_none(&stake_pool.reward_schedule)) {
-            return 0
-        };
-        let reward_schedule = option::borrow(&stake_pool.reward_schedule);
-        let current_ts = timestamp::now_seconds();
-        if (current_ts < reward_schedule.start_ts) {
-            return 0
-        };
-        if (!table::contains(&stake_pool.user_stakes, user_addr)) {
-            return 0
-        };
-
-        let updated_reward_index = calculate_new_reward_index(
-            &stake_pool.reward_schedule,
-            current_ts,
-            stake_pool.total_stake
-        );
-
-        let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
-
-        (fixed_point64::multiply_u128(
-            (user_stake.amount as u128),
-            fixed_point64::sub(updated_reward_index, user_stake.index)
-        ) as u64)
+        get_claimable_reward_helper(stake_pool, user_addr, timestamp::now_seconds())
     }
 
     // ================================= Helper Functions ================================= //
@@ -429,8 +340,100 @@ module staking_addr::staking2 {
                 fixed_point64::create_from_rational(((math64::min(
                     current_ts,
                     reward_schedule.end_ts
-                ) - reward_schedule.last_update_ts + 1) * reward_schedule.rps as u128), (total_stake as u128)))
+                ) - reward_schedule.last_update_ts) * reward_schedule.rps as u128), (total_stake as u128)))
         }
+    }
+
+    fun get_claimable_reward_helper(stake_pool: &StakePool, user_addr: address, current_ts: u64): u64 {
+        if (option::is_none(&stake_pool.reward_schedule)) {
+            return 0
+        };
+        let reward_schedule = option::borrow(&stake_pool.reward_schedule);
+        if (current_ts < reward_schedule.start_ts) {
+            return 0
+        };
+        if (!table::contains(&stake_pool.user_stakes, user_addr)) {
+            return 0
+        };
+
+        let updated_reward_index = calculate_new_reward_index(
+            &stake_pool.reward_schedule,
+            current_ts,
+            stake_pool.total_stake
+        );
+
+        let user_stake = table::borrow(&stake_pool.user_stakes, user_addr);
+
+        (fixed_point64::multiply_u128(
+            (user_stake.amount as u128),
+            fixed_point64::sub(updated_reward_index, user_stake.index)
+        ) as u64)
+    }
+
+    fun get_or_create_user_stake_store(
+        user_stakes: &Table<address, UserStake>,
+        staked_fa_metadata_object: Object<Metadata>,
+        sender_addr: address,
+    ): (Object<FungibleStore>, bool) {
+        if (!table::contains(user_stakes, sender_addr)) {
+            let stake_store_object_constructor_ref = &object::create_object(sender_addr);
+            let stake_store = fungible_asset::create_store(
+                stake_store_object_constructor_ref,
+                staked_fa_metadata_object,
+            );
+            (stake_store, true)
+        } else {
+            let user_stake = table::borrow(user_stakes, sender_addr);
+            (user_stake.stake_store, false)
+        }
+    }
+
+    fun transfer_reward_to_claimer(
+        claimable_reward: u64,
+        sender_addr: address,
+        stake_pool: &StakePool
+    ) acquires RewardStoreController {
+        primary_fungible_store::ensure_primary_store_exists(sender_addr, stake_pool.reward_fa_metadata_object);
+        fungible_asset::transfer(
+            &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@staking_addr).extend_ref),
+            stake_pool.reward_store,
+            primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
+            claimable_reward
+        );
+    }
+
+    fun update_reward_index_and_claim_ts(sender_addr: address, current_ts: u64) acquires StakePool {
+        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
+        if (option::is_none(&stake_pool_mut.reward_schedule)) {
+            return
+        };
+        let new_reward_index = calculate_new_reward_index(
+            &stake_pool_mut.reward_schedule,
+            current_ts,
+            stake_pool_mut.total_stake
+        );
+
+        let reward_schedule_mut = option::borrow_mut(&mut stake_pool_mut.reward_schedule);
+        reward_schedule_mut.last_update_ts = current_ts;
+        reward_schedule_mut.index = new_reward_index;
+
+        user_stake_mut.last_claim_ts = current_ts;
+        user_stake_mut.index = new_reward_index;
+    }
+
+    fun create_new_user_stake_entry(
+        sender_addr: address,
+        stake_store: Object<FungibleStore>,
+        current_ts: u64
+    ) acquires StakePool {
+        let stake_pool_mut = borrow_global_mut<StakePool>(@staking_addr);
+        table::add(&mut stake_pool_mut.user_stakes, sender_addr, UserStake {
+            stake_store,
+            last_claim_ts: current_ts,
+            amount: 0,
+            index: fixed_point64::create_from_u128(0),
+        });
     }
 
     // ================================= Unit Tests ================================= //
