@@ -24,7 +24,7 @@ module stake_pool_addr::test_end_to_end {
         staker1: &signer,
         staker2: &signer,
     ) {
-        let reward_amount = 1000;
+        let reward_amount = 10000;
         let staker1_stake_amount = 200;
         let staker2_stake_amount = 300;
         stake_pool::init_module_for_test(
@@ -38,41 +38,57 @@ module stake_pool_addr::test_end_to_end {
             staker2_stake_amount
         );
 
-        let sender_addr = signer::address_of(sender);
-        let initial_reward_creator_addr = signer::address_of(initial_reward_creator);
+        let _sender_addr = signer::address_of(sender);
+        let _initial_reward_creator_addr = signer::address_of(initial_reward_creator);
         let staker1_addr = signer::address_of(staker1);
         let staker2_addr = signer::address_of(staker2);
 
         let (_, reward_fa_metadata_object, _, _) = stake_pool::get_stake_pool_data();
 
-        stake_pool::create_reward_schedule(initial_reward_creator, 10, 100);
+        stake_pool::create_reward_schedule(initial_reward_creator, 100, 100);
+        /*
+        at this point, global reward index is 0, last update ts is 0, rps is 10, start ts is 0, end ts is 100, total stake is 0
+        */
 
         timestamp::update_global_time_for_test_secs(20);
         stake_pool::stake(staker1, 200);
-
-        // staking2::claim_reward(staker1);
-        // staking2::claim_reward(staker2);
+        /*
+        at this point, global reward index is 0, last update ts is 20, total stake is 200
+        staker1 reward index is 0, last claim ts is 20, stake = 200
+        */
 
         timestamp::update_global_time_for_test_secs(60);
         stake_pool::stake(staker2, 300);
-
-        // staking2::claim_reward(staker1);
-        // staking2::claim_reward(staker2);
+        /*
+        at this point, global reward index is (60 - 20) * 100 / 200 = 20, last update ts is 60, total stake is 500
+        staker1 reward index is 0, last claim ts is 20, stake = 200
+        staker2 reward index is 20, last claim ts is 60, stake = 300
+        */
 
         timestamp::update_global_time_for_test_secs(80);
-
-        // staking2::claim_reward(staker1);
-        // staking2::claim_reward(staker2);
-
         stake_pool::unstake(staker1, 100);
-
-        // staking2::claim_reward(staker1);
-        // staking2::claim_reward(staker2);
+        /*
+        at this point, global reward index is 2 + (80 - 60) * 100 / 500 = 24, last update ts 80, total stake is 400
+        staker1 reward index is 24, last claim ts is 80, stake = 100, claimed reward = 200 * (24 - 0) = 4800
+        staker2 reward index is 20, last claim ts is 60, stake = 300
+        */
 
         timestamp::update_global_time_for_test_secs(100);
 
+        timestamp::update_global_time_for_test_secs(150);
+
         stake_pool::claim_reward(staker1);
+        /*
+        at this point, global reward index is 24 + (100 - 80) * 100 / 400 = 29, last update ts 100, total stake is 400
+        staker1 reward index is 29, last claim ts is 100, stake = 100, claimed reward = 100 * (29 - 24) = 500
+        staker2 reward index is 29, last claim ts is 100, stake = 300
+        */
         stake_pool::claim_reward(staker2);
+        /*
+        at this point, global reward index is 29 + (100 - 100) * 10 /400 = 2.9, last update ts 100, total stake is 400
+        staker1 reward index is 29, last claim ts is 100, stake = 100
+        staker2 reward index is 29, last claim ts is 100, stake = 300, claimed reward = 300 * (29 - 20) = 2700
+        */
 
         // let (
         //     user_staked_amount,
@@ -102,8 +118,8 @@ module stake_pool_addr::test_end_to_end {
         // debug::print(&string_utils::format1( &b"reward_schedule_end_ts: {}", reward_schedule_end_ts));
 
         let staker1_reward_balance = primary_fungible_store::balance(staker1_addr, reward_fa_metadata_object);
-        assert!(staker1_reward_balance == 529, staker1_reward_balance); // 529 roughly =  400 + 80 + 50
+        assert!(staker1_reward_balance == 5300, staker1_reward_balance);
         let staker2_reward_balance = primary_fungible_store::balance(staker2_addr, reward_fa_metadata_object);
-        assert!(staker2_reward_balance == 269, staker2_reward_balance); // 269 roughly = 120 + 150
+        assert!(staker2_reward_balance == 2700, staker2_reward_balance);
     }
 }

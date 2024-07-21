@@ -373,10 +373,16 @@ module stake_pool_addr::stake_pool {
             let reward_schedule = option::borrow(reward_schedule);
             fixed_point64::add(
                 reward_schedule.index,
-                fixed_point64::create_from_rational(((math64::min(
-                    current_ts,
-                    reward_schedule.end_ts
-                ) - reward_schedule.last_update_ts) * reward_schedule.rps as u128), (total_stake as u128)))
+                fixed_point64::create_from_rational(
+                    ((math64::min(
+                        current_ts,
+                        reward_schedule.end_ts
+                    ) - math64::min(
+                        reward_schedule.last_update_ts,
+                        reward_schedule.end_ts
+                    )) * reward_schedule.rps as u128),
+                    (total_stake as u128)
+                ))
         }
     }
 
