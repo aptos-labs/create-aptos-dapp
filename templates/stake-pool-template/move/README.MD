@@ -16,4 +16,3 @@
 - Then we calculate reward for a user
   ```
   reward = user_stake * (reward_index - user_index_at_last_claim)
-  ```
