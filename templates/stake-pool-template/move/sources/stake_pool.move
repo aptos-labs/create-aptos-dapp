@@ -220,7 +220,7 @@ module stake_pool_addr::stake_pool {
         );
         fungible_asset::transfer(
             sender,
-            primary_fungible_store::primary_store(signer::address_of(sender), stake_pool.staked_fa_metadata_object),
+            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
             stake_store,
             amount
         );
@@ -260,7 +260,7 @@ module stake_pool_addr::stake_pool {
         fungible_asset::transfer(
             sender,
             user_stake.stake_store,
-            primary_fungible_store::primary_store(signer::address_of(sender), stake_pool.staked_fa_metadata_object),
+            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
             updated_amount
         );
 
