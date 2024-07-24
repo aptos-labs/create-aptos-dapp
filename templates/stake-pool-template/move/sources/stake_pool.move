@@ -33,6 +33,8 @@ module stake_pool_addr::stake_pool {
     const ERR_ONLY_ADMIN_CAN_UPDATE_REWARD_CREATOR: u64 = 9;
     /// User does not have reward to claim
     const ERR_USER_DOES_NOT_HAVE_REWARD_TO_CLAIM: u64 = 10;
+    /// Cannot compound when staked fa is different from reward fa
+    const ERR_CANNOT_COMPOUND_DIFFERENT_FA: u64 = 11;
 
     /// Unique per user
     struct UserStake has store, drop {
