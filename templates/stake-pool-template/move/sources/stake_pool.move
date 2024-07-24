@@ -33,6 +33,8 @@ module stake_pool_addr::stake_pool {
     const ERR_ONLY_ADMIN_CAN_UPDATE_REWARD_CREATOR: u64 = 9;
     /// User does not have reward to claim
     const ERR_USER_DOES_NOT_HAVE_REWARD_TO_CLAIM: u64 = 10;
+    /// Cannot compound when staked fa is different from reward fa
+    const ERR_CANNOT_COMPOUND_DIFFERENT_FA: u64 = 11;
 
     /// Unique per user
     struct UserStake has store, drop {
@@ -237,7 +239,8 @@ module stake_pool_addr::stake_pool {
 
     /// Unstake, will auto claim before unstaking
     /// Only existing stakers can call
-    public entry fun unstake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
+    /// If amount is not provided, unstake all
+    public entry fun unstake(sender: &signer, amount: Option<u64>) acquires StakePool, RewardStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
@@ -248,24 +251,40 @@ module stake_pool_addr::stake_pool {
         };
 
         let user_stake = table::borrow(&stake_pool.user_stakes, sender_addr);
-        assert!(user_stake.amount >= amount, ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE);
+        let updated_amount = if (option::is_none(&amount)) {
+            user_stake.amount
+        } else {
+            *option::borrow(&amount)
+        };
+        assert!(user_stake.amount >= updated_amount, ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE);
         fungible_asset::transfer(
             sender,
             user_stake.stake_store,
             primary_fungible_store::primary_store(signer::address_of(sender), stake_pool.staked_fa_metadata_object),
-            amount
+            updated_amount
         );
 
         update_reward_index_and_claim_ts(sender_addr, current_ts);
 
         let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         let user_stake_mut = table::borrow_mut(&mut stake_pool_mut.user_stakes, sender_addr);
-        user_stake_mut.amount = user_stake_mut.amount - amount;
-        stake_pool_mut.total_stake = stake_pool_mut.total_stake - amount;
+        user_stake_mut.amount = user_stake_mut.amount - updated_amount;
+        stake_pool_mut.total_stake = stake_pool_mut.total_stake - updated_amount;
 
         if (user_stake_mut.amount == 0) {
             table::remove(&mut stake_pool_mut.user_stakes, sender_addr);
         };
+    }
+
+    /// Claim reward and stake when reward fa is the same as staked fa
+    public entry fun compound(sender: &signer) acquires StakePool, RewardStoreController {
+        let sender_addr = signer::address_of(sender);
+        let (staked_fa_metadata_object, reward_fa_metadata_object, _, _) = get_stake_pool_data();
+        assert!(staked_fa_metadata_object == reward_fa_metadata_object, ERR_CANNOT_COMPOUND_DIFFERENT_FA);
+
+        let claimable_reward = get_claimable_reward(sender_addr);
+        // stake will auto claim before staking
+        stake(sender, claimable_reward);
     }
 
     // ================================= View Functions ================================= //
@@ -488,58 +507,16 @@ module stake_pool_addr::stake_pool {
     // ================================= Unit Tests ================================= //
 
     #[test_only]
-    use std::string;
-
-    #[test_only]
     public fun init_module_for_test(
         aptos_framework: &signer,
         sender: &signer,
         initial_reward_creator: &signer,
-        staker1: &signer,
-        staker2: &signer,
-        reward_amount: u64,
-        staker1_stake_amount: u64,
-        staker2_stake_amount: u64,
+        staked_fa_metadata_object: Object<Metadata>,
+        reward_fa_metadata_object: Object<Metadata>,
     ) {
         timestamp::set_time_has_started_for_testing(aptos_framework);
 
         let sender_addr = signer::address_of(sender);
-        let stake_fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
-        primary_fungible_store::create_primary_store_enabled_fungible_asset(
-            stake_fa_obj_constructor_ref,
-            option::none(),
-            string::utf8(b"Test FA for staking"),
-            string::utf8(b"TFAS"),
-            8,
-            string::utf8(b"url"),
-            string::utf8(b"url"),
-        );
-        primary_fungible_store::mint(
-            &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
-            signer::address_of(staker1),
-            staker1_stake_amount
-        );
-        primary_fungible_store::mint(
-            &fungible_asset::generate_mint_ref(stake_fa_obj_constructor_ref),
-            signer::address_of(staker2),
-            staker2_stake_amount
-        );
-
-        let reward_fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
-        primary_fungible_store::create_primary_store_enabled_fungible_asset(
-            reward_fa_obj_constructor_ref,
-            option::none(),
-            string::utf8(b"Test FA for reward"),
-            string::utf8(b"TFAR"),
-            8,
-            string::utf8(b"url"),
-            string::utf8(b"url"),
-        );
-        primary_fungible_store::mint(
-            &fungible_asset::generate_mint_ref(reward_fa_obj_constructor_ref),
-            signer::address_of(initial_reward_creator),
-            reward_amount
-        );
 
         move_to(sender, Config {
             reward_creator: signer::address_of(initial_reward_creator),
@@ -553,11 +530,11 @@ module stake_pool_addr::stake_pool {
         });
 
         move_to(sender, StakePool {
-            staked_fa_metadata_object: object::object_from_constructor_ref(stake_fa_obj_constructor_ref),
-            reward_fa_metadata_object: object::object_from_constructor_ref(reward_fa_obj_constructor_ref),
+            staked_fa_metadata_object,
+            reward_fa_metadata_object,
             reward_store: fungible_asset::create_store(
                 reward_store_constructor_ref,
-                object::object_from_constructor_ref<Metadata>(reward_fa_obj_constructor_ref),
+                reward_fa_metadata_object
             ),
             user_stakes: table::new(),
             total_stake: 0,
