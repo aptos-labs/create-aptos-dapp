@@ -459,11 +459,10 @@ module stake_pool_addr::stake_pool {
         sender_addr: address,
         stake_pool: &StakePool
     ) acquires RewardStoreController {
-        primary_fungible_store::ensure_primary_store_exists(sender_addr, stake_pool.reward_fa_metadata_object);
         fungible_asset::transfer(
             &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@stake_pool_addr).extend_ref),
             stake_pool.reward_store,
-            primary_fungible_store::primary_store(sender_addr, stake_pool.reward_fa_metadata_object),
+            primary_fungible_store::ensure_primary_store_exists(sender_addr, stake_pool.reward_fa_metadata_object),
             claimable_reward
         );
     }
