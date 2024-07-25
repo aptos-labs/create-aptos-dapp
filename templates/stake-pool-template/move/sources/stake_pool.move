@@ -332,6 +332,16 @@ module stake_pool_addr::stake_pool {
     }
 
     #[view]
+    /// Get reward distributed so far
+    public fun get_reward_distributed_so_far(): u64 acquires StakePool {
+        let current_ts = timestamp::now_seconds();
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
+        let reward_schedule = option::borrow(&stake_pool.reward_schedule);
+        // start ts is always less than current ts because reward schedule always starts when it's created
+        (math64::min(current_ts, reward_schedule.end_ts) - reward_schedule.start_ts) * reward_schedule.rps
+    }
+
+    #[view]
     /// Whether user has stake
     public fun exists_user_stake(user_addr: address): bool acquires StakePool {
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
