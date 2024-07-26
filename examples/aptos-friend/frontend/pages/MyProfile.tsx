@@ -11,7 +11,7 @@ import { TradeShare } from "@/components/TradeShare";
 
 export function MyProfile() {
   const { connected, account } = useWallet();
-  let hasIssuedShare = useHasIssuedShare(account?.address as `0x${string}`);
+  const hasIssuedShare = useHasIssuedShare(account?.address as `0x${string}`);
 
   return (
     <>
