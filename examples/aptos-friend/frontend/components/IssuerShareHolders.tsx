@@ -9,7 +9,7 @@ type IssuerShareHoldersProps = {
 };
 
 export function IssuerShareHolders({ issuerAddress }: IssuerShareHoldersProps) {
-  let holders = useGetHolders(issuerAddress);
+  const holders = useGetHolders(issuerAddress);
 
   return (
     <Card className="w-full">
