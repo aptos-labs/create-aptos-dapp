@@ -5,8 +5,7 @@ authors = []
 
 [addresses]
 stake_pool_addr = "_"
-staked_fa_obj_addr = "_"
-reward_fa_obj_addr = "_"
+fa_obj_addr = "_"
 initial_reward_creator_addr = "_"
 
 [dependencies]

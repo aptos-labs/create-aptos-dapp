@@ -31,8 +31,6 @@ module stake_pool_addr::stake_pool {
     const ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD: u64 = 8;
     /// Only admin can update reward creator
     const ERR_ONLY_ADMIN_CAN_UPDATE_REWARD_CREATOR: u64 = 9;
-    /// Cannot compound when staked fa is different from reward fa
-    const ERR_CANNOT_COMPOUND_DIFFERENT_FA: u64 = 10;
 
     /// Unique per user
     struct UserStake has store, drop {
@@ -61,10 +59,8 @@ module stake_pool_addr::stake_pool {
     }
 
     struct StakePool has key {
-        // Fungible asset stakers are staking
-        staked_fa_metadata_object: Object<Metadata>,
-        // Fungible asset stakers are earning rewards in
-        reward_fa_metadata_object: Object<Metadata>,
+        // Fungible asset stakers are staking and earning rewards in
+        fa_metadata_object: Object<Metadata>,
         // Fungible store to hold rewards
         reward_store: Object<FungibleStore>,
         // Key is user address, value is user stake data
@@ -107,11 +103,10 @@ module stake_pool_addr::stake_pool {
         });
 
         move_to(sender, StakePool {
-            staked_fa_metadata_object: object::address_to_object<Metadata>(@staked_fa_obj_addr),
-            reward_fa_metadata_object: object::address_to_object<Metadata>(@reward_fa_obj_addr),
+            fa_metadata_object: object::address_to_object<Metadata>(@fa_obj_addr),
             reward_store: fungible_asset::create_store(
                 reward_store_constructor_ref,
-                object::address_to_object<Metadata>(@reward_fa_obj_addr)
+                object::address_to_object<Metadata>(@fa_obj_addr)
             ),
             user_stakes: table::new(),
             total_stake: 0,
@@ -161,10 +156,13 @@ module stake_pool_addr::stake_pool {
         let config = borrow_global<Config>(@stake_pool_addr);
         assert!(config.reward_creator == sender_addr, ERR_ONLY_REWARD_CREATOR_CAN_ADD_REWARD);
 
-        let total_reward_amount  = rps * duration_seconds;
+        let total_reward_amount = rps * duration_seconds;
         let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
         assert!(option::is_none(&stake_pool_mut.reward_schedule), ERR_REWARD_SCHEDULE_ALREADY_EXISTS);
-        assert!(primary_fungible_store::balance(sender_addr, stake_pool_mut.reward_fa_metadata_object) >= total_reward_amount, ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD);
+        assert!(
+            primary_fungible_store::balance(sender_addr, stake_pool_mut.fa_metadata_object) >= total_reward_amount,
+            ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD
+        );
 
         stake_pool_mut.reward_schedule = option::some(RewardSchedule {
             index: fixed_point64::create_from_u128(0),
@@ -176,7 +174,7 @@ module stake_pool_addr::stake_pool {
 
         fungible_asset::transfer(
             sender,
-            primary_fungible_store::primary_store(sender_addr, stake_pool_mut.reward_fa_metadata_object),
+            primary_fungible_store::primary_store(sender_addr, stake_pool_mut.fa_metadata_object),
             stake_pool_mut.reward_store,
             total_reward_amount,
         );
@@ -208,17 +206,17 @@ module stake_pool_addr::stake_pool {
         };
 
         assert!(
-            primary_fungible_store::balance(sender_addr, stake_pool.staked_fa_metadata_object) >= amount,
+            primary_fungible_store::balance(sender_addr, stake_pool.fa_metadata_object) >= amount,
             ERR_NOT_ENOUGH_BALANCE_TO_STAKE
         );
         let (stake_store, is_new_stake_store) = get_or_create_user_stake_store(
             &stake_pool.user_stakes,
-            stake_pool.staked_fa_metadata_object,
+            stake_pool.fa_metadata_object,
             sender_addr,
         );
         fungible_asset::transfer(
             sender,
-            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
+            primary_fungible_store::primary_store(sender_addr, stake_pool.fa_metadata_object),
             stake_store,
             amount
         );
@@ -258,7 +256,7 @@ module stake_pool_addr::stake_pool {
         fungible_asset::transfer(
             sender,
             user_stake.stake_store,
-            primary_fungible_store::primary_store(sender_addr, stake_pool.staked_fa_metadata_object),
+            primary_fungible_store::primary_store(sender_addr, stake_pool.fa_metadata_object),
             updated_amount
         );
 
@@ -277,9 +275,6 @@ module stake_pool_addr::stake_pool {
     /// Claim reward and stake when reward fa is the same as staked fa
     public entry fun compound(sender: &signer) acquires StakePool, RewardStoreController {
         let sender_addr = signer::address_of(sender);
-        let (staked_fa_metadata_object, reward_fa_metadata_object, _, _) = get_stake_pool_data();
-        assert!(staked_fa_metadata_object == reward_fa_metadata_object, ERR_CANNOT_COMPOUND_DIFFERENT_FA);
-
         let claimable_reward = get_claimable_reward(sender_addr);
         // stake will auto claim before staking
         stake(sender, claimable_reward);
@@ -291,14 +286,12 @@ module stake_pool_addr::stake_pool {
     /// Get stake pool data
     public fun get_stake_pool_data(): (
         Object<Metadata>,
-        Object<Metadata>,
         Object<FungibleStore>,
         u64
     ) acquires StakePool {
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         (
-            stake_pool.staked_fa_metadata_object,
-            stake_pool.reward_fa_metadata_object,
+            stake_pool.fa_metadata_object,
             stake_pool.reward_store,
             stake_pool.total_stake
         )
@@ -445,14 +438,14 @@ module stake_pool_addr::stake_pool {
     /// If user does not have stake store, create one
     fun get_or_create_user_stake_store(
         user_stakes: &Table<address, UserStake>,
-        staked_fa_metadata_object: Object<Metadata>,
+        fa_metadata_object: Object<Metadata>,
         sender_addr: address,
     ): (Object<FungibleStore>, bool) {
         if (!table::contains(user_stakes, sender_addr)) {
             let stake_store_object_constructor_ref = &object::create_object(sender_addr);
             let stake_store = fungible_asset::create_store(
                 stake_store_object_constructor_ref,
-                staked_fa_metadata_object,
+                fa_metadata_object,
             );
             (stake_store, true)
         } else {
@@ -470,7 +463,7 @@ module stake_pool_addr::stake_pool {
         fungible_asset::transfer(
             &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@stake_pool_addr).extend_ref),
             stake_pool.reward_store,
-            primary_fungible_store::ensure_primary_store_exists(sender_addr, stake_pool.reward_fa_metadata_object),
+            primary_fungible_store::ensure_primary_store_exists(sender_addr, stake_pool.fa_metadata_object),
             claimable_reward
         );
     }
@@ -518,8 +511,7 @@ module stake_pool_addr::stake_pool {
         aptos_framework: &signer,
         sender: &signer,
         initial_reward_creator: &signer,
-        staked_fa_metadata_object: Object<Metadata>,
-        reward_fa_metadata_object: Object<Metadata>,
+        fa_metadata_object: Object<Metadata>,
     ) {
         timestamp::set_time_has_started_for_testing(aptos_framework);
 
@@ -537,11 +529,10 @@ module stake_pool_addr::stake_pool {
         });
 
         move_to(sender, StakePool {
-            staked_fa_metadata_object,
-            reward_fa_metadata_object,
+            fa_metadata_object,
             reward_store: fungible_asset::create_store(
                 reward_store_constructor_ref,
-                reward_fa_metadata_object
+                fa_metadata_object
             ),
             user_stakes: table::new(),
             total_stake: 0,
