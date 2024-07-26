@@ -364,6 +364,18 @@ module stake_pool_addr::stake_pool {
         get_claimable_reward_helper(stake_pool, user_addr, timestamp::now_seconds())
     }
 
+    #[view]
+    /// Get APY at the moment in percentage, e.g. return 100 means 100%
+    public fun get_apy(): u64 acquires StakePool {
+        let (_, _, total_stake) = get_stake_pool_data();
+        if (total_stake == 0) {
+            0
+        } else {
+            let (_, rps, _, _, _) = get_reward_schedule();
+            100 * rps * 365 * 24 * 60 * 60 / total_stake
+        }
+    }
+
     // ================================= Helper Functions ================================= //
 
     /// Check if sender is admin or owner of the object when package is published to object
