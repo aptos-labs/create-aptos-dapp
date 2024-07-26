@@ -325,8 +325,9 @@ module stake_pool_addr::stake_pool {
     }
 
     #[view]
-    /// Get reward distributed so far
-    public fun get_reward_distributed_so_far(): u64 acquires StakePool {
+    /// Get reward released so far
+    /// This is irrelative to user staking activity, only depends on reward schedule
+    public fun get_reward_released_so_far(): u64 acquires StakePool {
         let current_ts = timestamp::now_seconds();
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         let reward_schedule = option::borrow(&stake_pool.reward_schedule);
