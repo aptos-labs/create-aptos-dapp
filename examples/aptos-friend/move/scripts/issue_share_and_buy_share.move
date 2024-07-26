@@ -4,6 +4,8 @@ script {
 
     use aptos_friend_addr::aptos_friend;
 
+    // This Move script runs atomically, i.e. it issues a share and buys some of it in the same transaction.
+    // Move script is how we batch multiple function calls in 1 tx, similar to Solana allows multiple instructions in 1 tx
     fun issue_share_and_buy_share(sender: &signer) {
         let sender_addr = signer::address_of(sender);
         // issue my share
