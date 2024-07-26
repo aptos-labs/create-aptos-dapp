@@ -7,7 +7,7 @@ type IssuerDetailsProps = {
 };
 
 export function IssuerDetails({ issuerAddress }: IssuerDetailsProps) {
-  let issuer = useGetIssuer(issuerAddress);
+  const issuer = useGetIssuer(issuerAddress);
 
   return (
     <div className="flex flex-col gap-6">
