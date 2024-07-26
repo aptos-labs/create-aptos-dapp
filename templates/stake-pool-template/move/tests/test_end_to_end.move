@@ -249,10 +249,10 @@ module stake_pool_addr::test_end_to_end {
         let staker1_addr = signer::address_of(staker1);
         let staker2_addr = signer::address_of(staker2);
 
-        let rps = 4;
+        let rps = 400;
         let duration_seconds = 100;
-        let staker1_stake_amount = 200;
-        let staker2_stake_amount = 200;
+        let staker1_stake_amount = 20000;
+        let staker2_stake_amount = 20000;
 
         let fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
         primary_fungible_store::create_primary_store_enabled_fungible_asset(
@@ -286,12 +286,11 @@ module stake_pool_addr::test_end_to_end {
             sender,
             initial_reward_creator,
             fa_metadata_object,
-            fa_metadata_object,
         );
 
         stake_pool::create_reward_schedule(initial_reward_creator, rps, duration_seconds);
-        stake_pool::stake(staker1, 200);
-        stake_pool::stake(staker2, 200);
+        stake_pool::stake(staker1, 20000);
+        stake_pool::stake(staker2, 20000);
 
         timestamp::update_global_time_for_test_secs(50);
         stake_pool::compound(staker1);
@@ -301,8 +300,8 @@ module stake_pool_addr::test_end_to_end {
         stake_pool::unstake(staker2, option::none());
 
         let staker1_balance = primary_fungible_store::balance(staker1_addr, fa_metadata_object);
-        assert!(staker1_balance == 419, staker1_balance); // not 420 because of the rounding
+        assert!(staker1_balance == 41999, staker1_balance); // not 42000 because of the rounding
         let staker2_balance = primary_fungible_store::balance(staker2_addr, fa_metadata_object);
-        assert!(staker2_balance == 379, staker2_balance); // not 380 because of the rounding
+        assert!(staker2_balance == 37999, staker2_balance); // not 38000 because of the rounding
     }
 }
