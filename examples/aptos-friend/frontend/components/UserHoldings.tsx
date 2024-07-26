@@ -9,7 +9,7 @@ type UserHoldingsProps = {
 };
 
 export function UserHoldings({ userAddress }: UserHoldingsProps) {
-  let holdings = useGetHoldings(userAddress);
+  const holdings = useGetHoldings(userAddress);
 
   return (
     <Card className="w-full">
