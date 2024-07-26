@@ -7,22 +7,11 @@ import ora from "ora";
 import { exec } from "child_process";
 // internal files
 import { Selections } from "./types.js";
-import { copy } from "./utils/helpers.js";
 import { recordTelemetry } from "./telemetry.js";
+import { copy, runCommand } from "./utils/helpers.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout });
 let currentSpinner: Ora | null = null;
-
-const runCommand = (command) =>
-  new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve(stdout ? stdout : stderr);
-    });
-  });
 
 export async function generateDapp(selection: Selections) {
   const projectName = selection.projectName || "my-aptos-dapp";

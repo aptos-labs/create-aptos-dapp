@@ -6,7 +6,7 @@ import type { Ora } from "ora";
 import ora from "ora";
 import fs from "fs/promises";
 import { existsSync } from "node:fs";
-import { copy } from "./utils/helpers.js";
+import { copy, runCommand } from "./utils/helpers.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout });
 
@@ -111,7 +111,20 @@ export async function generateExample(example: string) {
     // cd into target directory
     process.chdir(targetDirectory);
 
+    // create .env file
+    const envContent = `PROJECT_NAME=${example}\nVITE_APP_NETWORK=testnet`;
+    await write(".env", envContent);
+
     scaffoldingSpinner.succeed();
+
+    const npmSpinner = spinner("Installing dependencies.....").start();
+
+    // install dependencies
+    const installRootDepsCommand = `npm install --silent --no-progress`;
+    await runCommand(installRootDepsCommand);
+
+    npmSpinner.succeed();
+    currentSpinner = npmSpinner;
 
     // Log next steps
     console.log(
