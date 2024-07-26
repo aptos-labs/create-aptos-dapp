@@ -1,7 +1,8 @@
-## Create Aptos Dapp Boilerplate Template
+## Aptos Friend Example
+
+This example is created from the boilerplate template in create-aptos-dapp.
 
 The Boilerplate template provides a starter dapp with all necessary dapp infrastructure and a simple wallet info implementation.
-
 
 The Boilerplate template provides:
 
@@ -30,3 +31,14 @@ Some commands are built-in the template and can be ran as a npm script, for exam
 - `npm run move:compile` - a command to compile the Move contract
 
 For all other available CLI commands, can run `npx aptos` and see a list of all available commands.
+
+### Aptos Friend Overview
+
+Anyone can issue its own share, buy and sell shares issued by anyone.
+
+Issuer data is stored in Object where seed is contract address + issuer address.
+
+Holding data is stored in Object where seed is contract address + issuer address + holder address.
+
+Additionally, to make the contract easier to query without an indexer, we created registry for all issuers, all holders for each issuer and all holdings for each user.
+In production, we would use off-chain indexer to store the registry so it's more performant.

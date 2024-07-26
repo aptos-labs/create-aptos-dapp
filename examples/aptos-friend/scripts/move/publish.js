@@ -12,10 +12,10 @@ async function publish() {
   move
     .createObjectAndPublishPackage({
       packageDirectoryPath: "move",
-      addressName: "friend_tech_addr",
+      addressName: "aptos_friend_addr",
       namedAddresses: {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
-        friend_tech_addr: accountAddress,
+        aptos_friend_addr: accountAddress,
       },
       profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
     })

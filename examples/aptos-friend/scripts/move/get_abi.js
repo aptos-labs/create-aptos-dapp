@@ -2,7 +2,7 @@ require("dotenv").config();
 const axios = require("axios");
 const fs = require("node:fs");
 
-const moduleName = "friend_tech";
+const moduleName = "aptos_friend";
 
 const url = `https://fullnode.${process.env.VITE_APP_NETWORK}.aptoslabs.com/v1/accounts/${process.env.VITE_MODULE_ADDRESS}/module/${moduleName}`;
 

@@ -8,7 +8,7 @@ async function test() {
   await move.test({
     packageDirectoryPath: "move",
     namedAddresses: {
-      friend_tech_addr: "0x100",
+      aptos_friend_addr: "0x100",
     },
   });
 }

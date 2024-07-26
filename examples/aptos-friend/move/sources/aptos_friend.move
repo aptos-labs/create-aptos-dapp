@@ -1,4 +1,4 @@
-module friend_tech_addr::friend_tech {
+module aptos_friend_addr::aptos_friend {
     use std::bcs;
     use std::signer;
     use std::string::String;
@@ -149,7 +149,7 @@ module friend_tech_addr::friend_tech {
             });
         };
 
-        let registry = borrow_global_mut<IssuerRegistry>(@friend_tech_addr);
+        let registry = borrow_global_mut<IssuerRegistry>(@aptos_friend_addr);
         vector::push_back(&mut registry.issuers, get_issuer_obj(sender_addr));
 
         event::emit(IssueShareEvent {
@@ -209,7 +209,7 @@ module friend_tech_addr::friend_tech {
         };
 
         aptos_account::transfer(sender, get_vault_addr(), share_cost);
-        aptos_account::transfer(sender, @friend_tech_addr, protocol_fee);
+        aptos_account::transfer(sender, @aptos_friend_addr, protocol_fee);
         aptos_account::transfer(sender, issuer_addr, issuer_fee);
 
         event::emit(
@@ -268,7 +268,7 @@ module friend_tech_addr::friend_tech {
         };
 
         aptos_account::transfer(&get_vault_signer(), sender_addr, share_cost);
-        aptos_account::transfer(sender, @friend_tech_addr, protocol_fee);
+        aptos_account::transfer(sender, @aptos_friend_addr, protocol_fee);
         aptos_account::transfer(sender, issuer_addr, issuer_fee);
 
         event::emit(
@@ -290,13 +290,13 @@ module friend_tech_addr::friend_tech {
 
     #[view]
     public fun get_vault_addr(): address acquires Vault {
-        let vault = borrow_global<Vault>(@friend_tech_addr);
+        let vault = borrow_global<Vault>(@aptos_friend_addr);
         vault.addr
     }
 
     #[view]
     public fun get_issuer_registry(): vector<Object<Issuer>> acquires IssuerRegistry {
-        let registry = borrow_global<IssuerRegistry>(@friend_tech_addr);
+        let registry = borrow_global<IssuerRegistry>(@aptos_friend_addr);
         registry.issuers
     }
 
@@ -395,23 +395,23 @@ module friend_tech_addr::friend_tech {
     // ================================= Helper functions ================================== //
 
     fun get_vault_signer(): signer acquires Vault {
-        let vault = borrow_global<Vault>(@friend_tech_addr);
+        let vault = borrow_global<Vault>(@aptos_friend_addr);
         object::generate_signer_for_extending(&vault.extend_ref)
     }
 
     fun construct_issuer_object_seed(issuer_addr: address): vector<u8> {
-        bcs::to_bytes(&string_utils::format2(&b"{}_issuer_{}", @friend_tech_addr, issuer_addr))
+        bcs::to_bytes(&string_utils::format2(&b"{}_issuer_{}", @aptos_friend_addr, issuer_addr))
     }
 
     fun construct_user_object_seed(user_addr: address): vector<u8> {
-        bcs::to_bytes(&string_utils::format2(&b"{}_user_{}", @friend_tech_addr, user_addr))
+        bcs::to_bytes(&string_utils::format2(&b"{}_user_{}", @aptos_friend_addr, user_addr))
     }
 
     fun construct_holding_object_seed(issuer_addr: address, holder_addr: address): vector<u8> {
         bcs::to_bytes(
             &string_utils::format3(
                 &b"{}_share_issued_by_{}_hold_by_{}",
-                @friend_tech_addr,
+                @aptos_friend_addr,
                 issuer_addr,
                 holder_addr,
             )
@@ -447,7 +447,7 @@ module friend_tech_addr::friend_tech {
     #[test_only]
     use aptos_framework::aptos_coin;
 
-    #[test(aptos_framework = @aptos_framework, deployer = @friend_tech_addr, user_1 = @0x998, user_2 = @0x997)]
+    #[test(aptos_framework = @aptos_framework, deployer = @aptos_friend_addr, user_1 = @0x998, user_2 = @0x997)]
     fun test_happy_path(
         aptos_framework: &signer,
         deployer: &signer,
@@ -515,7 +515,7 @@ module friend_tech_addr::friend_tech {
         buy_share(user_1, issuer_1_obj, 10);
         assert!(coin::balance<AptosCoin>(user_1_addr) == issuer_fee_1, 4);
         assert!(coin::balance<AptosCoin>(get_vault_addr()) == share_cost_1, 4);
-        assert!(coin::balance<AptosCoin>(@friend_tech_addr) == protocol_fee_1, 4);
+        assert!(coin::balance<AptosCoin>(@aptos_friend_addr) == protocol_fee_1, 4);
 
         {
             let (_, _, total_issued_shares) = get_issuer(issuer_1_obj);
@@ -548,7 +548,7 @@ module friend_tech_addr::friend_tech {
         assert!(coin::balance<AptosCoin>(user_2_addr) == 0, 8);
         assert!(coin::balance<AptosCoin>(user_1_addr) == issuer_fee_1 + issuer_fee_2, 8);
         assert!(coin::balance<AptosCoin>(get_vault_addr()) == share_cost_1 + share_cost_2, 8);
-        assert!(coin::balance<AptosCoin>(@friend_tech_addr) == protocol_fee_1 + protocol_fee_2, 8);
+        assert!(coin::balance<AptosCoin>(@aptos_friend_addr) == protocol_fee_1 + protocol_fee_2, 8);
 
         {
             let (_, _, total_issued_shares) = get_issuer(issuer_1_obj);
@@ -592,7 +592,7 @@ module friend_tech_addr::friend_tech {
         );
         assert!(coin::balance<AptosCoin>(get_vault_addr()) == share_cost_1 + share_cost_2 - share_cost_3, 12);
         assert!(
-            coin::balance<AptosCoin>(@friend_tech_addr) == protocol_fee_1 + protocol_fee_2 + protocol_fee_3,
+            coin::balance<AptosCoin>(@aptos_friend_addr) == protocol_fee_1 + protocol_fee_2 + protocol_fee_3,
             12
         );
 
@@ -643,7 +643,7 @@ module friend_tech_addr::friend_tech {
         );
         assert!(
             coin::balance<AptosCoin>(
-                @friend_tech_addr
+                @aptos_friend_addr
             ) == protocol_fee_1 + protocol_fee_2 + protocol_fee_3 + protocol_fee_4,
             16
         );
@@ -673,7 +673,7 @@ module friend_tech_addr::friend_tech {
         coin::destroy_mint_cap(mint_cap);
     }
 
-    #[test(aptos_framework = @aptos_framework, deployer = @friend_tech_addr, user_1 = @0x998)]
+    #[test(aptos_framework = @aptos_framework, deployer = @aptos_friend_addr, user_1 = @0x998)]
     fun buy_sell_should_have_same_price_when_supply_is_not_changed(
         aptos_framework: &signer,
         deployer: &signer,
