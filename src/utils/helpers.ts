@@ -1,17 +1,20 @@
-import { execSync } from "child_process";
+import { exec } from "child_process";
 import path from "path";
 import fs from "node:fs";
 import os from "node:os";
 
-export const runCommand = (command) => {
-  try {
-    execSync(`${command}`, { stdio: "inherit" });
-  } catch (e) {
-    console.error(`Failed to execute ${command}`, e);
-    return false;
-  }
-  return true;
-};
+// Run a command. Must return a Promise so we dont block execution context
+// (to run the spinner for example)
+export const runCommand = (command) =>
+  new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(stdout ? stdout : stderr);
+    });
+  });
 
 // Copy a full source directory into a destination directory
 export const copy = (src: string, dest: string) => {

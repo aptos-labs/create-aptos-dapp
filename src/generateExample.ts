@@ -136,7 +136,6 @@ export async function generateExample(example: string) {
     console.log(bold("\nNext steps:") + "\n");
 
     console.log(green(`1. cd ${example}`) + "\n");
-    console.log(green(`2. npm install`) + "\n");
     console.log(green(`2. open in your favorite IDE`) + "\n");
   } catch (error: any) {
     currentSpinner?.fail(`Failed to scaffold project: ${error.message}`);
