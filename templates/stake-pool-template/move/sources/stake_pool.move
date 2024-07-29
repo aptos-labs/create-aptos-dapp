@@ -366,8 +366,8 @@ module stake_pool_addr::stake_pool {
     }
 
     #[view]
-    /// Get APY at the moment in percentage, e.g. return 100 means 100%
-    public fun get_apy(): u64 acquires StakePool {
+    /// Get APR at the moment in percentage, e.g. return 100 means 100%
+    public fun get_apr(): u64 acquires StakePool {
         let (_, _, total_stake) = get_stake_pool_data();
         if (total_stake == 0) {
             0
