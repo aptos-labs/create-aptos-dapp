@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 import fs from "fs/promises";
 import type { Ora } from "ora";
 import ora from "ora";
-import { exec } from "child_process";
 // internal files
 import { Selections } from "./types.js";
 import { recordTelemetry } from "./telemetry.js";
