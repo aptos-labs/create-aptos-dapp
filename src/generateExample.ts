@@ -1,37 +1,69 @@
-import { green, bold, white } from "kolorist";
+import { green, bold, red } from "kolorist";
+import prompts from "prompts";
 import path from "path";
 import { fileURLToPath } from "node:url";
-import fs from "fs/promises";
 import type { Ora } from "ora";
 import ora from "ora";
-import { exec } from "child_process";
-// internal files
-import { Selections } from "./types.js";
-import { recordTelemetry } from "./telemetry.js";
+import fs from "fs/promises";
+import { existsSync } from "node:fs";
 import { copy, runCommand } from "./utils/helpers.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout });
-let currentSpinner: Ora | null = null;
 
-export async function generateDapp(selection: Selections) {
-  const projectName = selection.projectName || "my-aptos-dapp";
+export async function generateExample(example: string) {
+  let currentSpinner: Ora | null = null;
 
-  // internal template directory path
-  const templateDir = path.resolve(
+  // internal examples directory path
+  const exampleDir = path.resolve(
     fileURLToPath(import.meta.url),
-    "../../templates",
-    selection.template.path
+    "../../examples",
+    example
   );
+
+  // validate existing example folder for the provided example name
+  try {
+    await fs.access(exampleDir);
+  } catch (error) {
+    throw new Error(`${example} is not a valid example name`);
+  }
+
+  // Check if `example` folder already exists, if so ask the user whether to override
+  // or not.
+  const projectPath = path.resolve(example);
+  const dirExists: boolean = existsSync(projectPath);
+
+  if (dirExists) {
+    const { confirm } = await prompts(
+      [
+        {
+          type: "confirm",
+          name: "confirm",
+          message: `${example} folder already exists, override? (Default is Yes)`,
+          initial: true,
+        },
+      ],
+      {
+        onCancel: () => {
+          throw new Error(red("✖") + " Operation cancelled");
+        },
+      }
+    );
+    if (!confirm) {
+      throw new Error(
+        "decline override, please use another folder to generate the example in"
+      );
+    }
+  }
 
   // current working directory
   const cwd = process.cwd();
 
-  // target directory - current directory + chosen project name
-  const targetDirectory = path.join(cwd, projectName);
+  // target directory - current directory + chosen example
+  const targetDirectory = path.join(cwd, example);
 
   console.log(); // print new line
   const scaffoldingSpinner = spinner(
-    `Scaffolding project in ${targetDirectory}`
+    `Generating example in ${targetDirectory}`
   ).start();
   currentSpinner = scaffoldingSpinner;
 
@@ -39,8 +71,8 @@ export async function generateDapp(selection: Selections) {
     // make target directory if not exist
     await fs.mkdir(targetDirectory, { recursive: true });
 
-    // internal template directory files
-    const files = await fs.readdir(templateDir);
+    // internal example directory files
+    const files = await fs.readdir(exampleDir);
 
     // write to file
     const write = async (file: string, content?: string) => {
@@ -50,7 +82,7 @@ export async function generateDapp(selection: Selections) {
       if (content) {
         await fs.writeFile(targetPath, content);
       } else {
-        await copy(path.join(templateDir, file), targetPath);
+        await copy(path.join(exampleDir, file), targetPath);
       }
     };
 
@@ -80,30 +112,8 @@ export async function generateDapp(selection: Selections) {
     process.chdir(targetDirectory);
 
     // create .env file
-    const generateEnvFile = async (additionalContent?: string) => {
-      const content = `PROJECT_NAME=${selection.projectName}\nVITE_APP_NETWORK=${selection.network}`;
-
-      await write(
-        ".env",
-        `${
-          additionalContent ? content.concat("\n", additionalContent) : content
-        }`
-      );
-    };
-
-    switch (selection.template.path) {
-      case "nft-minting-dapp-template":
-        await generateEnvFile(`VITE_COLLECTION_CREATOR_ADDRESS=""`);
-        break;
-      case "token-minting-dapp-template":
-        await generateEnvFile(`VITE_FA_CREATOR_ADDRESS=""`);
-        break;
-      case "boilerplate-template":
-        await generateEnvFile();
-        break;
-      default:
-        throw new Error("Unsupported template to generate an .env file for");
-    }
+    const envContent = `PROJECT_NAME=${example}\nVITE_APP_NETWORK=testnet`;
+    await write(".env", envContent);
 
     scaffoldingSpinner.succeed();
 
@@ -113,34 +123,21 @@ export async function generateDapp(selection: Selections) {
     const installRootDepsCommand = `npm install --silent --no-progress`;
     await runCommand(installRootDepsCommand);
 
-    // If approve telemetry
-    if (selection.telemetry) {
-      await recordTelemetry(selection);
-    }
-
     npmSpinner.succeed();
     currentSpinner = npmSpinner;
 
     // Log next steps
     console.log(
-      green("\nSuccess! You're ready to start building your dapp on Aptos.")
+      green(
+        `\nSuccess! You're ready to start exploring the ${example} example.`
+      )
     );
 
     console.log(bold("\nNext steps:") + "\n");
 
-    console.log(green(`1. cd ${projectName}`) + "\n");
-
-    if (selection.template.doc) {
-      console.log(
-        green(
-          `2. Follow the instructions for the ${
-            selection.template.name
-          } template on ${white(selection.template.doc)}`
-        ) + "\n"
-      );
-    }
-
-    console.log(green(`3. npm run dev`) + "\n");
+    console.log(green(`1. cd ${example}`) + "\n");
+    console.log(green(`2. npm install`) + "\n");
+    console.log(green(`2. open in your favorite IDE`) + "\n");
   } catch (error: any) {
     currentSpinner?.fail(`Failed to scaffold project: ${error.message}`);
     console.error(error);
