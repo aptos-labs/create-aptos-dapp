@@ -4,11 +4,11 @@ This example is created from the boilerplate template in create-aptos-dapp.
 
 The Boilerplate template provides a starter dapp with all necessary dapp infrastructure and a simple wallet info implementation.
 
-The Boilerplate template provides:
+### Aptos Friend Overview
 
-- **Folder structure** - A pre-made dapp folder structure with a `frontend` and `move` folders.
-- **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.
-- **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
+Aptos friend is inspired by Friend.Tech, which is a social app that enables anyone to tokenize their profile by issuing shares (also know as keys). The price of the share is based on the supply and demand, i.e. price goes up when more people buying the share and vice versa. On top of the share trading, developers can build interesting things on top such as share gated chat, priority chat based on number of shares hold, etc.
+
+You can find a detailed explanation on the contract on [Aptos Learn](https://learn.aptoslabs.com/en/tutorial/solana-to-aptos-guide/move-friend/demo?workshop=solana-to-aptos).
 
 ### What tools the template uses?
 
@@ -27,18 +27,9 @@ Some commands are built-in the template and can be ran as a npm script, for exam
 
 - `npm run move:init` - a command to initialize an account to publish the Move contract and to configure the development environment
 - `npm run move:publish` - a command to publish the Move contract
+- `npm run move:upgrade` - a command to upgrade the Move contract
 - `npm run move:test` - a command to run Move unit tests
-- `npm run move:compile` - a command to compile the Move contract
+- `npm run move:get-abi` - a command to download the ABI of the contract
+- `npm run move:issue-share-and-buy-share` - a command to run a Move script that will issue share and buy share in one transaction
 
 For all other available CLI commands, can run `npx aptos` and see a list of all available commands.
-
-### Aptos Friend Overview
-
-Anyone can issue its own share, buy and sell shares issued by anyone.
-
-Issuer data is stored in Object where seed is contract address + issuer address.
-
-Holding data is stored in Object where seed is contract address + issuer address + holder address.
-
-Additionally, to make the contract easier to query without an indexer, we created registry for all issuers, all holders for each issuer and all holdings for each user.
-In production, we would use off-chain indexer to store the registry so it's more performant.

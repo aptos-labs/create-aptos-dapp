@@ -27,6 +27,7 @@ Some commands are built-in the template and can be ran as a npm script, for exam
 
 - `npm run move:init` - a command to initialize an account to publish the Move contract and to configure the development environment
 - `npm run move:publish` - a command to publish the Move contract
+- `npm run move:upgrade` - a command to upgrade the Move contract
 - `npm run move:test` - a command to run Move unit tests
 - `npm run move:compile` - a command to compile the Move contract
 

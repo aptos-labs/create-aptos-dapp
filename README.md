@@ -36,5 +36,12 @@ Then follow the prompts!
 
 `create-aptos-dapp` provides you with pre-made end-to-end dapp templates, i.e a ready dapp with configurations and a beautiful UI to get you started with creating a dapp on Aptos.
 
+- **Boilerplate Template:** A minimal dapp that has an empty contract and a UI that only connects to wallet
 - **Digital Asset Template:** A minting NFT dapp
 - **Fungible Asset Template:** A minting fungible asset dapp
+
+### Examples
+
+`create-aptos-dapp` also provides you with full stack examples that are for educational purpose, these examples are not production ready and not audited.
+
+- **Aptos Friend Template:** A friend tech style social app that implements share trading
