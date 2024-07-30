@@ -1,0 +1,14 @@
+[package]
+name = "StakePoolTemplate"
+version = "1.0.0"
+authors = []
+
+[addresses]
+stake_pool_addr = "_"
+fa_obj_addr = "_"
+initial_reward_creator_addr = "_"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "mainnet", subdir = "aptos-move/framework/aptos-framework" }
+
+[dev-dependencies]
