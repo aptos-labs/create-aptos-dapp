@@ -6,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { config } from "@/config";
 
 export const ConnectWalletAlert: FC = () => {
-  if (config.asset_id) return null;
+  if (config.fa_address) return null;
 
   return (
     <div className="px-4">
@@ -23,7 +23,7 @@ export const ConnectWalletAlert: FC = () => {
             <li>
               Fill in the{" "}
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-                asset_id
+                fa_address
               </code>{" "}
               field in
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">

@@ -41,11 +41,11 @@ interface MintData {
   isMintActive: boolean;
 }
 
-async function getMintLimit(asset_id: string): Promise<number> {
+async function getMintLimit(fa_address: string): Promise<number> {
   const mintLimitRes = await aptosClient().view<[{ vec: [string] }]>({
     payload: {
       function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_limit`,
-      functionArguments: [asset_id],
+      functionArguments: [fa_address],
     },
   });
 
@@ -55,25 +55,25 @@ async function getMintLimit(asset_id: string): Promise<number> {
 /**
  * A react hook to get fungible asset data.
  */
-export function useGetAssetData(asset_id: string = config.asset_id) {
+export function useGetAssetData(fa_address: string = config.fa_address) {
   const { account } = useWallet();
 
   return useQuery({
-    queryKey: ["app-state", asset_id],
+    queryKey: ["app-state", fa_address],
     refetchInterval: 1000 * 30,
     queryFn: async () => {
       try {
-        if (!asset_id) return null;
+        if (!fa_address) return null;
 
         const res = await aptosClient().queryIndexer<MintQueryResult>({
           query: {
             variables: {
-              asset_id,
+              fa_address,
               account: account?.address.toString() ?? "",
             },
             query: `
-            query FungibleQuery($asset_id: String, $account: String) {
-              fungible_asset_metadata(where: {asset_type: {_eq: $asset_id}}) {
+            query FungibleQuery($fa_address: String, $account: String) {
+              fungible_asset_metadata(where: {asset_type: {_eq: $fa_address}}) {
                 maximum_v2
                 supply_v2
                 name
@@ -84,14 +84,14 @@ export function useGetAssetData(asset_id: string = config.asset_id) {
               }
               current_fungible_asset_balances_aggregate(
                 distinct_on: owner_address
-                where: {asset_type: {_eq: $asset_id}}
+                where: {asset_type: {_eq: $fa_address}}
               ) {
                 aggregate {
                   count
                 }
               }
               current_fungible_asset_balances(
-                where: {owner_address: {_eq: $account}, asset_type: {_eq: $asset_id}}
+                where: {owner_address: {_eq: $account}, asset_type: {_eq: $fa_address}}
                 distinct_on: asset_type
                 limit: 1
               ) {
@@ -109,7 +109,7 @@ export function useGetAssetData(asset_id: string = config.asset_id) {
           maxSupply: convertAmountFromOnChainToHumanReadable(asset.maximum_v2 ?? 0, asset.decimals),
           currentSupply: convertAmountFromOnChainToHumanReadable(asset.supply_v2 ?? 0, asset.decimals),
           uniqueHolders: res.current_fungible_asset_balances_aggregate.aggregate.count ?? 0,
-          totalAbleToMint: convertAmountFromOnChainToHumanReadable(await getMintLimit(asset_id), asset.decimals),
+          totalAbleToMint: convertAmountFromOnChainToHumanReadable(await getMintLimit(fa_address), asset.decimals),
           yourBalance: convertAmountFromOnChainToHumanReadable(
             res.current_fungible_asset_balances[0]?.amount ?? 0,
             asset.decimals,
