@@ -72,8 +72,8 @@ module stake_pool_addr::stake_pool {
     }
 
     /// Global per contract
-    /// Generate signer to send reward from reward store to user
-    struct RewardStoreController has key {
+    /// Generate signer to send reward from reward store and stake store to user
+    struct FungibleStoreController has key {
         extend_ref: ExtendRef,
     }
 
@@ -98,7 +98,7 @@ module stake_pool_addr::stake_pool {
         });
 
         let reward_store_constructor_ref = &object::create_object(sender_addr);
-        move_to(sender, RewardStoreController {
+        move_to(sender, FungibleStoreController {
             extend_ref: object::generate_extend_ref(reward_store_constructor_ref),
         });
 
@@ -182,7 +182,7 @@ module stake_pool_addr::stake_pool {
 
     /// Claim reward
     /// Any staker can call
-    public entry fun claim_reward(sender: &signer) acquires StakePool, RewardStoreController {
+    public entry fun claim_reward(sender: &signer) acquires StakePool, FungibleStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
@@ -196,7 +196,7 @@ module stake_pool_addr::stake_pool {
 
     /// Stake, will auto claim before staking
     /// Anyone can call
-    public entry fun stake(sender: &signer, amount: u64) acquires StakePool, RewardStoreController {
+    public entry fun stake(sender: &signer, amount: u64) acquires StakePool, FungibleStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
@@ -236,7 +236,7 @@ module stake_pool_addr::stake_pool {
     /// Unstake, will auto claim before unstaking
     /// Only existing stakers can call
     /// If amount is not provided, unstake all
-    public entry fun unstake(sender: &signer, amount: Option<u64>) acquires StakePool, RewardStoreController {
+    public entry fun unstake(sender: &signer, amount: Option<u64>) acquires StakePool, FungibleStoreController {
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
@@ -254,7 +254,7 @@ module stake_pool_addr::stake_pool {
         };
         assert!(user_stake.amount >= updated_amount, ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE);
         fungible_asset::transfer(
-            sender,
+            &generate_store_signer(),
             user_stake.stake_store,
             primary_fungible_store::primary_store(sender_addr, stake_pool.fa_metadata_object),
             updated_amount
@@ -273,7 +273,7 @@ module stake_pool_addr::stake_pool {
     }
 
     /// Claim reward and stake when reward fa is the same as staked fa
-    public entry fun compound(sender: &signer) acquires StakePool, RewardStoreController {
+    public entry fun compound(sender: &signer) acquires StakePool, FungibleStoreController {
         let sender_addr = signer::address_of(sender);
         let claimable_reward = get_claimable_reward(sender_addr);
         // stake will auto claim before staking
@@ -447,15 +447,21 @@ module stake_pool_addr::stake_pool {
         ) as u64)
     }
 
+    /// Generate signer to send reward from reward store and stake store to user
+    fun generate_store_signer(): signer acquires FungibleStoreController {
+        object::generate_signer_for_extending(&borrow_global<FungibleStoreController>(@stake_pool_addr).extend_ref)
+    }
+
     /// Get or create user stake store
     /// If user does not have stake store, create one
     fun get_or_create_user_stake_store(
         user_stakes: &Table<address, UserStake>,
         fa_metadata_object: Object<Metadata>,
         sender_addr: address,
-    ): (Object<FungibleStore>, bool) {
+    ): (Object<FungibleStore>, bool) acquires FungibleStoreController {
+        let store_signer = &generate_store_signer();
         if (!table::contains(user_stakes, sender_addr)) {
-            let stake_store_object_constructor_ref = &object::create_object(sender_addr);
+            let stake_store_object_constructor_ref = &object::create_object(signer::address_of(store_signer));
             let stake_store = fungible_asset::create_store(
                 stake_store_object_constructor_ref,
                 fa_metadata_object,
@@ -472,9 +478,9 @@ module stake_pool_addr::stake_pool {
         claimable_reward: u64,
         sender_addr: address,
         stake_pool: &StakePool
-    ) acquires RewardStoreController {
+    ) acquires FungibleStoreController {
         fungible_asset::transfer(
-            &object::generate_signer_for_extending(&borrow_global<RewardStoreController>(@stake_pool_addr).extend_ref),
+            &generate_store_signer(),
             stake_pool.reward_store,
             primary_fungible_store::ensure_primary_store_exists(sender_addr, stake_pool.fa_metadata_object),
             claimable_reward
@@ -537,7 +543,7 @@ module stake_pool_addr::stake_pool {
         });
 
         let reward_store_constructor_ref = &object::create_object(sender_addr);
-        move_to(sender, RewardStoreController {
+        move_to(sender, FungibleStoreController {
             extend_ref: object::generate_extend_ref(reward_store_constructor_ref),
         });
 
