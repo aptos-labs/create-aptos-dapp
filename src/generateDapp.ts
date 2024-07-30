@@ -97,6 +97,9 @@ export async function generateDapp(selection: Selections) {
       case "token-minting-dapp-template":
         await generateEnvFile(`VITE_FA_CREATOR_ADDRESS=""`);
         break;
+      case "token-staking-dapp-template":
+        await generateEnvFile(`VITE_FA_ADDRESS=""\nVITE_CREATOR_ADDRESS=""`);
+        break;
       case "boilerplate-template":
         await generateEnvFile();
         break;
