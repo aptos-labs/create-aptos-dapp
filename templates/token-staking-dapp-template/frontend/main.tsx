@@ -11,6 +11,7 @@ import { WalletProvider } from "@/components/WalletProvider.tsx";
 import { TokenDataContextProvider } from "./providers/tokenData";
 import { PoolDataContextProvider } from "./providers/poolData";
 import { AccountDataContextProvider } from "./providers/accountData";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 const queryClient = new QueryClient();
 
@@ -21,8 +22,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <TokenDataContextProvider>
           <PoolDataContextProvider>
             <AccountDataContextProvider>
-              <App />
-              <Toaster />
+              <TooltipProvider delayDuration={100}>
+                <App />
+                <Toaster />
+              </TooltipProvider>
             </AccountDataContextProvider>
           </PoolDataContextProvider>
         </TokenDataContextProvider>

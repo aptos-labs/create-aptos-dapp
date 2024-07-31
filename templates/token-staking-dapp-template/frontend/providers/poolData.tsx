@@ -1,10 +1,11 @@
 import { useToast } from "@/components/ui/use-toast";
 import { useGetTokenData } from "@/hooks/useGetTokenData";
 import { useGetUniqueHolders } from "@/hooks/useGetUniqueHolders";
-import { aptosClient } from "@/utils/aptosClient";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
 import { getAPR } from "@/view-functions/getAPR";
+import { getExistsRewardSchedule } from "@/view-functions/getExistsRewardSchedule";
 import { getRewardReleased } from "@/view-functions/getRewardDistributed";
+import { getRewardSchedule } from "@/view-functions/getRewardSchedule";
 import { getStakePoolData } from "@/view-functions/getStakePoolData";
 import { getTotalSupply } from "@/view-functions/getTotalSupply";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +17,8 @@ export interface PoolDataProviderState {
   apr: string;
   rewardReleased: string;
   uniqueHolders: number;
+  existsRewardSchedule: boolean;
+  rewardSchedule?: GetRewardScheduleResponse;
 }
 
 const defaultValues: PoolDataProviderState = {
@@ -24,7 +27,17 @@ const defaultValues: PoolDataProviderState = {
   apr: "0",
   rewardReleased: "0",
   uniqueHolders: 0,
+  existsRewardSchedule: false,
+  rewardSchedule: undefined,
 };
+
+export interface GetRewardScheduleResponse {
+  index: string;
+  rps: string;
+  last_update_ts: string;
+  start_ts: string;
+  end_ts: string;
+}
 
 export const PoolDataContext = createContext<PoolDataProviderState>(defaultValues);
 
@@ -34,6 +47,8 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
   const [apr, setAPR] = useState<string>("0");
   const [rewardReleased, setRewardReleased] = useState<string>("0");
   const [uniqueHolders, setUniqueHolders] = useState<number>(0);
+  const [existsRewardSchedule, setExistsRewardSchedule] = useState<boolean>(false);
+  const [rewardSchedule, setRewardSchedule] = useState<GetRewardScheduleResponse>();
 
   const { tokenData } = useGetTokenData();
   const { toast } = useToast();
@@ -65,6 +80,17 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
         const formattedStakingRatio = stakingRatio?.toFixed(2) ?? 0;
 
         /**
+         * Get whether a rewards achedule exists
+         */
+
+        const existsRewardSchedule = await getExistsRewardSchedule();
+
+        /**
+         * Get the rewards scheulde
+         */
+        const rewardSchedule = await getRewardSchedule();
+
+        /**
          * Get APR
          */
         const apr = await getAPR();
@@ -77,6 +103,7 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
          * Get reward released so far
          */
         const rewardReleasedFromChain = await getRewardReleased();
+
         const rewardReleased =
           convertAmountFromOnChainToHumanReadable(
             rewardReleasedFromChain ?? 0,
@@ -90,7 +117,16 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
          * Get unique holders
          */
         const { uniqueHolders } = await useGetUniqueHolders();
-        return { totalStaked, totalSupply, formattedStakingRatio, formattedAPR, rewardReleased, uniqueHolders };
+        return {
+          totalStaked,
+          totalSupply,
+          formattedStakingRatio,
+          formattedAPR,
+          rewardReleased,
+          uniqueHolders,
+          existsRewardSchedule,
+          rewardSchedule,
+        };
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -108,11 +144,15 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
       setRewardReleased(data.rewardReleased);
       setStakingRatio(data.formattedStakingRatio);
       setUniqueHolders(data.uniqueHolders);
+      setExistsRewardSchedule(data.existsRewardSchedule);
+      setRewardSchedule(data.rewardSchedule);
     }
   }, [data]);
 
   return (
-    <PoolDataContext.Provider value={{ totalStaked, stakingRatio, apr, rewardReleased, uniqueHolders }}>
+    <PoolDataContext.Provider
+      value={{ totalStaked, stakingRatio, apr, rewardReleased, uniqueHolders, existsRewardSchedule, rewardSchedule }}
+    >
       {children}
     </PoolDataContext.Provider>
   );

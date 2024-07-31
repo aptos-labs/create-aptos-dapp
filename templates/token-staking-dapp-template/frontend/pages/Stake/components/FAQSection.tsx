@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 interface FAQSectionProps {}
 
 export const FAQSection: React.FC<FAQSectionProps> = () => {
-  if (!config.faqs || !config.faqs.questions.length) return null;
+  if (!config.faqs || !config.faqs.questions?.length) return null;
 
   return (
     <section className="faq-container px-4 max-w-screen-xl mx-auto w-full">

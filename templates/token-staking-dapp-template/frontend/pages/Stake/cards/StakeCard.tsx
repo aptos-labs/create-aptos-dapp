@@ -31,7 +31,7 @@ export const StakeCard: React.FC = () => {
   const { tokenData } = useGetTokenData();
   const queryClient = useQueryClient();
 
-  const { accountTokenBalance } = useGetAccountData();
+  const { accountTokenBalance, hasRewards } = useGetAccountData();
   const { apr } = useGetStakePoolData();
 
   const [amount, setAmount] = useState<string>();
@@ -52,7 +52,7 @@ export const StakeCard: React.FC = () => {
       await aptosClient().waitForTransaction({
         transactionHash: response.hash,
       });
-      queryClient.invalidateQueries();
+      queryClient.refetchQueries();
     } catch (error: any) {}
   };
 
@@ -90,11 +90,14 @@ export const StakeCard: React.FC = () => {
             <p className="text-gray-400 text-sm">
               {accountTokenBalance} {tokenData?.name} Available in your wallet
             </p>
+            {hasRewards && <p className="text-gray-400 text-sm">Staking will auto claim your available rewards</p>}
           </div>
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button onClick={onStakeClick}>Stake</Button>
+            <Button onClick={onStakeClick} disabled={parseInt(accountTokenBalance) <= 0}>
+              Stake
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

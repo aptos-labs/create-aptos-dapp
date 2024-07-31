@@ -9,8 +9,7 @@ async function test() {
     packageDirectoryPath: "move",
     namedAddresses: {
       stake_pool_addr: "0x100",
-      staked_fa_obj_addr: "0x200",
-      reward_fa_obj_addr: "0x200",
+      fa_obj_addr: "0x200",
       initial_reward_creator_addr: "0x300",
     },
   });

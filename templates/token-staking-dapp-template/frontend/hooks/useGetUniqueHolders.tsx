@@ -22,7 +22,7 @@ export async function useGetUniqueHolders(
       },
       query: `query UniqueHolder($fa_address: String) {
         current_fungible_asset_balances_aggregate(
-          where: {asset_type: {_eq: $fa_address}}
+          where: {asset_type: {_eq: $fa_address}, amount: {_gt: "0"}, is_primary: {_eq: true}}
         ) {
           aggregate {
             count(columns: owner_address, distinct: true)

@@ -69,8 +69,8 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
         /**
          * Define whether the current connected account is the stake creator
          */
-        const isCreator = account?.address === import.meta.env.VITE_CREATOR_ADDRESS;
-
+        const isCreator =
+          import.meta.env.VITE_CREATOR_ADDRESS && account?.address === import.meta.env.VITE_CREATOR_ADDRESS;
         /**
          * Get the TOKEN balance of an Account
          *

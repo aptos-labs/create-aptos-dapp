@@ -1,4 +1,12 @@
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,10 +20,10 @@ import {
 } from "@/utils/helpers";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useState } from "react";
-import { useGetExistsRewardSchedule } from "@/hooks/useGetExistsRewardSchedule";
-import { useGetRewardSchedule } from "@/hooks/useGetRewardSchedule";
 import { useGetTokenData } from "@/hooks/useGetTokenData";
 import { useGetAccountData } from "@/hooks/useGetAccountData";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetStakePoolData } from "@/hooks/useGetStakePoolData";
 
 const WEEKS_IN_SECONDS = 604800;
 
@@ -23,15 +31,14 @@ export const AddIncentivePoolDialog: React.FC = () => {
   const { signAndSubmitTransaction } = useWallet();
   const { tokenData } = useGetTokenData();
   const { accountTokenBalance } = useGetAccountData();
+  const { existsRewardSchedule, rewardSchedule } = useGetStakePoolData();
+  const queryClient = useQueryClient();
 
   const [incentiveAmount, setIncentiveAmount] = useState<string>("");
   const [weeks, setWeeks] = useState<string>("");
 
   const [isValidMinimalIncentiveAmount, setisValidMinimalIncentiveAmount] = useState<boolean>(true);
   const [minimalIncentiveAmountInHumandReadable, setMinimalIncentiveAmountInHumandReadable] = useState<number>(0);
-
-  const existsRewardSchedule = useGetExistsRewardSchedule();
-  const rewardSchedule = useGetRewardSchedule();
 
   const rps = parseInt(rewardSchedule?.rps ?? "0");
   const start_ts = parseInt(rewardSchedule?.start_ts ?? "0");
@@ -96,6 +103,7 @@ export const AddIncentivePoolDialog: React.FC = () => {
       await aptosClient().waitForTransaction({
         transactionHash: response.hash,
       });
+      queryClient.refetchQueries();
     } catch (error: any) {}
   };
 
@@ -186,10 +194,10 @@ export const AddIncentivePoolDialog: React.FC = () => {
           </div>
         </div>
         <DialogFooter>
-        <DialogClose asChild>
-          <Button onClick={onAddIncetive} disabled={existsRewardSchedule}>
-            Add Incentive
-          </Button>
+          <DialogClose asChild>
+            <Button onClick={onAddIncetive} disabled={existsRewardSchedule}>
+              Add Incentive
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

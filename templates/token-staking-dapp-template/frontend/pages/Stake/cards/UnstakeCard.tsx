@@ -26,7 +26,7 @@ export const UnstakeCard: React.FC = () => {
   const { signAndSubmitTransaction } = useWallet();
   const { tokenData } = useGetTokenData();
 
-  const { accountStakeAmount } = useGetAccountData();
+  const { accountStakeAmount, hasRewards } = useGetAccountData();
   const queryClient = useQueryClient();
 
   const [amountToUnstake, setAmountToUnstake] = useState<string>();
@@ -84,6 +84,7 @@ export const UnstakeCard: React.FC = () => {
             <p className="text-gray-400 text-sm">
               {accountStakeAmount} {tokenData?.name} available to unstake
             </p>
+            {hasRewards && <p className="text-gray-400 text-sm">Unstaking will auto claim your available rewards</p>}
           </div>
         </div>
         <DialogFooter>
