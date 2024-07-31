@@ -4,6 +4,9 @@ module stake_pool_addr::test_end_to_end {
     use std::signer;
     use std::string;
 
+    use aptos_std::debug;
+    use aptos_std::string_utils;
+
     use aptos_framework::fungible_asset;
     use aptos_framework::object;
     use aptos_framework::primary_fungible_store;
@@ -104,6 +107,17 @@ module stake_pool_addr::test_end_to_end {
             assert!(unique_stakers == 2, unique_stakers);
         };
 
+        let (
+            user_staked_amount,
+            userlast_claim_ts,
+            user_index,
+        ) = stake_pool::get_user_stake_data(staker1_addr);
+        let claimable_reward = stake_pool::get_claimable_reward(staker1_addr);
+        debug::print(&string_utils::format1( &b"user_staked_amount: {}", user_staked_amount));
+        debug::print(&string_utils::format1( &b"userlast_claim_ts: {}", userlast_claim_ts));
+        debug::print(&string_utils::format1( &b"user_index: {}", user_index));
+        debug::print(&string_utils::format1( &b"claimable_reward: {}", claimable_reward));
+
         stake_pool::unstake(staker1, option::none());
         /*
         at this point, global reward index is 24 + (100 - 80) * 100 / 400 = 29, last update ts 100, total stake is 40000
@@ -122,29 +136,18 @@ module stake_pool_addr::test_end_to_end {
             assert!(unique_stakers == 0, unique_stakers);
         };
 
-        // let (
-        //     user_staked_amount,
-        //     userlast_claim_ts,
-        //     user_index,
-        // ) = staking2::get_user_stake_data(staker1_addr);
-        // let claimable_reward = staking2::get_claimable_reward(staker1_addr);
-        // debug::print(&string_utils::format1( &b"user_staked_amount: {}", user_staked_amount));
-        // debug::print(&string_utils::format1( &b"userlast_claim_ts: {}", userlast_claim_ts));
-        // debug::print(&string_utils::format1( &b"user_index: {}", user_index));
-        // debug::print(&string_utils::format1( &b"claimable_reward: {}", claimable_reward));
-
-        // let (
-        //     reward_schedule_index,
-        //     reward_schedule_rps,
-        //     reward_schedule_last_update_ts,
-        //     reward_schedule_start_ts,
-        //     reward_schedule_end_ts
-        // ) = staking2::get_reward_schedule();
-        // debug::print(&string_utils::format1( &b"reward_schedule_index: {}", reward_schedule_index));
-        // debug::print(&string_utils::format1( &b"reward_schedule_rps: {}", reward_schedule_rps));
-        // debug::print(&string_utils::format1( &b"reward_schedule_last_update_ts: {}", reward_schedule_last_update_ts));
-        // debug::print(&string_utils::format1( &b"reward_schedule_start_ts: {}", reward_schedule_start_ts));
-        // debug::print(&string_utils::format1( &b"reward_schedule_end_ts: {}", reward_schedule_end_ts));
+        let (
+            reward_schedule_index,
+            reward_schedule_rps,
+            reward_schedule_last_update_ts,
+            reward_schedule_start_ts,
+            reward_schedule_end_ts
+        ) = stake_pool::get_reward_schedule();
+        debug::print(&string_utils::format1( &b"reward_schedule_index: {}", reward_schedule_index));
+        debug::print(&string_utils::format1( &b"reward_schedule_rps: {}", reward_schedule_rps));
+        debug::print(&string_utils::format1( &b"reward_schedule_last_update_ts: {}", reward_schedule_last_update_ts));
+        debug::print(&string_utils::format1( &b"reward_schedule_start_ts: {}", reward_schedule_start_ts));
+        debug::print(&string_utils::format1( &b"reward_schedule_end_ts: {}", reward_schedule_end_ts));
 
         let staker1_reward_balance = primary_fungible_store::balance(staker1_addr, fa_metadata_object);
         assert!(staker1_reward_balance == 25298, staker1_reward_balance); // not 25300 because of the rounding
