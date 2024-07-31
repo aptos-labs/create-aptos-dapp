@@ -26,7 +26,7 @@ async function main() {
     // check there is a second argument
     if (!args[1]) throw new Error("Please provide an example name to generate");
     const exampleName = args[1];
-    return generateExample(exampleName.trim());
+    return generateExample(exampleName.trim(), args);
   }
   const selection = await startWorkflow();
   generateDapp(selection);

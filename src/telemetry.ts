@@ -1,9 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { GA4_URL } from "./utils/constants.js";
 import { getOS } from "./utils/helpers.js";
-import { Selections } from "./types.js";
+import { ExampleTelemetryData, TemplateTelemetryData } from "./types.js";
 
-export const recordTelemetry = async (selection: Selections) => {
+export const recordTelemetry = async (
+  telemetryData: ExampleTelemetryData | TemplateTelemetryData
+) => {
   try {
     const telemetry = {
       client_id: randomUUID(), // We generate a random client id for each request
@@ -13,10 +15,7 @@ export const recordTelemetry = async (selection: Selections) => {
         {
           name: "wizard_command",
           params: {
-            command: "npx create-aptos-dapp", // TODO make it generic once --example is introduced
-            project_name: selection.projectName,
-            template: selection.template.name,
-            network: selection.network,
+            ...telemetryData,
             os: getOS(),
           },
         },

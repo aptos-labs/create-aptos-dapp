@@ -7,10 +7,11 @@ import ora from "ora";
 import fs from "fs/promises";
 import { existsSync } from "node:fs";
 import { copy, runCommand } from "./utils/helpers.js";
+import { recordTelemetry } from "./telemetry.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout });
 
-export async function generateExample(example: string) {
+export async function generateExample(example: string, cliArgs: string[]) {
   let currentSpinner: Ora | null = null;
 
   // internal examples directory path
@@ -114,6 +115,11 @@ export async function generateExample(example: string) {
     // create .env file
     const envContent = `PROJECT_NAME=${example}\nVITE_APP_NETWORK=testnet`;
     await write(".env", envContent);
+
+    await recordTelemetry({
+      command: `npx create-aptos-dapp ${cliArgs.join(" ")}`,
+      example: cliArgs[1],
+    });
 
     scaffoldingSpinner.succeed();
 

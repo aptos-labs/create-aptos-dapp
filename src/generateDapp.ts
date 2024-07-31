@@ -114,7 +114,12 @@ export async function generateDapp(selection: Selections) {
 
     // If approve telemetry
     if (selection.telemetry) {
-      await recordTelemetry(selection);
+      await recordTelemetry({
+        command: "npx create-aptos-dapp",
+        project_name: selection.projectName,
+        template: selection.template.name,
+        network: selection.network,
+      });
     }
 
     npmSpinner.succeed();
