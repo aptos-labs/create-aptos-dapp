@@ -4,6 +4,23 @@ import { white } from "kolorist";
 import { startWorkflow } from "./src/workflow.js";
 import { generateDapp } from "./src/generateDapp.js";
 import { generateExample } from "./src/generateExample.js";
+import { Command } from "commander";
+
+const program = new Command();
+program
+  .name("")
+  .description("")
+  .version("aasd")
+  .option("-pn, --name [value]", "Enter a new project name")
+  .option(
+    "-t, --template [value]",
+    "Choose a template to start your application from"
+  )
+  .option(
+    "-n, --network [value]",
+    "select the network on which your application will run"
+  )
+  .parse(process.argv);
 
 console.log(
   white(`

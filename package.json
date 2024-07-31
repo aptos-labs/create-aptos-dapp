@@ -26,6 +26,7 @@
   ],
   "type": "module",
   "dependencies": {
+    "commander": "^12.1.0",
     "kolorist": "^1.8.0",
     "ora": "^8.0.1",
     "prompts": "^2.4.2",
