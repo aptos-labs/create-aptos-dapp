@@ -1,10 +1,9 @@
 import { useToast } from "@/components/ui/use-toast";
 import { useGetTokenData } from "@/hooks/useGetTokenData";
-import { useGetUniqueHolders } from "@/hooks/useGetUniqueHolders";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
 import { getAPR } from "@/view-functions/getAPR";
 import { getExistsRewardSchedule } from "@/view-functions/getExistsRewardSchedule";
-import { getRewardReleased } from "@/view-functions/getRewardDistributed";
+import { getRewardReleased } from "@/view-functions/getRewardReleased";
 import { getRewardSchedule } from "@/view-functions/getRewardSchedule";
 import { getStakePoolData } from "@/view-functions/getStakePoolData";
 import { getTotalSupply } from "@/view-functions/getTotalSupply";
@@ -16,7 +15,7 @@ export interface PoolDataProviderState {
   stakingRatio: string;
   apr: string;
   rewardReleased: string;
-  uniqueHolders: number;
+  uniqueStakers: string;
   existsRewardSchedule: boolean;
   rewardSchedule?: GetRewardScheduleResponse;
 }
@@ -26,7 +25,7 @@ const defaultValues: PoolDataProviderState = {
   stakingRatio: "0",
   apr: "0",
   rewardReleased: "0",
-  uniqueHolders: 0,
+  uniqueStakers: "0",
   existsRewardSchedule: false,
   rewardSchedule: undefined,
 };
@@ -46,7 +45,7 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
   const [stakingRatio, setStakingRatio] = useState<string>("0");
   const [apr, setAPR] = useState<string>("0");
   const [rewardReleased, setRewardReleased] = useState<string>("0");
-  const [uniqueHolders, setUniqueHolders] = useState<number>(0);
+  const [uniqueStakers, setUniqueStakers] = useState<string>("0");
   const [existsRewardSchedule, setExistsRewardSchedule] = useState<boolean>(false);
   const [rewardSchedule, setRewardSchedule] = useState<GetRewardScheduleResponse>();
 
@@ -70,6 +69,11 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
+
+        /**
+         * Get unique stakers
+         */
+        const uniqueStakers = poolData?.unique_stakers ?? "0";
 
         /**
          * Get total supply and calculate staking ratio
@@ -113,17 +117,13 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
             maximumFractionDigits: 2,
           }) ?? 0;
 
-        /**
-         * Get unique holders
-         */
-        const { uniqueHolders } = await useGetUniqueHolders();
         return {
           totalStaked,
           totalSupply,
           formattedStakingRatio,
           formattedAPR,
           rewardReleased,
-          uniqueHolders,
+          uniqueStakers,
           existsRewardSchedule,
           rewardSchedule,
         };
@@ -143,7 +143,7 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
       setAPR(data.formattedAPR);
       setRewardReleased(data.rewardReleased);
       setStakingRatio(data.formattedStakingRatio);
-      setUniqueHolders(data.uniqueHolders);
+      setUniqueStakers(data.uniqueStakers);
       setExistsRewardSchedule(data.existsRewardSchedule);
       setRewardSchedule(data.rewardSchedule);
     }
@@ -151,7 +151,7 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
 
   return (
     <PoolDataContext.Provider
-      value={{ totalStaked, stakingRatio, apr, rewardReleased, uniqueHolders, existsRewardSchedule, rewardSchedule }}
+      value={{ totalStaked, stakingRatio, apr, rewardReleased, uniqueStakers, existsRewardSchedule, rewardSchedule }}
     >
       {children}
     </PoolDataContext.Provider>

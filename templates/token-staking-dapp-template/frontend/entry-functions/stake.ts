@@ -5,7 +5,7 @@ export type StakeTokenArguments = {
 };
 
 /**
- * Stake an amoubt of token
+ * Stake an amount of token
  */
 export const stake = (args: StakeTokenArguments): InputTransactionData => {
   const { amount } = args;

@@ -60,7 +60,7 @@ export const UnstakeCard: React.FC = () => {
           <div className="flex flex-row w-full justify-between">
             <div className="flex flex-row gap-6">
               <div>
-                <p>Total {tokenData?.name} Staked</p>
+                <p>Total {tokenData?.symbol} Staked</p>
                 <p className="body-md-semibold">{accountStakeAmount}</p>
               </div>
             </div>
@@ -75,14 +75,14 @@ export const UnstakeCard: React.FC = () => {
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Unstake {tokenData?.name}</DialogTitle>
+          <DialogTitle>Unstake {tokenData?.symbol}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4 space-y-4">
           <div className="flex flex-col item-center space-y-2">
             <Label htmlFor="incentive-amount">Amount</Label>
             <Input id="incentive-amount" className="col-span-3" type="number" onChange={onAmountChange} />
             <p className="text-gray-400 text-sm">
-              {accountStakeAmount} {tokenData?.name} available to unstake
+              {accountStakeAmount} {tokenData?.symbol} available to unstake
             </p>
             {hasRewards && <p className="text-gray-400 text-sm">Unstaking will auto claim your available rewards</p>}
           </div>

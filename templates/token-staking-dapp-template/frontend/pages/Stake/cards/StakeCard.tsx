@@ -71,7 +71,7 @@ export const StakeCard: React.FC = () => {
             <div>
               <DialogTrigger asChild>
                 <Button className="flex items-center" disabled={!account}>
-                  Stake {tokenData?.name}
+                  Stake {tokenData?.symbol}
                 </Button>
               </DialogTrigger>
             </div>
@@ -81,14 +81,14 @@ export const StakeCard: React.FC = () => {
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Stake {tokenData?.name}</DialogTitle>
+          <DialogTitle>Stake {tokenData?.symbol}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4 space-y-4">
           <div className="flex flex-col item-center space-y-2">
             <Label htmlFor="incentive-amount">Amount</Label>
             <Input id="incentive-amount" className="col-span-3" type="number" onChange={onAmountChange} />
             <p className="text-gray-400 text-sm">
-              {accountTokenBalance} {tokenData?.name} Available in your wallet
+              {accountTokenBalance} {tokenData?.symbol} Available in your wallet
             </p>
             {hasRewards && <p className="text-gray-400 text-sm">Staking will auto claim your available rewards</p>}
           </div>

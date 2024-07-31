@@ -47,7 +47,7 @@ export const AboutUsSection: React.FC = () => {
         {isCreator && <AddIncentivePoolDialog />}
         <a href="#" target="_blank">
           <div className="flex flex-row gap-2 mt-4">
-            <p>Get more {tokenData?.name ?? config.aboutUs?.title}</p>
+            <p>Get more {tokenData?.symbol ?? config.aboutUs?.title}</p>
             <Image width={16} height={16} src={ExternalLinkIcon} className="dark:invert" />
           </div>
         </a>
