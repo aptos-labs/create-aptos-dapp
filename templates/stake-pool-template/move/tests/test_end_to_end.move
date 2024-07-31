@@ -97,9 +97,12 @@ module stake_pool_addr::test_end_to_end {
         staker2 reward index is 20, last claim ts is 60, stake = 30000
         */
 
-        timestamp::update_global_time_for_test_secs(100);
-
         timestamp::update_global_time_for_test_secs(150);
+
+        {
+            let (_, _, _, unique_stakers) = stake_pool::get_stake_pool_data();
+            assert!(unique_stakers == 2, unique_stakers);
+        };
 
         stake_pool::unstake(staker1, option::none());
         /*
@@ -113,6 +116,11 @@ module stake_pool_addr::test_end_to_end {
         staker1 reward index is 29, last claim ts is 100, stake = 10000
         staker2 reward index is 29, last claim ts is 100, stake = 30000, claimed reward = 30000 * (29 - 20) = 2700
         */
+
+        {
+            let (_, _, _, unique_stakers) = stake_pool::get_stake_pool_data();
+            assert!(unique_stakers == 0, unique_stakers);
+        };
 
         // let (
         //     user_staked_amount,
