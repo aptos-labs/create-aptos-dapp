@@ -65,6 +65,8 @@ module stake_pool_addr::stake_pool {
         reward_store: Object<FungibleStore>,
         // Key is user address, value is user stake data
         user_stakes: Table<address, UserStake>,
+        // Because there is no way to get table size, we need to manually keep track of unique stakers
+        unique_stakers: u64,
         // Total stake in the contract
         total_stake: u64,
         // Reward schedule if there exists one
@@ -109,6 +111,7 @@ module stake_pool_addr::stake_pool {
                 object::address_to_object<Metadata>(@fa_obj_addr)
             ),
             user_stakes: table::new(),
+            unique_stakers: 0,
             total_stake: 0,
             reward_schedule: option::none(),
         });
@@ -268,6 +271,7 @@ module stake_pool_addr::stake_pool {
         stake_pool_mut.total_stake = stake_pool_mut.total_stake - updated_amount;
 
         if (user_stake_mut.amount == 0) {
+            stake_pool_mut.unique_stakers = stake_pool_mut.unique_stakers - 1;
             table::remove(&mut stake_pool_mut.user_stakes, sender_addr);
         };
     }
@@ -287,13 +291,15 @@ module stake_pool_addr::stake_pool {
     public fun get_stake_pool_data(): (
         Object<Metadata>,
         Object<FungibleStore>,
+        u64,
         u64
     ) acquires StakePool {
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         (
             stake_pool.fa_metadata_object,
             stake_pool.reward_store,
-            stake_pool.total_stake
+            stake_pool.total_stake,
+            stake_pool.unique_stakers
         )
     }
 
@@ -368,7 +374,7 @@ module stake_pool_addr::stake_pool {
     #[view]
     /// Get APR at the moment in percentage, e.g. return 100 means 100%
     public fun get_apr(): u64 acquires StakePool {
-        let (_, _, total_stake) = get_stake_pool_data();
+        let (_, _, total_stake, _) = get_stake_pool_data();
         if (total_stake == 0) {
             0
         } else {
@@ -515,6 +521,7 @@ module stake_pool_addr::stake_pool {
         current_ts: u64
     ) acquires StakePool {
         let stake_pool_mut = borrow_global_mut<StakePool>(@stake_pool_addr);
+        stake_pool_mut.unique_stakers = stake_pool_mut.unique_stakers + 1;
         table::add(&mut stake_pool_mut.user_stakes, sender_addr, UserStake {
             stake_store,
             last_claim_ts: current_ts,
@@ -554,6 +561,7 @@ module stake_pool_addr::stake_pool {
                 fa_metadata_object
             ),
             user_stakes: table::new(),
+            unique_stakers: 0,
             total_stake: 0,
             reward_schedule: option::none(),
         });
