@@ -18,3 +18,15 @@ export type Selections = {
   network: Network;
   telemetry: boolean;
 };
+
+export type TemplateTelemetryData = {
+  command: string;
+  project_name: string;
+  template: string;
+  network: string;
+};
+
+export type ExampleTelemetryData = {
+  command: string;
+  example: string;
+};
