@@ -31,6 +31,8 @@ module stake_pool_addr::stake_pool {
     const ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD: u64 = 8;
     /// Only admin can update reward creator
     const ERR_ONLY_ADMIN_CAN_UPDATE_REWARD_CREATOR: u64 = 9;
+    /// user try to stake/unstake zero
+    const ERR_AMOUNT_ZERO: u64 = 10;
 
     /// Unique per user
     struct UserStake has store, drop {
@@ -200,6 +202,7 @@ module stake_pool_addr::stake_pool {
     /// Stake, will auto claim before staking
     /// Anyone can call
     public entry fun stake(sender: &signer, amount: u64) acquires StakePool, FungibleStoreController {
+        assert!(amount > 0, ERR_AMOUNT_ZERO);
         let current_ts = timestamp::now_seconds();
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
@@ -255,6 +258,7 @@ module stake_pool_addr::stake_pool {
         } else {
             *option::borrow(&amount)
         };
+        assert!(updated_amount > 0, ERR_AMOUNT_ZERO);
         assert!(user_stake.amount >= updated_amount, ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE);
         fungible_asset::transfer(
             &generate_store_signer(),

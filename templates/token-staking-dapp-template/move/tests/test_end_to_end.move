@@ -229,4 +229,114 @@ module stake_pool_addr::test_end_to_end {
         let staker2_balance = primary_fungible_store::balance(staker2_addr, fa_metadata_object);
         assert!(staker2_balance == 37999, staker2_balance); // not 38000 because of the rounding
     }
+
+
+
+    #[test(
+        aptos_framework = @0x1,
+        sender = @stake_pool_addr,
+        initial_reward_creator = @0x100,
+        staker1 = @0x101,
+    )]
+    #[expected_failure(abort_code = 10)]
+    fun test_zero_stake(
+        aptos_framework: &signer,
+        sender: &signer,
+        initial_reward_creator: &signer,
+        staker1: &signer,
+    ) {
+        let sender_addr = signer::address_of(sender);
+        let initial_reward_creator_addr = signer::address_of(initial_reward_creator);
+
+        let rps = 400;
+        let duration_seconds = 100;
+        let staker1_stake_amount = 0;
+        let fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
+        primary_fungible_store::create_primary_store_enabled_fungible_asset(
+            fa_obj_constructor_ref,
+            option::none(),
+            string::utf8(b"Test FA"),
+            string::utf8(b"TFA"),
+            8,
+            string::utf8(b"url"),
+            string::utf8(b"url"),
+        );
+        let fa_metadata_object = object::object_from_constructor_ref(fa_obj_constructor_ref);
+        primary_fungible_store::mint(
+            &fungible_asset::generate_mint_ref(fa_obj_constructor_ref),
+            signer::address_of(staker1),
+            staker1_stake_amount
+        );
+        primary_fungible_store::mint(
+            &fungible_asset::generate_mint_ref(fa_obj_constructor_ref),
+            initial_reward_creator_addr,
+            rps * duration_seconds
+        );
+
+        stake_pool::init_module_for_test(
+            aptos_framework,
+            sender,
+            initial_reward_creator,
+            fa_metadata_object,
+        );
+
+        stake_pool::create_reward_schedule(initial_reward_creator, rps, duration_seconds);
+        stake_pool::stake(staker1, 0);
+    }
+
+
+    #[test(
+        aptos_framework = @0x1,
+        sender = @stake_pool_addr,
+        initial_reward_creator = @0x100,
+        staker1 = @0x101,
+    )]
+    #[expected_failure(abort_code = 10)]
+    fun test_zero_unstake(
+        aptos_framework: &signer,
+        sender: &signer,
+        initial_reward_creator: &signer,
+        staker1: &signer,
+    ) {
+        let sender_addr = signer::address_of(sender);
+        let initial_reward_creator_addr = signer::address_of(initial_reward_creator);
+
+        let rps = 400;
+        let duration_seconds = 100;
+        let staker1_stake_amount = 100;
+        let fa_obj_constructor_ref = &object::create_sticky_object(sender_addr);
+        primary_fungible_store::create_primary_store_enabled_fungible_asset(
+            fa_obj_constructor_ref,
+            option::none(),
+            string::utf8(b"Test FA"),
+            string::utf8(b"TFA"),
+            8,
+            string::utf8(b"url"),
+            string::utf8(b"url"),
+        );
+        let fa_metadata_object = object::object_from_constructor_ref(fa_obj_constructor_ref);
+        primary_fungible_store::mint(
+            &fungible_asset::generate_mint_ref(fa_obj_constructor_ref),
+            signer::address_of(staker1),
+            staker1_stake_amount
+        );
+        primary_fungible_store::mint(
+            &fungible_asset::generate_mint_ref(fa_obj_constructor_ref),
+            initial_reward_creator_addr,
+            rps * duration_seconds
+        );
+
+        stake_pool::init_module_for_test(
+            aptos_framework,
+            sender,
+            initial_reward_creator,
+            fa_metadata_object,
+        );
+
+        stake_pool::create_reward_schedule(initial_reward_creator, rps, duration_seconds);
+        stake_pool::stake(staker1, staker1_stake_amount);
+        timestamp::update_global_time_for_test_secs(50);
+        stake_pool::unstake(staker1, option::some(0));
+    }
+
 }
