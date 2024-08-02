@@ -4,7 +4,7 @@ Digital Assets are the NFT standard for Aptos. The Digital Asset template provid
 
 Read more about how to use the template [here](https://aptos.dev/create-aptos-dapp/templates/digital-asset)
 
-The Digital Asset template provides 3 pages:
+## The Digital Asset template provides 3 pages:
 
 - **Public Mint NFT Page** - A page for the public to mint NFTs.
 - **Create Collection Page** - A page for creating new NFT collections. This page is not accessible on production.

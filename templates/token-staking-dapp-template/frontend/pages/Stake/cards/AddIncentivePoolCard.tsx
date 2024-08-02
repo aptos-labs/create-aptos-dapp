@@ -83,7 +83,7 @@ export const AddIncentivePoolDialog: React.FC = () => {
     });
   };
 
-  const onAddIncetive = async () => {
+  const onAddIncentive = async () => {
     /**
      * RPS (rewards per second) calculated by the incentive amount value * 10^8 / weeks_in_seconds
      * For example, if incentive amount is 500 and weeks is 2, then
@@ -195,7 +195,7 @@ export const AddIncentivePoolDialog: React.FC = () => {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button onClick={onAddIncetive} disabled={existsRewardSchedule}>
+            <Button onClick={onAddIncentive} disabled={existsRewardSchedule}>
               Add Incentive
             </Button>
           </DialogClose>

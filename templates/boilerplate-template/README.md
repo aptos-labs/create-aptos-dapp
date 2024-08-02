@@ -3,7 +3,7 @@
 The Boilerplate template provides a starter dapp with all necessary dapp infrastructure and a simple wallet info implementation.
 
 
-The Boilerplate template provides:
+## The Boilerplate template provides:
 
 - **Folder structure** - A pre-made dapp folder structure with a `frontend` and `move` folders.
 - **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.

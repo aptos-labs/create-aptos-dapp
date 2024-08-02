@@ -15,6 +15,7 @@ export const getStakePoolData = async (): Promise<StakePoolDataResponse | null> 
         functionArguments: [],
       },
     });
+    console.log("stakePoolOnChainData", stakePoolOnChainData);
     const stakePoolData = {
       fa_metadata_object: stakePoolOnChainData[0],
       reward_store: stakePoolOnChainData[1],

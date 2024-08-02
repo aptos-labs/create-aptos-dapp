@@ -50,7 +50,7 @@ export const workflowOptions = {
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/token-staking-dapp",
         },
         description:
-          "A production ready template to create a staking dapp to a token",
+          "A production ready template to create a token staking dapp",
       },
     ],
     initial: 0,

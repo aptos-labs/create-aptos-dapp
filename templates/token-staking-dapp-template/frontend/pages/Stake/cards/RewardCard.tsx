@@ -51,7 +51,9 @@ export const RewardCard: React.FC = () => {
               <p className="body-md-semibold">
                 {convertAmountFromOnChainToHumanReadable(claimableRewards, tokenData?.decimals ?? 0)}
               </p>
-              <p className="text-gray-400 text-sm">Stake rewards will auto claim your available rewards</p>
+              <p className="text-gray-400 text-sm">
+                Stake rewards will auto claim your available rewards and stake them
+              </p>
             </div>
           </div>
           <div className="flex gap-4">

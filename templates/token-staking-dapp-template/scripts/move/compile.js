@@ -15,7 +15,7 @@ async function compile() {
       // Compile module with account address
       stake_pool_addr: accountAddress,
       fa_obj_addr: process.env.VITE_FA_ADDRESS,
-      initial_reward_creator_addr: process.env.VITE_CREATOR_ADDRESS,
+      initial_reward_creator_addr: process.env.VITE_REWARD_CREATOR_ADDRESS,
     },
   });
 }

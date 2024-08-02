@@ -58,6 +58,12 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
     queryFn: async () => {
       try {
         /**
+         * Get whether a rewards schedule exists
+         */
+
+        const existsRewardSchedule = await getExistsRewardSchedule();
+        if (!existsRewardSchedule) return { ...defaultValues, formattedAPR: "0", formattedStakingRatio: "0" };
+        /**
          * Get total staked amount
          */
         const poolData = await getStakePoolData();
@@ -84,15 +90,12 @@ export const PoolDataContextProvider: React.FC<PropsWithChildren> = ({ children 
         const formattedStakingRatio = stakingRatio?.toFixed(2) ?? 0;
 
         /**
-         * Get whether a rewards achedule exists
+         * Get the rewards schedule
          */
-
-        const existsRewardSchedule = await getExistsRewardSchedule();
-
-        /**
-         * Get the rewards scheulde
-         */
-        const rewardSchedule = await getRewardSchedule();
+        let rewardSchedule;
+        if (existsRewardSchedule) {
+          rewardSchedule = await getRewardSchedule();
+        }
 
         /**
          * Get APR

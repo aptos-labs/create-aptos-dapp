@@ -1,4 +1,5 @@
 import { useToast } from "@/components/ui/use-toast";
+import { useGetStakePoolData } from "@/hooks/useGetStakePoolData";
 import { useGetTokenData } from "@/hooks/useGetTokenData";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
 import { getAccountTokenBalance } from "@/view-functions/getAccountTokenAmount";
@@ -33,6 +34,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
   const { account } = useWallet();
   const { tokenData } = useGetTokenData();
   const { toast } = useToast();
+  const { existsRewardSchedule } = useGetStakePoolData();
 
   const [hasStake, setHasStake] = useState<boolean>(false);
   const [hasRewards, setHasRewards] = useState<boolean>(false);
@@ -46,10 +48,14 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
     refetchInterval: 1000 * 30,
     queryFn: async () => {
       try {
+        if (!account) return defaultValues;
         /**
          * Get the current connected account claimable rewards
          */
-        const claimableRewards = await getClaimableRewards(account?.address);
+        let claimableRewards = 0;
+        if (existsRewardSchedule) {
+          claimableRewards = await getClaimableRewards(account?.address);
+        }
 
         /**
          * Determine whether the current connected account has staked
@@ -59,18 +65,23 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
         /**
          * Get the current connected account stake data
          */
-        const accountStakeData = await getUserStakeData(account?.address);
+        let accountStakeData;
+        let accountStakeAmount = 0;
+        if (hasStake) {
+          accountStakeData = await getUserStakeData(account?.address);
 
-        const accountStakedAmount = convertAmountFromOnChainToHumanReadable(
-          parseInt(accountStakeData?.amount ?? "0"),
-          tokenData?.decimals ?? 0,
-        );
+          accountStakeAmount = convertAmountFromOnChainToHumanReadable(
+            parseInt(accountStakeData?.amount ?? "0"),
+            tokenData?.decimals ?? 0,
+          );
+        }
 
         /**
          * Define whether the current connected account is the stake creator
          */
         const isCreator =
-          import.meta.env.VITE_CREATOR_ADDRESS && account?.address === import.meta.env.VITE_CREATOR_ADDRESS;
+          import.meta.env.VITE_REWARD_CREATOR_ADDRESS &&
+          account?.address === import.meta.env.VITE_REWARD_CREATOR_ADDRESS;
         /**
          * Get the TOKEN balance of an Account
          *
@@ -82,7 +93,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
          * the account balance and converts it into a human readable format.
          */
         const onChainBalance = await getAccountTokenBalance(account?.address);
-        const tokenBalance = convertAmountFromOnChainToHumanReadable(
+        const accountTokenBalance = convertAmountFromOnChainToHumanReadable(
           onChainBalance,
           tokenData?.decimals ?? 0,
         ).toLocaleString(undefined, {
@@ -90,7 +101,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
           maximumFractionDigits: 4,
         });
 
-        return { claimableRewards, hasStake, accountStakedAmount, isCreator, tokenBalance };
+        return { claimableRewards, hasStake, accountStakeAmount, isCreator, accountTokenBalance };
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -106,9 +117,9 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
       setClaimableRewards(data.claimableRewards);
       setHasRewards(data.claimableRewards > 0);
       setHasStake(data.hasStake);
-      setAccountStakeAmount(data.accountStakedAmount);
+      setAccountStakeAmount(data.accountStakeAmount);
       setIsCreator(data.isCreator);
-      setAccountTokenBalance(data.tokenBalance);
+      setAccountTokenBalance(data.accountTokenBalance);
     }
   }, [data]);
 

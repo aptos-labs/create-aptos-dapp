@@ -17,7 +17,7 @@ async function publish() {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
         stake_pool_addr: accountAddress,
         fa_obj_addr: process.env.VITE_FA_ADDRESS,
-        initial_reward_creator_addr: process.env.VITE_CREATOR_ADDRESS,
+        initial_reward_creator_addr: process.env.VITE_REWARD_CREATOR_ADDRESS,
       },
       profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
     })
