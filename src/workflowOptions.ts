@@ -42,6 +42,16 @@ export const workflowOptions = {
         description:
           "A production ready template to create your own token minting dapp",
       },
+      {
+        title: "Token staking dapp",
+        value: {
+          path: "token-staking-dapp-template",
+          name: "Token staking dapp",
+          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/token-staking-dapp",
+        },
+        description:
+          "A production ready template to create a token staking dapp",
+      },
     ],
     initial: 0,
   },
@@ -50,7 +60,10 @@ export const workflowOptions = {
     name: "network",
     message: "Choose your network",
     choices(prev) {
-      if (prev.path === "boilerplate-template") {
+      if (
+        prev.path === "boilerplate-template" ||
+        prev.path === "token-staking-dapp-template"
+      ) {
         return [
           { title: "Mainnet", value: "mainnet" },
           { title: "Testnet", value: "testnet" },

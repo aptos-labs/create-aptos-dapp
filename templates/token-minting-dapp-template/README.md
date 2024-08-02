@@ -4,7 +4,7 @@ The Fungible Asset template provides an end-to-end Fungible Asset minting dapp w
 
 Read more about how to use the template [here](https://aptos.dev/create-aptos-dapp/templates/fungible-asset)
 
-The Fungible Asset template provides 3 pages:
+## The Fungible Asset template provides 3 pages:
 
 - **Public Mint Fungible Asset Page** - A page for the public to mint Fungible Assets.
 - **Create Fungible Asset page** - A page for creating new asset. This page is not accessible on production.
