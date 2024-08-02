@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.17 (2024-08-02)
+
 - Support an `--example` command to generate a specific example
 - Add `aptos-friend` example
 - Change `asset_id` to `fa_address` on the token minting dapp template
