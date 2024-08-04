@@ -139,7 +139,6 @@ module stake_pool_addr::stake_pool {
         });
     }
 
-
     // ================================= Entry Functions ================================= //
 
     /// Set pending admin of the contract, then pending admin can call accept_admin to become admin
