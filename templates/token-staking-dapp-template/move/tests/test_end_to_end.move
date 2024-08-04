@@ -29,7 +29,7 @@ module stake_pool_addr::test_end_to_end {
         staker2: &signer,
     ) {
         let sender_addr = signer::address_of(sender);
-        let _initial_reward_creator_addr = signer::address_of(initial_reward_creator);
+        let initial_reward_creator_addr = signer::address_of(initial_reward_creator);
         let staker1_addr = signer::address_of(staker1);
         let staker2_addr = signer::address_of(staker2);
 
@@ -68,7 +68,7 @@ module stake_pool_addr::test_end_to_end {
         stake_pool::init_module_for_test(
             aptos_framework,
             sender,
-            initial_reward_creator,
+            initial_reward_creator_addr,
             fa_metadata_object,
         );
 
@@ -209,7 +209,7 @@ module stake_pool_addr::test_end_to_end {
         stake_pool::init_module_for_test(
             aptos_framework,
             sender,
-            initial_reward_creator,
+            initial_reward_creator_addr,
             fa_metadata_object,
         );
 
@@ -274,7 +274,7 @@ module stake_pool_addr::test_end_to_end {
         stake_pool::init_module_for_test(
             aptos_framework,
             sender,
-            initial_reward_creator,
+            initial_reward_creator_addr,
             fa_metadata_object,
         );
 
@@ -327,7 +327,7 @@ module stake_pool_addr::test_end_to_end {
         stake_pool::init_module_for_test(
             aptos_framework,
             sender,
-            initial_reward_creator,
+            initial_reward_creator_addr,
             fa_metadata_object,
         );
 
