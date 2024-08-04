@@ -230,15 +230,13 @@ module stake_pool_addr::test_end_to_end {
         assert!(staker2_balance == 37999, staker2_balance); // not 38000 because of the rounding
     }
 
-
-
     #[test(
         aptos_framework = @0x1,
         sender = @stake_pool_addr,
         initial_reward_creator = @0x100,
         staker1 = @0x101,
     )]
-    #[expected_failure(abort_code = 10)]
+    #[expected_failure(abort_code = 10, location = stake_pool)]
     fun test_zero_stake(
         aptos_framework: &signer,
         sender: &signer,
@@ -291,7 +289,7 @@ module stake_pool_addr::test_end_to_end {
         initial_reward_creator = @0x100,
         staker1 = @0x101,
     )]
-    #[expected_failure(abort_code = 10)]
+    #[expected_failure(abort_code = 10, location = stake_pool)]
     fun test_zero_unstake(
         aptos_framework: &signer,
         sender: &signer,
@@ -338,5 +336,4 @@ module stake_pool_addr::test_end_to_end {
         timestamp::update_global_time_for_test_secs(50);
         stake_pool::unstake(staker1, option::some(0));
     }
-
 }
