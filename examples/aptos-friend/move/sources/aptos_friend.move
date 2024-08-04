@@ -406,7 +406,10 @@ module aptos_friend_addr::aptos_friend {
 
     #[view]
     /// Calculate sell share cost
-    public fun calculate_sell_share_cost(issuer_obj: Object<Issuer>, amount: u64): (u64, u64, u64, u64) acquires Issuer {
+    public fun calculate_sell_share_cost(
+        issuer_obj: Object<Issuer>,
+        amount: u64
+    ): (u64, u64, u64, u64) acquires Issuer {
         let issuer_obj_addr = object::object_address(&issuer_obj);
         let issuer = borrow_global<Issuer>(issuer_obj_addr);
         let old_supply = issuer.total_issued_shares;
@@ -471,270 +474,28 @@ module aptos_friend_addr::aptos_friend {
         share_cost
     }
 
-    // ================================= Tests ================================== //
+    // ================================= Uint Tests Helper ================================== //
 
+    #[test_only]
+    use aptos_framework::aptos_coin;
     #[test_only]
     use aptos_framework::account;
     #[test_only]
-    use std::string;
+    use aptos_framework::coin::{BurnCapability, MintCapability};
+
     #[test_only]
-    use aptos_framework::aptos_coin;
-
-    #[test(aptos_framework = @aptos_framework, deployer = @aptos_friend_addr, user_1 = @0x998, user_2 = @0x997)]
-    fun test_happy_path(
+    public fun init_module_for_test(
         aptos_framework: &signer,
-        deployer: &signer,
-        user_1: &signer,
-        user_2: &signer,
-    ) acquires User, IssuerRegistry, Issuer, Holding, Vault {
-        // ================================= Setup ================================== //
+        sender: &signer
+    ): (BurnCapability<AptosCoin>, MintCapability<AptosCoin>) {
+        init_module(sender);
 
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
-        let deployer_addr = signer::address_of(deployer);
+        let deployer_addr = signer::address_of(sender);
         account::create_account_for_test(deployer_addr);
-        coin::register<AptosCoin>(deployer);
+        coin::register<AptosCoin>(sender);
 
-        let user_1_addr = signer::address_of(user_1);
-        account::create_account_for_test(user_1_addr);
-        coin::register<AptosCoin>(user_1);
-
-        let user_2_addr = signer::address_of(user_2);
-        account::create_account_for_test(user_2_addr);
-        coin::register<AptosCoin>(user_2);
-
-        init_module(deployer);
-
-        // ================================= User 1 issues share ================================== //
-
-        issue_share(user_1, string::utf8(b"test_user_1"));
-        let issuer_1_obj = get_issuer_obj(user_1_addr);
-
-        {
-            let (
-                addr,
-                username,
-                total_issued_shares,
-            ) = get_issuer(issuer_1_obj);
-            let holder_holdings = get_issuer_holder_holdings(issuer_1_obj);
-            assert!(addr == user_1_addr, 1);
-            assert!(username == string::utf8(b"test_user_1"), 1);
-            assert!(total_issued_shares == 1, 1);
-            assert!(vector::length(&holder_holdings) == 1, 1);
-            assert!(vector::borrow(&holder_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 1);
-        };
-
-        {
-            let user_obj = get_user_obj(user_1_addr);
-            let user_holdings = get_user_holdings(user_obj);
-            assert!(vector::length(&user_holdings) == 1, 2);
-            assert!(vector::borrow(&user_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 1);
-        };
-
-        {
-            let holding_obj = get_holding_obj(user_1_addr, user_1_addr);
-            let (issuer, holder, shares) = get_holding(holding_obj);
-            assert!(issuer == user_1_addr, 3);
-            assert!(holder == user_1_addr, 3);
-            assert!(shares == 1, 3);
-        };
-
-        // ================================= User 1 buy 10 shares of its own share ================================== //
-
-        let (share_cost_1, issuer_fee_1, protocol_fee_1, total_cost_1) = calculate_buy_share_cost(issuer_1_obj, 10);
-        let coins = coin::mint(total_cost_1, &mint_cap);
-        coin::deposit(user_1_addr, coins);
-
-        buy_share(user_1, issuer_1_obj, 10);
-        assert!(coin::balance<AptosCoin>(user_1_addr) == issuer_fee_1, 4);
-        assert!(coin::balance<AptosCoin>(get_vault_addr()) == share_cost_1, 4);
-        assert!(coin::balance<AptosCoin>(@aptos_friend_addr) == protocol_fee_1, 4);
-
-        {
-            let (_, _, total_issued_shares) = get_issuer(issuer_1_obj);
-            let holder_holdings = get_issuer_holder_holdings(issuer_1_obj);
-            assert!(total_issued_shares == 11, 5);
-            assert!(vector::length(&holder_holdings) == 1, 5);
-            assert!(vector::borrow(&holder_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 5);
-        };
-
-        {
-            let user_obj = get_user_obj(user_1_addr);
-            let user_holdings = get_user_holdings(user_obj);
-            assert!(vector::length(&user_holdings) == 1, 6);
-            assert!(vector::borrow(&user_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 6);
-        };
-
-        {
-            let holding_obj = get_holding_obj(user_1_addr, user_1_addr);
-            let (_, _, shares) = get_holding(holding_obj);
-            assert!(shares == 11, 7);
-        };
-
-        // ================================= User 2 buy 5 shares of user 1's share ================================== //
-
-        let (share_cost_2, issuer_fee_2, protocol_fee_2, total_cost_2) = calculate_buy_share_cost(issuer_1_obj, 5);
-        let coins = coin::mint(total_cost_2, &mint_cap);
-        coin::deposit(user_2_addr, coins);
-
-        buy_share(user_2, issuer_1_obj, 5);
-        assert!(coin::balance<AptosCoin>(user_2_addr) == 0, 8);
-        assert!(coin::balance<AptosCoin>(user_1_addr) == issuer_fee_1 + issuer_fee_2, 8);
-        assert!(coin::balance<AptosCoin>(get_vault_addr()) == share_cost_1 + share_cost_2, 8);
-        assert!(coin::balance<AptosCoin>(@aptos_friend_addr) == protocol_fee_1 + protocol_fee_2, 8);
-
-        {
-            let (_, _, total_issued_shares) = get_issuer(issuer_1_obj);
-            let holder_holdings = get_issuer_holder_holdings(issuer_1_obj);
-            assert!(total_issued_shares == 16, 9);
-            assert!(vector::length(&holder_holdings) == 2, 9);
-            assert!(vector::borrow(&holder_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 9);
-            assert!(vector::borrow(&holder_holdings, 1) == &get_holding_obj(user_1_addr, user_2_addr), 9);
-        };
-
-        {
-            let user_1_obj = get_user_obj(user_1_addr);
-            let user_1_holdings = get_user_holdings(user_1_obj);
-            assert!(vector::length(&user_1_holdings) == 1, 10);
-            assert!(vector::borrow(&user_1_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 10);
-
-            let user_2_obj = get_user_obj(user_2_addr);
-            let user_2_holdings = get_user_holdings(user_2_obj);
-            assert!(vector::length(&user_2_holdings) == 1, 10);
-            assert!(vector::borrow(&user_2_holdings, 0) == &get_holding_obj(user_1_addr, user_2_addr), 10);
-        };
-
-        {
-            let holding_obj = get_holding_obj(user_1_addr, user_2_addr);
-            let (_, _, shares) = get_holding(holding_obj);
-            assert!(shares == 5, 11);
-        };
-
-        // ================================= User 1 sell 3 shares of its own share ================================== //
-
-        let (share_cost_3, issuer_fee_3, protocol_fee_3, total_cost_3) = calculate_sell_share_cost(issuer_1_obj, 3);
-        let coins = coin::mint(total_cost_3, &mint_cap);
-        coin::deposit(user_1_addr, coins);
-
-        sell_share(user_1, issuer_1_obj, 3);
-        assert!(
-            coin::balance<AptosCoin>(
-                user_1_addr
-            ) == issuer_fee_1 + issuer_fee_2 + issuer_fee_3 + share_cost_3,
-            12
-        );
-        assert!(coin::balance<AptosCoin>(get_vault_addr()) == share_cost_1 + share_cost_2 - share_cost_3, 12);
-        assert!(
-            coin::balance<AptosCoin>(@aptos_friend_addr) == protocol_fee_1 + protocol_fee_2 + protocol_fee_3,
-            12
-        );
-
-        {
-            let (_, _, total_issued_shares) = get_issuer(issuer_1_obj);
-            let holder_holdings = get_issuer_holder_holdings(issuer_1_obj);
-            assert!(total_issued_shares == 13, 13);
-            assert!(vector::length(&holder_holdings) == 2, 13);
-            assert!(vector::borrow(&holder_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 13);
-            assert!(vector::borrow(&holder_holdings, 1) == &get_holding_obj(user_1_addr, user_2_addr), 13);
-        };
-
-        {
-            let user_1_obj = get_user_obj(user_1_addr);
-            let user_1_holdings = get_user_holdings(user_1_obj);
-            assert!(vector::length(&user_1_holdings) == 1, 14);
-            assert!(vector::borrow(&user_1_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 14);
-
-            let user_2_obj = get_user_obj(user_2_addr);
-            let user_2_holdings = get_user_holdings(user_2_obj);
-            assert!(vector::length(&user_2_holdings) == 1, 14);
-            assert!(vector::borrow(&user_2_holdings, 0) == &get_holding_obj(user_1_addr, user_2_addr), 14);
-        };
-
-        {
-            let holding_obj = get_holding_obj(user_1_addr, user_1_addr);
-            let (_, _, shares) = get_holding(holding_obj);
-            assert!(shares == 8, 15);
-        };
-
-        // ================================= User 2 sell all user 1's share it owns ================================== //
-
-        let (share_cost_4, issuer_fee_4, protocol_fee_4, total_cost_4) = calculate_sell_share_cost(issuer_1_obj, 5);
-        let coins = coin::mint(total_cost_4, &mint_cap);
-        coin::deposit(user_2_addr, coins);
-
-        sell_share(user_2, issuer_1_obj, 5);
-        assert!(coin::balance<AptosCoin>(user_2_addr) == share_cost_4, 16);
-        assert!(
-            coin::balance<AptosCoin>(
-                user_1_addr
-            ) == issuer_fee_1 + issuer_fee_2 + issuer_fee_3 + issuer_fee_4 + share_cost_3,
-            16
-        );
-        assert!(
-            coin::balance<AptosCoin>(get_vault_addr()) == share_cost_1 + share_cost_2 - share_cost_3 - share_cost_4,
-            16
-        );
-        assert!(
-            coin::balance<AptosCoin>(
-                @aptos_friend_addr
-            ) == protocol_fee_1 + protocol_fee_2 + protocol_fee_3 + protocol_fee_4,
-            16
-        );
-
-        {
-            let (_, _, total_issued_shares) = get_issuer(issuer_1_obj);
-            let holder_holdings = get_issuer_holder_holdings(issuer_1_obj);
-            assert!(total_issued_shares == 8, 17);
-            assert!(vector::length(&holder_holdings) == 1, 17);
-            assert!(vector::borrow(&holder_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 17);
-        };
-
-        {
-            let user_1_obj = get_user_obj(user_1_addr);
-            let user_1_holdings = get_user_holdings(user_1_obj);
-            assert!(vector::length(&user_1_holdings) == 1, 18);
-            assert!(vector::borrow(&user_1_holdings, 0) == &get_holding_obj(user_1_addr, user_1_addr), 18);
-
-            let user_2_obj = get_user_obj(user_2_addr);
-            let user_2_holdings = get_user_holdings(user_2_obj);
-            assert!(vector::length(&user_2_holdings) == 0, 18);
-        };
-
-        // ================================= Clean up ================================== //
-
-        coin::destroy_burn_cap(burn_cap);
-        coin::destroy_mint_cap(mint_cap);
-    }
-
-    #[test(aptos_framework = @aptos_framework, deployer = @aptos_friend_addr, user_1 = @0x998)]
-    fun buy_sell_should_have_same_price_when_supply_is_not_changed(
-        aptos_framework: &signer,
-        deployer: &signer,
-        user_1: &signer,
-    ) acquires User, IssuerRegistry, Issuer, Holding, Vault {
-        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
-
-        let deployer_addr = signer::address_of(deployer);
-        account::create_account_for_test(deployer_addr);
-        coin::register<AptosCoin>(deployer);
-
-        let user_1_addr = signer::address_of(user_1);
-        account::create_account_for_test(user_1_addr);
-        coin::register<AptosCoin>(user_1);
-
-        init_module(deployer);
-
-        issue_share(user_1, string::utf8(b"test_user_1"));
-        let issuer_1_obj = get_issuer_obj(user_1_addr);
-
-        let (share_cost_1, _, _, total_cost_1) = calculate_buy_share_cost(issuer_1_obj, 5);
-        let coins = coin::mint(total_cost_1, &mint_cap);
-        coin::deposit(user_1_addr, coins);
-        buy_share(user_1, issuer_1_obj, 5);
-        let (share_cost_2, _, _, _) = calculate_sell_share_cost(issuer_1_obj, 5);
-        assert!(share_cost_1 == share_cost_2, 1);
-
-        coin::destroy_burn_cap(burn_cap);
-        coin::destroy_mint_cap(mint_cap);
+        (burn_cap, mint_cap)
     }
 }
