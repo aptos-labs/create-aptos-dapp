@@ -282,7 +282,6 @@ module stake_pool_addr::test_end_to_end {
         stake_pool::stake(staker1, 0);
     }
 
-
     #[test(
         aptos_framework = @0x1,
         sender = @stake_pool_addr,
