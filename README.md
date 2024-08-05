@@ -19,6 +19,7 @@ Then follow the prompts!
 ### Prerequisites
 
 - [node and npm](https://nodejs.org/en) (npm ≥ 5.2.0)
+- [Python 3.6+](https://www.python.org/)
 
 ### What is create-aptos-dapp?
 
