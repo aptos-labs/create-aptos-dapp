@@ -28,6 +28,8 @@ module aptos_friend_addr::aptos_friend {
     /// Issuer cannot sell last share
     const ERR_ISSUER_CANNOT_SELL_LAST_SHARE: u64 = 7;
 
+    const VAULT_SEED: vector<u8> = b"vault";
+
     /// Holding stores the share issuer, holder and the number of shares held
     struct Holding has key {
         issuer: address,
@@ -57,7 +59,6 @@ module aptos_friend_addr::aptos_friend {
 
     /// Vault stores the APT to be sent to sellers
     struct Vault has key {
-        addr: address,
         extend_ref: ExtendRef,
     }
 
@@ -97,11 +98,10 @@ module aptos_friend_addr::aptos_friend {
     // If you deploy the module under an object, sender is the object's signer
     // If you deploy the moduelr under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
-        let vault_constructor_ref = &object::create_sticky_object(signer::address_of(sender));
+        let vault_constructor_ref = &object::create_named_object(sender, VAULT_SEED);
         let vault_signer = &object::generate_signer(vault_constructor_ref);
 
-        move_to(sender, Vault {
-            addr: signer::address_of(vault_signer),
+        move_to(vault_signer, Vault {
             extend_ref: object::generate_extend_ref(vault_constructor_ref),
         });
         move_to(sender, IssuerRegistry {
@@ -174,7 +174,7 @@ module aptos_friend_addr::aptos_friend {
         sender: &signer,
         issuer_obj: Object<Issuer>,
         amount: u64,
-    ) acquires Issuer, Holding, User, Vault {
+    ) acquires Issuer, Holding, User {
         let sender_addr = signer::address_of(sender);
         let (share_cost, issuer_fee, protocol_fee, total_cost) = calculate_buy_share_cost(issuer_obj, amount);
         assert!(coin::balance<AptosCoin>(sender_addr) >= total_cost, ERR_INSUFFICIENT_BALANCE);
@@ -302,9 +302,8 @@ module aptos_friend_addr::aptos_friend {
 
     #[view]
     /// Get vault address
-    public fun get_vault_addr(): address acquires Vault {
-        let vault = borrow_global<Vault>(@aptos_friend_addr);
-        vault.addr
+    public fun get_vault_addr(): address {
+        object::create_object_address(&@aptos_friend_addr, VAULT_SEED)
     }
 
     #[view]
@@ -426,7 +425,7 @@ module aptos_friend_addr::aptos_friend {
 
     /// Generate vault signer to send APT to sellers
     fun get_vault_signer(): signer acquires Vault {
-        let vault = borrow_global<Vault>(@aptos_friend_addr);
+        let vault = borrow_global<Vault>(get_vault_addr());
         object::generate_signer_for_extending(&vault.extend_ref)
     }
 
