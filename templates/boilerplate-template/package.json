@@ -11,6 +11,7 @@
     "move:upgrade": "node ./scripts/move/upgrade",
     "dev": "vite",
     "build": "tsc && vite build",
+    "deploy":"vercel",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "_fmt": "prettier 'frontend/**/*.ts'",
@@ -52,6 +53,7 @@
     "vite": "^5.2.0",
     "vite-plugin-notifier": "^0.1.5",
     "tree-kill": "1.2.2",
-    "dotenv": "16.3.1"
+    "dotenv": "16.3.1",
+    "vercel": "^35.2.4"
   }
 }
