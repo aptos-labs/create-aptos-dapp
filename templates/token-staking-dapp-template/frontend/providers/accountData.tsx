@@ -44,7 +44,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
   const [accountTokenBalance, setAccountTokenBalance] = useState<string>("0");
 
   const { data } = useQuery({
-    queryKey: ["account-data-context", account],
+    queryKey: ["account-data-context", account, existsRewardSchedule],
     refetchInterval: 1000 * 30,
     queryFn: async () => {
       try {
