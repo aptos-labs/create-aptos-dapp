@@ -1,6 +1,6 @@
 // External packages
 import { useRef, useState } from "react";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { isAptosConnectWallet, useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link, useNavigate } from "react-router-dom";
 // Internal utils
 import { aptosClient } from "@/utils/aptosClient";
@@ -23,7 +23,7 @@ import { createCollection } from "@/entry-functions/create_collection";
 export function CreateCollection() {
   // Wallet Adapter provider
   const aptosWallet = useWallet();
-  const { account, signAndSubmitTransaction } = useWallet();
+  const { account, wallet, signAndSubmitTransaction } = useWallet();
 
   // If we are on Production mode, redierct to the public mint page
   const navigate = useNavigate();
@@ -143,6 +143,12 @@ export function CreateCollection() {
             </WarningAlert>
           )}
 
+{wallet && isAptosConnectWallet(wallet) && (
+            <WarningAlert title="Wallet not supported">
+              Google account is not supported when creating a NFT collection. Please use a different wallet.
+            </WarningAlert>
+          )}
+
           <UploadSpinner on={isUploading} />
 
           <Card>
@@ -166,7 +172,7 @@ export function CreateCollection() {
                   className="hidden"
                   ref={inputRef}
                   id="upload"
-                  disabled={isUploading || !account}
+                  disabled={isUploading || !account || !wallet || isAptosConnectWallet(wallet)}
                   webkitdirectory="true"
                   multiple
                   type="file"
