@@ -8,6 +8,7 @@ export type Template = {
   name: string;
   path: string;
   doc: string;
+  video?: string;
 };
 
 export type Network = "mainnet" | "testnet";
