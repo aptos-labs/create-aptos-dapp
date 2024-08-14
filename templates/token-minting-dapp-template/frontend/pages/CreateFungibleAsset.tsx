@@ -1,4 +1,4 @@
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { isAptosConnectWallet, useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 // Internal components
@@ -22,7 +22,7 @@ import { createAsset } from "@/entry-functions/create_asset";
 export function CreateFungibleAsset() {
   // Wallet Adapter provider
   const aptosWallet = useWallet();
-  const { account, signAndSubmitTransaction } = useWallet();
+  const { account, wallet, signAndSubmitTransaction } = useWallet();
 
   // If we are on Production mode, redierct to the public mint page
   const navigate = useNavigate();
@@ -111,6 +111,13 @@ export function CreateFungibleAsset() {
             </WarningAlert>
           )}
 
+{wallet && isAptosConnectWallet(wallet) && (
+            <WarningAlert title="Wallet not supported">
+              Google account is not supported when creating a Token. Please use a different wallet.
+            </WarningAlert>
+          )}
+
+
           <UploadSpinner on={isUploading} />
 
           <Card>
@@ -132,7 +139,7 @@ export function CreateFungibleAsset() {
                   </Label>
                 )}
                 <Input
-                  disabled={isUploading || !account}
+                  disabled={isUploading || !account || !wallet || isAptosConnectWallet(wallet)}
                   type="file"
                   className="hidden"
                   ref={inputRef}
