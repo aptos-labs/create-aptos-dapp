@@ -1,4 +1,4 @@
-import { green, bold, white } from "kolorist";
+import { green, bold, blue } from "kolorist";
 import path from "path";
 import { fileURLToPath } from "node:url";
 import fs from "fs/promises";
@@ -9,7 +9,7 @@ import { Selections } from "./types.js";
 import { recordTelemetry } from "./telemetry.js";
 import { copy, runCommand } from "./utils/helpers.js";
 
-const spinner = (text) => ora({ text, stream: process.stdout });
+const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
 
 export async function generateDapp(selection: Selections) {
@@ -111,7 +111,20 @@ export async function generateDapp(selection: Selections) {
 
     scaffoldingSpinner.succeed();
 
-    const npmSpinner = spinner("Installing dependencies.....").start();
+    let docsInstructions = blue(
+      `\n📖 Visit the ${selection.template.name} docs: ${selection.template.doc}`
+    );
+    if (selection.template.video) {
+      docsInstructions += blue(
+        `\n🎬 Check out the walkthrough video: ${selection.template.video}`
+      );
+    }
+
+    console.log(
+      `\nNeed to install dependencies, this might take a while - in the meantime:\n ${docsInstructions}\n`
+    );
+
+    const npmSpinner = spinner(`Installing the dependencies...\n`).start();
 
     // install dependencies
     const installRootDepsCommand = `npm install --silent --no-progress`;
@@ -135,21 +148,11 @@ export async function generateDapp(selection: Selections) {
       green("\nSuccess! You're ready to start building your dapp on Aptos.")
     );
 
-    console.log(bold("\nNext steps:") + "\n");
+    console.log(bold("\nNext steps:"));
 
-    console.log(green(`1. cd ${projectName}`) + "\n");
+    console.log(green(`\nRun: cd ${projectName} && npm run dev`));
 
-    if (selection.template.doc) {
-      console.log(
-        green(
-          `2. Follow the instructions for the ${
-            selection.template.name
-          } template on ${white(selection.template.doc)}`
-        ) + "\n"
-      );
-    }
-
-    console.log(green(`3. npm run dev`) + "\n");
+    console.log("\n");
   } catch (error: any) {
     currentSpinner?.fail(`Failed to scaffold project: ${error.message}`);
     console.error(error);
