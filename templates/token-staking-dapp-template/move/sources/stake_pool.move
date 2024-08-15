@@ -13,9 +13,9 @@ module stake_pool_addr::stake_pool {
     use aptos_framework::timestamp;
 
     // ================================= Errors ================================= //
-    /// user tries to stake more than owned
+    /// User tries to stake more than owned
     const ERR_NOT_ENOUGH_BALANCE_TO_STAKE: u64 = 1;
-    /// user tries to unstake more than staked
+    /// User tries to unstake more than staked
     const ERR_NOT_ENOUGH_BALANCE_TO_UNSTAKE: u64 = 2;
     /// User does not have any stake
     const ERR_USER_DOES_NOT_HAVE_STAKE: u64 = 3;
@@ -31,8 +31,10 @@ module stake_pool_addr::stake_pool {
     const ERR_NOT_ENOUGH_BALANCE_TO_ADD_REWARD: u64 = 8;
     /// Only admin can update reward creator
     const ERR_ONLY_ADMIN_CAN_UPDATE_REWARD_CREATOR: u64 = 9;
-    /// user try to stake/unstake zero
+    /// User try to stake/unstake zero
     const ERR_AMOUNT_ZERO: u64 = 10;
+    /// Cannot stake after reward schedule has finished
+    const ERR_CANNOT_STAKE_AFTER_REWARD_SCHEDULE_HAS_FINISHED: u64 = 11;
 
     /// Unique per user
     struct UserStake has key, store, drop {
@@ -229,6 +231,7 @@ module stake_pool_addr::stake_pool {
     ) acquires StakePool, FungibleStoreController, UserStake, UserStakeController {
         assert!(amount > 0, ERR_AMOUNT_ZERO);
         let current_ts = timestamp::now_seconds();
+        abort_if_reward_schedule_has_finished(current_ts);
         let sender_addr = signer::address_of(sender);
         let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
         let claimable_reward = get_claimable_reward_helper(stake_pool, sender_addr, current_ts);
@@ -428,6 +431,15 @@ module stake_pool_addr::stake_pool {
             } else {
                 false
             }
+        }
+    }
+
+    /// Abort if reward schedule has finished to make sure user can't stake after reward schedule has finished
+    fun abort_if_reward_schedule_has_finished(current_ts: u64) acquires StakePool {
+        let stake_pool = borrow_global<StakePool>(@stake_pool_addr);
+        if (option::is_some(&stake_pool.reward_schedule)) {
+            let reward_schedule = option::borrow(&stake_pool.reward_schedule);
+            assert!(current_ts < reward_schedule.end_ts, ERR_CANNOT_STAKE_AFTER_REWARD_SCHEDULE_HAS_FINISHED);
         }
     }
 
