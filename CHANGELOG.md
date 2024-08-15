@@ -4,8 +4,11 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
-- Add a Staking template
+# 0.0.18 (2024-08-15)
+
+- Add a production ready Staking template
 - Add a npm deploy command `npm run deploy`
+- Improve instruction on the CLI UI
 
 # 0.0.17 (2024-08-02)
 
