@@ -336,7 +336,7 @@ module stake_pool_addr::test_end_to_end {
         stake_pool::unstake(staker1, option::some(0));
     }
 
-        #[test(
+    #[test(
         aptos_framework = @0x1,
         sender = @stake_pool_addr,
         initial_reward_creator = @0x100,
