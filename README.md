@@ -9,7 +9,7 @@
 To create a Aptos dapp, open your terminal, cd into the directory you’d like to create the dapp in, and run the following command:
 
 ```bash
-npx create-aptos-dapp
+npx create-aptos-dapp@latest
 ```
 
 Then follow the prompts!
