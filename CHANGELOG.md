@@ -4,6 +4,15 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.20 (2024-08-16)
+
+- Upgrade dapp dependencies
+- Handle Move scripts issues by throwing meaningful errors
+
+# 0.0.19 (2024-08-16)
+
+- A release to fix broken previous release
+
 # 0.0.18 (2024-08-15)
 
 - Add a production ready Staking template
