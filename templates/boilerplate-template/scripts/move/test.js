@@ -8,7 +8,7 @@ async function test() {
   await move.test({
     packageDirectoryPath: "move",
     namedAddresses: {
-      module_addr: "0x100",
+      message_board_addr: "0x100",
     },
   });
 }
