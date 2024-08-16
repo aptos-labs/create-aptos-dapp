@@ -15,7 +15,7 @@ async function publish() {
     objectAddress: process.env.VITE_MODULE_ADDRESS,
     namedAddresses: {
       // Upgrade module from an object
-      module_addr: process.env.VITE_MODULE_ADDRESS,
+      message_board_addr: process.env.VITE_MODULE_ADDRESS,
     },
       profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
   });

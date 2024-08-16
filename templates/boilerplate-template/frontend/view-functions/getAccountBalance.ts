@@ -4,7 +4,7 @@ export type AccountAPTBalanceArguments = {
   accountAddress: string;
 };
 
-export const accountAPTBalance = async (args: AccountAPTBalanceArguments): Promise<number> => {
+export const getAccountAPTBalance = async (args: AccountAPTBalanceArguments): Promise<number> => {
   const { accountAddress } = args;
   const balance = await aptosClient().view<[number]>({
     payload: {

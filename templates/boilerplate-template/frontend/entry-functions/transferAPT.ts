@@ -5,7 +5,7 @@ export type TransferAPTArguments = {
   amount: number; // the APT amount to transfer
 };
 
-export const trasnferAPT = (args: TransferAPTArguments): InputTransactionData => {
+export const transferAPT = (args: TransferAPTArguments): InputTransactionData => {
   const { to, amount } = args;
   return {
     data: {
