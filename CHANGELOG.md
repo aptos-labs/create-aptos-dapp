@@ -4,6 +4,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.22 (2024-08-19)
+
+- Fix latest release with updated files
+
 # 0.0.21 (2024-08-16)
 
 - Add a minimal contract to the boilerplate template
