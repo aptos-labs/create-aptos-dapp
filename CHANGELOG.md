@@ -4,6 +4,9 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add Token Staking template walkthrough video
+- Change Token minting template walkthrough video
+
 # 0.0.22 (2024-08-19)
 
 - Fix latest release with updated files

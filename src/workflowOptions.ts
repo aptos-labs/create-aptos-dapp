@@ -39,7 +39,7 @@ export const workflowOptions = {
           path: "token-minting-dapp-template",
           name: "Token minting dapp",
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/token-minting-dapp",
-          video: "https://www.youtube.com/watch?v=VmaEDJ4VQIo",
+          video: "https://www.youtube.com/watch?v=cr7LS-k4nQo",
         },
         description:
           "A production ready template to create your own token minting dapp",
@@ -50,6 +50,7 @@ export const workflowOptions = {
           path: "token-staking-dapp-template",
           name: "Token staking dapp",
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/token-staking-dapp",
+          video: "https://www.youtube.com/watch?v=xWkAVVE4WXk",
         },
         description:
           "A production ready template to create a token staking dapp",
