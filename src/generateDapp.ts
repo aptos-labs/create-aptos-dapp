@@ -7,7 +7,9 @@ import ora from "ora";
 // internal files
 import { Selections } from "./types.js";
 import { recordTelemetry } from "./telemetry.js";
-import { copy, runCommand } from "./utils/helpers.js";
+import { copy } from "./utils/helpers.js";
+import { installDependencies } from "./utils/installDependencies.js";
+import { context } from "./utils/context.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -126,9 +128,7 @@ export async function generateDapp(selection: Selections) {
 
     const npmSpinner = spinner(`Installing the dependencies...\n`).start();
 
-    // install dependencies
-    const installRootDepsCommand = `npm install --silent --no-progress`;
-    await runCommand(installRootDepsCommand);
+    await installDependencies(context);
 
     // If approve telemetry
     if (selection.telemetry) {
