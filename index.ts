@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 import { white } from "kolorist";
-import { startWorkflow } from "./src/workflow.js";
-import { generateDapp } from "./src/generateDapp.js";
 import { program } from "commander";
 import { parseCommandOptions } from "./src/utils/parseCommandOptions.js";
 
@@ -33,9 +31,6 @@ async function main() {
     verbose: program.opts().verbose,
   };
   await parseCommandOptions(options);
-
-  const selections = await startWorkflow();
-  generateDapp(selections);
 }
 
 main().catch((e) => {
