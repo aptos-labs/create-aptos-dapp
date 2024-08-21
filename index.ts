@@ -3,7 +3,15 @@
 import { white } from "kolorist";
 import { startWorkflow } from "./src/workflow.js";
 import { generateDapp } from "./src/generateDapp.js";
-import { generateExample } from "./src/generateExample.js";
+import { program } from "commander";
+import { parseCommandOptions } from "./src/utils/parseCommandOptions.js";
+
+program
+  .name("")
+  .description("")
+  .option("-e, --example [value]", "Enter an example name");
+
+program.parse();
 
 console.log(
   white(`
@@ -19,17 +27,13 @@ console.log(
 console.log("Welcome to the create-aptos-dapp wizard 🌐");
 
 async function main() {
-  // get the passed cli arguments
-  const args = process.argv.slice(2);
-  // if passed argument is `--example`
-  if (args[0] === "--example") {
-    // check there is a second argument
-    if (!args[1]) throw new Error("Please provide an example name to generate");
-    const exampleName = args[1];
-    return generateExample(exampleName.trim(), args);
-  }
-  const selection = await startWorkflow();
-  generateDapp(selection);
+  const options = {
+    example: program.opts().example,
+  };
+  await parseCommandOptions(options);
+
+  const selections = await startWorkflow();
+  generateDapp(selections);
 }
 
 main().catch((e) => {

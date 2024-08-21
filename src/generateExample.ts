@@ -11,7 +11,12 @@ import { recordTelemetry } from "./telemetry.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout });
 
-export async function generateExample(example: string, cliArgs: string[]) {
+export type GenerateExampleInput = {
+  example: string;
+};
+
+export async function generateExample(options: GenerateExampleInput) {
+  const { example } = options;
   let currentSpinner: Ora | null = null;
 
   // internal examples directory path
@@ -117,8 +122,8 @@ export async function generateExample(example: string, cliArgs: string[]) {
     await write(".env", envContent);
 
     await recordTelemetry({
-      command: `npx create-aptos-dapp ${cliArgs.join(" ")}`,
-      example: cliArgs[1],
+      command: `npx create-aptos-dapp --example ${example}`,
+      example: example,
     });
 
     scaffoldingSpinner.succeed();
