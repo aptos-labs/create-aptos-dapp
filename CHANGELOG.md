@@ -6,6 +6,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 - Add Token Staking template walkthrough video
 - Change Token minting template walkthrough video
+- Support a `--verbose` flag to run wizard with std out
 
 # 0.0.22 (2024-08-19)
 
