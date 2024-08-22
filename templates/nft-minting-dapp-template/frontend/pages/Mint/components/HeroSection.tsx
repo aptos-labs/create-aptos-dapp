@@ -78,7 +78,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
                 Mint
               </Button>
             </form>
-            <div className="flex flex-col basis-1/3">
+            <div className="flex flex-col gap-2 w-full md:basis-1/3">
               <p className="label-sm">You can mint up to</p>
               <p className="body-md">{mintUpTo > 1 ? `${mintUpTo} NFTs` : `${mintUpTo} NFT`}</p>
             </div>
