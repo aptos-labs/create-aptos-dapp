@@ -1,3 +1,4 @@
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { useQuery } from "@tanstack/react-query";
 
@@ -45,6 +46,7 @@ interface MintData {
   maxSupply: number;
   totalMinted: number;
   uniqueHolders: number;
+  userMintBalance: number;
   collection: Collection;
   startDate: Date;
   endDate: Date;
@@ -53,21 +55,13 @@ interface MintData {
 }
 
 async function getStartAndEndTime(
-  collection_address: string,
+  collection_id: string,
+  mint_stage: string,
 ): Promise<[start: Date, end: Date, isMintInfinite: boolean]> {
-  const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
-    payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_active_or_next_mint_stage`,
-      functionArguments: [collection_address],
-    },
-  });
-
-  const mintStage = mintStageRes[0].vec[0];
-
   const startAndEndRes = await aptosClient().view<[string, string]>({
     payload: {
       function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_stage_start_and_end_time`,
-      functionArguments: [collection_address, mintStage],
+      functionArguments: [collection_id, mint_stage],
     },
   });
 
@@ -80,7 +74,24 @@ async function getStartAndEndTime(
   ];
 }
 
-export function useGetCollectionData(collection_address: string = COLLECTION_ADDRESS) {
+async function getUserMintBalance(
+  user_address: string,
+  collection_address: string,
+  stage_name: string,
+): Promise<number> {
+  const userMintedAmount = await aptosClient().view<[string]>({
+    payload: {
+      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_balance`,
+      functionArguments: [collection_address, stage_name, user_address],
+    },
+  });
+
+  return Number(userMintedAmount[0]);
+}
+
+export function useGetCollectionData(collection_id: string = config.collection_id) {
+  const { account } = useWallet();
+
   return useQuery({
     queryKey: ["app-state", collection_address],
     refetchInterval: 1000 * 30,
@@ -88,7 +99,20 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
       try {
         if (!collection_address) return null;
 
-        const [startDate, endDate, isMintInfinite] = await getStartAndEndTime(collection_address);
+        const mintStageRes = await aptosClient().view<[{ vec: [string] | [] }]>({
+          payload: {
+            function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_active_or_next_mint_stage`,
+            functionArguments: [collection_id],
+          },
+        });
+
+        if (mintStageRes[0].vec.length === 0) return null;
+
+        const mint_stage = mintStageRes[0].vec[0];
+
+        const [startDate, endDate, isMintInfinite] = await getStartAndEndTime(collection_id, mint_stage);
+        const userMintBalance =
+          account == null ? 0 : await getUserMintBalance(account.address, collection_id, mint_stage);
 
         const res = await aptosClient().queryIndexer<MintQueryResult>({
           query: {
@@ -113,12 +137,6 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
                   cdn_image_uri
                 }
 							}
-							current_collection_ownership_v2_view(
-								where: { collection_id: { _eq: $collection_id } }
-								order_by: { last_transaction_version: desc }
-							) {
-								owner_address
-							}
 							current_collection_ownership_v2_view_aggregate(
 								where: { collection_id: { _eq: $collection_id } }
 							) {
@@ -137,6 +155,7 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
           maxSupply: collection.max_supply ?? 0,
           totalMinted: collection.current_supply ?? 0,
           uniqueHolders: res.current_collection_ownership_v2_view_aggregate.aggregate?.count ?? 0,
+          userMintBalance,
           collection,
           endDate,
           startDate,

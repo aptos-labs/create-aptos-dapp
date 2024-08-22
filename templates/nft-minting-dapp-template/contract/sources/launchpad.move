@@ -349,7 +349,7 @@ module launchpad_addr::launchpad {
 
     #[view]
     /// Get contract pending admin
-    public fun get_pendingadmin(): Option<address> acquires Config {
+    public fun get_pending_admin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
@@ -378,6 +378,18 @@ module launchpad_addr::launchpad {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
         let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage_name);
         amount * fee
+    }
+
+    #[view]
+    /// Get mint balance for the stage, i.e. how many NFT user can mint
+    /// e.g. If the mint limit is 1, user has already minted 1, balance is 0
+    public fun get_mint_balance(collection_obj: Object<Collection>, stage_name: String, user_addr: address): u64 {
+        let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
+        if (stage_name == string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY)) {
+            mint_stage::allowlist_balance(collection_obj, stage_idx, user_addr)
+        } else {
+            mint_stage::public_stage_with_limit_user_balance(collection_obj, stage_idx, user_addr)
+        }
     }
 
     #[view]

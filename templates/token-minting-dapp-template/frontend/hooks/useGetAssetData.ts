@@ -34,20 +34,20 @@ interface MintData {
   currentSupply: number;
   uniqueHolders: number;
   yourBalance: number;
-  totalAbleToMint: number;
+  userMintBalance: number;
   asset: FungibleAsset;
   isMintActive: boolean;
 }
 
-async function getMintLimit(fa_address: string): Promise<number> {
-  const mintLimitRes = await aptosClient().view<[{ vec: [string] }]>({
+async function getUserMintBalance(user_address: string, fa_address: string): Promise<number> {
+  const userMintedAmount = await aptosClient().view<[string]>({
     payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_limit`,
-      functionArguments: [fa_address],
+      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_balance`,
+      functionArguments: [fa_address, user_address],
     },
   });
 
-  return Number(mintLimitRes[0].vec[0]);
+  return Number(userMintedAmount[0]);
 }
 
 /**
@@ -107,7 +107,10 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
           maxSupply: convertAmountFromOnChainToHumanReadable(asset.maximum_v2 ?? 0, asset.decimals),
           currentSupply: convertAmountFromOnChainToHumanReadable(asset.supply_v2 ?? 0, asset.decimals),
           uniqueHolders: res.current_fungible_asset_balances_aggregate.aggregate.count ?? 0,
-          totalAbleToMint: convertAmountFromOnChainToHumanReadable(await getMintLimit(fa_address), asset.decimals),
+          userMintBalance: convertAmountFromOnChainToHumanReadable(
+            account == null ? 0 : await getUserMintBalance(account.address, fa_address),
+            asset.decimals,
+          ),
           yourBalance: convertAmountFromOnChainToHumanReadable(
             res.current_fungible_asset_balances[0]?.amount ?? 0,
             asset.decimals,

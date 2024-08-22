@@ -34,7 +34,8 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
   const { account, signAndSubmitTransaction } = useWallet();
   const [nftCount, setNftCount] = useState(1);
 
-  const { collection, totalMinted = 0, maxSupply = 1 } = data ?? {};
+  const { userMintBalance = 0, collection, totalMinted = 0, maxSupply = 1 } = data ?? {};
+  const mintUpTo = Math.min(userMintBalance, maxSupply - totalMinted);
 
   const mintNft = async (e: FormEvent) => {
     e.preventDefault();
@@ -77,8 +78,11 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
                 Mint
               </Button>
             </form>
-
-            <div className="flex flex-col gap-2 w-full md:basis-1/2">
+            <div className="flex flex-col basis-1/3">
+              <p className="label-sm">You can mint up to</p>
+              <p className="body-md">{mintUpTo > 1 ? `${mintUpTo} NFTs` : `${mintUpTo} NFT`}</p>
+            </div>
+            <div className="flex flex-col gap-2 w-full md:basis-1/3">
               <p className="label-sm text-secondary-text">
                 {clampNumber(totalMinted)} / {clampNumber(maxSupply)} Minted
               </p>

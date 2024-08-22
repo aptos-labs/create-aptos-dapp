@@ -33,7 +33,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
   const [assetCount, setAssetCount] = useState<string>("1");
   const [error, setError] = useState<string | null>(null);
 
-  const { asset, totalAbleToMint = 0, yourBalance = 0, maxSupply = 0, currentSupply = 0 } = data ?? {};
+  const { asset, userMintBalance = 0, yourBalance = 0, maxSupply = 0, currentSupply = 0 } = data ?? {};
 
   const mintFA = async (e: FormEvent) => {
     e.preventDefault();
@@ -101,7 +101,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             <div className="flex flex-col basis-1/3">
               <p className="label-sm">You can mint up to</p>
               <p className="body-md">
-                {Math.min(totalAbleToMint, maxSupply - currentSupply)} {asset?.symbol}
+                {Math.min(userMintBalance, maxSupply - currentSupply)} {asset?.symbol}
               </p>
             </div>
 

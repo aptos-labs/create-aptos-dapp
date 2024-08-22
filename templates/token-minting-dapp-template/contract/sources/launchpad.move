@@ -275,7 +275,7 @@ module launchpad_addr::launchpad {
 
     #[view]
     /// Get contract pending admin
-    public fun get_pendingadmin(): Option<address> acquires Config {
+    public fun get_pending_admin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
@@ -319,8 +319,9 @@ module launchpad_addr::launchpad {
     }
 
     #[view]
-    /// Get current minted amount by an address
-    public fun get_current_minted_amount(
+    /// Get mint balance, i.e. how many tokens user can mint
+    /// e.g. If the mint limit is 1, user has already minted 1, balance is 0
+    public fun get_mint_balance(
         fa_obj: Object<Metadata>,
         addr: address
     ): u64 acquires FAConfig {
@@ -328,7 +329,7 @@ module launchpad_addr::launchpad {
         assert!(option::is_some(&fa_config.mint_limit), ENO_MINT_LIMIT);
         let mint_limit = option::borrow(&fa_config.mint_limit);
         let mint_tracker = &mint_limit.mint_tracker;
-        *table::borrow_with_default(mint_tracker, addr, &0)
+        mint_limit.limit - *table::borrow_with_default(mint_tracker, addr, &0)
     }
 
     #[view]
@@ -371,14 +372,14 @@ module launchpad_addr::launchpad {
     ) acquires FAConfig {
         let mint_limit = get_mint_limit(fa_obj);
         if (option::is_some(&mint_limit)) {
-            let old_amount = get_current_minted_amount(fa_obj, sender);
+            let mint_balance = get_mint_balance(fa_obj, sender);
             assert!(
-                old_amount + amount <= *option::borrow(&mint_limit),
+                mint_balance > 0,
                 EMINT_LIMIT_REACHED,
             );
             let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
             let mint_limit = option::borrow_mut(&mut fa_config.mint_limit);
-            table::upsert(&mut mint_limit.mint_tracker, sender, old_amount + amount)
+            table::upsert(&mut mint_limit.mint_tracker, sender, mint_balance - amount)
         }
     }
 
