@@ -74,7 +74,9 @@ module launchpad_addr::launchpad {
     /// Unique per FA
     struct MintLimit has store {
         limit: u64,
-        mint_tracker: Table<address, u64>,
+        // key is minter address, value is how many tokens minter left to mint
+        // e.g. mint limit is 3, minter has minted 2, mint balance should be 1
+        mint_balance_tracker: Table<address, u64>,
     }
 
     /// Unique per FA
@@ -209,7 +211,7 @@ module launchpad_addr::launchpad {
             mint_limit: if (option::is_some(&mint_limit_per_addr)) {
                 option::some(MintLimit {
                     limit: *option::borrow(&mint_limit_per_addr),
-                    mint_tracker: table::new()
+                    mint_balance_tracker: table::new()
                 })
             } else {
                 option::none()
@@ -328,8 +330,8 @@ module launchpad_addr::launchpad {
         let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
         assert!(option::is_some(&fa_config.mint_limit), ENO_MINT_LIMIT);
         let mint_limit = option::borrow(&fa_config.mint_limit);
-        let mint_tracker = &mint_limit.mint_tracker;
-        mint_limit.limit - *table::borrow_with_default(mint_tracker, addr, &0)
+        let mint_tracker = &mint_limit.mint_balance_tracker;
+        *table::borrow_with_default(mint_tracker, addr, &mint_limit.limit)
     }
 
     #[view]
@@ -379,7 +381,7 @@ module launchpad_addr::launchpad {
             );
             let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
             let mint_limit = option::borrow_mut(&mut fa_config.mint_limit);
-            table::upsert(&mut mint_limit.mint_tracker, sender, mint_balance - amount)
+            table::upsert(&mut mint_limit.mint_balance_tracker, sender, mint_balance - amount)
         }
     }
 
