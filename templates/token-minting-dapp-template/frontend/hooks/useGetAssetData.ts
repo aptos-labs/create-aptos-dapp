@@ -1,11 +1,10 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { useQuery } from "@tanstack/react-query";
 // Internal utils
 import { aptosClient } from "@/utils/aptosClient";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
 // Internal constants
-import { FA_ADDRESS, MODULE_ADDRESS } from "@/constants";
+import { getUserMintBalance } from "@/view-functions/getUserMintBalance";
 
 export interface FungibleAsset {
   maximum_v2: number;
@@ -37,17 +36,6 @@ interface MintData {
   userMintBalance: number;
   asset: FungibleAsset;
   isMintActive: boolean;
-}
-
-async function getUserMintBalance(user_address: string, fa_address: string): Promise<number> {
-  const userMintedAmount = await aptosClient().view<[string]>({
-    payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_balance`,
-      functionArguments: [fa_address, user_address],
-    },
-  });
-
-  return Number(userMintedAmount[0]);
 }
 
 /**
@@ -108,7 +96,7 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
           currentSupply: convertAmountFromOnChainToHumanReadable(asset.supply_v2 ?? 0, asset.decimals),
           uniqueHolders: res.current_fungible_asset_balances_aggregate.aggregate.count ?? 0,
           userMintBalance: convertAmountFromOnChainToHumanReadable(
-            account == null ? 0 : await getUserMintBalance(account.address, fa_address),
+            account == null ? 0 : await getUserMintBalance({ user_address: account.address, fa_address }),
             asset.decimals,
           ),
           yourBalance: convertAmountFromOnChainToHumanReadable(

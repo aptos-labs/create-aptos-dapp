@@ -2,7 +2,7 @@ import { AccountAddress, GetFungibleAssetMetadataResponse } from "@aptos-labs/ts
 import { useState, useEffect } from "react";
 // Internal utils
 import { aptosClient } from "@/utils/aptosClient";
-import { MODULE_ADDRESS } from "@/constants";
+import { getRegistry } from "@/view-functions/getRegistry";
 
 /**
  * A react hook to get fungible asset metadatas.
@@ -29,15 +29,6 @@ export function useGetAssetMetadata() {
 
   return fas;
 }
-
-const getRegistry = async () => {
-  const registry = await aptosClient().view<[[{ inner: string }]]>({
-    payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_registry`,
-    },
-  });
-  return registry[0];
-};
 
 const getObjects = async (registry: [{ inner: string }]) => {
   const objects = await Promise.all(
