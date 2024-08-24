@@ -64,21 +64,7 @@ module message_board_addr::message_board {
     // ======================== Unit Tests ========================
 
     #[test_only]
-    use std::string;
-
-    #[test(sender = @message_board_addr)]
-    fun test_end_to_end<>(sender: &signer) acquires Message, BoardObjectController {
+    public fun init_module_for_test(sender: &signer) {
         init_module(sender);
-
-        post_message(sender, string::utf8(b"hello world"));
-
-        let string_content = get_message_content();
-        assert!(string_content == string::utf8(b"hello world"), 3);
-
-        // Post again, should overwrite the old message
-        post_message(sender, string::utf8(b"hello aptos"));
-
-        let string_content = get_message_content();
-        assert!(string_content == string::utf8(b"hello aptos"), 16);
     }
 }

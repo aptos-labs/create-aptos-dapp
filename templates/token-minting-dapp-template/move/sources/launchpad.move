@@ -202,7 +202,10 @@ module launchpad_addr::launchpad {
             transfer_ref,
         });
         move_to(fa_obj_signer, FAConfig {
-            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(&mint_fee_per_smallest_unit_of_fa, &DEFAULT_mint_fee_per_smallest_unit_of_fa),
+            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(
+                &mint_fee_per_smallest_unit_of_fa,
+                &DEFAULT_mint_fee_per_smallest_unit_of_fa
+            ),
             mint_limit: if (option::is_some(&mint_limit_per_addr)) {
                 option::some(MintLimit {
                     limit: *option::borrow(&mint_limit_per_addr),
@@ -227,7 +230,10 @@ module launchpad_addr::launchpad {
             decimals,
             icon_uri,
             project_uri,
-            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(&mint_fee_per_smallest_unit_of_fa, &DEFAULT_mint_fee_per_smallest_unit_of_fa),
+            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(
+                &mint_fee_per_smallest_unit_of_fa,
+                &DEFAULT_mint_fee_per_smallest_unit_of_fa
+            ),
             pre_mint_amount: *option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT),
             mint_limit_per_addr,
         });
@@ -411,72 +417,7 @@ module launchpad_addr::launchpad {
     // ================================= Uint Tests ================================== //
 
     #[test_only]
-    use aptos_framework::aptos_coin;
-    #[test_only]
-    use aptos_framework::coin;
-    #[test_only]
-    use aptos_framework::account;
-
-    #[test(aptos_framework = @0x1, sender = @launchpad_addr)]
-    fun test_happy_path(
-        aptos_framework: &signer,
-        sender: &signer,
-    ) acquires Registry, FAController, Config, FAConfig {
-        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
-
-        let sender_addr = signer::address_of(sender);
-
+    public fun init_module_for_test(sender: &signer) {
         init_module(sender);
-
-        // create first FA
-
-        create_fa(
-            sender,
-            option::some(1000),
-            string::utf8(b"FA1"),
-            string::utf8(b"FA1"),
-            2,
-            string::utf8(b"icon_url"),
-            string::utf8(b"project_url"),
-            option::none(),
-            option::none(),
-            option::some(500)
-        );
-        let registry = get_registry();
-        let fa_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
-        assert!(fungible_asset::supply(fa_1) == option::some(0), 1);
-
-        mint_fa(sender, fa_1, 20);
-        assert!(fungible_asset::supply(fa_1) == option::some(20), 2);
-        assert!(primary_fungible_store::balance(sender_addr, fa_1) == 20, 3);
-
-        // create second FA
-
-        create_fa(
-            sender,
-            option::some(1000),
-            string::utf8(b"FA2"),
-            string::utf8(b"FA2"),
-            3,
-            string::utf8(b"icon_url"),
-            string::utf8(b"project_url"),
-            option::some(1),
-            option::none(),
-            option::some(500)
-        );
-        let registry = get_registry();
-        let fa_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
-        assert!(fungible_asset::supply(fa_2) == option::some(0), 4);
-
-        account::create_account_for_test(sender_addr);
-        coin::register<aptos_coin::AptosCoin>(sender);
-        let mint_fee = get_mint_fee(fa_2, 300);
-        aptos_coin::mint(aptos_framework, sender_addr, mint_fee);
-        mint_fa(sender, fa_2, 300);
-        assert!(fungible_asset::supply(fa_2) == option::some(300), 5);
-        assert!(primary_fungible_store::balance(sender_addr, fa_2) == 300, 6);
-
-        coin::destroy_burn_cap(burn_cap);
-        coin::destroy_mint_cap(mint_cap);
     }
 }
