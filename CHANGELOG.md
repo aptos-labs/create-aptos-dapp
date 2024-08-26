@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add new view function to minting template that returns user mint balance and display that on UI
+
 # 0.0.24 (2024-09-04)
 
 - Code cleanup, always use env var from constants
@@ -18,7 +20,6 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Add Token Staking template walkthrough video
 - Change Token minting template walkthrough video
 - Support a `--verbose` flag to run wizard with std out
-- Add new view function to minting template that returns user mint balance and display that on UI
 
 # 0.0.22 (2024-08-19)
 
