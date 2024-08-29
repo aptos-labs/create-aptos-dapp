@@ -63,19 +63,18 @@ export const workflowOptions = {
     name: "network",
     message: "Choose your network",
     choices(prev) {
-      if (
-        prev.path === "boilerplate-template" ||
-        prev.path === "token-staking-dapp-template"
-      ) {
+      // We don't support devnet for NFT minting dapp because it depends on token-minter contract
+      // token-minter contract is not deployed on devnet because devnet is reset frequently
+      if (prev.path === "nft-minting-dapp-template") {
         return [
           { title: "Mainnet", value: "mainnet" },
           { title: "Testnet", value: "testnet" },
-          { title: "Devnet", value: "devnet" },
         ];
       }
       return [
         { title: "Mainnet", value: "mainnet" },
         { title: "Testnet", value: "testnet" },
+        { title: "Devnet", value: "devnet" },
       ];
     },
     initial: 0,

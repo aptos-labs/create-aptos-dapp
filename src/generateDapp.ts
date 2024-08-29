@@ -1,3 +1,4 @@
+
 import { green, bold, blue } from "kolorist";
 import path from "path";
 import { fileURLToPath } from "node:url";
@@ -94,10 +95,14 @@ export async function generateDapp(selection: Selections) {
 
     switch (selection.template.path) {
       case "nft-minting-dapp-template":
-        await generateEnvFile(`VITE_COLLECTION_CREATOR_ADDRESS=""`);
+        await generateEnvFile(
+          `VITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`
+        );
         break;
       case "token-minting-dapp-template":
-        await generateEnvFile(`VITE_FA_CREATOR_ADDRESS=""`);
+        await generateEnvFile(
+          `VITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`
+        );
         break;
       case "token-staking-dapp-template":
         await generateEnvFile(

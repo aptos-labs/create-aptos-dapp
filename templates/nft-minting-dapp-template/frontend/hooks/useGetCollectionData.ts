@@ -1,8 +1,7 @@
 import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { useQuery } from "@tanstack/react-query";
 
-import { config } from "@/config";
-import { MODULE_ADDRESS } from "@/constants";
+import { COLLECTION_ADDRESS, MODULE_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 
 export interface Token {
@@ -53,11 +52,11 @@ interface MintData {
   isMintInfinite: boolean;
 }
 
-async function getStartAndEndTime(collection_id: string): Promise<[start: Date, end: Date, isMintInfinite: boolean]> {
+async function getStartAndEndTime(collection_address: string): Promise<[start: Date, end: Date, isMintInfinite: boolean]> {
   const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
     payload: {
       function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_active_or_next_mint_stage`,
-      functionArguments: [collection_id],
+      functionArguments: [collection_address],
     },
   });
 
@@ -66,7 +65,7 @@ async function getStartAndEndTime(collection_id: string): Promise<[start: Date, 
   const startAndEndRes = await aptosClient().view<[string, string]>({
     payload: {
       function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_stage_start_and_end_time`,
-      functionArguments: [collection_id, mintStage],
+      functionArguments: [collection_address, mintStage],
     },
   });
 
@@ -79,20 +78,20 @@ async function getStartAndEndTime(collection_id: string): Promise<[start: Date, 
   ];
 }
 
-export function useGetCollectionData(collection_id: string = config.collection_id) {
+export function useGetCollectionData(collection_address: string = COLLECTION_ADDRESS) {
   return useQuery({
-    queryKey: ["app-state", collection_id],
+    queryKey: ["app-state", collection_address],
     refetchInterval: 1000 * 30,
     queryFn: async () => {
       try {
-        if (!collection_id) return null;
+        if (!collection_address) return null;
 
-        const [startDate, endDate, isMintInfinite] = await getStartAndEndTime(collection_id);
+        const [startDate, endDate, isMintInfinite] = await getStartAndEndTime(collection_address);
 
         const res = await aptosClient().queryIndexer<MintQueryResult>({
           query: {
             variables: {
-              collection_id,
+              collection_id: collection_address,
             },
             query: `
 						query TokenQuery($collection_id: String) {

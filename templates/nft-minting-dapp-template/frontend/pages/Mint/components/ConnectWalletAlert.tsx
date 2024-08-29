@@ -2,10 +2,10 @@ import { FC } from "react";
 // Internal components
 import { WarningAlert } from "@/components/ui/warning-alert";
 // Internal config
-import { config } from "@/config";
+import { COLLECTION_ADDRESS } from "@/constants";
 
 export const ConnectWalletAlert: FC = () => {
-  if (config.collection_id) return null;
+  if (COLLECTION_ADDRESS) return null;
 
   return (
     <div className="md:flex-row gap-6 px-4 max-w-screen-xl mx-auto w-full">
@@ -19,11 +19,11 @@ export const ConnectWalletAlert: FC = () => {
           <li>
             Fill in the{" "}
             <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-              collection_id
+              VITE_COLLECTION_ADDRESS
             </code>{" "}
             field in
             <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-              frontend/config.ts
+              .env
             </code>
           </li>
         </ol>
