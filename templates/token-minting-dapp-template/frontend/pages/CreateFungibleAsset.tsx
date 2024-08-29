@@ -15,7 +15,7 @@ import { LaunchpadHeader } from "@/components/LaunchpadHeader";
 import { checkIfFund, uploadFile } from "@/utils/Irys";
 import { aptosClient } from "@/utils/aptosClient";
 // Internal constants
-import { CREATOR_ADDRESS } from "@/constants";
+import { CREATOR_ADDRESS, IS_PROD } from "@/constants";
 // Entry functions
 import { createAsset } from "@/entry-functions/create_asset";
 
@@ -26,7 +26,7 @@ export function CreateFungibleAsset() {
 
   // If we are on Production mode, redierct to the public mint page
   const navigate = useNavigate();
-  if (import.meta.env.PROD) navigate("/", { replace: true });
+  if (IS_PROD) navigate("/", { replace: true });
 
   // Collection data entered by the user on UI
   const [name, setName] = useState<string>("");
@@ -111,12 +111,11 @@ export function CreateFungibleAsset() {
             </WarningAlert>
           )}
 
-{wallet && isAptosConnectWallet(wallet) && (
+          {wallet && isAptosConnectWallet(wallet) && (
             <WarningAlert title="Wallet not supported">
               Google account is not supported when creating a Token. Please use a different wallet.
             </WarningAlert>
           )}
-
 
           <UploadSpinner on={isUploading} />
 

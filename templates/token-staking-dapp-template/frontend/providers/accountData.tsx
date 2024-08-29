@@ -1,4 +1,5 @@
 import { useToast } from "@/components/ui/use-toast";
+import { REWARD_CREATOR_ADDRESS } from "@/constants";
 import { useGetStakePoolData } from "@/hooks/useGetStakePoolData";
 import { useGetTokenData } from "@/hooks/useGetTokenData";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
@@ -79,9 +80,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
         /**
          * Define whether the current connected account is the stake creator
          */
-        const isCreator =
-          import.meta.env.VITE_REWARD_CREATOR_ADDRESS &&
-          account?.address === import.meta.env.VITE_REWARD_CREATOR_ADDRESS;
+        const isCreator = REWARD_CREATOR_ADDRESS && account?.address === REWARD_CREATOR_ADDRESS;
         /**
          * Get the TOKEN balance of an Account
          *

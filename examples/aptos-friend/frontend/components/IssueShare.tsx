@@ -6,6 +6,7 @@ import { ABI } from "@/utils/abi";
 import { LabeledInput } from "@/components/ui/labeled-input";
 import { useToast } from "./ui/use-toast";
 import { aptosClient } from "@/utils/aptosClient";
+import { NETWORK } from "@/constants";
 
 export function IssueShare() {
   const { client: walletClient } = useWalletClient();
@@ -26,9 +27,7 @@ export function IssueShare() {
     toast({
       title: "Success",
       description: (
-        <a
-          href={`https://explorer.aptoslabs.com/txn/${executedTransaction.hash}?network=${import.meta.env.VITE_APP_NETWORK}`}
-        >
+        <a href={`https://explorer.aptoslabs.com/txn/${executedTransaction.hash}?network=${NETWORK}`}>
           Share issued, view on explorer
         </a>
       ),

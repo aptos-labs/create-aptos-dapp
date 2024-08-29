@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useGetHolders } from "@/hooks/useHolder";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { NETWORK } from "@/constants";
 
 type IssuerShareHoldersProps = {
   issuerAddress: `0x${string}`;
@@ -31,9 +32,7 @@ export function IssuerShareHolders({ issuerAddress }: IssuerShareHoldersProps) {
                   <TableRow key={holder.holder}>
                     <TableCell>
                       <Link
-                        to={`https://explorer.aptoslabs.com/account/${
-                          holder.holder
-                        }?network=${import.meta.env.VITE_APP_NETWORK}`}
+                        to={`https://explorer.aptoslabs.com/account/${holder.holder}?network=${NETWORK}`}
                         target="_blank"
                         style={{ textDecoration: "underline" }}
                       >

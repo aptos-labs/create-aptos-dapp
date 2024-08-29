@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useGetHolding, useGetIssuerObjectAddress } from "@/hooks/useHolding";
 import { aptosClient } from "@/utils/aptosClient";
 import { useToast } from "@/components/ui/use-toast";
+import { NETWORK } from "@/constants";
 
 type TradeShareProps = {
   issuerAddress: `0x${string}`;
@@ -49,9 +50,7 @@ export function TradeShare({ issuerAddress }: TradeShareProps) {
     toast({
       title: "Success",
       description: (
-        <a
-          href={`https://explorer.aptoslabs.com/txn/${executedTransaction.hash}?network=${import.meta.env.VITE_APP_NETWORK}`}
-        >
+        <a href={`https://explorer.aptoslabs.com/txn/${executedTransaction.hash}?network=${NETWORK}`}>
           Share {isBuying ? "bought" : "sold"}, view on explorer
         </a>
       ),

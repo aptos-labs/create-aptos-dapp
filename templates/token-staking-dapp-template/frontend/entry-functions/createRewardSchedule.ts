@@ -1,3 +1,4 @@
+import { MODULE_ADDRESS } from "@/constants";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 export type CreateRewardScheduleArguments = {
@@ -12,7 +13,7 @@ export const createRewardSchedule = (args: CreateRewardScheduleArguments): Input
   const { rps, durationInSeconds } = args;
   return {
     data: {
-      function: `${import.meta.env.VITE_MODULE_ADDRESS}::stake_pool::create_reward_schedule`,
+      function: `${MODULE_ADDRESS}::stake_pool::create_reward_schedule`,
       functionArguments: [rps, durationInSeconds],
     },
   };

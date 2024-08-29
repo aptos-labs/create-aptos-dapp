@@ -1,11 +1,12 @@
 import { WebIrys } from "@irys/sdk";
 import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
 import { accountAPTBalance } from "@/view-functions/accountBalance";
+import { NETWORK } from "@/constants";
 
 const getWebIrys = async (aptosWallet: WalletContextState) => {
-  const network = import.meta.env.VITE_APP_NETWORK === "testnet" ? "devnet" : "mainnet"; // Irys network
+  const network = NETWORK === "testnet" ? "devnet" : "mainnet"; // Irys network
   const token = "aptos";
-  const rpcUrl = import.meta.env.VITE_APP_NETWORK; // Aptos network "mainnet" || "testnet"
+  const rpcUrl = NETWORK; // Aptos network "mainnet" || "testnet"
   const wallet = { rpcUrl: rpcUrl, name: "aptos", provider: aptosWallet };
   const webIrys = new WebIrys({ network, token, wallet });
   await webIrys.ready();

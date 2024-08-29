@@ -1,3 +1,4 @@
+import { MODULE_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 
 export interface RewardsScheduleReponse {
@@ -12,7 +13,7 @@ export const getRewardSchedule = async (): Promise<RewardsScheduleReponse | unde
   try {
     const response = await aptosClient().view<string[]>({
       payload: {
-        function: `${import.meta.env.VITE_MODULE_ADDRESS}::stake_pool::get_reward_schedule`,
+        function: `${MODULE_ADDRESS}::stake_pool::get_reward_schedule`,
       },
     });
 

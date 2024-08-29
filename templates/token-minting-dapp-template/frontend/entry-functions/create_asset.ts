@@ -5,6 +5,7 @@ import {
   convertAmountFromHumanReadableToOnChain,
   convertAmountFromOnChainToHumanReadable,
 } from "@/utils/helpers";
+import { MODULE_ADDRESS } from "@/constants";
 
 export type CreateAssetArguments = {
   maxSupply: number; // The total amount of the asset in full unit that can be minted.
@@ -23,7 +24,7 @@ export const createAsset = (args: CreateAssetArguments): InputTransactionData =>
     args;
   return {
     data: {
-      function: `${import.meta.env.VITE_MODULE_ADDRESS}::launchpad::create_fa`,
+      function: `${MODULE_ADDRESS}::launchpad::create_fa`,
       typeArguments: [],
       functionArguments: [
         convertAmountFromHumanReadableToOnChain(maxSupply, decimal),

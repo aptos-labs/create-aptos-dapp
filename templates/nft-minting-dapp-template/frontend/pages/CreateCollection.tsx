@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { LaunchpadHeader } from "@/components/LaunchpadHeader";
-import { CREATOR_ADDRESS } from "@/constants";
+import { CREATOR_ADDRESS, IS_PROD } from "@/constants";
 import { WarningAlert } from "@/components/ui/warning-alert";
 import { UploadSpinner } from "@/components/UploadSpinner";
 import { LabeledInput } from "@/components/ui/labeled-input";
@@ -27,7 +27,7 @@ export function CreateCollection() {
 
   // If we are on Production mode, redierct to the public mint page
   const navigate = useNavigate();
-  if (import.meta.env.PROD) navigate("/", { replace: true });
+  if (IS_PROD) navigate("/", { replace: true });
 
   // Collection data entered by the user on UI
   const [royaltyPercentage, setRoyaltyPercentage] = useState<number>();
@@ -143,7 +143,7 @@ export function CreateCollection() {
             </WarningAlert>
           )}
 
-{wallet && isAptosConnectWallet(wallet) && (
+          {wallet && isAptosConnectWallet(wallet) && (
             <WarningAlert title="Wallet not supported">
               Google account is not supported when creating a NFT collection. Please use a different wallet.
             </WarningAlert>

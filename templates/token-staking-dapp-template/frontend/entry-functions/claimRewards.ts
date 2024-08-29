@@ -1,3 +1,4 @@
+import { MODULE_ADDRESS } from "@/constants";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
@@ -6,7 +7,7 @@ import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 export const claimRewards = (): InputTransactionData => {
   return {
     data: {
-      function: `${import.meta.env.VITE_MODULE_ADDRESS}::stake_pool::claim_reward`,
+      function: `${MODULE_ADDRESS}::stake_pool::claim_reward`,
       functionArguments: [],
     },
   };

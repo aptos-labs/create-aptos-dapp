@@ -2,6 +2,7 @@ import { AccountAddressInput } from "@aptos-labs/ts-sdk";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 import { APT_DECIMALS, dateToSeconds, convertAmountFromHumanReadableToOnChain } from "@/utils/helpers";
+import { MODULE_ADDRESS } from "@/constants";
 
 export type CreateCollectionArguments = {
   collectionDescription: string; // The collection description
@@ -41,7 +42,7 @@ export const createCollection = (args: CreateCollectionArguments): InputTransact
   } = args;
   return {
     data: {
-      function: `${import.meta.env.VITE_MODULE_ADDRESS}::launchpad::create_collection`,
+      function: `${MODULE_ADDRESS}::launchpad::create_collection`,
       typeArguments: [],
       functionArguments: [
         collectionDescription,
