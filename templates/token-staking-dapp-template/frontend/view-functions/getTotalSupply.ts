@@ -1,3 +1,4 @@
+import { FA_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 
 export const getTotalSupply = async (): Promise<number> => {
@@ -6,7 +7,7 @@ export const getTotalSupply = async (): Promise<number> => {
       payload: {
         function: "0x1::fungible_asset::supply",
         typeArguments: ["0x1::fungible_asset::Metadata"],
-        functionArguments: [import.meta.env.VITE_FA_ADDRESS],
+        functionArguments: [FA_ADDRESS],
       },
     });
     return parseInt(totalSupply[0].vec);

@@ -5,13 +5,14 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 // Internal hooks
 import { useGetAssetMetadata } from "@/hooks/useGetAssetMetadata";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
+import { IS_PROD, NETWORK } from "@/constants";
 
 export function MyFungibleAssets() {
   const fas = useGetAssetMetadata();
 
   // If we are on Production mode, redierct to the public mint page
   const navigate = useNavigate();
-  if (import.meta.env.PROD) navigate("/", { replace: true });
+  if (IS_PROD) navigate("/", { replace: true });
 
   return (
     <>
@@ -30,21 +31,19 @@ export function MyFungibleAssets() {
         </TableHeader>
         <TableBody>
           {fas.length > 0 &&
-            fas.map((fa: any) => {
+            fas.map((fa) => {
               return (
                 <TableRow key={fa.asset_type}>
                   <TableCell className="font-medium">
                     <div className="flex items-center">
-                      <img src={fa.icon_uri} style={{ width: "40px" }} className="mr-2"></img>
+                      <img src={fa.icon_uri ?? ""} style={{ width: "40px" }} className="mr-2"></img>
                       <span>{fa.symbol}</span>
                     </div>
                   </TableCell>
                   <TableCell>{fa.name}</TableCell>
                   <TableCell>
                     <Link
-                      to={`https://explorer.aptoslabs.com/object/${
-                        fa.asset_type
-                      }?network=${import.meta.env.VITE_APP_NETWORK}`}
+                      to={`https://explorer.aptoslabs.com/object/${fa.asset_type}?network=${NETWORK}`}
                       target="_blank"
                       style={{ textDecoration: "underline" }}
                     >

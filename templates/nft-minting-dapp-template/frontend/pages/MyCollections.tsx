@@ -7,14 +7,14 @@ import { Image } from "@/components/ui/image";
 // Internal hooks
 import { useGetCollections } from "@/hooks/useGetCollections";
 // Internal constants
-import { NETWORK } from "@/constants";
+import { IS_PROD, NETWORK } from "@/constants";
 
 export function MyCollections() {
   const collections: Array<GetCollectionDataResponse> = useGetCollections();
 
   // If we are on Production mode, redierct to the mint page
   const navigate = useNavigate();
-  if (import.meta.env.PROD) navigate("/", { replace: true });
+  if (IS_PROD) navigate("/", { replace: true });
 
   return (
     <>

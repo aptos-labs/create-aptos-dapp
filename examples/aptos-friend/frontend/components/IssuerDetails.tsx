@@ -1,6 +1,7 @@
 import { LabelValueGrid } from "@/components/LabelValueGrid";
 import { useGetIssuer } from "@/hooks/useIssuer";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { NETWORK } from "@/constants";
 
 type IssuerDetailsProps = {
   issuerAddress: `0x${string}`;
@@ -27,9 +28,7 @@ export function IssuerDetails({ issuerAddress }: IssuerDetailsProps) {
                   label: "Issuer address",
                   value: (
                     <a
-                      href={`https://explorer.aptoslabs.com/account/${
-                        issuer.issuerAddress
-                      }?network=${import.meta.env.VITE_APP_NETWORK}`}
+                      href={`https://explorer.aptoslabs.com/account/${issuer.issuerAddress}?network=${NETWORK}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-blue-600 dark:text-blue-300"

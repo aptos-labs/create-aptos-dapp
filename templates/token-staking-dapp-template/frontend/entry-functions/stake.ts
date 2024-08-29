@@ -1,3 +1,4 @@
+import { MODULE_ADDRESS } from "@/constants";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 export type StakeTokenArguments = {
@@ -11,7 +12,7 @@ export const stake = (args: StakeTokenArguments): InputTransactionData => {
   const { amount } = args;
   return {
     data: {
-      function: `${import.meta.env.VITE_MODULE_ADDRESS}::stake_pool::stake`,
+      function: `${MODULE_ADDRESS}::stake_pool::stake`,
       functionArguments: [amount],
     },
   };

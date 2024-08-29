@@ -1,3 +1,4 @@
+import { MODULE_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 
 export interface StakePoolDataResponse {
@@ -11,7 +12,7 @@ export const getStakePoolData = async (): Promise<StakePoolDataResponse | null> 
   try {
     const stakePoolOnChainData = await aptosClient().view<string[]>({
       payload: {
-        function: `${import.meta.env.VITE_MODULE_ADDRESS}::stake_pool::get_stake_pool_data`,
+        function: `${MODULE_ADDRESS}::stake_pool::get_stake_pool_data`,
         functionArguments: [],
       },
     });

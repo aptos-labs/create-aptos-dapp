@@ -1,3 +1,4 @@
+import { MODULE_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 
 export interface UserStakeData {
@@ -10,7 +11,7 @@ export const getUserStakeData = async (accountAddress: string | undefined): Prom
   try {
     const userOnChainStakeData = await aptosClient().view<string[]>({
       payload: {
-        function: `${import.meta.env.VITE_MODULE_ADDRESS}::stake_pool::get_user_stake_data`,
+        function: `${MODULE_ADDRESS}::stake_pool::get_user_stake_data`,
         functionArguments: [accountAddress],
       },
     });

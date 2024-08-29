@@ -1,3 +1,4 @@
+import { FA_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 
 export interface TokenDataResponse {
@@ -14,7 +15,7 @@ export const getTokenData = async (): Promise<TokenDataResponse | null> => {
       payload: {
         function: "0x1::fungible_asset::metadata",
         typeArguments: ["0x1::object::ObjectCore"],
-        functionArguments: [import.meta.env.VITE_FA_ADDRESS],
+        functionArguments: [FA_ADDRESS],
       },
     });
 

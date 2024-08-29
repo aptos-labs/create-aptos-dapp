@@ -1,3 +1,4 @@
+import { FA_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
 
 export const getAccountTokenBalance = async (accountAddress: string | undefined): Promise<number> => {
@@ -7,7 +8,7 @@ export const getAccountTokenBalance = async (accountAddress: string | undefined)
       payload: {
         function: "0x1::primary_fungible_store::balance",
         typeArguments: ["0x1::object::ObjectCore"],
-        functionArguments: [accountAddress, import.meta.env.VITE_FA_ADDRESS],
+        functionArguments: [accountAddress, FA_ADDRESS],
       },
     });
     return balance[0];
