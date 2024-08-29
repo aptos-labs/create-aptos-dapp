@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Code cleanup, always use env var from constants
+
 # 0.0.23 (2024-08-21)
 
 - Add Token Staking template walkthrough video
