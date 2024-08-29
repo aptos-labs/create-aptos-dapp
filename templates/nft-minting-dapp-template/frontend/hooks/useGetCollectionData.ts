@@ -52,7 +52,9 @@ interface MintData {
   isMintInfinite: boolean;
 }
 
-async function getStartAndEndTime(collection_address: string): Promise<[start: Date, end: Date, isMintInfinite: boolean]> {
+async function getStartAndEndTime(
+  collection_address: string,
+): Promise<[start: Date, end: Date, isMintInfinite: boolean]> {
   const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
     payload: {
       function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_active_or_next_mint_stage`,
