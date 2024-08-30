@@ -1,11 +1,11 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
 
-import { config } from "@/config";
 import { aptosClient } from "@/utils/aptosClient";
 import { getActiveOrNextMintStage } from "@/view-functions/getActiveOrNextMintStage";
 import { getMintStageStartAndEndTime } from "@/view-functions/getMintStageStartAndEndTime";
 import { getUserMintBalance } from "@/view-functions/getUserMintBalance";
+import { COLLECTION_ADDRESS } from "@/constants";
 
 export interface Token {
   token_name: string;
@@ -56,7 +56,7 @@ interface MintData {
   isMintInfinite: boolean;
 }
 
-export function useGetCollectionData(collection_id: string = config.collection_id) {
+export function useGetCollectionData(collection_address: string = COLLECTION_ADDRESS) {
   const { account } = useWallet();
 
   return useQuery({
@@ -103,7 +103,7 @@ export function useGetCollectionData(collection_id: string = config.collection_i
         const collection = res.current_collections_v2[0];
         if (!collection) return null;
 
-        const mintStageRes = await getActiveOrNextMintStage({ collection_id });
+        const mintStageRes = await getActiveOrNextMintStage({ collection_address });
         // Only return collection data if no mint stage is found
         if (mintStageRes.length === 0) {
           return {
@@ -120,9 +120,14 @@ export function useGetCollectionData(collection_id: string = config.collection_i
         }
 
         const mint_stage = mintStageRes[0];
-        const { startDate, endDate, isMintInfinite } = await getMintStageStartAndEndTime({ collection_id, mint_stage });
+        const { startDate, endDate, isMintInfinite } = await getMintStageStartAndEndTime({
+          collection_address,
+          mint_stage,
+        });
         const userMintBalance =
-          account == null ? 0 : await getUserMintBalance({ user_address: account.address, collection_id, mint_stage });
+          account == null
+            ? 0
+            : await getUserMintBalance({ user_address: account.address, collection_address, mint_stage });
 
         return {
           maxSupply: collection.max_supply ?? 0,

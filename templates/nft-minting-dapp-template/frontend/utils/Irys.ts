@@ -1,6 +1,7 @@
 import { WebIrys } from "@irys/sdk";
 import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
 import { getAccountAPTBalance } from "@/view-functions/getAccountAPTBalance";
+import { NETWORK } from "@/constants";
 
 const getWebIrys = async (aptosWallet: WalletContextState) => {
   const network = NETWORK === "testnet" ? "devnet" : "mainnet"; // Irys network
