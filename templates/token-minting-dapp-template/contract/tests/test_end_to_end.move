@@ -75,4 +75,41 @@ module launchpad_addr::test_end_to_end {
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
     }
+
+    #[test(aptos_framework = @0x1, sender = @launchpad_addr)]
+    #[expected_failure(abort_code = 9, location = launchpad)]
+    fun test_mint_disabled(
+        aptos_framework: &signer,
+        sender: &signer,
+    ) {
+        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
+
+        launchpad::init_module_for_test(sender);
+
+        launchpad::create_fa(
+            sender,
+            option::some(1000),
+            string::utf8(b"FA1"),
+            string::utf8(b"FA1"),
+            2,
+            string::utf8(b"icon_url"),
+            string::utf8(b"project_url"),
+            option::none(),
+            option::none(),
+            option::some(500)
+        );
+        let registry = launchpad::get_registry();
+        let fa_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
+        assert!(launchpad::is_mint_enabled(fa_1), 1);
+
+        launchpad::mint_fa(sender, fa_1, 20);
+
+        launchpad::update_mint_enabled(sender, fa_1, false);
+        assert!(!launchpad::is_mint_enabled(fa_1), 2);
+
+        launchpad::mint_fa(sender, fa_1, 20);
+
+        coin::destroy_burn_cap(burn_cap);
+        coin::destroy_mint_cap(mint_cap);
+    }
 }

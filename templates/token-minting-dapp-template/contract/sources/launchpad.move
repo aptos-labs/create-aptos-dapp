@@ -9,7 +9,7 @@ module launchpad_addr::launchpad {
     use aptos_framework::aptos_account;
     use aptos_framework::event;
     use aptos_framework::fungible_asset::{Self, Metadata};
-    use aptos_framework::object::{Self, Object, ObjectCore};
+    use aptos_framework::object::{Self, Object, ObjectCore, ExtendRef};
     use aptos_framework::primary_fungible_store;
 
     /// Only admin can update creator
@@ -26,6 +26,10 @@ module launchpad_addr::launchpad {
     const ENO_MINT_LIMIT: u64 = 6;
     /// Mint limit reached
     const EMINT_LIMIT_REACHED: u64 = 7;
+    /// Only admin can update mint enabled
+    const EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED: u64 = 8;
+    /// Mint is disabled
+    const EMINT_IS_DISABLED: u64 = 9;
 
     /// Default to mint 0 amount to creator when creating FA
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -60,8 +64,8 @@ module launchpad_addr::launchpad {
     /// We need this object to own the FA object instead of contract directly owns the FA object
     /// This helps us avoid address collision when we create multiple FAs with same name
     struct FAOwnerObjConfig has key {
-        // Only thing it stores is the link to FA object
-        fa_obj: Object<Metadata>
+        fa_obj: Object<Metadata>,
+        extend_ref: ExtendRef,
     }
 
     /// Unique per FA
@@ -84,7 +88,9 @@ module launchpad_addr::launchpad {
         // Mint fee per FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         mint_fee_per_smallest_unit_of_fa: u64,
         mint_limit: Option<MintLimit>,
+        mint_enabled: bool,
         fa_owner_obj: Object<FAOwnerObjConfig>,
+        extend_ref: ExtendRef,
     }
 
     /// Global per contract
@@ -151,6 +157,16 @@ module launchpad_addr::launchpad {
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
+    /// Update mint enabled
+    public entry fun update_mint_enabled(sender: &signer, fa_obj: Object<Metadata>, enabled: bool) acquires Config, FAConfig{
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED);
+        let fa_obj_addr = object::object_address(&fa_obj);
+        let fa_config = borrow_global_mut<FAConfig>(fa_obj_addr);
+        fa_config.mint_enabled = enabled;
+    }
+
     /// Create a fungible asset, only admin or creator can create FA
     public entry fun create_fa(
         sender: &signer,
@@ -193,6 +209,7 @@ module launchpad_addr::launchpad {
         let fa_obj = object::object_from_constructor_ref(fa_obj_constructor_ref);
         move_to(fa_owner_obj_signer, FAOwnerObjConfig {
             fa_obj,
+            extend_ref: object::generate_extend_ref(fa_owner_obj_constructor_ref),
         });
         let fa_owner_obj = object::object_from_constructor_ref(fa_owner_obj_constructor_ref);
         let mint_ref = fungible_asset::generate_mint_ref(fa_obj_constructor_ref);
@@ -216,6 +233,8 @@ module launchpad_addr::launchpad {
             } else {
                 option::none()
             },
+            mint_enabled: true,
+            extend_ref: object::generate_extend_ref(fa_obj_constructor_ref),
             fa_owner_obj,
         });
 
@@ -252,6 +271,7 @@ module launchpad_addr::launchpad {
         fa_obj: Object<Metadata>,
         amount: u64
     ) acquires FAController, FAConfig, Config {
+        assert!(is_mint_enabled(fa_obj), EMINT_IS_DISABLED);
         let sender_addr = signer::address_of(sender);
         check_mint_limit_and_update_mint_tracker(sender_addr, fa_obj, amount);
         let total_mint_fee = get_mint_fee(fa_obj, amount);
@@ -299,11 +319,11 @@ module launchpad_addr::launchpad {
     #[view]
     /// Get fungible asset metadata
     public fun get_fa_objects_metadatas(
-        collection_obj: Object<Metadata>
+        fa_obj: Object<Metadata>
     ): (String, String, u8) {
-        let name = fungible_asset::name(collection_obj);
-        let symbol = fungible_asset::symbol(collection_obj);
-        let decimals = fungible_asset::decimals(collection_obj);
+        let name = fungible_asset::name(fa_obj);
+        let symbol = fungible_asset::symbol(fa_obj);
+        let decimals = fungible_asset::decimals(fa_obj);
         (symbol, name, decimals)
     }
 
@@ -343,6 +363,14 @@ module launchpad_addr::launchpad {
     ): u64 acquires FAConfig {
         let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
         amount * fa_config.mint_fee_per_smallest_unit_of_fa
+    }
+
+    #[view]
+    /// Is mint enabled for the fa
+    public fun is_mint_enabled(fa_obj: Object<Metadata>): bool acquires FAConfig {
+        let fa_addr = object::object_address(&fa_obj);
+        let fa_config = borrow_global<FAConfig>(fa_addr);
+        fa_config.mint_enabled
     }
 
     // ================================= Helper Functions ================================== //
