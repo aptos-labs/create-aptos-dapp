@@ -3,10 +3,10 @@ import { FC } from "react";
 // Internal components
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 // Internal config
-import { config } from "@/config";
+import { FA_ADDRESS } from "@/constants";
 
 export const ConnectWalletAlert: FC = () => {
-  if (config.fa_address) return null;
+  if (FA_ADDRESS) return null;
 
   return (
     <div className="px-4">
@@ -23,11 +23,11 @@ export const ConnectWalletAlert: FC = () => {
             <li>
               Fill in the{" "}
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-                fa_address
+                VITE_FA_ADDRESS
               </code>{" "}
               field in
               <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-                frontend/config.ts
+                .env
               </code>
             </li>
           </ol>

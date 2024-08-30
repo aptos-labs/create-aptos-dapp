@@ -3,9 +3,6 @@ import Placeholder2 from "@/assets/placeholders/bear-2.png";
 import Placeholder3 from "@/assets/placeholders/bear-3.png";
 
 export const config: Config = {
-  // TODO: Fill in your collection id
-  collection_id: "",
-
   // Removing one or all of these socials will remove them from the page
   socials: {
     twitter: "https://twitter.com",
@@ -81,8 +78,6 @@ export const config: Config = {
 };
 
 export interface Config {
-  collection_id: string;
-
   socials?: {
     twitter?: string;
     discord?: string;

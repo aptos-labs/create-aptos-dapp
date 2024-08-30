@@ -1,9 +1,6 @@
 import Placeholder1 from "@/assets/placeholders/asset.png";
 
 export const config: Config = {
-  // TODO: Fill in your asset id
-  fa_address: "",
-
   // Removing one or all of these socials will remove them from the page
   socials: {
     twitter: "https://twitter.com",
@@ -24,8 +21,6 @@ export const config: Config = {
 };
 
 export interface Config {
-  fa_address: string;
-
   socials?: {
     twitter?: string;
     discord?: string;
