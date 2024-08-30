@@ -6,6 +6,7 @@ import { getActiveOrNextMintStage } from "@/view-functions/getActiveOrNextMintSt
 import { getMintStageStartAndEndTime } from "@/view-functions/getMintStageStartAndEndTime";
 import { getUserMintBalance } from "@/view-functions/getUserMintBalance";
 import { COLLECTION_ADDRESS } from "@/constants";
+import { getMintEnabled } from "@/view-functions/getMintEnabled";
 
 export interface Token {
   token_name: string;
@@ -128,6 +129,7 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
           account == null
             ? 0
             : await getUserMintBalance({ user_address: account.address, collection_address, mint_stage });
+        const isMintEnabled = await getMintEnabled({ collection_address });
 
         return {
           maxSupply: collection.max_supply ?? 0,
@@ -138,7 +140,10 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
           endDate,
           startDate,
           isMintActive:
-            new Date() >= startDate && new Date() <= endDate && collection.max_supply > collection.current_supply,
+            isMintEnabled &&
+            new Date() >= startDate &&
+            new Date() <= endDate &&
+            collection.max_supply > collection.current_supply,
           isMintInfinite,
         } satisfies MintData;
       } catch (error) {

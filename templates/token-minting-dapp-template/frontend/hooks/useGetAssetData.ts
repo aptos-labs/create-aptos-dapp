@@ -6,6 +6,7 @@ import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
 // Internal constants
 import { getUserMintBalance } from "@/view-functions/getUserMintBalance";
 import { FA_ADDRESS } from "@/constants";
+import { getMintEnabled } from "@/view-functions/getMintEnabled";
 
 export interface FungibleAsset {
   maximum_v2: number;
@@ -91,6 +92,8 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
         const asset = res.fungible_asset_metadata[0];
         if (!asset) return null;
 
+        const isMintEnabled = await getMintEnabled({ fa_address });
+
         return {
           asset,
           maxSupply: convertAmountFromOnChainToHumanReadable(asset.maximum_v2 ?? 0, asset.decimals),
@@ -104,7 +107,7 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
             res.current_fungible_asset_balances[0]?.amount ?? 0,
             asset.decimals,
           ),
-          isMintActive: asset.maximum_v2 > asset.supply_v2,
+          isMintActive: isMintEnabled && asset.maximum_v2 > asset.supply_v2,
         } satisfies MintData;
       } catch (error) {
         console.error(error);
