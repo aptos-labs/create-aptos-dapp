@@ -13,6 +13,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Add new view function to minting template that returns user mint balance and display that on UI
 - Add a minting enabled / disabled flag to nft minting template and token minting template
 
+# 0.0.24 (2024-09-04)
+
+- Add NextJS Boilerplate template
+
 # 0.0.23 (2024-08-21)
 
 - Add Token Staking template walkthrough video
