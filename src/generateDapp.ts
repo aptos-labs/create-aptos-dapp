@@ -111,6 +111,9 @@ export async function generateDapp(selection: Selections) {
       case "boilerplate-template":
         await generateEnvFile();
         break;
+      case "aptos-next-template":
+        await generateEnvFile();
+        break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
     }
