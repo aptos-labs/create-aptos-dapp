@@ -4,18 +4,18 @@
  * @returns BigInt representing the amount in octas
  */
 export function parseAptos(amount: string): number {
-	const parts = amount.split('.')
-	const wholePart = parts[0]
-	let fractionalPart = parts[1] || ''
+  const parts = amount.split(".");
+  const wholePart = parts[0];
+  let fractionalPart = parts[1] || "";
 
-	// Pad or truncate fractional part to 8 digits
-	fractionalPart = fractionalPart.padEnd(8, '0').slice(0, 8)
+  // Pad or truncate fractional part to 8 digits
+  fractionalPart = fractionalPart.padEnd(8, "0").slice(0, 8);
 
-	// Combine whole and fractional parts
-	const octas = wholePart + fractionalPart
+  // Combine whole and fractional parts
+  const octas = wholePart + fractionalPart;
 
-	// Remove leading zeros and convert to BigInt
-	return Number(octas.replace(/^0+/, '') || '0')
+  // Remove leading zeros and convert to BigInt
+  return Number(octas.replace(/^0+/, "") || "0");
 }
 
 /**
@@ -24,8 +24,8 @@ export function parseAptos(amount: string): number {
  * @returns String representation of the APT amount
  */
 export function formatAptos(octas: number): string {
-	const aptString = octas.toString().padStart(9, '0')
-	const wholePart = aptString.slice(0, -8) || '0'
-	const fractionalPart = aptString.slice(-8)
-	return `${wholePart}.${fractionalPart}`
+  const aptString = octas.toString().padStart(9, "0");
+  const wholePart = aptString.slice(0, -8) || "0";
+  const fractionalPart = aptString.slice(-8);
+  return `${wholePart}.${fractionalPart}`;
 }
