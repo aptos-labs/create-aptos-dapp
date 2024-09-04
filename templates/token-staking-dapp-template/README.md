@@ -1,4 +1,9 @@
-# Create Aptos Dapp Token Staking Template
+# Create Aptos Dapp Token staking dapp Template
+
+The Token staking dapp template provides an end-to-end Staking dapp with a beautiful pre-made UI users can quickly adjust and deploy into a live server.
+
+## Read the Token staking dapp template docs
+To get started with the Token staking dapp template and learn more about the template functionality and usage, head over to the [Token staking dapp template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/token-staking-dapp) 
 
 ## Overview
 
@@ -20,7 +25,7 @@
 
 ## Limitation
 
-For simplicity of the template, we didn't implement the function for the reward provider to claim back any orphaned reward after the duration has passed. There are are multiple ways to implement this, the simplest way is to transfer all the reward left from reward store after the duration has passed, but this makes anyone who still has pending claim reward have no reward to claim.
+For simplicity of the template, we didn't implement the function for the reward provider to claim back any orphaned reward after the duration has passed. There are multiple ways to implement this, the simplest way is to transfer all the reward left from reward store after the duration has passed, but this makes anyone who still has pending claim reward have no reward to claim.
 
 ## The Token Staking Template provides:
 
