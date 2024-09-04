@@ -35,6 +35,12 @@ async function publish() {
     );
   }
 
+  if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS) {
+    throw new Error(
+      "VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY variable is not set, make sure you have set the publisher account address",
+    );
+  }
+
   const move = new cli.Move();
 
   move.upgradeObjectPackage({
@@ -42,9 +48,11 @@ async function publish() {
     objectAddress: process.env.VITE_MODULE_ADDRESS,
     namedAddresses: {
       // Upgrade module from an object
-      module_addr: process.env.VITE_MODULE_ADDRESS,
+      stake_pool_addr: process.env.VITE_MODULE_ADDRESS,
+      fa_obj_addr: process.env.VITE_FA_ADDRESS,
+      initial_reward_creator_addr: process.env.VITE_REWARD_CREATOR_ADDRESS,
     },
-      profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+    extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
   });
 }
 publish();

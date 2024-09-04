@@ -1,12 +1,6 @@
 require("dotenv").config();
-const fs = require("node:fs");
-const yaml = require("js-yaml");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 const aptosSDK = require("@aptos-labs/ts-sdk")
-
-const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
-const accountAddress =
-  config["profiles"][`${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`]["account"];
 
 async function compile() {
 
@@ -27,6 +21,11 @@ async function compile() {
     );
   }
   
+  if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS) {
+    throw new Error(
+      "VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS variable is not set, make sure you have set the publisher account address",
+    );
+  }
 
   const move = new cli.Move();
 
@@ -34,7 +33,7 @@ async function compile() {
     packageDirectoryPath: "contract",
     namedAddresses: {
       // Publish module to account address
-      launchpad_addr: accountAddress,
+      launchpad_addr: process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS,
       // This is the address you want to use to create collection with, e.g. an address in Petra so you can create collection in UI using Petra
       initial_creator_addr: process.env.VITE_COLLECTION_CREATOR_ADDRESS,
       // Our contract depends on the token-minter contract to provide some common NFT functionalities like managing refs and mint stages
