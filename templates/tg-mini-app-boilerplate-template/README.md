@@ -1,6 +1,6 @@
 ## Overview
 
-This template is made from the [boilerplate template](https://github.com/aptos-labs/create-aptos-dapp/tree/main/templates/boilerplate-template), the difference is that we make this possible to run as a telegram mini app.
+This template is made from the [boilerplate template](https://github.com/aptos-labs/create-aptos-dapp/tree/main/templates/boilerplate-template), the difference is that we make this possible to run as a Telegram mini app.
 
 You can access a live demo of the mini app by starting a chat with the example bot https://t.me/aptos_explict_siging_bot/.
 
