@@ -407,7 +407,7 @@ module launchpad_addr::launchpad {
         if (option::is_some(&mint_limit)) {
             let mint_balance = get_mint_balance(fa_obj, sender);
             assert!(
-                mint_balance <= amount,
+                mint_balance >= amount,
                 EMINT_LIMIT_REACHED,
             );
             let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
