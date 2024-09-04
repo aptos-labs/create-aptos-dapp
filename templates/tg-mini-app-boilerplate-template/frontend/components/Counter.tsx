@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { useWalletClient } from "@thalalabs/surf/hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Internal components
-import { aptosClient, surfClient } from "@/utils/aptosClient";
+import { aptosClient } from "@/utils/aptosClient";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { ABI } from "@/utils/abi";
+import { getCounter } from "@/view-functions/getCounter";
+import { click } from "@/entry-functions/click";
 
 export function Counter() {
   const [counter, setCounter] = useState<number>(0);
-  const { account } = useWallet();
-  const { client: walletClient } = useWalletClient();
+  const { account,signAndSubmitTransaction  } = useWallet();
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
@@ -25,15 +24,7 @@ export function Counter() {
         };
       }
       try {
-        const counter = await surfClient()
-          .view.count({
-            typeArguments: [],
-            functionArguments: [account?.address as `0x${string}`],
-          })
-          .then((result) => {
-            return parseInt(result[0]);
-          });
-
+        const counter = await getCounter(account.address);
         return {
           counter,
         };
@@ -51,16 +42,13 @@ export function Counter() {
   });
 
   const onClickButton = async () => {
-    if (!account || !walletClient) {
+    if (!account) {
       console.error("Account or wallet client not available");
       return;
     }
 
     try {
-      const committedTransaction = await walletClient.useABI(ABI).click({
-        type_arguments: [],
-        arguments: [],
-      });
+      const committedTransaction = await signAndSubmitTransaction(click())
       const executedTransaction = await aptosClient().waitForTransaction({
         transactionHash: committedTransaction.hash,
       });

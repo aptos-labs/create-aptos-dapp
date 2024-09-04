@@ -26,8 +26,8 @@ The Boilerplate template provides a starter dapp with all necessary dapp infrast
 - Aptos TS SDK
 - Aptos Wallet Adapter
 - Node based Move commands
-- Surf for Move contract type checking in TypeScript
 - Telegram min app SDK
+- Mizu wallet SDK
 
 ### What Move commands are available?
 
@@ -39,7 +39,6 @@ Some commands are built-in the template and can be ran as a npm script, for exam
 - `npm run move:test` - a command to run Move unit tests
 - `npm run move:compile` - a command to compile the Move contract
 - `npm run move:publish` - a command to publish the Move contract
-- `npm run move:get-abi`: a command to get the Move contract ABI to be used by the frontend
 - `npm run deploy` - a command to deploy the dapp to Vercel
 
 For all other available CLI commands, can run `npx aptos` and see a list of all available commands.
