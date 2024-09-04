@@ -14,7 +14,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Move `collection_address` and `fa_address` from `config.ts` to the `.env` file in the minting templates
 - Rename template `move` folder to `contract`
 - Update next steps instructions when generating a template to follow README file
-- Make sure each temlpate README file mentions the template doc on aptos.dev
+- Make sure each template README file mentions the template doc on aptos.dev
 
 # 0.0.23 (2024-08-21)
 
