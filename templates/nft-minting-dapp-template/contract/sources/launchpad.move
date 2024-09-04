@@ -44,6 +44,8 @@ module launchpad_addr::launchpad {
     const EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED: u64 = 11;
     /// Mint is disabled
     const EMINT_IS_DISABLED: u64 = 12;
+    /// Cannot mint 0 amount
+    const ECANNOT_MINT_ZERO: u64 = 13;
 
     /// Default to mint 0 amount to creator when creating collection
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -324,6 +326,7 @@ module launchpad_addr::launchpad {
         collection_obj: Object<Collection>,
         amount: u64,
     ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
+        assert!(amount > 0, ECANNOT_MINT_ZERO);
         assert!(is_mint_enabled(collection_obj), EMINT_IS_DISABLED);
         let sender_addr = signer::address_of(sender);
 

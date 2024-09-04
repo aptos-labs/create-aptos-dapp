@@ -30,6 +30,8 @@ module launchpad_addr::launchpad {
     const EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED: u64 = 8;
     /// Mint is disabled
     const EMINT_IS_DISABLED: u64 = 9;
+    /// Cannot mint 0 amount
+    const ECANNOT_MINT_ZERO: u64 = 10;
 
     /// Default to mint 0 amount to creator when creating FA
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -271,6 +273,7 @@ module launchpad_addr::launchpad {
         fa_obj: Object<Metadata>,
         amount: u64
     ) acquires FAController, FAConfig, Config {
+        assert!(amount > 0, ECANNOT_MINT_ZERO);
         assert!(is_mint_enabled(fa_obj), EMINT_IS_DISABLED);
         let sender_addr = signer::address_of(sender);
         check_mint_limit_and_update_mint_tracker(sender_addr, fa_obj, amount);
@@ -404,7 +407,7 @@ module launchpad_addr::launchpad {
         if (option::is_some(&mint_limit)) {
             let mint_balance = get_mint_balance(fa_obj, sender);
             assert!(
-                mint_balance > 0,
+                mint_balance <= amount,
                 EMINT_LIMIT_REACHED,
             );
             let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
