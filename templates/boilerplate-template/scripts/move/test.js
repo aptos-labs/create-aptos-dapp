@@ -6,7 +6,7 @@ async function test() {
   const move = new cli.Move();
 
   await move.test({
-    packageDirectoryPath: "contracts",
+    packageDirectoryPath: "contract",
     namedAddresses: {
       message_board_addr: "0x100",
     },

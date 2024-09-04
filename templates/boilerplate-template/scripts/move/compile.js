@@ -12,7 +12,7 @@ async function compile() {
   const move = new cli.Move();
 
   await move.compile({
-    packageDirectoryPath: "contracts",
+    packageDirectoryPath: "contract",
     namedAddresses: {
       // Compile module with account address
       message_board_addr: accountAddress,

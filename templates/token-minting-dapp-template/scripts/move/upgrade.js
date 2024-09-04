@@ -31,7 +31,7 @@ async function publish() {
   const move = new cli.Move();
 
   move.upgradeObjectPackage({
-    packageDirectoryPath: "contracts",
+    packageDirectoryPath: "contract",
     objectAddress: process.env.VITE_MODULE_ADDRESS,
     namedAddresses: {
       // Upgrade module from an object
