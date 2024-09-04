@@ -2,7 +2,7 @@
 
 This template is made from the [boilerplate template](https://github.com/aptos-labs/create-aptos-dapp/tree/main/templates/boilerplate-template), the difference is that we make this possible to run as a Telegram mini app, and we change the app to be a simple clicker game.
 
-The difference between this template and the [tg-mini-app-boilerplate-template](https://aptos.dev/en/build/create-aptos-dapp/templates/tg-mini-app-boilerplate) is we are using [mizu wallet sdk core](https://docs.mizu.io/docs/api-connect/core) instead of Aptos wallet adaptor that gives you more control on the wallet flow, this way we achieve a seamless signing experience, i.e. users no longer need to approve the transaction explicitly.
+The difference between this template and the [tg-mini-app-boilerplate-template](https://aptos.dev/en/build/create-aptos-dapp/templates/tg-mini-app-boilerplate) is we are using [@mizuwallet-sdk/core](https://docs.mizu.io/docs/api-connect/core) instead of Aptos Wallet Adapter that gives you more control on the wallet flow, this way we achieve a seamless signing experience, i.e. users no longer need to approve the transaction explicitly.
 
 You can access a live demo of the mini app by starting a chat with the example bot at https://t.me/seamless345_bot/.
 
@@ -26,7 +26,6 @@ The Boilerplate template provides a starter dapp with all necessary dapp infrast
 - Vite development tool
 - shadcn/ui + tailwind for styling
 - Aptos TS SDK
-- Aptos Wallet Adapter
 - Node based Move commands
 - Telegram min app SDK
 - Mizu wallet SDK

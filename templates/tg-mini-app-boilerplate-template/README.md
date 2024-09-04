@@ -2,7 +2,7 @@
 
 This template is made from the [boilerplate template](https://github.com/aptos-labs/create-aptos-dapp/tree/main/templates/boilerplate-template), the difference is that we make this possible to run as a Telegram mini app, and we change the app to be a simple clicker game.
 
-The difference between this template and the [tg-mini-app-seamless-signing-boilerplate-template](https://aptos.dev/en/build/create-aptos-dapp/templates/tg-mini-app-seamless-signing-boilerplate) is we are using Aptos wallet adaptor instead of mizu wallet sdk core, this way the UX is similar to all other dapps using wallet adapter, i.e. users need to approve the transaction explicitly. Also since mizu is the only Aptos wallet supports Telegram now, we removed other wallet options.
+The difference between this template and the [tg-mini-app-seamless-signing-boilerplate-template](https://aptos.dev/en/build/create-aptos-dapp/templates/tg-mini-app-seamless-signing-boilerplate) is we are using Aptos wallet adapter instead of Mizu wallet sdk core, this way the UX is similar to all other dapps using the Wallet Adapter, i.e. users need to approve the transaction explicitly. Also since Mizu is the only Aptos wallet supports Telegram now, we removed other wallet options.
 
 You can access a live demo of the mini app by starting a chat with the example bot https://t.me/aptos_explict_siging_bot/.
 
