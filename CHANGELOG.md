@@ -2,6 +2,10 @@
 
 All notable changes to the create-aptos-dapp tool will be captured in this file. This changelog is written by hand for now. It adheres to the format set out by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+# 0.0.25 (2024-09-04)
+
+- Add NextJS Boilerplate template
+
 # 0.0.24 (2024-09-04)
 
 - Code cleanup, always use env var from constants
@@ -12,10 +16,6 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Make sure each template README file mentions the template doc on aptos.dev
 - Add new view function to minting template that returns user mint balance and display that on UI
 - Add a minting enabled / disabled flag to nft minting template and token minting template
-
-# 0.0.24 (2024-09-04)
-
-- Add NextJS Boilerplate template
 
 # 0.0.23 (2024-08-21)
 
