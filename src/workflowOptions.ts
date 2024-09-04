@@ -63,9 +63,16 @@ export const workflowOptions = {
     name: "network",
     message: "Choose your network",
     choices(prev) {
-      // We don't support devnet for NFT minting dapp because it depends on token-minter contract
-      // token-minter contract is not deployed on devnet because devnet is reset frequently
-      if (prev.path === "nft-minting-dapp-template") {
+      /**
+       * We don't support devnet for NFT and Token minting dapps because
+       * 1. Both templates depend on Irys to upload files, but Irys does not support Aptos devnet yet
+       * 2. NFT minting dapp depends on token-minter contract and token-minter contract is not
+       * deployed on devnet because devnet is reset frequently
+       */
+      if (
+        prev.path === "nft-minting-dapp-template" ||
+        prev.path === "token-minting-dapp-template"
+      ) {
         return [
           { title: "Mainnet", value: "mainnet" },
           { title: "Testnet", value: "testnet" },
