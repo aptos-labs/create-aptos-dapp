@@ -1,6 +1,6 @@
 import { WebIrys } from "@irys/sdk";
 import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
-import { accountAPTBalance } from "@/view-functions/accountBalance";
+import { getAccountAPTBalance } from "@/view-functions/getAccountAPTBalance";
 import { NETWORK } from "@/constants";
 
 const getWebIrys = async (aptosWallet: WalletContextState) => {
@@ -27,7 +27,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, files: File[]
   // 4. if balance is not enough,  check the payer balance
   const currentAccountAddress = await aptosWallet.account!.address;
 
-  const currentAccountBalance = await accountAPTBalance({ accountAddress: currentAccountAddress });
+  const currentAccountBalance = await getAccountAPTBalance({ accountAddress: currentAccountAddress });
 
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
   if (currentAccountBalance > costToUpload.toNumber()) {

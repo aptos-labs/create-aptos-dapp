@@ -39,8 +39,6 @@ module launchpad_addr::test_end_to_end {
 
         launchpad::init_module_for_test(sender);
 
-        // create first collection
-
         launchpad::create_collection(
             sender,
             string::utf8(b"description"),
@@ -103,6 +101,61 @@ module launchpad_addr::test_end_to_end {
         timestamp::update_global_time_for_test_secs(350);
         let active_or_next_stage = launchpad::get_active_or_next_mint_stage(collection_1);
         assert!(active_or_next_stage == option::none(), 12);
+
+        coin::destroy_burn_cap(burn_cap);
+        coin::destroy_mint_cap(mint_cap);
+    }
+
+    #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200)]
+    #[expected_failure(abort_code = 12, location = launchpad)]
+    fun test_mint_disabled(
+        aptos_framework: &signer,
+        sender: &signer,
+        user1: &signer,
+    ) {
+        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
+
+        let user1_addr = signer::address_of(user1);
+
+        // current timestamp is 0 after initialization
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+        account::create_account_for_test(user1_addr);
+        coin::register<AptosCoin>(user1);
+
+        launchpad::init_module_for_test(sender);
+
+        launchpad::create_collection(
+            sender,
+            string::utf8(b"description"),
+            string::utf8(b"name"),
+            string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
+            10,
+            option::some(10),
+            option::some(3),
+            option::some(vector[user1_addr]),
+            option::some(timestamp::now_seconds()),
+            option::some(timestamp::now_seconds() + 100),
+            option::some(3),
+            option::some(5),
+            option::some(timestamp::now_seconds() + 200),
+            option::some(timestamp::now_seconds() + 300),
+            option::some(2),
+            option::some(10),
+        );
+        let registry = launchpad::get_registry();
+        let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
+
+        assert!(launchpad::is_mint_enabled(collection_1), 1);
+
+        let mint_fee = launchpad::get_mint_fee(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY), 1);
+        aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
+
+        launchpad::mint_nft(user1, collection_1, 1);
+
+        launchpad::update_mint_enabled(sender, collection_1, false);
+        assert!(!launchpad::is_mint_enabled(collection_1), 2);
+
+        launchpad::mint_nft(user1, collection_1, 1);
 
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);

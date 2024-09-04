@@ -9,7 +9,7 @@ module launchpad_addr::launchpad {
     use aptos_framework::aptos_account;
     use aptos_framework::event;
     use aptos_framework::fungible_asset::{Self, Metadata};
-    use aptos_framework::object::{Self, Object, ObjectCore};
+    use aptos_framework::object::{Self, Object, ObjectCore, ExtendRef};
     use aptos_framework::primary_fungible_store;
 
     /// Only admin can update creator
@@ -26,6 +26,12 @@ module launchpad_addr::launchpad {
     const ENO_MINT_LIMIT: u64 = 6;
     /// Mint limit reached
     const EMINT_LIMIT_REACHED: u64 = 7;
+    /// Only admin can update mint enabled
+    const EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED: u64 = 8;
+    /// Mint is disabled
+    const EMINT_IS_DISABLED: u64 = 9;
+    /// Cannot mint 0 amount
+    const ECANNOT_MINT_ZERO: u64 = 10;
 
     /// Default to mint 0 amount to creator when creating FA
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -60,8 +66,8 @@ module launchpad_addr::launchpad {
     /// We need this object to own the FA object instead of contract directly owns the FA object
     /// This helps us avoid address collision when we create multiple FAs with same name
     struct FAOwnerObjConfig has key {
-        // Only thing it stores is the link to FA object
-        fa_obj: Object<Metadata>
+        fa_obj: Object<Metadata>,
+        extend_ref: ExtendRef,
     }
 
     /// Unique per FA
@@ -74,7 +80,9 @@ module launchpad_addr::launchpad {
     /// Unique per FA
     struct MintLimit has store {
         limit: u64,
-        mint_tracker: Table<address, u64>,
+        // key is minter address, value is how many tokens minter left to mint
+        // e.g. mint limit is 3, minter has minted 2, mint balance should be 1
+        mint_balance_tracker: Table<address, u64>,
     }
 
     /// Unique per FA
@@ -82,7 +90,9 @@ module launchpad_addr::launchpad {
         // Mint fee per FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
         mint_fee_per_smallest_unit_of_fa: u64,
         mint_limit: Option<MintLimit>,
+        mint_enabled: bool,
         fa_owner_obj: Object<FAOwnerObjConfig>,
+        extend_ref: ExtendRef,
     }
 
     /// Global per contract
@@ -149,6 +159,16 @@ module launchpad_addr::launchpad {
         config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
+    /// Update mint enabled
+    public entry fun update_mint_enabled(sender: &signer, fa_obj: Object<Metadata>, enabled: bool) acquires Config, FAConfig{
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED);
+        let fa_obj_addr = object::object_address(&fa_obj);
+        let fa_config = borrow_global_mut<FAConfig>(fa_obj_addr);
+        fa_config.mint_enabled = enabled;
+    }
+
     /// Create a fungible asset, only admin or creator can create FA
     public entry fun create_fa(
         sender: &signer,
@@ -191,6 +211,7 @@ module launchpad_addr::launchpad {
         let fa_obj = object::object_from_constructor_ref(fa_obj_constructor_ref);
         move_to(fa_owner_obj_signer, FAOwnerObjConfig {
             fa_obj,
+            extend_ref: object::generate_extend_ref(fa_owner_obj_constructor_ref),
         });
         let fa_owner_obj = object::object_from_constructor_ref(fa_owner_obj_constructor_ref);
         let mint_ref = fungible_asset::generate_mint_ref(fa_obj_constructor_ref);
@@ -209,11 +230,13 @@ module launchpad_addr::launchpad {
             mint_limit: if (option::is_some(&mint_limit_per_addr)) {
                 option::some(MintLimit {
                     limit: *option::borrow(&mint_limit_per_addr),
-                    mint_tracker: table::new()
+                    mint_balance_tracker: table::new()
                 })
             } else {
                 option::none()
             },
+            mint_enabled: true,
+            extend_ref: object::generate_extend_ref(fa_obj_constructor_ref),
             fa_owner_obj,
         });
 
@@ -250,6 +273,8 @@ module launchpad_addr::launchpad {
         fa_obj: Object<Metadata>,
         amount: u64
     ) acquires FAController, FAConfig, Config {
+        assert!(amount > 0, ECANNOT_MINT_ZERO);
+        assert!(is_mint_enabled(fa_obj), EMINT_IS_DISABLED);
         let sender_addr = signer::address_of(sender);
         check_mint_limit_and_update_mint_tracker(sender_addr, fa_obj, amount);
         let total_mint_fee = get_mint_fee(fa_obj, amount);
@@ -275,7 +300,7 @@ module launchpad_addr::launchpad {
 
     #[view]
     /// Get contract pending admin
-    public fun get_pendingadmin(): Option<address> acquires Config {
+    public fun get_pending_admin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
@@ -297,11 +322,11 @@ module launchpad_addr::launchpad {
     #[view]
     /// Get fungible asset metadata
     public fun get_fa_objects_metadatas(
-        collection_obj: Object<Metadata>
+        fa_obj: Object<Metadata>
     ): (String, String, u8) {
-        let name = fungible_asset::name(collection_obj);
-        let symbol = fungible_asset::symbol(collection_obj);
-        let decimals = fungible_asset::decimals(collection_obj);
+        let name = fungible_asset::name(fa_obj);
+        let symbol = fungible_asset::symbol(fa_obj);
+        let decimals = fungible_asset::decimals(fa_obj);
         (symbol, name, decimals)
     }
 
@@ -319,16 +344,17 @@ module launchpad_addr::launchpad {
     }
 
     #[view]
-    /// Get current minted amount by an address
-    public fun get_current_minted_amount(
+    /// Get mint balance, i.e. how many tokens user can mint
+    /// e.g. If the mint limit is 1, user has already minted 1, balance is 0
+    public fun get_mint_balance(
         fa_obj: Object<Metadata>,
         addr: address
     ): u64 acquires FAConfig {
         let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
         assert!(option::is_some(&fa_config.mint_limit), ENO_MINT_LIMIT);
         let mint_limit = option::borrow(&fa_config.mint_limit);
-        let mint_tracker = &mint_limit.mint_tracker;
-        *table::borrow_with_default(mint_tracker, addr, &0)
+        let mint_tracker = &mint_limit.mint_balance_tracker;
+        *table::borrow_with_default(mint_tracker, addr, &mint_limit.limit)
     }
 
     #[view]
@@ -340,6 +366,14 @@ module launchpad_addr::launchpad {
     ): u64 acquires FAConfig {
         let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
         amount * fa_config.mint_fee_per_smallest_unit_of_fa
+    }
+
+    #[view]
+    /// Is mint enabled for the fa
+    public fun is_mint_enabled(fa_obj: Object<Metadata>): bool acquires FAConfig {
+        let fa_addr = object::object_address(&fa_obj);
+        let fa_config = borrow_global<FAConfig>(fa_addr);
+        fa_config.mint_enabled
     }
 
     // ================================= Helper Functions ================================== //
@@ -371,14 +405,14 @@ module launchpad_addr::launchpad {
     ) acquires FAConfig {
         let mint_limit = get_mint_limit(fa_obj);
         if (option::is_some(&mint_limit)) {
-            let old_amount = get_current_minted_amount(fa_obj, sender);
+            let mint_balance = get_mint_balance(fa_obj, sender);
             assert!(
-                old_amount + amount <= *option::borrow(&mint_limit),
+                mint_balance >= amount,
                 EMINT_LIMIT_REACHED,
             );
             let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
             let mint_limit = option::borrow_mut(&mut fa_config.mint_limit);
-            table::upsert(&mut mint_limit.mint_tracker, sender, old_amount + amount)
+            table::upsert(&mut mint_limit.mint_balance_tracker, sender, mint_balance - amount)
         }
     }
 

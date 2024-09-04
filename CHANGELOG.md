@@ -2,8 +2,6 @@
 
 All notable changes to the create-aptos-dapp tool will be captured in this file. This changelog is written by hand for now. It adheres to the format set out by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-# Unreleased
-
 # 0.0.24 (2024-09-04)
 
 - Code cleanup, always use env var from constants
@@ -11,7 +9,9 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Move `collection_address` and `fa_address` from `config.ts` to the `.env` file in the minting templates
 - Rename template `move` folder to `contract`
 - Update next steps instructions when generating a template to follow README file
-- Make sure each temlpate README file mentions the template doc on aptos.dev
+- Make sure each template README file mentions the template doc on aptos.dev
+- Add new view function to minting template that returns user mint balance and display that on UI
+- Add a minting enabled / disabled flag to nft minting template and token minting template
 
 # 0.0.23 (2024-08-21)
 

@@ -1,11 +1,12 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { useQuery } from "@tanstack/react-query";
 // Internal utils
 import { aptosClient } from "@/utils/aptosClient";
 import { convertAmountFromOnChainToHumanReadable } from "@/utils/helpers";
 // Internal constants
-import { FA_ADDRESS, MODULE_ADDRESS } from "@/constants";
+import { getUserMintBalance } from "@/view-functions/getUserMintBalance";
+import { FA_ADDRESS } from "@/constants";
+import { getMintEnabled } from "@/view-functions/getMintEnabled";
 
 export interface FungibleAsset {
   maximum_v2: number;
@@ -34,20 +35,9 @@ interface MintData {
   currentSupply: number;
   uniqueHolders: number;
   yourBalance: number;
-  totalAbleToMint: number;
+  userMintBalance: number;
   asset: FungibleAsset;
   isMintActive: boolean;
-}
-
-async function getMintLimit(fa_address: string): Promise<number> {
-  const mintLimitRes = await aptosClient().view<[{ vec: [string] }]>({
-    payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_limit`,
-      functionArguments: [fa_address],
-    },
-  });
-
-  return Number(mintLimitRes[0].vec[0]);
 }
 
 /**
@@ -102,17 +92,22 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
         const asset = res.fungible_asset_metadata[0];
         if (!asset) return null;
 
+        const isMintEnabled = await getMintEnabled({ fa_address });
+
         return {
           asset,
           maxSupply: convertAmountFromOnChainToHumanReadable(asset.maximum_v2 ?? 0, asset.decimals),
           currentSupply: convertAmountFromOnChainToHumanReadable(asset.supply_v2 ?? 0, asset.decimals),
           uniqueHolders: res.current_fungible_asset_balances_aggregate.aggregate.count ?? 0,
-          totalAbleToMint: convertAmountFromOnChainToHumanReadable(await getMintLimit(fa_address), asset.decimals),
+          userMintBalance: convertAmountFromOnChainToHumanReadable(
+            account == null ? 0 : await getUserMintBalance({ user_address: account.address, fa_address }),
+            asset.decimals,
+          ),
           yourBalance: convertAmountFromOnChainToHumanReadable(
             res.current_fungible_asset_balances[0]?.amount ?? 0,
             asset.decimals,
           ),
-          isMintActive: asset.maximum_v2 > asset.supply_v2,
+          isMintActive: isMintEnabled && asset.maximum_v2 > asset.supply_v2,
         } satisfies MintData;
       } catch (error) {
         console.error(error);

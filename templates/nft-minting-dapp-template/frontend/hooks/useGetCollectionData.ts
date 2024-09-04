@@ -1,8 +1,12 @@
-import { AccountAddress } from "@aptos-labs/ts-sdk";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
 
-import { COLLECTION_ADDRESS, MODULE_ADDRESS } from "@/constants";
 import { aptosClient } from "@/utils/aptosClient";
+import { getActiveOrNextMintStage } from "@/view-functions/getActiveOrNextMintStage";
+import { getMintStageStartAndEndTime } from "@/view-functions/getMintStageStartAndEndTime";
+import { getUserMintBalance } from "@/view-functions/getUserMintBalance";
+import { COLLECTION_ADDRESS } from "@/constants";
+import { getMintEnabled } from "@/view-functions/getMintEnabled";
 
 export interface Token {
   token_name: string;
@@ -45,6 +49,7 @@ interface MintData {
   maxSupply: number;
   totalMinted: number;
   uniqueHolders: number;
+  userMintBalance: number;
   collection: Collection;
   startDate: Date;
   endDate: Date;
@@ -52,43 +57,15 @@ interface MintData {
   isMintInfinite: boolean;
 }
 
-async function getStartAndEndTime(
-  collection_address: string,
-): Promise<[start: Date, end: Date, isMintInfinite: boolean]> {
-  const mintStageRes = await aptosClient().view<[{ vec: [string] }]>({
-    payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_active_or_next_mint_stage`,
-      functionArguments: [collection_address],
-    },
-  });
-
-  const mintStage = mintStageRes[0].vec[0];
-
-  const startAndEndRes = await aptosClient().view<[string, string]>({
-    payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_mint_stage_start_and_end_time`,
-      functionArguments: [collection_address, mintStage],
-    },
-  });
-
-  const [start, end] = startAndEndRes;
-  return [
-    new Date(parseInt(start, 10) * 1000),
-    new Date(parseInt(end, 10) * 1000),
-    // isMintInfinite is true if the mint stage is 100 years later
-    parseInt(end, 10) === parseInt(start, 10) + 100 * 365 * 24 * 60 * 60,
-  ];
-}
-
 export function useGetCollectionData(collection_address: string = COLLECTION_ADDRESS) {
+  const { account } = useWallet();
+
   return useQuery({
     queryKey: ["app-state", collection_address],
     refetchInterval: 1000 * 30,
     queryFn: async () => {
       try {
         if (!collection_address) return null;
-
-        const [startDate, endDate, isMintInfinite] = await getStartAndEndTime(collection_address);
 
         const res = await aptosClient().queryIndexer<MintQueryResult>({
           query: {
@@ -113,12 +90,6 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
                   cdn_image_uri
                 }
 							}
-							current_collection_ownership_v2_view(
-								where: { collection_id: { _eq: $collection_id } }
-								order_by: { last_transaction_version: desc }
-							) {
-								owner_address
-							}
 							current_collection_ownership_v2_view_aggregate(
 								where: { collection_id: { _eq: $collection_id } }
 							) {
@@ -133,15 +104,46 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
         const collection = res.current_collections_v2[0];
         if (!collection) return null;
 
+        const mintStageRes = await getActiveOrNextMintStage({ collection_address });
+        // Only return collection data if no mint stage is found
+        if (mintStageRes.length === 0) {
+          return {
+            maxSupply: collection.max_supply ?? 0,
+            totalMinted: collection.current_supply ?? 0,
+            uniqueHolders: res.current_collection_ownership_v2_view_aggregate.aggregate?.count ?? 0,
+            userMintBalance: 0,
+            collection,
+            endDate: new Date(),
+            startDate: new Date(),
+            isMintActive: false,
+            isMintInfinite: false,
+          } satisfies MintData;
+        }
+
+        const mint_stage = mintStageRes[0];
+        const { startDate, endDate, isMintInfinite } = await getMintStageStartAndEndTime({
+          collection_address,
+          mint_stage,
+        });
+        const userMintBalance =
+          account == null
+            ? 0
+            : await getUserMintBalance({ user_address: account.address, collection_address, mint_stage });
+        const isMintEnabled = await getMintEnabled({ collection_address });
+
         return {
           maxSupply: collection.max_supply ?? 0,
           totalMinted: collection.current_supply ?? 0,
           uniqueHolders: res.current_collection_ownership_v2_view_aggregate.aggregate?.count ?? 0,
+          userMintBalance,
           collection,
           endDate,
           startDate,
           isMintActive:
-            new Date() >= startDate && new Date() <= endDate && collection.max_supply > collection.current_supply,
+            isMintEnabled &&
+            new Date() >= startDate &&
+            new Date() <= endDate &&
+            collection.max_supply > collection.current_supply,
           isMintInfinite,
         } satisfies MintData;
       } catch (error) {

@@ -4,11 +4,5 @@ node_modules
 .idea
 .env
 .aptos
-
 package-lock.json
-
-templates/*/contract/build
-templates/*/build
-
-examples/*/move/build
-examples/*/build
+build

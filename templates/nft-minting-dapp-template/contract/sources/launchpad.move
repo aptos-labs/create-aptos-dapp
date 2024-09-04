@@ -40,6 +40,12 @@ module launchpad_addr::launchpad {
     const EEND_TIME_MUST_BE_SET_FOR_STAGE: u64 = 9;
     /// Mint limit per address must be set for stage
     const EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE: u64 = 10;
+    /// Only admin can update mint enabled
+    const EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED: u64 = 11;
+    /// Mint is disabled
+    const EMINT_IS_DISABLED: u64 = 12;
+    /// Cannot mint 0 amount
+    const ECANNOT_MINT_ZERO: u64 = 13;
 
     /// Default to mint 0 amount to creator when creating collection
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -94,7 +100,6 @@ module launchpad_addr::launchpad {
     /// We need this object to own the collection object instead of contract directly owns the collection object
     /// This helps us avoid address collision when we create multiple collections with same name
     struct CollectionOwnerObjConfig has key {
-        // Only thing it stores is the link to collection object
         collection_obj: Object<Collection>,
         extend_ref: object::ExtendRef,
     }
@@ -103,7 +108,9 @@ module launchpad_addr::launchpad {
     struct CollectionConfig has key {
         // Key is stage, value is mint fee denomination
         mint_fee_per_nft_by_stages: SimpleMap<String, u64>,
+        mint_enabled: bool,
         collection_owner_obj: Object<CollectionOwnerObjConfig>,
+        extend_ref: object::ExtendRef,
     }
 
     /// Global per contract
@@ -160,6 +167,16 @@ module launchpad_addr::launchpad {
         assert!(config.pending_admin_addr == option::some(sender_addr), ENOT_PENDING_ADMIN);
         config.admin_addr = sender_addr;
         config.pending_admin_addr = option::none();
+    }
+
+    /// Update mint enabled
+    public entry fun update_mint_enabled(sender: &signer, collection_obj: Object<Collection>, enabled: bool) acquires Config, CollectionConfig {
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@launchpad_addr);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED);
+        let collection_obj_addr = object::object_address(&collection_obj);
+        let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
+        collection_config.mint_enabled = enabled;
     }
 
     /// Update mint fee collector address
@@ -229,6 +246,8 @@ module launchpad_addr::launchpad {
         let collection_owner_obj = object::object_from_constructor_ref(collection_owner_obj_constructor_ref);
         move_to(collection_obj_signer, CollectionConfig {
             mint_fee_per_nft_by_stages: simple_map::new(),
+            mint_enabled: true,
+            extend_ref: object::generate_extend_ref(collection_obj_constructor_ref),
             collection_owner_obj,
         });
 
@@ -307,6 +326,8 @@ module launchpad_addr::launchpad {
         collection_obj: Object<Collection>,
         amount: u64,
     ) acquires CollectionConfig, CollectionOwnerObjConfig, Config {
+        assert!(amount > 0, ECANNOT_MINT_ZERO);
+        assert!(is_mint_enabled(collection_obj), EMINT_IS_DISABLED);
         let sender_addr = signer::address_of(sender);
 
         let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
@@ -349,7 +370,7 @@ module launchpad_addr::launchpad {
 
     #[view]
     /// Get contract pending admin
-    public fun get_pendingadmin(): Option<address> acquires Config {
+    public fun get_pending_admin(): Option<address> acquires Config {
         let config = borrow_global<Config>(@launchpad_addr);
         config.pending_admin_addr
     }
@@ -369,6 +390,14 @@ module launchpad_addr::launchpad {
     }
 
     #[view]
+    /// Is mint enabled for the collection
+    public fun is_mint_enabled(collection_obj: Object<Collection>): bool acquires CollectionConfig {
+        let collection_addr = object::object_address(&collection_obj);
+        let collection_config = borrow_global<CollectionConfig>(collection_addr);
+        collection_config.mint_enabled
+    }
+
+    #[view]
     /// Get mint fee for a specific stage, denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
     public fun get_mint_fee(
         collection_obj: Object<Collection>,
@@ -378,6 +407,18 @@ module launchpad_addr::launchpad {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
         let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage_name);
         amount * fee
+    }
+
+    #[view]
+    /// Get mint balance for the stage, i.e. how many NFT user can mint
+    /// e.g. If the mint limit is 1, user has already minted 1, balance is 0
+    public fun get_mint_balance(collection_obj: Object<Collection>, stage_name: String, user_addr: address): u64 {
+        let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
+        if (stage_name == string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY)) {
+            mint_stage::allowlist_balance(collection_obj, stage_idx, user_addr)
+        } else {
+            mint_stage::public_stage_with_limit_user_balance(collection_obj, stage_idx, user_addr)
+        }
     }
 
     #[view]

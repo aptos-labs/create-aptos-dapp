@@ -2,7 +2,7 @@ import { AccountAddress, GetCollectionDataResponse } from "@aptos-labs/ts-sdk";
 import { useState, useEffect } from "react";
 
 import { aptosClient } from "@/utils/aptosClient";
-import { MODULE_ADDRESS } from "@/constants";
+import { getRegistry } from "@/view-functions/getRegistry";
 
 /**
  * A react hook to get all collections under the current contract.
@@ -30,15 +30,6 @@ export function useGetCollections() {
 
   return collections;
 }
-
-const getRegistry = async () => {
-  const registry = await aptosClient().view<[[{ inner: string }]]>({
-    payload: {
-      function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_registry`,
-    },
-  });
-  return registry[0];
-};
 
 const getObjects = async (registry: [{ inner: string }]) => {
   const objects = await Promise.all(

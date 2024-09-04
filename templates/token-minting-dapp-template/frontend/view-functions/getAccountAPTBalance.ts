@@ -1,10 +1,10 @@
 import { aptosClient } from "@/utils/aptosClient";
 
-export type AccountAPTBalanceArguments = {
+export type GetAccountAPTBalanceArguments = {
   accountAddress: string;
 };
 
-export const accountAPTBalance = async (args: AccountAPTBalanceArguments): Promise<number> => {
+export const getAccountAPTBalance = async (args: GetAccountAPTBalanceArguments): Promise<number> => {
   const { accountAddress } = args;
   const balance = await aptosClient().view<[number]>({
     payload: {
