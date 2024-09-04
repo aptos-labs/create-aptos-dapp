@@ -1,9 +1,10 @@
 {
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "single",
-			"trailingCommas": "none",
-			"semicolons": "asNeeded"
+			"quoteStyle": "double",
+			"trailingCommas": "es5",
+			"semicolons": "always",
+			"indentStyle": "space"
 		}
 	},
 	"linter": {

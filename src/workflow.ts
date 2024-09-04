@@ -1,7 +1,7 @@
 import { red } from "kolorist";
 import prompts from "prompts";
-import { Selections, Result } from "./types.js";
 import { rechoseWorkflow } from "./rechoseWorkflow.js";
+import type { Result, Selections } from "./types.js";
 import { workflowOptions } from "./workflowOptions.js";
 
 export async function startWorkflow() {
@@ -15,6 +15,7 @@ export async function startWorkflow() {
           initial: "my-aptos-dapp",
         },
         workflowOptions.template,
+        workflowOptions.framework,
         workflowOptions.network,
         workflowOptions.analytics,
       ],
@@ -30,7 +31,7 @@ export async function startWorkflow() {
   }
 
   // copy the initialResults
-  let result = { ...initialResult };
+  const result = { ...initialResult };
 
   try {
     // A boolean variable that keeps track on whether the user wants to change their initial choices
@@ -57,7 +58,7 @@ export async function startWorkflow() {
       );
 
       if (confirm) {
-        // a seperate function for selecting the prompt you want to edit
+        // a separate function for selecting the prompt you want to edit
         await rechoseWorkflow(result);
       } else {
         confirmOptions = false;
@@ -68,10 +69,13 @@ export async function startWorkflow() {
     process.exit(0);
   }
 
-  const { projectName, template, network, telemetry } = result;
+  const { projectName, template, framework, network, telemetry } = result;
   return {
     projectName,
-    template,
+    template:
+      template && framework === "server"
+        ? { ...template, path: "aptos-next-template" }
+        : template,
     network,
     telemetry,
   } as Selections;
