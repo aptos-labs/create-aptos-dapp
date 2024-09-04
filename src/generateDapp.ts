@@ -1,4 +1,3 @@
-
 import { green, bold, blue } from "kolorist";
 import path from "path";
 import { fileURLToPath } from "node:url";
@@ -155,7 +154,9 @@ export async function generateDapp(selection: Selections) {
 
     console.log(bold("\nNext steps:"));
 
-    console.log(green(`\nRun: cd ${projectName} && npm run dev`));
+    console.log(green(`\nRun: cd ${projectName}`));
+
+    console.log(green(`\nOpen in your favorite IDE && follow the README file`));
 
     console.log("\n");
   } catch (error: any) {

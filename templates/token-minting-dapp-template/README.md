@@ -1,8 +1,10 @@
-## Create Aptos Dapp Fungible Asset Template
+## Create Aptos Dapp Token minting dapp Template
 
-The Fungible Asset template provides an end-to-end Fungible Asset minting dapp with a beautiful pre-made UI users can quickly adjust and deploy into a live server.
+The Token minting dapp template provides an end-to-end Fungible Asset minting dapp with a beautiful pre-made UI users can quickly adjust and deploy into a live server.
 
-Read more about how to use the template [here](https://aptos.dev/create-aptos-dapp/templates/fungible-asset)
+
+## Read the Token minting dapp template docs
+To get started with the Token minting dapp template and learn more about the template functionality and usage, head over to the [Token minting dapp template docs](https://aptos.dev/create-aptos-dapp/templates/fungible-asset) 
 
 ## The Fungible Asset template provides 3 pages:
 
@@ -10,7 +12,7 @@ Read more about how to use the template [here](https://aptos.dev/create-aptos-da
 - **Create Fungible Asset page** - A page for creating new asset. This page is not accessible on production.
 - **My Fungible Assets page** - A page to view all the assets created under the current Move module (smart contract). This page is not accessible on production.
 
-### What tools the template uses?
+## What tools the template uses?
 
 - React framework
 - Vite development tool
@@ -19,7 +21,7 @@ Read more about how to use the template [here](https://aptos.dev/create-aptos-da
 - Aptos Wallet Adapter
 - Node based Move commands
 
-### What Move commands are available?
+## What Move commands are available?
 
 The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli) that lets us run Aptos CLI in a Node environment.
 
