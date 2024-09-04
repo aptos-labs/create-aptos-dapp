@@ -28,7 +28,7 @@ async function compile() {
   const move = new cli.Move();
 
   await move.compile({
-    packageDirectoryPath: "move",
+    packageDirectoryPath: "contracts",
     namedAddresses: {
       // Publish module to account address
       launchpad_addr: accountAddress,

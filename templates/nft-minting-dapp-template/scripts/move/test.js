@@ -6,7 +6,7 @@ async function test() {
   const move = new cli.Move();
 
   await move.test({
-    packageDirectoryPath: "move",
+    packageDirectoryPath: "contracts",
     namedAddresses: {
       launchpad_addr: "0x100",
       initial_creator_addr: "0x101",

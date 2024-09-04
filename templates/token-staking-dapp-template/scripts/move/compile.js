@@ -37,7 +37,7 @@ async function compile() {
   const move = new cli.Move();
 
   await move.compile({
-    packageDirectoryPath: "move",
+    packageDirectoryPath: "contracts",
     namedAddresses: {
       // Compile module with account address
       stake_pool_addr: accountAddress,

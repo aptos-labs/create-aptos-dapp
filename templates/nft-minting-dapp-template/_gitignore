@@ -1,7 +1,7 @@
 # Aptos related files
 .aptos
 .env
-move/build
+contracts/build
 
 # Logs
 logs

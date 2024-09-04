@@ -7,7 +7,7 @@ node_modules
 
 package-lock.json
 
-templates/*/move/build
+templates/*/contracts/build
 templates/*/build
 
 examples/*/move/build
