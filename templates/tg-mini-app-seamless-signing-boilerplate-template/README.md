@@ -4,7 +4,7 @@ This template is made from the [boilerplate template](https://github.com/aptos-l
 
 You can access a live demo of the mini app by starting a chat with the example bot at https://t.me/seamless345_bot/.
 
-To deploy your own mini app, you need to create a bot, deploy the mini app to say vercel just like deploying a normal web app, link the web app to the bot. You can follow a complete guide on the [mini app doc](https://docs.telegram-mini-apps.com/platform/creating-new-app).
+To deploy your own mini app, you need to create a bot, deploy the dapp by following the [deployment guide](https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate#deploy-to-a-live-server), link the web app to the bot. You can follow a complete guide on the [mini app doc](https://docs.telegram-mini-apps.com/platform/creating-new-app).
 
 To debug and test the mini app, follow the guide on [mini app doc](https://docs.telegram-mini-apps.com/platform/debugging).
 
