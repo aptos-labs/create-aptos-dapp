@@ -7,6 +7,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Code cleanup, always use env var from constants
 - Rename `collection_id` to `collection_address` in the NFT minting template
 - Move `collection_address` and `fa_address` from `config.ts` to the `.env` file in the minting templates
+- Rename template `move` folder to `contract`
 
 # 0.0.23 (2024-08-21)
 

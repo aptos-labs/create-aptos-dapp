@@ -30,7 +30,7 @@ async function publish() {
 
   move
     .createObjectAndPublishPackage({
-      packageDirectoryPath: "move",
+      packageDirectoryPath: "contract",
       addressName: "launchpad_addr",
       namedAddresses: {
         // Publish module to account address
