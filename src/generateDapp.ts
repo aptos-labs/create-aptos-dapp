@@ -111,7 +111,7 @@ export async function generateDapp(selection: Selections) {
       case "boilerplate-template":
         await generateEnvFile();
         break;
-      case "aptos-next-template":
+      case "nextjs-boilerplate-template":
         await generateEnvFile();
         break;
       default:
