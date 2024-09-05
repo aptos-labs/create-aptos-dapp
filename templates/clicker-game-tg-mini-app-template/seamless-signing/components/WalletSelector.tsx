@@ -15,8 +15,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { useMizuWallet } from "@/components/WalletProvider";
 import { MIZU_WALLET_APP_ID } from "@/constants";
 
+// To learn more about Mizu, visit https://docs.mizu.io/
+
 export function WalletSelector() {
-  const { mizuClient, setMizuClient, userAddress, setUserAddress } = useMizuWallet();
+  const { mizuClient, setMizuClient, userAddress, setUserAddress } =
+    useMizuWallet();
 
   const { toast } = useToast();
 

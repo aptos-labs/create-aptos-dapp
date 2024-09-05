@@ -17,7 +17,6 @@ To debug and test the mini app, follow the guide on [mini app doc](https://docs.
 
 - **Folder structure** - A pre-made dapp folder structure with a `frontend` and `move` folders.
 - **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.
-- **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
 
 ### What tools the template uses?
 

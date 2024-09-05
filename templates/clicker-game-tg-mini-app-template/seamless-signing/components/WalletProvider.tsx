@@ -3,6 +3,8 @@ import { Mizu } from "@mizuwallet-sdk/core";
 import { Network } from "@aptos-labs/ts-sdk";
 import { MIZU_WALLET_APP_ID } from "@/constants";
 
+// To learn more about Mizu, visit https://docs.mizu.io/
+
 interface MizuWalletContextType {
   mizuClient?: Mizu;
   userAddress?: string;
@@ -10,7 +12,9 @@ interface MizuWalletContextType {
   setUserAddress: (address?: string) => void;
 }
 
-const MizuWalletContext = createContext<MizuWalletContextType | undefined>(undefined);
+const MizuWalletContext = createContext<MizuWalletContextType | undefined>(
+  undefined
+);
 
 export const WalletProvider: React.FC<{
   children: React.ReactNode;
@@ -36,7 +40,9 @@ export const WalletProvider: React.FC<{
   }, []);
 
   return (
-    <MizuWalletContext.Provider value={{ mizuClient, setMizuClient, userAddress, setUserAddress }}>
+    <MizuWalletContext.Provider
+      value={{ mizuClient, setMizuClient, userAddress, setUserAddress }}
+    >
       {children}
     </MizuWalletContext.Provider>
   );
