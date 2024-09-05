@@ -27,7 +27,7 @@ To debug and test the mini app, follow the guide on [mini app doc](https://docs.
 - Aptos Wallet Adapter
 - Node based Move commands
 - Telegram mini app SDK
-- Mizu Wallet SDK Core if you choose to use seamless signing
+- Mizu Wallet SDK Core if you choose seamless signing experience
 
 ### What Move commands are available?
 
@@ -35,7 +35,6 @@ The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cl
 
 Some commands are built-in the template and can be ran as a npm script, for example:
 
-- `npm run move:init` - a command to initialize an account to publish the Move contract and to configure the development environment
 - `npm run move:test` - a command to run Move unit tests
 - `npm run move:compile` - a command to compile the Move contract
 - `npm run move:publish` - a command to publish the Move contract

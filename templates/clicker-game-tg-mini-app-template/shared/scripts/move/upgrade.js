@@ -1,5 +1,6 @@
 require("dotenv").config();
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
   if (!process.env.VITE_MODULE_ADDRESS) {
@@ -11,13 +12,16 @@ async function publish() {
   const move = new cli.Move();
 
   move.upgradeObjectPackage({
-    packageDirectoryPath: "move",
+    packageDirectoryPath: "contract",
     objectAddress: process.env.VITE_MODULE_ADDRESS,
     namedAddresses: {
       // Upgrade module from an object
       counter_app_addr: process.env.VITE_MODULE_ADDRESS,
     },
-    profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+    extraArguments: [
+      `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+      `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+    ],
   });
 }
 publish();
