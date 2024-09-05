@@ -102,7 +102,7 @@ export async function generateDapp(selection: Selections) {
             amount: 1_000_000_000,
           });
           content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
-          content += `\n#This is the module publisher account private key, do not share this address\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+          content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
         } catch (error: any) {
           throw new Error(
             "Could not create a module publisher account, please try again",
