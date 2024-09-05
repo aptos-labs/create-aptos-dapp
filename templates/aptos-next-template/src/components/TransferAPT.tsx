@@ -30,7 +30,7 @@ export function TransferAPT() {
 		try {
 			await transferMutation.mutate({
 				to: recipient as `0x${string}`,
-				amount: transferAmount * 1e8 // Convert to Octas
+				amount: Math.pow(10, 8) * transferAmount // Convert to Octas
 			})
 		} catch (error) {
 			console.error(error)
