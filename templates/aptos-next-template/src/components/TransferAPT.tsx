@@ -64,7 +64,7 @@ export function TransferAPT() {
 		<div className="flex flex-col gap-6">
 			<div className="flex flex-row items-center gap-2">
 				<h4 className="text-lg font-medium">
-					APT balance: {data?.balance ? data.balance / 10 ** 8 : 0}
+					APT balance: {data?.balance ? data.balance / Math.pow(10, 8) : 0}
 				</h4>
 				{process.env.NEXT_PUBLIC_APP_NETWORK !== 'mainnet' && (
 					<Button onClick={topUp}>Top Up</Button>
