@@ -1,11 +1,7 @@
 require("dotenv").config();
 const fs = require("node:fs");
-const yaml = require("js-yaml");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 const aptosSDK = require("@aptos-labs/ts-sdk")
-
-const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
-const accountAddress = config["profiles"][`${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`]["account"];
 
 async function publish() {
   
@@ -34,6 +30,18 @@ async function publish() {
     );
   }
 
+  if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS) {
+    throw new Error(
+      "VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY variable is not set, make sure you have set the publisher account address",
+    );
+  }
+
+  if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY) {
+    throw new Error(
+      "VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY variable is not set, make sure you have set the publisher account private key",
+    );
+  }
+
 
   const move = new cli.Move();
 
@@ -43,11 +51,11 @@ async function publish() {
       addressName: "stake_pool_addr",
       namedAddresses: {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
-        stake_pool_addr: accountAddress,
+        stake_pool_addr: process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS,
         fa_obj_addr: process.env.VITE_FA_ADDRESS,
         initial_reward_creator_addr: process.env.VITE_REWARD_CREATOR_ADDRESS,
       },
-      profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+      extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
     })
     .then((response) => {
       const filePath = ".env";

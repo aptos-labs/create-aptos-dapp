@@ -1,11 +1,7 @@
 require("dotenv").config();
 const fs = require("node:fs");
-const yaml = require("js-yaml");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 const aptosSDK = require("@aptos-labs/ts-sdk")
-
-const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
-const accountAddress = config["profiles"][`${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`]["account"];
 
 async function publish() {
 
@@ -26,6 +22,18 @@ async function publish() {
     );
   }
 
+  if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS) {
+    throw new Error(
+      "VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY variable is not set, make sure you have set the publisher account address",
+    );
+  }
+
+  if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY) {
+    throw new Error(
+      "VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY variable is not set, make sure you have set the publisher account private key",
+    );
+  }
+
   const move = new cli.Move();
 
   move
@@ -34,11 +42,11 @@ async function publish() {
       addressName: "launchpad_addr",
       namedAddresses: {
         // Publish module to account address
-        launchpad_addr: accountAddress,
+        launchpad_addr: process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS,
         // This is the address you want to use to create fungible asset with, e.g. an address in Petra so you can create fungible asset in UI using Petra
         initial_creator_addr: process.env.VITE_FA_CREATOR_ADDRESS,
       },
-      profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+      extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
     })
     .then((response) => {
       const filePath = ".env";

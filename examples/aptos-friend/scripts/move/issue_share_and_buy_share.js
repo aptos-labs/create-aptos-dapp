@@ -1,5 +1,6 @@
 require("dotenv").config();
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
+const aptosSDK = require("@aptos-labs/ts-sdk")
 
 const packageName = "AptosFriend";
 const scriptName = "issue_share_and_buy_share";
@@ -15,7 +16,7 @@ async function issueAndBuyShare() {
 
   move.runScript({
     compiledScriptPath: `move/build/${packageName}/bytecode_scripts/${scriptName}.mv`,
-    profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+    extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
   });
 }
 issueAndBuyShare();

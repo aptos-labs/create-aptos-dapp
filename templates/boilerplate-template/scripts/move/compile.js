@@ -1,13 +1,13 @@
 require("dotenv").config();
-const fs = require("node:fs");
-const yaml = require("js-yaml");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 
-const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
-const accountAddress =
-  config["profiles"][`${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`]["account"];
-
 async function compile() {
+
+  if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS) {
+    throw new Error(
+      "VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS variable is not set, make sure you have set the publisher account address",
+    );
+  }
 
   const move = new cli.Move();
 
@@ -15,7 +15,7 @@ async function compile() {
     packageDirectoryPath: "contract",
     namedAddresses: {
       // Compile module with account address
-      message_board_addr: accountAddress,
+      message_board_addr: process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS,
     },
   });
 }
