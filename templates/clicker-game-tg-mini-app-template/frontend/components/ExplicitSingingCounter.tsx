@@ -5,13 +5,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Internal components
 import { aptosClient } from "@/utils/aptosClient";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { getCounter } from "@/view-functions/getCounter";
 import { click } from "@/entry-functions/click";
 
 export function Counter() {
   const [counter, setCounter] = useState<number>(0);
-  const { account,signAndSubmitTransaction  } = useWallet();
+  const { connected, account, signAndSubmitTransaction } = useWallet();
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
@@ -48,7 +49,7 @@ export function Counter() {
     }
 
     try {
-      const committedTransaction = await signAndSubmitTransaction(click())
+      const committedTransaction = await signAndSubmitTransaction(click());
       const executedTransaction = await aptosClient().waitForTransaction({
         transactionHash: committedTransaction.hash,
       });
@@ -68,10 +69,18 @@ export function Counter() {
     }
   }, [data]);
 
-  return (
-    <div className="flex flex-col gap-6">
-      <h4 className="text-lg font-medium">Counter {counter}</h4>
-      <Button onClick={onClickButton}>Increment counter</Button>
-    </div>
+  return connected ? (
+    <Card>
+      <CardContent className="flex flex-col gap-10 pt-6">
+        <div className="flex flex-col gap-6">
+          <h4 className="text-lg font-medium">Counter {counter}</h4>
+          <Button onClick={onClickButton}>Increment counter</Button>
+        </div>
+      </CardContent>
+    </Card>
+  ) : (
+    <CardHeader>
+      <CardTitle>To get started Connect a wallet</CardTitle>
+    </CardHeader>
   );
 }

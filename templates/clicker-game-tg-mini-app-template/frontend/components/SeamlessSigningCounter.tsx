@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Internal components
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { useMizuWallet } from "@/components/WalletProvider";
 import { getCounter } from "@/view-functions/getCounter";
@@ -74,10 +75,18 @@ export function Counter() {
     }
   }, [data]);
 
-  return (
-    <div className="flex flex-col gap-6">
-      <h4 className="text-lg font-medium">Counter {counter}</h4>
-      <Button onClick={onClickButton}>Increment counter</Button>
-    </div>
+  return mizuClient ? (
+    <Card>
+      <CardContent className="flex flex-col gap-10 pt-6">
+        <div className="flex flex-col gap-6">
+          <h4 className="text-lg font-medium">Counter {counter}</h4>
+          <Button onClick={onClickButton}>Increment counter</Button>
+        </div>
+      </CardContent>
+    </Card>
+  ) : (
+    <CardHeader>
+      <CardTitle>To get started Connect a wallet</CardTitle>
+    </CardHeader>
   );
 }

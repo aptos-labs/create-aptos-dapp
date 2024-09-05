@@ -13,13 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { useMizuWallet } from "@/components/WalletProvider";
-import { MIZU_WALLET_APP_ID } from "@/constants";
 
 // To learn more about Mizu, visit https://docs.mizu.io/
 
 export function WalletSelector() {
-  const { mizuClient, setMizuClient, userAddress, setUserAddress } =
-    useMizuWallet();
+  const { mizuClient, setMizuClient, userAddress, setUserAddress } = useMizuWallet();
 
   const { toast } = useToast();
 
@@ -48,7 +46,7 @@ export function WalletSelector() {
   const onConnectWallet = async () => {
     localStorage.setItem("auto-connect", "true");
     const mizu = new Mizu({
-      appId: MIZU_WALLET_APP_ID,
+      appId: import.meta.env.VITE_MIZU_WALLET_APP_ID,
       network: Network.TESTNET,
     });
     mizu

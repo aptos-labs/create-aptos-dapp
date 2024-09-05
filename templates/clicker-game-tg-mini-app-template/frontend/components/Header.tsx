@@ -1,4 +1,4 @@
-import { WalletSelector } from "@/components/WalletSelector";
+import { WalletSelector } from "@/components/SeamlessSigningWalletSelector";
 
 export function Header() {
   return (
