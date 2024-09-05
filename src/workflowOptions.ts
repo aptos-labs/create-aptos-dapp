@@ -23,10 +23,10 @@ export const workflowOptions = {
         description: "A boilerplate template to start an Aptos dapp with",
       },
       {
-        title: "Telegram Mini App Boilerplate Template",
+        title: "A clicker game Telegram Mini App",
         value: {
-          path: "tg-mini-app-boilerplate-template",
-          name: "Telegram Mini App Boilerplate Template",
+          path: "clicker-game-tg-mini-app-template",
+          name: "Clicker Game Telegram Mini App Template",
           doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/tg-mini-app-boilerplate",
         },
         description:
