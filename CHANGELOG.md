@@ -4,7 +4,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # 0.0.25 (2024-09-04)
 
-- Add NextJS Boilerplate template
+- Support Nextjs framework for Boilerplate template
 
 # 0.0.24 (2024-09-04)
 
