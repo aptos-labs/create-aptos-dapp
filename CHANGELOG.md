@@ -4,8 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
-- Add 2 telegram mini app templates, one using wallet adapter and the other using mizu sdk core directly to achieve seamless signing experience
 - Support Nextjs framework for Boilerplate template
+- Add new telegram mini app templates, we have 2 options, one using Aptos Wallet Adapter for explicit signing like other dapps, and the other using Mizu Wallet SDK Core for seamless signing experience.
 
 # 0.0.24 (2024-09-04)
 
@@ -17,7 +17,6 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Make sure each template README file mentions the template doc on aptos.dev
 - Add new view function to minting template that returns user mint balance and display that on UI
 - Add a minting enabled / disabled flag to nft minting template and token minting template
-- Add 2 telegram mini app templates, one using wallet adapter and the other using mizu sdk core directly to achieve seamless signing experience
 
 # 0.0.23 (2024-08-21)
 

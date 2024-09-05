@@ -25,6 +25,6 @@
       "@/*": ["./frontend/*"]
     }
   },
-  "include": ["frontend", "vite-env.d.ts"],
+  "include": ["frontend", "vite-env.d.ts", "../explicit-signing/components/Counter.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

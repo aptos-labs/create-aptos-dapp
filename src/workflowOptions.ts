@@ -33,17 +33,6 @@ export const workflowOptions = {
           "A telegram mini app boilerplate template to start an Aptos dapp with",
       },
       {
-        title:
-          "Telegram Mini App Supports Seamless Signing Boilerplate Template",
-        value: {
-          path: "tg-mini-app-seamless-signing-boilerplate-template",
-          name: "Telegram Mini App Supports Seamless Signing Boilerplate Template",
-          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/tg-mini-app-seamless-signing-boilerplate",
-        },
-        description:
-          "A telegram mini app boilerplate template supports seamless signing to start an Aptos dapp with",
-      },
-      {
         title: "NFT minting dapp",
         value: {
           path: "nft-minting-dapp-template",

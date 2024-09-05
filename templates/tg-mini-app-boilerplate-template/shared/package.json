@@ -1,5 +1,5 @@
 {
-  "name": "tg-mini-app-seamless-signing-boilerplate-template",
+  "name": "tg-mini-app-boilerplate-template",
   "private": true,
   "version": "0.0.0",
   "license": "Apache-2.0",
@@ -18,7 +18,7 @@
     "fmt": "npm run _fmt -- --write"
   },
   "dependencies": {
-    "@aptos-labs/ts-sdk": "1.27.0",
+    "@aptos-labs/ts-sdk": "1.26.0",
     "@aptos-labs/wallet-adapter-react": "^3.5.10",
     "@mizuwallet-sdk/core": "^1.3.0",
     "@radix-ui/react-collapsible": "^1.1.0",

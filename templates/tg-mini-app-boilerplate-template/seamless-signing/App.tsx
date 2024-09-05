@@ -6,7 +6,6 @@ import { useMizuWallet } from "@/components/WalletProvider";
 
 function App() {
   const { mizuClient } = useMizuWallet();
-  console.log("mizuClient from app.tsx", mizuClient);
 
   return (
     <>

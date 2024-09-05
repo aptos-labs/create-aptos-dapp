@@ -1,4 +1,4 @@
-import { WalletSelector } from "./WalletSelector";
+import { WalletSelector } from "@/components/WalletSelector";
 
 export function Header() {
   return (
