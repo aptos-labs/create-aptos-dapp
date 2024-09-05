@@ -1,4 +1,4 @@
-name: Build Aptos Next Template Frontend
+name: Build Nextjs Boilerplate Template Frontend
 
 on:
   pull_request:
