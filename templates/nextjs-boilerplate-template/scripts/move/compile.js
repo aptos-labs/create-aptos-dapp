@@ -6,7 +6,7 @@ const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
 const accountAddress =
   config["profiles"][
-    `${process.env.PROJECT_NAME}-${process.env.NEXT_APP_NETWORK}`
+    `${process.env.PROJECT_NAME}-${process.env.NEXT_PUBLIC_APP_NETWORK}`
   ]["account"];
 
 async function compile() {

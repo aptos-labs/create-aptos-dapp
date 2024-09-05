@@ -6,7 +6,7 @@ const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
 const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
 const accountAddress =
   config["profiles"][
-    `${process.env.PROJECT_NAME}-${process.env.NEXT_APP_NETWORK}`
+    `${process.env.PROJECT_NAME}-${process.env.NEXT_PUBLIC_APP_NETWORK}`
   ]["account"];
 
 async function publish() {
@@ -20,7 +20,7 @@ async function publish() {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
         message_board_addr: accountAddress,
       },
-      profile: `${process.env.PROJECT_NAME}-${process.env.NEXT_APP_NETWORK}`,
+      profile: `${process.env.PROJECT_NAME}-${process.env.NEXT_PUBLIC_APP_NETWORK}`,
     })
     .then((response) => {
       const filePath = ".env";

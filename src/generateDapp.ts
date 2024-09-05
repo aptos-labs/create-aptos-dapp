@@ -87,7 +87,7 @@ export async function generateDapp(selection: Selections) {
       if (selection.framework === "vite") {
         content += `\nVITE_APP_NETWORK=${selection.network}`;
       } else if (selection.framework === "nextjs") {
-        content += `\nNEXT_APP_NETWORK=${selection.network}`;
+        content += `\nNEXT_PUBLIC_APP_NETWORK=${selection.network}`;
       } else {
         throw new Error(`Framework ${selection.framework} not supported`);
       }
