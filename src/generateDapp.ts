@@ -10,6 +10,7 @@ import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
 import { copy } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -80,16 +81,34 @@ export async function generateDapp(selection: Selections) {
     // cd into target directory
     process.chdir(targetDirectory);
 
+    scaffoldingSpinner.succeed();
+
+    const accountCreationSpinner = spinner(
+      `Creating a module publisher account\n`
+    ).start();
+
     // create .env file
     const generateEnvFile = async (additionalContent?: string) => {
-      let content = `PROJECT_NAME=${selection.projectName}`;
-
-      if (selection.framework === "vite") {
-        content += `\nVITE_APP_NETWORK=${selection.network}`;
-      } else if (selection.framework === "nextjs") {
-        content += `\nNEXT_PUBLIC_APP_NETWORK=${selection.network}`;
-      } else {
-        throw new Error(`Framework ${selection.framework} not supported`);
+      let content = `PROJECT_NAME=${selection.projectName}\nVITE_APP_NETWORK=${selection.network}`;
+      if (selection.network !== "mainnet") {
+        const publisherAccount = Account.generate();
+        const aptosConfig = new AptosConfig({
+          network: selection.network as Network,
+        });
+        const aptos = new Aptos(aptosConfig);
+        try {
+          await aptos.fundAccount({
+            accountAddress: publisherAccount.accountAddress,
+            amount: 1_000_000_000,
+          });
+          content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+          content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+        } catch (error: any) {
+          throw new Error(
+            "Could not create a module publisher account, please try again",
+            error
+          );
+        }
       }
 
       await write(
@@ -126,7 +145,7 @@ export async function generateDapp(selection: Selections) {
         throw new Error("Unsupported template to generate an .env file for");
     }
 
-    scaffoldingSpinner.succeed();
+    accountCreationSpinner.succeed();
 
     let docsInstructions = blue(
       `\n📖 Visit the ${selection.template.name} docs: ${selection.template.doc}`
@@ -141,7 +160,7 @@ export async function generateDapp(selection: Selections) {
       `\nNeed to install dependencies, this might take a while - in the meantime:\n ${docsInstructions}\n`
     );
 
-    const npmSpinner = spinner(`Installing the dependencies...\n`).start();
+    const npmSpinner = spinner(`Installing the dependencies\n`).start();
 
     await installDependencies(context);
 
