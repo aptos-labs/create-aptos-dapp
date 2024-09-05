@@ -1,15 +1,15 @@
-import { green, bold, blue } from "kolorist";
-import path from "path";
-import { fileURLToPath } from "node:url";
 import fs from "fs/promises";
+import { blue, bold, green } from "kolorist";
+import { fileURLToPath } from "node:url";
 import type { Ora } from "ora";
 import ora from "ora";
-// internal files
-import { Selections } from "./types.js";
+import path from "path";
 import { recordTelemetry } from "./telemetry.js";
+// internal files
+import type { Selections } from "./types.js";
+import { context } from "./utils/context.js";
 import { copy } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
-import { context } from "./utils/context.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -82,7 +82,7 @@ export async function generateDapp(selection: Selections) {
 
     // create .env file
     const generateEnvFile = async (additionalContent?: string) => {
-      const content = `PROJECT_NAME=${selection.projectName}\nVITE_APP_NETWORK=${selection.network}`;
+      const content = `PROJECT_NAME=${selection.projectName}`;
 
       await write(
         ".env",
@@ -95,24 +95,28 @@ export async function generateDapp(selection: Selections) {
     switch (selection.template.path) {
       case "nft-minting-dapp-template":
         await generateEnvFile(
-          `VITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`
+          `VITE_APP_NETWORK=${selection.network}\nVITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`
         );
         break;
       case "token-minting-dapp-template":
         await generateEnvFile(
-          `VITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`
+          `VITE_APP_NETWORK=${selection.network}\nVITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`
         );
         break;
       case "token-staking-dapp-template":
         await generateEnvFile(
-          `VITE_FA_ADDRESS=""\nVITE_REWARD_CREATOR_ADDRESS=""`
+          `VITE_APP_NETWORK=${selection.network}\nVITE_FA_ADDRESS=""\nVITE_REWARD_CREATOR_ADDRESS=""`
         );
         break;
       case "boilerplate-template":
-        await generateEnvFile();
+        await generateEnvFile(
+          `VITE_APP_NETWORK=${selection.network}\nVITE_MODULE_ADDRESS=""`
+        );
         break;
       case "nextjs-boilerplate-template":
-        await generateEnvFile();
+        await generateEnvFile(
+          `NEXT_PUBLIC_APP_NETWORK=${selection.network}\nNEXT_PUBLIC_MODULE_ADDRESS=""`
+        );
         break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
