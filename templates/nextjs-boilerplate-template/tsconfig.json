@@ -26,7 +26,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./frontend/*"
       ]
     },
     "plugins": [
@@ -36,7 +36,7 @@
     ]
   },
   "include": [
-    "./src",
+    "./frontend",
     "./dist/types/**/*.ts",
     "./next-env.d.ts"
   ],
