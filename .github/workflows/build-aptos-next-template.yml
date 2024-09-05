@@ -12,7 +12,7 @@ jobs:
     concurrency: ci-${{ github.ref }}-${{ github.workflow }}
     defaults:
       run:
-        working-directory: ./templates/aptos-next-template
+        working-directory: ./templates/nextjs-boilerplate-template
     steps:
       - uses: actions/checkout@v3
 
