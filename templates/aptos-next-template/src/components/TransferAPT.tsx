@@ -1,99 +1,93 @@
-'use client'
-
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useTransferCoin } from '@/hooks/entry/useTransferCoin'
-import { useAccountAPTBalance } from '@/hooks/view/useAccountAPTBalance'
-import { aptosClient, callFaucet } from '@/utils/aptosClient'
-import { parseAptos } from '@/utils/units'
-import { useWallet } from '@aptos-labs/wallet-adapter-react'
-import { ToastAction } from '@radix-ui/react-toast'
-import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useState } from "react";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+// Internal components
+import { toast } from "@/components/ui/use-toast";
+import { aptosClient } from "@/utils/aptosClient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { getAccountAPTBalance } from "@/view-functions/getAccountBalance";
+import { transferAPT } from "@/entry-functions/transferAPT";
 
 export function TransferAPT() {
-	const { account } = useWallet()
-	const queryClient = useQueryClient()
-	const transferMutation = useTransferCoin()
-	const { data } = useAccountAPTBalance({
-		accountAddress: account?.address as `0x${string}`
-	})
-	const [recipient, setRecipient] = useState<string>()
-	const [transferAmount, setTransferAmount] = useState<number>()
+  const { account, signAndSubmitTransaction } = useWallet();
+  const queryClient = useQueryClient();
 
-	const doTransfer = async () => {
-		if (!account || !recipient || !transferAmount) {
-			return
-		}
+  const [aptBalance, setAptBalance] = useState<number>(0);
+  const [recipient, setRecipient] = useState<string>();
+  const [transferAmount, setTransferAmount] = useState<number>();
 
-		try {
-			await transferMutation.mutate({
-				to: recipient as `0x${string}`,
-				amount: Math.pow(10, 8) * transferAmount // Convert to Octas
-			})
-		} catch (error) {
-			console.error(error)
-		}
-	}
+  const { data } = useQuery({
+    queryKey: ["apt-balance", account?.address],
+    refetchInterval: 10_000,
+    queryFn: async () => {
+      try {
+        if (account === null) {
+          console.error("Account not available");
+        }
 
-	const topUp = async () => {
-		const hashes = await callFaucet(parseAptos('1'), account!.address)
-		const executedTransaction = await aptosClient().waitForTransaction({
-			transactionHash: hashes as unknown as string
-		})
-		queryClient.invalidateQueries()
-		toast('Transaction sent', {
-			action: (
-				<ToastAction
-					altText="View Hash"
-					onClick={() => {
-						window.open(
-							`https://explorer.aptoslabs.com/txn/${executedTransaction.hash}?network=${process.env.NEXT_PUBLIC_APP_NETWORK}`,
-							'_blank'
-						)
-					}}
-				>
-					View Hash
-				</ToastAction>
-			)
-		})
-	}
+        const balance = await getAccountAPTBalance({ accountAddress: account!.address });
 
-	return (
-		<div className="flex flex-col gap-6">
-			<div className="flex flex-row items-center gap-2">
-				<h4 className="text-lg font-medium">
-					APT balance: {data?.balance ? data.balance / Math.pow(10, 8) : 0}
-				</h4>
-				{process.env.NEXT_PUBLIC_APP_NETWORK !== 'mainnet' && (
-					<Button onClick={topUp}>Top Up</Button>
-				)}
-			</div>
-			Recipient{' '}
-			<Input
-				disabled={!account}
-				placeholder="0x1"
-				onChange={(e) => setRecipient(e.target.value)}
-			/>
-			Amount{' '}
-			<Input
-				disabled={!account}
-				placeholder="100"
-				onChange={(e) => setTransferAmount(Number.parseFloat(e.target.value))}
-			/>
-			<Button
-				disabled={
-					!account ||
-					!recipient ||
-					!transferAmount ||
-					transferAmount > (data?.balance ?? 0) ||
-					transferAmount <= 0
-				}
-				onClick={doTransfer}
-			>
-				Transfer
-			</Button>
-		</div>
-	)
+        return {
+          balance,
+        };
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error,
+        });
+        return {
+          balance: 0,
+        };
+      }
+    },
+  });
+
+  const onClickButton = async () => {
+    if (!account || !recipient || !transferAmount) {
+      return;
+    }
+
+    try {
+      const committedTransaction = await signAndSubmitTransaction(
+        transferAPT({
+          to: recipient,
+          // APT is 8 decimal places
+          amount: Math.pow(10, 8) * transferAmount,
+        }),
+      );
+      const executedTransaction = await aptosClient().waitForTransaction({
+        transactionHash: committedTransaction.hash,
+      });
+      queryClient.invalidateQueries();
+      toast({
+        title: "Success",
+        description: `Transaction succeeded, hash: ${executedTransaction.hash}`,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (data) {
+      setAptBalance(data.balance);
+    }
+  }, [data]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <h4 className="text-lg font-medium">APT balance: {aptBalance / Math.pow(10, 8)}</h4>
+      Recipient <Input disabled={!account} placeholder="0x1" onChange={(e) => setRecipient(e.target.value)} />
+      Amount{" "}
+      <Input disabled={!account} placeholder="100" onChange={(e) => setTransferAmount(parseFloat(e.target.value))} />
+      <Button
+        disabled={!account || !recipient || !transferAmount || transferAmount > aptBalance || transferAmount <= 0}
+        onClick={onClickButton}
+      >
+        Transfer
+      </Button>
+    </div>
+  );
 }

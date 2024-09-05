@@ -1,24 +1,26 @@
-'use client'
-
+import { PropsWithChildren } from "react";
+import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
 // Internal components
-import { NETWORK } from '@/lib/constants'
+import { useToast } from "@/components/ui/use-toast";
 // Internal constants
-import { AptosWalletAdapterProvider } from '@aptos-labs/wallet-adapter-react'
-import type { PropsWithChildren } from 'react'
-import { toast } from 'sonner'
+import { NETWORK } from "@/constants";
 
 export function WalletProvider({ children }: PropsWithChildren) {
-	return (
-		<AptosWalletAdapterProvider
-			autoConnect={true}
-			dappConfig={{ network: NETWORK }}
-			onError={(error) => {
-				toast.error('Error', {
-					description: error
-				})
-			}}
-		>
-			{children}
-		</AptosWalletAdapterProvider>
-	)
+  const { toast } = useToast();
+
+  return (
+    <AptosWalletAdapterProvider
+      autoConnect={true}
+      dappConfig={{ network: NETWORK }}
+      onError={(error) => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error || "Unknown wallet error",
+        });
+      }}
+    >
+      {children}
+    </AptosWalletAdapterProvider>
+  );
 }
