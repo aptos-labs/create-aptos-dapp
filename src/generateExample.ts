@@ -8,6 +8,7 @@ import fs from "fs/promises";
 import { existsSync } from "node:fs";
 import { copy, runCommand } from "./utils/helpers.js";
 import { recordTelemetry } from "./telemetry.js";
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 
 const spinner = (text) => ora({ text, stream: process.stdout });
 
@@ -118,7 +119,18 @@ export async function generateExample(options: GenerateExampleInput) {
     process.chdir(targetDirectory);
 
     // create .env file
-    const envContent = `PROJECT_NAME=${example}\nVITE_APP_NETWORK=testnet`;
+    let envContent = `PROJECT_NAME=${example}\nVITE_APP_NETWORK=testnet`;
+    const publisherAccount = Account.generate();
+    const aptosConfig = new AptosConfig({
+      network: Network.TESTNET, // we default all examples to use TESTNET
+    });
+    const aptos = new Aptos(aptosConfig);
+    await aptos.fundAccount({
+      accountAddress: publisherAccount.accountAddress,
+      amount: 1_000_000_000,
+    });
+    envContent += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+    envContent += `\n#This is the module publisher account private key, do not share this address\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
     await write(".env", envContent);
 
     await recordTelemetry({

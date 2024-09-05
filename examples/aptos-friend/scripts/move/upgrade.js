@@ -17,7 +17,7 @@ async function publish() {
       // Upgrade module from an object
       aptos_friend_addr: process.env.VITE_MODULE_ADDRESS,
     },
-    profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+    extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
   });
 }
 publish();
