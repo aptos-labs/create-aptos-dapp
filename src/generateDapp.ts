@@ -82,7 +82,15 @@ export async function generateDapp(selection: Selections) {
 
     // create .env file
     const generateEnvFile = async (additionalContent?: string) => {
-      const content = `PROJECT_NAME=${selection.projectName}`;
+      let content = `PROJECT_NAME=${selection.projectName}`;
+
+      if (selection.framework === "vite") {
+        content += `\nVITE_APP_NETWORK=${selection.network}`;
+      } else if (selection.framework === "nextjs") {
+        content += `\nNEXT_APP_NETWORK=${selection.network}`;
+      } else {
+        throw new Error(`Framework ${selection.framework} not supported`);
+      }
 
       await write(
         ".env",
@@ -95,28 +103,24 @@ export async function generateDapp(selection: Selections) {
     switch (selection.template.path) {
       case "nft-minting-dapp-template":
         await generateEnvFile(
-          `VITE_APP_NETWORK=${selection.network}\nVITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`
+          `VITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`
         );
         break;
       case "token-minting-dapp-template":
         await generateEnvFile(
-          `VITE_APP_NETWORK=${selection.network}\nVITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`
+          `VITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`
         );
         break;
       case "token-staking-dapp-template":
         await generateEnvFile(
-          `VITE_APP_NETWORK=${selection.network}\nVITE_FA_ADDRESS=""\nVITE_REWARD_CREATOR_ADDRESS=""`
+          `VITE_FA_ADDRESS=""\nVITE_REWARD_CREATOR_ADDRESS=""`
         );
         break;
       case "boilerplate-template":
-        await generateEnvFile(
-          `VITE_APP_NETWORK=${selection.network}\nVITE_MODULE_ADDRESS=""`
-        );
+        await generateEnvFile();
         break;
       case "nextjs-boilerplate-template":
-        await generateEnvFile(
-          `NEXT_PUBLIC_APP_NETWORK=${selection.network}\nNEXT_PUBLIC_MODULE_ADDRESS=""`
-        );
+        await generateEnvFile();
         break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
@@ -147,6 +151,7 @@ export async function generateDapp(selection: Selections) {
         command: "npx create-aptos-dapp",
         project_name: selection.projectName,
         template: selection.template.name,
+        framework: selection.framework,
         network: selection.network,
       });
     }

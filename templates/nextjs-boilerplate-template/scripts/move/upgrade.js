@@ -17,7 +17,7 @@ async function publish() {
       // Upgrade module from an object
       message_board_addr: process.env.NEXT_PUBLIC_MODULE_ADDRESS,
     },
-    profile: `${process.env.PROJECT_NAME}-${process.env.NEXT_PUBLIC_APP_NETWORK}`,
+    profile: `${process.env.PROJECT_NAME}-${process.env.NEXT_APP_NETWORK}`,
   });
 }
 publish();

@@ -65,11 +65,11 @@ export const workflowOptions = {
     choices(prev, values) {
       if (values.template.path === "boilerplate-template") {
         return [
-          { title: "Client-side (Vue app)", value: "client" },
-          { title: "Server-side (Next.js app)", value: "server" },
+          { title: "Client-side (Vite app)", value: "vite" },
+          { title: "Server-side (Next.js app)", value: "nextjs" },
         ];
       }
-      return [{ title: "Client-side (Vue app)", value: "client" }];
+      return [{ title: "Client-side (Vite app)", value: "vite" }];
     },
     initial: 0,
   },

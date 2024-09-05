@@ -73,9 +73,10 @@ export async function startWorkflow() {
   return {
     projectName,
     template:
-      template && framework === "server"
+      template && framework === "nextjs"
         ? { ...template, path: "nextjs-boilerplate-template" }
         : template,
+    framework,
     network,
     telemetry,
   } as Selections;
