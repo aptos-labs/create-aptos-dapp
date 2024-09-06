@@ -76,17 +76,3 @@ export const getUserPackageManager = () => {
       : 0;
   return packageManagerInitialIndex;
 };
-
-/**
- * Rename a file or directory
- */
-export const rename = (dir: string, oldName: string, newName: string) => {
-  fs.renameSync(path.join(dir, oldName), path.join(dir, newName));
-};
-
-/**
- * Remove a file or directory
- */
-export const remove = (dir: string, name: string) => {
-  fs.rmSync(path.join(dir, name));
-};

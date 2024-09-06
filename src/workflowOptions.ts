@@ -84,30 +84,20 @@ export const workflowOptions = {
     initial: 0,
   },
   signingOption: {
-    type: "select",
+    type: (prev) =>
+      prev.path == "clicker-game-tg-mini-app-template" ? "selection" : null,
     name: "signingOption",
     message: "Choose your signing option",
-    choices(_, values) {
-      if (values.template.path === "clicker-game-tg-mini-app-template") {
-        return [
-          {
-            title: "Explicit signing (Aptos Wallet Adapter)",
-            value: "explicit",
-          },
-          {
-            title: "Seamless signing (Mizu SDK Core)",
-            value: "seamless",
-          },
-        ];
-      }
-      return [
-        {
-          title: "Explicit signing (Aptos Wallet Adapter)",
-          value: "explicit",
-        },
-      ];
-    },
-    initial: 0,
+    choices: [
+      {
+        title: "Explicit signing (Aptos Wallet Adapter)",
+        value: "explicit",
+      },
+      {
+        title: "Seamless signing (Mizu SDK Core)",
+        value: "seamless",
+      },
+    ],
   },
   network: {
     type: "select",
