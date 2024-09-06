@@ -56,6 +56,14 @@ export async function generateDapp(selection: Selections) {
       }
     };
 
+    const rename = async (dir: string, oldName: string, newName: string) => {
+      await fs.rename(path.join(dir, oldName), path.join(dir, newName));
+    };
+
+    const remove = async (dir: string, name: string) => {
+      await fs.unlink(path.join(dir, name));
+    };
+
     // Map of files to rename on build time
     const renameFiles: Record<string, string | undefined> = {
       // `npm publish` doesnt include the .gitignore file
@@ -156,11 +164,46 @@ export async function generateDapp(selection: Selections) {
       case "nextjs-boilerplate-template":
         await generateEnvFile();
         break;
-      case "tg-mini-app-boilerplate-template":
-        await generateEnvFile();
-        break;
-      case "tg-mini-app-seamless-signing-boilerplate-template":
-        await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
+      case "clicker-game-tg-mini-app-template":
+        const dir = "frontend/components";
+
+        if (selection.signingOption === "explicit") {
+          await generateEnvFile();
+          await rename(dir, "ExplicitSigningCounter.tsx", "Counter.tsx");
+          await rename(
+            dir,
+            "ExplicitSigningWalletProvider.tsx",
+            "WalletProvider.tsx"
+          );
+          await rename(
+            dir,
+            "ExplicitSigningWalletSelector.tsx",
+            "WalletSelector.tsx"
+          );
+          await remove(dir, "SeamlessSigningCounter.tsx");
+          await remove(dir, "SeamlessSigningWalletProvider.tsx");
+          await remove(dir, "SeamlessSigningWalletSelector.tsx");
+        } else if (selection.signingOption === "seamless") {
+          await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
+          await rename(dir, "SeamlessSigningCounter.tsx", "Counter.tsx");
+          await rename(
+            dir,
+            "SeamlessSigningWalletProvider.tsx",
+            "WalletProvider.tsx"
+          );
+          await rename(
+            dir,
+            "SeamlessSigningWalletSelector.tsx",
+            "WalletSelector.tsx"
+          );
+          await remove(dir, "ExplicitSigningCounter.tsx");
+          await remove(dir, "ExplicitSigningWalletProvider.tsx");
+          await remove(dir, "ExplicitSigningWalletSelector.tsx");
+        } else {
+          throw new Error(
+            `Unsupported signing option: ${selection.signingOption}`
+          );
+        }
         break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
@@ -193,6 +236,7 @@ export async function generateDapp(selection: Selections) {
         template: selection.template.name,
         framework: selection.framework,
         network: selection.network,
+        signing_option: selection.signingOption,
       });
     }
 

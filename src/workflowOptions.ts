@@ -27,10 +27,10 @@ export const workflowOptions = {
         value: {
           path: "clicker-game-tg-mini-app-template",
           name: "Clicker Game Telegram Mini App Template",
-          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/tg-mini-app-boilerplate",
+          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/clicker-game-tg-mini-app-template",
         },
         description:
-          "A telegram mini app boilerplate template to start an Aptos dapp with",
+          "A clicker game Telegram Mini App template to start an Aptos dapp with",
       },
       {
         title: "NFT minting dapp",
@@ -80,6 +80,32 @@ export const workflowOptions = {
         ];
       }
       return [{ title: "Client-side (Vite app)", value: "vite" }];
+    },
+    initial: 0,
+  },
+  signingOption: {
+    type: "select",
+    name: "signingOption",
+    message: "Choose your signing option",
+    choices(_, values) {
+      if (values.template.path === "clicker-game-tg-mini-app-template") {
+        return [
+          {
+            title: "Explicit signing (Aptos Wallet Adapter)",
+            value: "explicit",
+          },
+          {
+            title: "Seamless signing (Mizu SDK Core)",
+            value: "seamless",
+          },
+        ];
+      }
+      return [
+        {
+          title: "Explicit signing (Aptos Wallet Adapter)",
+          value: "explicit",
+        },
+      ];
     },
     initial: 0,
   },
