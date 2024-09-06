@@ -8,7 +8,7 @@ import { recordTelemetry } from "./telemetry.js";
 // internal files
 import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
-import { copy } from "./utils/helpers.js";
+import { copy, remove, rename } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
 import { Account, Aptos, AptosConfig, type Network } from "@aptos-labs/ts-sdk";
 
@@ -54,14 +54,6 @@ export async function generateDapp(selection: Selections) {
       } else {
         await copy(path.join(templateDir, file), targetPath);
       }
-    };
-
-    const rename = async (dir: string, oldName: string, newName: string) => {
-      await fs.rename(path.join(dir, oldName), path.join(dir, newName));
-    };
-
-    const remove = async (dir: string, name: string) => {
-      await fs.unlink(path.join(dir, name));
     };
 
     // Map of files to rename on build time
@@ -169,36 +161,36 @@ export async function generateDapp(selection: Selections) {
 
         if (selection.signingOption === "explicit") {
           await generateEnvFile();
-          await rename(dir, "ExplicitSigningCounter.tsx", "Counter.tsx");
-          await rename(
+          rename(dir, "ExplicitSigningCounter.tsx", "Counter.tsx");
+          rename(
             dir,
             "ExplicitSigningWalletProvider.tsx",
             "WalletProvider.tsx"
           );
-          await rename(
+          rename(
             dir,
             "ExplicitSigningWalletSelector.tsx",
             "WalletSelector.tsx"
           );
-          await remove(dir, "SeamlessSigningCounter.tsx");
-          await remove(dir, "SeamlessSigningWalletProvider.tsx");
-          await remove(dir, "SeamlessSigningWalletSelector.tsx");
+          remove(dir, "SeamlessSigningCounter.tsx");
+          remove(dir, "SeamlessSigningWalletProvider.tsx");
+          remove(dir, "SeamlessSigningWalletSelector.tsx");
         } else if (selection.signingOption === "seamless") {
           await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
-          await rename(dir, "SeamlessSigningCounter.tsx", "Counter.tsx");
-          await rename(
+          rename(dir, "SeamlessSigningCounter.tsx", "Counter.tsx");
+          rename(
             dir,
             "SeamlessSigningWalletProvider.tsx",
             "WalletProvider.tsx"
           );
-          await rename(
+          rename(
             dir,
             "SeamlessSigningWalletSelector.tsx",
             "WalletSelector.tsx"
           );
-          await remove(dir, "ExplicitSigningCounter.tsx");
-          await remove(dir, "ExplicitSigningWalletProvider.tsx");
-          await remove(dir, "ExplicitSigningWalletSelector.tsx");
+          remove(dir, "ExplicitSigningCounter.tsx");
+          remove(dir, "ExplicitSigningWalletProvider.tsx");
+          remove(dir, "ExplicitSigningWalletSelector.tsx");
         } else {
           throw new Error(
             `Unsupported signing option: ${selection.signingOption}`
