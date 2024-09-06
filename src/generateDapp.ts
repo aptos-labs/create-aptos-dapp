@@ -172,6 +172,14 @@ export async function generateDapp(selection: Selections) {
             "frontend/components/explicitSigning/WalletSelector.tsx",
             "frontend/components/WalletSelector.tsx"
           );
+          const packageJson = JSON.parse(
+            await fs.readFile("package.json", "utf-8")
+          );
+          delete packageJson.dependencies["@mizuwallet-sdk/core"];
+          await fs.writeFile(
+            "package.json",
+            JSON.stringify(packageJson, null, 2)
+          );
           await fs.rm("frontend/components/seamlessSigning", {
             recursive: true,
           });
