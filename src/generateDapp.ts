@@ -10,7 +10,7 @@ import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
 import { copy } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
-import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AptosConfig, type Network } from "@aptos-labs/ts-sdk";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -89,7 +89,15 @@ export async function generateDapp(selection: Selections) {
 
     // create .env file
     const generateEnvFile = async (additionalContent?: string) => {
-      let content = `PROJECT_NAME=${selection.projectName}\nVITE_APP_NETWORK=${selection.network}`;
+      let content = `PROJECT_NAME=${selection.projectName}`;
+
+      if (selection.framework === "vite") {
+        content += `\nVITE_APP_NETWORK=${selection.network}`;
+      } else if (selection.framework === "nextjs") {
+        content += `\nNEXT_APP_NETWORK=${selection.network}`;
+      } else {
+        throw new Error(`Framework ${selection.framework} not supported`);
+      }
       if (selection.network !== "mainnet") {
         const publisherAccount = Account.generate();
         const aptosConfig = new AptosConfig({
@@ -136,10 +144,10 @@ export async function generateDapp(selection: Selections) {
         );
         break;
       case "boilerplate-template":
-        await generateEnvFile();
+        await generateEnvFile(`VITE_MODULE_ADDRESS=""`);
         break;
       case "nextjs-boilerplate-template":
-        await generateEnvFile();
+        await generateEnvFile(`NEXT_PUBLIC_MODULE_ADDRESS=""`);
         break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
