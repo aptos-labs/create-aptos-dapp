@@ -2,6 +2,9 @@ import { mockTelegramEnv, parseInitData, retrieveLaunchParams } from "@telegram-
 
 import { IS_DEV } from "./constants";
 
+// When testing outside the Telegram environment, we need to mock the environment to be able to test the application.
+// Learn more at https://docs.telegram-mini-apps.com/packages/telegram-apps-sdk/environment#environment
+
 // It is important, to mock the environment only for development purposes. When building the application
 // IS_DEV will become false, and the code inside will be tree-shaken,
 // so you will not see it in your final bundle.
