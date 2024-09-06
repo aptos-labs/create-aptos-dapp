@@ -8,7 +8,7 @@ import { recordTelemetry } from "./telemetry.js";
 // internal files
 import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
-import { copy, remove, rename } from "./utils/helpers.js";
+import { copy } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
 import { Account, Aptos, AptosConfig, type Network } from "@aptos-labs/ts-sdk";
 
@@ -161,36 +161,44 @@ export async function generateDapp(selection: Selections) {
 
         if (selection.signingOption === "explicit") {
           await generateEnvFile();
-          rename(dir, "ExplicitSigningCounter.tsx", "Counter.tsx");
-          rename(
-            dir,
-            "ExplicitSigningWalletProvider.tsx",
-            "WalletProvider.tsx"
+          copy(
+            "frontend/components/explicitSigning/Counter.tsx",
+            "frontend/components/Counter.tsx"
           );
-          rename(
-            dir,
-            "ExplicitSigningWalletSelector.tsx",
-            "WalletSelector.tsx"
+          copy(
+            "frontend/components/explicitSigning/WalletProvider.tsx",
+            "frontend/components/WalletProvider.tsx"
           );
-          remove(dir, "SeamlessSigningCounter.tsx");
-          remove(dir, "SeamlessSigningWalletProvider.tsx");
-          remove(dir, "SeamlessSigningWalletSelector.tsx");
+          copy(
+            "frontend/components/explicitSigning/WalletSelector.tsx",
+            "frontend/components/WalletSelector.tsx"
+          );
+          await fs.rmdir("frontend/components/seamlessSigning", {
+            recursive: true,
+          });
+          await fs.rmdir("frontend/components/explicitSigning", {
+            recursive: true,
+          });
         } else if (selection.signingOption === "seamless") {
           await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
-          rename(dir, "SeamlessSigningCounter.tsx", "Counter.tsx");
-          rename(
-            dir,
-            "SeamlessSigningWalletProvider.tsx",
-            "WalletProvider.tsx"
+          copy(
+            "frontend/components/seamlessSigning/Counter.tsx",
+            "frontend/components/Counter.tsx"
           );
-          rename(
-            dir,
-            "SeamlessSigningWalletSelector.tsx",
-            "WalletSelector.tsx"
+          copy(
+            "frontend/components/seamlessSigning/WalletProvider.tsx",
+            "frontend/components/WalletProvider.tsx"
           );
-          remove(dir, "ExplicitSigningCounter.tsx");
-          remove(dir, "ExplicitSigningWalletProvider.tsx");
-          remove(dir, "ExplicitSigningWalletSelector.tsx");
+          copy(
+            "frontend/components/seamlessSigning/WalletSelector.tsx",
+            "frontend/components/WalletSelector.tsx"
+          );
+          await fs.rmdir("frontend/components/seamlessSigning", {
+            recursive: true,
+          });
+          await fs.rmdir("frontend/components/explicitSigning", {
+            recursive: true,
+          });
         } else {
           throw new Error(
             `Unsupported signing option: ${selection.signingOption}`
