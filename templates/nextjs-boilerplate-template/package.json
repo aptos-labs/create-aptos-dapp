@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "scripts": {
-    "move:init": "node ./scripts/init",
     "move:test": "node ./scripts/move/test",
     "move:compile": "node ./scripts/move/compile",
     "move:publish": "node ./scripts/move/publish",

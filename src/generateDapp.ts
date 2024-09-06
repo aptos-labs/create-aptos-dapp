@@ -94,7 +94,7 @@ export async function generateDapp(selection: Selections) {
       if (selection.framework === "vite") {
         content += `\nVITE_APP_NETWORK=${selection.network}`;
       } else if (selection.framework === "nextjs") {
-        content += `\nNEXT_APP_NETWORK=${selection.network}`;
+        content += `\nNEXT_PUBLIC_APP_NETWORK=${selection.network}`;
       } else {
         throw new Error(`Framework ${selection.framework} not supported`);
       }
@@ -109,8 +109,15 @@ export async function generateDapp(selection: Selections) {
             accountAddress: publisherAccount.accountAddress,
             amount: 1_000_000_000,
           });
-          content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
-          content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+          if (selection.framework === "vite") {
+            content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+            content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+          } else if (selection.framework === "nextjs") {
+            content += `\nNEXT_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+            content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nNEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+          } else {
+            throw new Error(`Framework ${selection.framework} not supported`);
+          }
         } catch (error: any) {
           throw new Error(
             "Could not create a module publisher account, please try again",
@@ -144,10 +151,10 @@ export async function generateDapp(selection: Selections) {
         );
         break;
       case "boilerplate-template":
-        await generateEnvFile(`VITE_MODULE_ADDRESS=""`);
+        await generateEnvFile();
         break;
       case "nextjs-boilerplate-template":
-        await generateEnvFile(`NEXT_PUBLIC_MODULE_ADDRESS=""`);
+        await generateEnvFile();
         break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
