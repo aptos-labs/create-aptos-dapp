@@ -18,6 +18,7 @@ export type GenerateExampleInput = {
 
 export async function generateExample(options: GenerateExampleInput) {
   const { example } = options;
+  const isNextJs = example != "aptos-friend";
   let currentSpinner: Ora | null = null;
 
   // internal examples directory path
@@ -119,18 +120,33 @@ export async function generateExample(options: GenerateExampleInput) {
     process.chdir(targetDirectory);
 
     // create .env file
-    let envContent = `PROJECT_NAME=${example}\nVITE_APP_NETWORK=testnet`;
+    let envContent = `PROJECT_NAME=${example}\n${
+      isNextJs ? "NEXT_PUBLIC" : "VITE"
+    }_APP_NETWORK=testnet`;
+    if (example === "aptogotchi-keyless") {
+      envContent += `\nGOOGLE_CLIENT_ID="",VERCEL_URL=""`;
+    }
     const publisherAccount = Account.generate();
     const aptosConfig = new AptosConfig({
       network: Network.TESTNET, // we default all examples to use TESTNET
     });
     const aptos = new Aptos(aptosConfig);
-    await aptos.fundAccount({
-      accountAddress: publisherAccount.accountAddress,
-      amount: 1_000_000_000,
-    });
-    envContent += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
-    envContent += `\n#This is the module publisher account private key, do not share this address\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+    await aptos
+      .fundAccount({
+        accountAddress: publisherAccount.accountAddress,
+        amount: 10_000_000,
+      })
+      .catch((error) => {
+        console.error(
+          `Failed to fund account: ${error.message}, please fund the account manually`
+        );
+      });
+    envContent += `\n${
+      isNextJs ? "NEXT_PUBLIC" : "VITE"
+    }_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+    envContent += `\n#This is the module publisher account private key, do not share this address\n${
+      isNextJs ? "NEXT" : "VITE"
+    }_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
     await write(".env", envContent);
 
     await recordTelemetry({

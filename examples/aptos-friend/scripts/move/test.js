@@ -6,7 +6,7 @@ async function test() {
   const move = new cli.Move();
 
   await move.test({
-    packageDirectoryPath: "move",
+    packageDirectoryPath: "contract",
     namedAddresses: {
       aptos_friend_addr: "0x100",
     },

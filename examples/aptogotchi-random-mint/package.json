@@ -1,0 +1,51 @@
+{
+  "name": "aptogotchi-random-mint-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "move:test": "node ./scripts/move/test",
+    "move:publish": "node ./scripts/move/publish",
+    "move:upgrade": "node ./scripts/move/upgrade",
+    "move:get-abi": "node ./scripts/move/get_abi",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "1.27.0",
+    "@aptos-labs/wallet-adapter-react": "^3.5.10",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@thalalabs/surf": "^1.7.3",
+    "autoprefixer": "10.4.14",
+    "clsx": "^2.0.0",
+    "dotenv": "16.3.1",
+    "framer-motion": "^10.16.0",
+    "nes.css": "^2.3.0",
+    "next": "13.4.12",
+    "postcss": "8.4.27",
+    "react": "18.2.0",
+    "react-confetti": "^6.1.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^4.10.1",
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss": "3.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "20.9.0",
+    "@types/react": "18.2.37",
+    "@types/react-dom": "18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.9.1",
+    "@typescript-eslint/parser": "^6.9.1",
+    "eslint": "8.53.0",
+    "eslint-config-next": "14.0.2",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "prettier": "^3.1.0",
+    "tree-kill": "1.2.2",
+    "typescript": "5.2.2"
+  }
+}
