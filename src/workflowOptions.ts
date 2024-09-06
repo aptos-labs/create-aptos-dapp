@@ -85,7 +85,7 @@ export const workflowOptions = {
   },
   signingOption: {
     type: (prev) =>
-      prev.path == "clicker-game-tg-mini-app-template" ? "selection" : null,
+      prev.path == "clicker-game-tg-mini-app-template" ? "select" : null,
     name: "signingOption",
     message: "Choose your signing option",
     choices: [
