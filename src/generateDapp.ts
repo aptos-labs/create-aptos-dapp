@@ -52,7 +52,7 @@ export async function generateDapp(selection: Selections) {
       if (content) {
         await fs.writeFile(targetPath, content);
       } else {
-        await copy(path.join(templateDir, file), targetPath);
+        copy(path.join(templateDir, file), targetPath);
       }
     };
 
@@ -160,7 +160,6 @@ export async function generateDapp(selection: Selections) {
         const dir = "frontend/components";
 
         if (selection.signingOption === "explicit") {
-          await generateEnvFile();
           copy(
             "frontend/components/explicitSigning/Counter.tsx",
             "frontend/components/Counter.tsx"
@@ -173,14 +172,14 @@ export async function generateDapp(selection: Selections) {
             "frontend/components/explicitSigning/WalletSelector.tsx",
             "frontend/components/WalletSelector.tsx"
           );
-          await fs.rmdir("frontend/components/seamlessSigning", {
+          await fs.rm("frontend/components/seamlessSigning", {
             recursive: true,
           });
-          await fs.rmdir("frontend/components/explicitSigning", {
+          await fs.rm("frontend/components/explicitSigning", {
             recursive: true,
           });
+          await generateEnvFile();
         } else if (selection.signingOption === "seamless") {
-          await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
           copy(
             "frontend/components/seamlessSigning/Counter.tsx",
             "frontend/components/Counter.tsx"
@@ -193,12 +192,13 @@ export async function generateDapp(selection: Selections) {
             "frontend/components/seamlessSigning/WalletSelector.tsx",
             "frontend/components/WalletSelector.tsx"
           );
-          await fs.rmdir("frontend/components/seamlessSigning", {
+          await fs.rm("frontend/components/seamlessSigning", {
             recursive: true,
           });
-          await fs.rmdir("frontend/components/explicitSigning", {
+          await fs.rm("frontend/components/explicitSigning", {
             recursive: true,
           });
+          await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
         } else {
           throw new Error(
             `Unsupported signing option: ${selection.signingOption}`
