@@ -1,0 +1,31 @@
+name: Build Token Minting Dapp Template Frontend
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: ci-${{ github.ref }}-${{ github.workflow }}
+    defaults:
+      run:
+        working-directory: ./templates/token-minting-dapp-template
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install pnpm
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.1
+          run_install: false
+
+      # Install deps and build.
+      - run: pnpm install
+      - run: CI= pnpm build
+
+      # Verify that the format is correct
+      - run: npm run _fmt -- --check
+        shell: bash

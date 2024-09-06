@@ -1,0 +1,47 @@
+{
+  "name": "create-aptos-dapp",
+  "description": "a starter kit for dapp developers to easily bootstrap a dapp on the Aptos network",
+  "version": "0.0.24",
+  "license": "Apache-2.0",
+  "author": "aptoslabs.com",
+  "keywords": [
+    "create aptos dapp",
+    "create-aptos-dapp",
+    "create-apt-dapp",
+    "create apt dapp",
+    "aptos",
+    "boilerplate"
+  ],
+  "bin": {
+    "create-aptos-dapp": "./dist/index.js"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc && cp -r templates dist/templates && cp -r examples dist/examples",
+    "dev": "rm -rf my-aptos-dapp && npm run build && node dist/index.js",
+    "prepublish": "npm run build && npm publish"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.27.1",
+    "commander": "^12.1.0",
+    "kolorist": "^1.8.0",
+    "ora": "^8.0.1",
+    "prompts": "^2.4.2",
+    "typescript": "^4.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aptos-labs/create-aptos-dapp"
+  },
+  "homepage": "https://github.com/aptos-labs/create-aptos-dapp/blob/main/README.md",
+  "bugs": {
+    "url": "https://github.com/aptos-labs/create-aptos-dapp/issues"
+  }
+}
