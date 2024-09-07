@@ -19,13 +19,13 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 First, install all project dependencies:
 
 ```bash
-pnpm install
+npm i
 ```
 
 Then, you can run the development server:
 
 ```bash
-pnpm dev
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

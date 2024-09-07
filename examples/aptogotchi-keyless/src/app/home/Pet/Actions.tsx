@@ -49,7 +49,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
     const transaction = await aptosClient().transaction.build.simple({
       sender: keylessAccount.accountAddress,
       data: {
-        function: `${MODULE_ADDRESS}::main::feed`,
+        function: `${MODULE_ADDRESS}::aptogotchi::feed`,
         typeArguments: [],
         functionArguments: [ENERGY_INCREASE],
       },
@@ -103,7 +103,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
     const transaction = await aptosClient().transaction.build.simple({
       sender: keylessAccount.accountAddress,
       data: {
-        function: `${MODULE_ADDRESS}::main::play`,
+        function: `${MODULE_ADDRESS}::aptogotchi::play`,
         typeArguments: [],
         functionArguments: [ENERGY_DECREASE],
       },
@@ -157,7 +157,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
     const transaction = await aptosClient().transaction.build.simple({
       sender: keylessAccount.accountAddress,
       data: {
-        function: `${MODULE_ADDRESS}::main::delete`,
+        function: `${MODULE_ADDRESS}::aptogotchi::delete`,
         typeArguments: [],
         functionArguments: [],
       },

@@ -11,7 +11,7 @@ const getAptogotchiByAddress = async (address: string): Promise<Pet> => {
   return aptosClient
     .view({
       payload: {
-        function: `${ABI.address}::main::get_aptogotchi`,
+        function: `${ABI.address}::aptogotchi::get_aptogotchi`,
         functionArguments: [address],
       },
     })
@@ -37,7 +37,7 @@ export function Mint() {
 
     const aptogotchiCollectionAddressResponse = (await aptosClient().view({
       payload: {
-        function: `${ABI.address}::main::get_aptogotchi_collection_address`,
+        function: `${ABI.address}::aptogotchi::get_aptogotchi_collection_address`,
       },
     })) as [`0x${string}`];
 
@@ -87,7 +87,7 @@ export function Mint() {
       const response = await signAndSubmitTransaction({
         sender: account.address,
         data: {
-          function: `${ABI.address}::main::create_aptogotchi`,
+          function: `${ABI.address}::aptogotchi::create_aptogotchi`,
           typeArguments: [],
           functionArguments: [],
         },

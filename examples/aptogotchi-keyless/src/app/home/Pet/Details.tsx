@@ -29,7 +29,7 @@ export function Details() {
     const transaction = await aptosClient().transaction.build.simple({
       sender: keylessAccount.accountAddress,
       data: {
-        function: `${MODULE_ADDRESS}::main::set_name`,
+        function: `${MODULE_ADDRESS}::aptogotchi::set_name`,
         typeArguments: [],
         functionArguments: [newName],
       },

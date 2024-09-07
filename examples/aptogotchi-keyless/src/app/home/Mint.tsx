@@ -8,7 +8,7 @@ import { aptosClient } from "@/utils/aptosClient";
 import { MODULE_ADDRESS } from "@/utils/constants";
 
 export interface MintProps {
-  fetchPet: () => Promise<void>;
+  fetchPet: () => void;
 }
 
 export function Mint({ fetchPet }: MintProps) {
@@ -27,7 +27,7 @@ export function Mint({ fetchPet }: MintProps) {
     const transaction = await aptosClient().transaction.build.simple({
       sender: keylessAccount.accountAddress,
       data: {
-        function: `${MODULE_ADDRESS}::main::create_aptogotchi`,
+        function: `${MODULE_ADDRESS}::aptogotchi::create_aptogotchi`,
         typeArguments: [],
         functionArguments: [name, petParts.body, petParts.ear, petParts.face],
       },
