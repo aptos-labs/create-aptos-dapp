@@ -124,7 +124,7 @@ export async function generateExample(options: GenerateExampleInput) {
       isNextJs ? "NEXT_PUBLIC" : "VITE"
     }_APP_NETWORK=testnet`;
     if (example === "aptogotchi-keyless") {
-      envContent += `\nGOOGLE_CLIENT_ID="",VERCEL_URL=""`;
+      envContent += `\nNEXT_PUBLIC_GOOGLE_CLIENT_ID=""\nNEXT_PUBLIC_VERCEL_URL=""`;
     }
     const publisherAccount = Account.generate();
     const aptosConfig = new AptosConfig({
