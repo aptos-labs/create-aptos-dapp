@@ -3,8 +3,8 @@
 import dynamic from "next/dynamic";
 import { PropsWithChildren } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Connected } from "@/components/Home/Connected";
-import { NotConnected } from "@/components/Home/NotConnected";
+import { Connected } from "@/components/Connected";
+import { NotConnected } from "@/components/NotConnected";
 import { WalletButtons } from "@/components/WalletButtons";
 
 const FixedSizeWrapper = ({ children }: PropsWithChildren) => {

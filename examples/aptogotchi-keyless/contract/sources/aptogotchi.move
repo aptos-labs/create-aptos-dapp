@@ -11,7 +11,7 @@ module aptogotchi_addr::aptogotchi {
     use aptos_framework::timestamp;
 
     use aptos_token_objects::collection;
-    use aptos_token_objects::token;
+    use aptos_token_objects::token::{Self, BurnRef, MutatorRef};
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
@@ -50,8 +50,8 @@ module aptogotchi_addr::aptogotchi {
         birthday: u64,
         energy_points: u64,
         parts: AptogotchiParts,
-        mutator_ref: token::MutatorRef,
-        burn_ref: token::BurnRef,
+        mutator_ref: MutatorRef,
+        burn_ref: BurnRef,
     }
 
     #[event]

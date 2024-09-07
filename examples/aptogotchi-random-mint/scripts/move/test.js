@@ -8,7 +8,7 @@ async function test() {
   await move.test({
     packageDirectoryPath: "contract",
     namedAddresses: {
-      aptos_friend_addr: "0x100",
+      aptogotchi_addr: "0x100",
     },
   });
 }

@@ -1,14 +1,15 @@
 "use client";
 
-import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
-import { PetraWallet } from "petra-plugin-wallet-adapter";
 import { PropsWithChildren } from "react";
-
-const wallets = [new PetraWallet()];
+import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
+import { NETWORK } from "@/utils/constants";
 
 export function WalletProvider({ children }: PropsWithChildren) {
   return (
-    <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
+    <AptosWalletAdapterProvider
+      autoConnect={true}
+      dappConfig={{ network: NETWORK }}
+    >
       {children}
     </AptosWalletAdapterProvider>
   );

@@ -1,24 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { getAptosClient } from "@/utils/aptosClient";
+import { aptosClient, surfClient } from "@/utils/aptosClient";
 import { PetImage, QuestionMarkImage } from "@/components/Pet";
-import { Pet, PetParts } from "../Pet";
+import { Pet, PetParts } from "./Pet";
 import { padAddressIfNeeded } from "@/utils/address";
 import Confetti from "react-confetti";
 import { ABI } from "@/utils/abi";
 
-const getAptogotchiByAddress = async (address: string): Promise<Pet> => {
-  return aptosClient
-    .view({
-      payload: {
-        function: `${ABI.address}::aptogotchi::get_aptogotchi`,
-        functionArguments: [address],
-      },
+const getAptogotchiByAddress = async (address: `0x${string}`): Promise<Pet> => {
+  return surfClient()
+    .view.get_aptogotchi({
+      functionArguments: [address],
+      typeArguments: [],
     })
     .then((response) => {
       return {
-        live: response[0] as boolean,
-        health: response[1] as number,
+        live: response[0],
+        health: response[1],
         parts: response[2] as PetParts,
       };
     });
@@ -64,7 +62,7 @@ export function Mint() {
     } else {
       setMyPet(
         await getAptogotchiByAddress(
-          myLatestAptogotchiResponse[0].token_data_id
+          myLatestAptogotchiResponse[0].token_data_id as `0x${string}`
         )
       );
     }
@@ -92,7 +90,7 @@ export function Mint() {
           functionArguments: [],
         },
       });
-      await aptosClient
+      await aptosClient()
         .waitForTransaction({
           transactionHash: response.hash,
         })
