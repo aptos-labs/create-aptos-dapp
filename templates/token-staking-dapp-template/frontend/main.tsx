@@ -8,10 +8,11 @@ import App from "@/App.tsx";
 // Internal components
 import { Toaster } from "@/components/ui/toaster.tsx";
 import { WalletProvider } from "@/components/WalletProvider.tsx";
-import { TokenDataContextProvider } from "./providers/tokenData";
-import { PoolDataContextProvider } from "./providers/poolData";
-import { AccountDataContextProvider } from "./providers/accountData";
-import { TooltipProvider } from "./components/ui/tooltip";
+import { TokenDataContextProvider } from "@/providers/tokenData";
+import { PoolDataContextProvider } from "@/providers/poolData";
+import { AccountDataContextProvider } from "@/providers/accountData";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { WrongNetwork } from "@/components/WrongNetwork";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <AccountDataContextProvider>
               <TooltipProvider delayDuration={100}>
                 <App />
+                <WrongNetwork />
                 <Toaster />
               </TooltipProvider>
             </AccountDataContextProvider>

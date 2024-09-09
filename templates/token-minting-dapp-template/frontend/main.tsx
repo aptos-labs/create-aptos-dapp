@@ -9,6 +9,7 @@ import App from "@/App.tsx";
 import { Toaster } from "@/components/ui/toaster.tsx";
 import { TooltipProvider } from "@/components/ui/tooltip.tsx";
 import { WalletProvider } from "@/components/WalletProvider.tsx";
+import { WrongNetwork } from "@/components/WrongNetwork";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <TooltipProvider delayDuration={100}>
           <App />
+          <WrongNetwork />
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>

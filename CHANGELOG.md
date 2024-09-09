@@ -7,6 +7,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Support Nextjs framework for Boilerplate template
 - Add new telegram mini app templates, we have 2 options, one using Aptos Wallet Adapter for explicit signing like other dapps, and the other using Mizu Wallet SDK Core for seamless signing experience.
 - Update NFT template Move scripts to dynamically use the correct token minter module address
+- Add a wrong network component to all templates to show when the user is on the wrong network
+- Add 2 new examples, `aptogotchi-keyless` and `aptogotchi-random-mint`
 
 # 0.0.24 (2024-09-04)
 
