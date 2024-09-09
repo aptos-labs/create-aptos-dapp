@@ -76,3 +76,12 @@ export const getUserPackageManager = () => {
       : 0;
   return packageManagerInitialIndex;
 };
+
+/**
+ * Remove a directory and all its contents
+ */
+export const remove = (path: string) => {
+  fs.rmSync(path, {
+    recursive: true,
+  });
+};

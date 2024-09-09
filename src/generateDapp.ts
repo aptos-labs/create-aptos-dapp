@@ -8,7 +8,7 @@ import { recordTelemetry } from "./telemetry.js";
 // internal files
 import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
-import { copy } from "./utils/helpers.js";
+import { copy, remove } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
 import { Account, Aptos, AptosConfig, type Network } from "@aptos-labs/ts-sdk";
 
@@ -157,8 +157,6 @@ export async function generateDapp(selection: Selections) {
         await generateEnvFile();
         break;
       case "clicker-game-tg-mini-app-template":
-        const dir = "frontend/components";
-
         if (selection.signingOption === "explicit") {
           copy(
             "frontend/components/explicitSigning/Counter.tsx",
@@ -180,12 +178,8 @@ export async function generateDapp(selection: Selections) {
             "package.json",
             JSON.stringify(packageJson, null, 2)
           );
-          await fs.rm("frontend/components/seamlessSigning", {
-            recursive: true,
-          });
-          await fs.rm("frontend/components/explicitSigning", {
-            recursive: true,
-          });
+          remove("frontend/components/seamlessSigning");
+          remove("frontend/components/explicitSigning");
           await generateEnvFile();
         } else if (selection.signingOption === "seamless") {
           copy(
@@ -200,12 +194,8 @@ export async function generateDapp(selection: Selections) {
             "frontend/components/seamlessSigning/WalletSelector.tsx",
             "frontend/components/WalletSelector.tsx"
           );
-          await fs.rm("frontend/components/seamlessSigning", {
-            recursive: true,
-          });
-          await fs.rm("frontend/components/explicitSigning", {
-            recursive: true,
-          });
+          remove("frontend/components/seamlessSigning");
+          remove("frontend/components/explicitSigning");
           await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
         } else {
           throw new Error(
