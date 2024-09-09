@@ -27,7 +27,7 @@ export const workflowOptions = {
         value: {
           path: "clicker-game-tg-mini-app-template",
           name: "Clicker Game Telegram Mini App Template",
-          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/clicker-game-tg-mini-app-template",
+          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/clicker-game-tg-mini-app",
         },
         description:
           "A clicker game Telegram Mini App template to start an Aptos dapp with",
