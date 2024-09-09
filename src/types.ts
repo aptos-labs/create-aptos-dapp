@@ -1,4 +1,4 @@
-import prompts from "prompts";
+import type prompts from "prompts";
 
 // constants.ts
 
@@ -12,12 +12,14 @@ export type Template = {
 };
 
 export type Network = "mainnet" | "testnet";
+export type Framework = "vite" | "nextjs";
 
 export type Selections = {
   projectName: string;
   template: Template;
   network: Network;
   telemetry: boolean;
+  framework: Framework;
 };
 
 export type TemplateTelemetryData = {
@@ -25,6 +27,7 @@ export type TemplateTelemetryData = {
   project_name: string;
   template: string;
   network: string;
+  framework: Framework;
 };
 
 export type ExampleTelemetryData = {

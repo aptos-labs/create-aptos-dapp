@@ -58,11 +58,26 @@ export const workflowOptions = {
     ],
     initial: 0,
   },
+  framework: {
+    type: "select",
+    name: "framework",
+    message: "Choose your framework",
+    choices(prev, values) {
+      if (values.template.path === "boilerplate-template") {
+        return [
+          { title: "Client-side (Vite app)", value: "vite" },
+          { title: "Server-side (Next.js app)", value: "nextjs" },
+        ];
+      }
+      return [{ title: "Client-side (Vite app)", value: "vite" }];
+    },
+    initial: 0,
+  },
   network: {
     type: "select",
     name: "network",
     message: "Choose your network",
-    choices(prev) {
+    choices(prev, values) {
       /**
        * We don't support devnet for NFT and Token minting dapps because
        * 1. Both templates depend on Irys to upload files, but Irys does not support Aptos devnet yet
@@ -70,8 +85,8 @@ export const workflowOptions = {
        * deployed on devnet because devnet is reset frequently
        */
       if (
-        prev.path === "nft-minting-dapp-template" ||
-        prev.path === "token-minting-dapp-template"
+        values.template.path === "nft-minting-dapp-template" ||
+        values.template.path === "token-minting-dapp-template"
       ) {
         return [
           { title: "Mainnet", value: "mainnet" },

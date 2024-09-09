@@ -2,6 +2,10 @@
 
 All notable changes to the create-aptos-dapp tool will be captured in this file. This changelog is written by hand for now. It adheres to the format set out by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+# 0.0.25 (2024-09-04)
+
+- Support Nextjs framework for Boilerplate template
+
 # 0.0.24 (2024-09-04)
 
 - Code cleanup, always use env var from constants

@@ -1,16 +1,16 @@
-import { green, bold, blue } from "kolorist";
-import path from "path";
-import { fileURLToPath } from "node:url";
 import fs from "fs/promises";
+import { blue, bold, green } from "kolorist";
+import { fileURLToPath } from "node:url";
 import type { Ora } from "ora";
 import ora from "ora";
-// internal files
-import { Selections } from "./types.js";
+import path from "path";
 import { recordTelemetry } from "./telemetry.js";
+// internal files
+import type { Selections } from "./types.js";
+import { context } from "./utils/context.js";
 import { copy } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
-import { context } from "./utils/context.js";
-import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AptosConfig, type Network } from "@aptos-labs/ts-sdk";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -89,7 +89,15 @@ export async function generateDapp(selection: Selections) {
 
     // create .env file
     const generateEnvFile = async (additionalContent?: string) => {
-      let content = `PROJECT_NAME=${selection.projectName}\nVITE_APP_NETWORK=${selection.network}`;
+      let content = `PROJECT_NAME=${selection.projectName}`;
+
+      if (selection.framework === "vite") {
+        content += `\nVITE_APP_NETWORK=${selection.network}`;
+      } else if (selection.framework === "nextjs") {
+        content += `\nNEXT_PUBLIC_APP_NETWORK=${selection.network}`;
+      } else {
+        throw new Error(`Framework ${selection.framework} not supported`);
+      }
       if (selection.network !== "mainnet") {
         const publisherAccount = Account.generate();
         const aptosConfig = new AptosConfig({
@@ -101,8 +109,15 @@ export async function generateDapp(selection: Selections) {
             accountAddress: publisherAccount.accountAddress,
             amount: 1_000_000_000,
           });
-          content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
-          content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+          if (selection.framework === "vite") {
+            content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+            content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+          } else if (selection.framework === "nextjs") {
+            content += `\nNEXT_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+            content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nNEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+          } else {
+            throw new Error(`Framework ${selection.framework} not supported`);
+          }
         } catch (error: any) {
           throw new Error(
             "Could not create a module publisher account, please try again",
@@ -138,6 +153,9 @@ export async function generateDapp(selection: Selections) {
       case "boilerplate-template":
         await generateEnvFile();
         break;
+      case "nextjs-boilerplate-template":
+        await generateEnvFile();
+        break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
     }
@@ -167,6 +185,7 @@ export async function generateDapp(selection: Selections) {
         command: "npx create-aptos-dapp",
         project_name: selection.projectName,
         template: selection.template.name,
+        framework: selection.framework,
         network: selection.network,
       });
     }
