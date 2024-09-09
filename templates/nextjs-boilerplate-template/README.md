@@ -8,7 +8,7 @@ To get started with the Boilerplate template and learn more about the template f
 
 ## The Boilerplate template provides:
 
-- **Folder structure** - A pre-made dapp folder structure with a `frontend` and `contract` folders.
+- **Folder structure** - A pre-made dapp folder structure with a `src` (frontend) and `contract` folders.
 - **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.
 - **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
 - **Trasnfer APT implementation** - Pre-made `transfer` components to send APT to an address.
@@ -18,7 +18,6 @@ To get started with the Boilerplate template and learn more about the template f
 ## What tools the template uses?
 
 - React framework
-- Vite development tool
 - shadcn/ui + tailwind for styling
 - Aptos TS SDK
 - Aptos Wallet Adapter
