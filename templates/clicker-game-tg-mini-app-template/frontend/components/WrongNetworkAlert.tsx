@@ -2,7 +2,7 @@ import { NETWORK } from "@/constants";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import * as Dialog from "@radix-ui/react-dialog";
 
-export function WrongNetwork() {
+export function WrongNetworkAlert() {
   const { network } = useWallet();
 
   return network?.name === NETWORK ? (
@@ -17,7 +17,7 @@ export function WrongNetwork() {
               Wrong Network
             </Dialog.Title>
             <Dialog.Description className="text-lg text-gray-700 dark:text-gray-300">
-              You are currently on <span className="font-bold">{network?.name}</span>. Please switch to{" "}
+              Your wallet is currently on <span className="font-bold">{network?.name}</span>. Please switch to{" "}
               <span className="font-bold">{NETWORK}</span> to continue using the app.
             </Dialog.Description>
           </div>

@@ -8,7 +8,7 @@ import App from "@/App.tsx";
 // Internal components
 import { Toaster } from "@/components/ui/toaster.tsx";
 import { WalletProvider } from "@/components/WalletProvider.tsx";
-import { WrongNetwork } from "@/components/WrongNetwork";
+import { WrongNetworkAlert } from "@/components/WrongNetworkAlert";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <WalletProvider>
       <QueryClientProvider client={queryClient}>
         <App />
-        <WrongNetwork />
+        <WrongNetworkAlert />
         <Toaster />
       </QueryClientProvider>
     </WalletProvider>

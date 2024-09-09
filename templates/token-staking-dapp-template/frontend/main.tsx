@@ -12,7 +12,7 @@ import { TokenDataContextProvider } from "@/providers/tokenData";
 import { PoolDataContextProvider } from "@/providers/poolData";
 import { AccountDataContextProvider } from "@/providers/accountData";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { WrongNetwork } from "@/components/WrongNetwork";
+import { WrongNetworkAlert } from "@/components/WrongNetworkAlert";
 
 const queryClient = new QueryClient();
 
@@ -25,7 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <AccountDataContextProvider>
               <TooltipProvider delayDuration={100}>
                 <App />
-                <WrongNetwork />
+                <WrongNetworkAlert />
                 <Toaster />
               </TooltipProvider>
             </AccountDataContextProvider>
