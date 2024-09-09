@@ -68,21 +68,6 @@ export const workflowOptions = {
     ],
     initial: 0,
   },
-  framework: {
-    type: "select",
-    name: "framework",
-    message: "Choose your framework",
-    choices(prev, values) {
-      if (values.template.path === "boilerplate-template") {
-        return [
-          { title: "Client-side (Vite app)", value: "vite" },
-          { title: "Server-side (Next.js app)", value: "nextjs" },
-        ];
-      }
-      return [{ title: "Client-side (Vite app)", value: "vite" }];
-    },
-    initial: 0,
-  },
   signingOption: {
     type: (prev) =>
       prev.path == "clicker-game-tg-mini-app-template" ? "select" : null,
@@ -98,6 +83,22 @@ export const workflowOptions = {
         value: "seamless",
       },
     ],
+    initial: 0,
+  },
+  framework: {
+    type: "select",
+    name: "framework",
+    message: "Choose your framework",
+    choices(prev, values) {
+      if (values.template.path === "boilerplate-template") {
+        return [
+          { title: "Client-side (Vite app)", value: "vite" },
+          { title: "Server-side (Next.js app)", value: "nextjs" },
+        ];
+      }
+      return [{ title: "Client-side (Vite app)", value: "vite" }];
+    },
+    initial: 0,
   },
   network: {
     type: "select",
