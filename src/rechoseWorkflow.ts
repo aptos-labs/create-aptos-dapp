@@ -44,7 +44,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
       break;
     case "template":
       result.template = (await prompts(workflowOptions.template)).template;
-      // For now, only boilerplate-template suports Devnet
+      // For now, only boilerplate-template and token-staking-template support Devnet
       if (
         result.network === "devnet" &&
         (result.template.path !== "boilerplate-template" ||

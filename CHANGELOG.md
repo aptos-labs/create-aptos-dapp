@@ -2,9 +2,10 @@
 
 All notable changes to the create-aptos-dapp tool will be captured in this file. This changelog is written by hand for now. It adheres to the format set out by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-# 0.0.25 (2024-09-04)
+# Unreleased
 
 - Support Nextjs framework for Boilerplate template
+- Add new telegram mini app templates, we have 2 options, one using Aptos Wallet Adapter for explicit signing like other dapps, and the other using Mizu Wallet SDK Core for seamless signing experience.
 
 # 0.0.24 (2024-09-04)
 

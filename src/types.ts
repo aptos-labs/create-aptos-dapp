@@ -1,8 +1,8 @@
 import type prompts from "prompts";
 
-// constants.ts
-
-export type Result = prompts.Answers<"projectName" | "template" | "network">;
+export type Result = prompts.Answers<
+  "projectName" | "template" | "network" | "signingOption"
+>;
 
 export type Template = {
   name: string;
@@ -13,6 +13,7 @@ export type Template = {
 
 export type Network = "mainnet" | "testnet";
 export type Framework = "vite" | "nextjs";
+export type SigningOption = "explicit" | "seamless";
 
 export type Selections = {
   projectName: string;
@@ -20,6 +21,7 @@ export type Selections = {
   network: Network;
   telemetry: boolean;
   framework: Framework;
+  signingOption: SigningOption;
 };
 
 export type TemplateTelemetryData = {
@@ -28,6 +30,7 @@ export type TemplateTelemetryData = {
   template: string;
   network: string;
   framework: Framework;
+  signing_option: string;
 };
 
 export type ExampleTelemetryData = {

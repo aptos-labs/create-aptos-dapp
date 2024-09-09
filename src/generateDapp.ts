@@ -8,7 +8,7 @@ import { recordTelemetry } from "./telemetry.js";
 // internal files
 import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
-import { copy } from "./utils/helpers.js";
+import { copy, remove } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
 import { Account, Aptos, AptosConfig, type Network } from "@aptos-labs/ts-sdk";
 
@@ -52,7 +52,7 @@ export async function generateDapp(selection: Selections) {
       if (content) {
         await fs.writeFile(targetPath, content);
       } else {
-        await copy(path.join(templateDir, file), targetPath);
+        copy(path.join(templateDir, file), targetPath);
       }
     };
 
@@ -156,6 +156,53 @@ export async function generateDapp(selection: Selections) {
       case "nextjs-boilerplate-template":
         await generateEnvFile();
         break;
+      case "clicker-game-tg-mini-app-template":
+        if (selection.signingOption === "explicit") {
+          copy(
+            "frontend/components/explicitSigning/Counter.tsx",
+            "frontend/components/Counter.tsx"
+          );
+          copy(
+            "frontend/components/explicitSigning/WalletProvider.tsx",
+            "frontend/components/WalletProvider.tsx"
+          );
+          copy(
+            "frontend/components/explicitSigning/WalletSelector.tsx",
+            "frontend/components/WalletSelector.tsx"
+          );
+          const packageJson = JSON.parse(
+            await fs.readFile("package.json", "utf-8")
+          );
+          delete packageJson.dependencies["@mizuwallet-sdk/core"];
+          await fs.writeFile(
+            "package.json",
+            JSON.stringify(packageJson, null, 2)
+          );
+          remove("frontend/components/seamlessSigning");
+          remove("frontend/components/explicitSigning");
+          await generateEnvFile();
+        } else if (selection.signingOption === "seamless") {
+          copy(
+            "frontend/components/seamlessSigning/Counter.tsx",
+            "frontend/components/Counter.tsx"
+          );
+          copy(
+            "frontend/components/seamlessSigning/WalletProvider.tsx",
+            "frontend/components/WalletProvider.tsx"
+          );
+          copy(
+            "frontend/components/seamlessSigning/WalletSelector.tsx",
+            "frontend/components/WalletSelector.tsx"
+          );
+          remove("frontend/components/seamlessSigning");
+          remove("frontend/components/explicitSigning");
+          await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
+        } else {
+          throw new Error(
+            `Unsupported signing option: ${selection.signingOption}`
+          );
+        }
+        break;
       default:
         throw new Error("Unsupported template to generate an .env file for");
     }
@@ -187,6 +234,7 @@ export async function generateDapp(selection: Selections) {
         template: selection.template.name,
         framework: selection.framework,
         network: selection.network,
+        signing_option: selection.signingOption,
       });
     }
 

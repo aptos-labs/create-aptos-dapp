@@ -15,6 +15,7 @@ export async function startWorkflow() {
           initial: "my-aptos-dapp",
         },
         workflowOptions.template,
+        workflowOptions.signingOption,
         workflowOptions.framework,
         workflowOptions.network,
         workflowOptions.analytics,
@@ -69,7 +70,14 @@ export async function startWorkflow() {
     process.exit(0);
   }
 
-  const { projectName, template, framework, network, telemetry } = result;
+  const {
+    projectName,
+    template,
+    framework,
+    signingOption,
+    network,
+    telemetry,
+  } = result;
   return {
     projectName,
     template:
@@ -77,6 +85,7 @@ export async function startWorkflow() {
         ? { ...template, path: "nextjs-boilerplate-template" }
         : template,
     framework,
+    signingOption,
     network,
     telemetry,
   } as Selections;

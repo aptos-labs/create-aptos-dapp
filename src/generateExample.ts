@@ -89,7 +89,7 @@ export async function generateExample(options: GenerateExampleInput) {
       if (content) {
         await fs.writeFile(targetPath, content);
       } else {
-        await copy(path.join(exampleDir, file), targetPath);
+        copy(path.join(exampleDir, file), targetPath);
       }
     };
 
