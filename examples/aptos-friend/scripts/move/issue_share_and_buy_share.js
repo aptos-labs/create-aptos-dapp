@@ -15,8 +15,11 @@ async function issueAndBuyShare() {
   const move = new cli.Move();
 
   move.runScript({
-    compiledScriptPath: `move/build/${packageName}/bytecode_scripts/${scriptName}.mv`,
-    extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
+    compiledScriptPath: `contract/build/${packageName}/bytecode_scripts/${scriptName}.mv`,
+    extraArguments: [
+      `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+      `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+    ],
   });
 }
 issueAndBuyShare();

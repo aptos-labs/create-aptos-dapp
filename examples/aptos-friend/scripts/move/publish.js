@@ -1,22 +1,25 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
   const move = new cli.Move();
 
   move
     .createObjectAndPublishPackage({
-      packageDirectoryPath: "move",
+      packageDirectoryPath: "contract",
       addressName: "aptos_friend_addr",
       namedAddresses: {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
         aptos_friend_addr: process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS,
       },
-      extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
+      extraArguments: [
+        `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+        `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+      ],
     })
-    .then((objectAddress) => {
+    .then((response) => {
       const filePath = ".env";
       let envContent = "";
 
@@ -27,7 +30,7 @@ async function publish() {
 
       // Regular expression to match the VITE_MODULE_ADDRESS variable
       const regex = /^VITE_MODULE_ADDRESS=.*$/m;
-      const newEntry = `VITE_MODULE_ADDRESS=${objectAddress}`;
+      const newEntry = `VITE_MODULE_ADDRESS=${response.objectAddress}`;
 
       // Check if VITE_MODULE_ADDRESS is already defined
       if (envContent.match(regex)) {

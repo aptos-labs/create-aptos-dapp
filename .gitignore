@@ -7,3 +7,4 @@ node_modules
 .aptos
 package-lock.json
 build
+.next
