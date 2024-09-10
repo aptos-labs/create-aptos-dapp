@@ -17,8 +17,9 @@ async function publish() {
   try {
     await aptos.getAccountInfo({ accountAddress: process.env.VITE_COLLECTION_CREATOR_ADDRESS });
   } catch (error) {
+    console.log("Error fetching the VITE_COLLECTION_CREATOR_ADDRESS info", error)
     throw new Error(
-      "Account does not exist. Make sure you have set up the correct address as the VITE_COLLECTION_CREATOR_ADDRESS in the .env file",
+      "Account does not exist on chain. Make sure you have set up the correct address as the VITE_COLLECTION_CREATOR_ADDRESS in the .env file",
     );
   }
 
@@ -32,6 +33,18 @@ async function publish() {
     throw new Error(
       "VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY variable is not set, make sure you have set the publisher account private key",
     );
+  }
+
+  let tokenMinterContractAddress;
+  switch(process.env.VITE_APP_NETWORK){
+    case "testnet":
+      tokenMinterContractAddress = "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490"
+      break;
+    case "mainnet":
+      tokenMinterContractAddress = "0x5ca749c835f44a9a9ff3fb0bec1f8e4f25ee09b424f62058c561ca41ec6bb146"
+      break;
+    default:
+      throw new Error(`Invalid network used. Make sure process.env.VITE_APP_NETWORK is either mainnet or testnet`)
   }
 
   const move = new cli.Move();
@@ -48,7 +61,7 @@ async function publish() {
         // Our contract depends on the token-minter contract to provide some common functionalities like managing refs and mint stages
         // You can read the source code of it here: https://github.com/aptos-labs/token-minter/
         // Please find it on the network you are using, This is testnet deployment
-        minter: "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
+        minter: tokenMinterContractAddress,
       },
       extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
     })
