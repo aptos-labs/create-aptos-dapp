@@ -27,6 +27,18 @@ async function compile() {
     );
   }
 
+  let tokenMinterContractAddress;
+  switch(process.env.VITE_APP_NETWORK){
+    case "testnet":
+      tokenMinterContractAddress = "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490"
+      break;
+    case "mainnet":
+      tokenMinterContractAddress = "0x5ca749c835f44a9a9ff3fb0bec1f8e4f25ee09b424f62058c561ca41ec6bb146"
+      break;
+    default:
+      throw new Error(`Invalid network used. Make sure process.env.VITE_APP_NETWORK is either mainnet or testnet`)
+  }
+
   const move = new cli.Move();
 
   await move.compile({
@@ -39,8 +51,7 @@ async function compile() {
       // Our contract depends on the token-minter contract to provide some common NFT functionalities like managing refs and mint stages
       // You can read the source code of it here: https://github.com/aptos-labs/token-minter/
       // Please find it on the network you are using, This is testnet deployment
-      minter:
-        "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
+      minter: tokenMinterContractAddress,
     },
   });
 }
