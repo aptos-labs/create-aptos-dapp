@@ -120,8 +120,7 @@ export async function generateDapp(selection: Selections) {
           }
         } catch (error: any) {
           throw new Error(
-            "Could not create a module publisher account, please try again",
-            error
+            `Could not create a module publisher account, please try again ${error}`
           );
         }
       }
