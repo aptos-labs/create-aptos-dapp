@@ -19,7 +19,6 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc && cp -r templates dist/templates && cp -r examples dist/examples",
     "dev": "rm -rf my-aptos-dapp && npm run build && node dist/index.js",
-    "prepublish": "npm run build && npm publish",
     "boilerplate:build": "cd template-live-examples/boilerplate && npm run build",
     "boilerplate:deploy": "npm run boilerplate:build && gh-pages --dist template-live-examples/boilerplate/dist",
     "nft-minting:build": "cd template-live-examples/nft-minting && npm run build",

@@ -11,7 +11,7 @@ export type Template = {
   video?: string;
 };
 
-export type Network = "mainnet" | "testnet";
+export type Network = "mainnet" | "testnet" | "devnet";
 export type Framework = "vite" | "nextjs";
 export type SigningOption = "explicit" | "seamless";
 
