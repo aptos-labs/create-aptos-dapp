@@ -129,10 +129,4 @@ export const workflowOptions = {
     initial: 0,
     hint: "- You can change this later",
   },
-  analytics: {
-    type: "confirm",
-    name: "telemetry",
-    message: "Help us improve create-aptos-dapp by collection anonymous data",
-    initial: true,
-  },
 };

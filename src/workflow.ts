@@ -18,7 +18,6 @@ export async function startWorkflow() {
         workflowOptions.signingOption,
         workflowOptions.framework,
         workflowOptions.network,
-        workflowOptions.analytics,
       ],
       {
         onCancel: () => {
@@ -70,14 +69,7 @@ export async function startWorkflow() {
     process.exit(0);
   }
 
-  const {
-    projectName,
-    template,
-    framework,
-    signingOption,
-    network,
-    telemetry,
-  } = result;
+  const { projectName, template, framework, signingOption, network } = result;
   return {
     projectName,
     template:
@@ -87,6 +79,5 @@ export async function startWorkflow() {
     framework,
     signingOption,
     network,
-    telemetry,
   } as Selections;
 }

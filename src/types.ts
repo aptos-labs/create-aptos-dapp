@@ -19,7 +19,6 @@ export type Selections = {
   projectName: string;
   template: Template;
   network: Network;
-  telemetry: boolean;
   framework: Framework;
   signingOption: SigningOption;
 };
