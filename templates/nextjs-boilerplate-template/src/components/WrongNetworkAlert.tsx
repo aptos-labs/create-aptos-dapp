@@ -5,9 +5,9 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import * as Dialog from "@radix-ui/react-dialog";
 
 export function WrongNetworkAlert() {
-  const { network } = useWallet();
+  const { network, connected } = useWallet();
 
-  return network?.name === NETWORK ? (
+  return !connected || network?.name === NETWORK ? (
     <></>
   ) : (
     <Dialog.Root open={true}>

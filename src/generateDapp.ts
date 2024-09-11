@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { blue, bold, green } from "kolorist";
+import { blue, bold, green, red } from "kolorist";
 import { fileURLToPath } from "node:url";
 import type { Ora } from "ora";
 import ora from "ora";
@@ -10,7 +10,8 @@ import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
 import { copy, remove } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
-import { Account, Aptos, AptosConfig, type Network } from "@aptos-labs/ts-sdk";
+import { createModulePublisherAccount } from "./utils/createModulePublisherAccount.js";
+import { setUpEnvVariables } from "./utils/setUpEnvVariables.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -83,47 +84,17 @@ export async function generateDapp(selection: Selections) {
 
     scaffoldingSpinner.succeed();
 
-    const accountCreationSpinner = spinner(
-      `Creating a module publisher account\n`
-    ).start();
-
     // create .env file
     const generateEnvFile = async (additionalContent?: string) => {
-      let content = `PROJECT_NAME=${selection.projectName}`;
+      let content = "";
 
-      if (selection.framework === "vite") {
-        content += `\nVITE_APP_NETWORK=${selection.network}`;
-      } else if (selection.framework === "nextjs") {
-        content += `\nNEXT_PUBLIC_APP_NETWORK=${selection.network}`;
-      } else {
-        throw new Error(`Framework ${selection.framework} not supported`);
-      }
-      if (selection.network !== "mainnet") {
-        const publisherAccount = Account.generate();
-        const aptosConfig = new AptosConfig({
-          network: selection.network as Network,
-        });
-        const aptos = new Aptos(aptosConfig);
-        try {
-          await aptos.fundAccount({
-            accountAddress: publisherAccount.accountAddress,
-            amount: 1_000_000_000,
-          });
-          if (selection.framework === "vite") {
-            content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
-            content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
-          } else if (selection.framework === "nextjs") {
-            content += `\nNEXT_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
-            content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nNEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
-          } else {
-            throw new Error(`Framework ${selection.framework} not supported`);
-          }
-        } catch (error: any) {
-          throw new Error(
-            `Could not create a module publisher account, please try again ${error}`
-          );
-        }
-      }
+      const accountCreationSpinner = spinner(
+        `Creating a module publisher account\n`
+      ).start();
+      const publisherAccount = await createModulePublisherAccount(selection);
+      accountCreationSpinner.succeed();
+
+      content += setUpEnvVariables(selection, publisherAccount);
 
       await write(
         ".env",
@@ -206,14 +177,14 @@ export async function generateDapp(selection: Selections) {
         throw new Error("Unsupported template to generate an .env file for");
     }
 
-    accountCreationSpinner.succeed();
-
     let docsInstructions = blue(
-      `\n📖 Visit the ${selection.template.name} docs: ${selection.template.doc}`
+      `\n📖 Visit the ${selection.template.name} docs: ${red(
+        selection.template.doc
+      )}`
     );
     if (selection.template.video) {
       docsInstructions += blue(
-        `\n🎬 Check out the walkthrough video: ${selection.template.video}`
+        `\n🎬 Check out the walkthrough video: ${red(selection.template.video)}`
       );
     }
 

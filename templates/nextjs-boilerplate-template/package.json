@@ -23,8 +23,8 @@
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-label": "^2.1.0",
-    "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.2.1",
+    "@radix-ui/react-slot": "^1.0.2",
     "@tanstack/react-query": "^5.51.23",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -43,15 +43,15 @@
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "autoprefixer": "^10.4.19",
-    "dotenv": "16.3.1",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "postcss": "^8.4.38",
     "prettier": "^3.3.2",
     "tailwindcss": "^3.4.3",
-    "tree-kill": "1.2.2",
     "typescript": "^5.2.2",
+    "tree-kill": "1.2.2",
+    "dotenv": "16.3.1",
     "vercel": "^35.2.4"
   }
 }
