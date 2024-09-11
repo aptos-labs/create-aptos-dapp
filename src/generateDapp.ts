@@ -225,17 +225,14 @@ export async function generateDapp(selection: Selections) {
 
     await installDependencies(context);
 
-    // If approve telemetry
-    if (selection.telemetry) {
-      await recordTelemetry({
-        command: "npx create-aptos-dapp",
-        project_name: selection.projectName,
-        template: selection.template.name,
-        framework: selection.framework,
-        network: selection.network,
-        signing_option: selection.signingOption,
-      });
-    }
+    await recordTelemetry({
+      command: "npx create-aptos-dapp",
+      project_name: selection.projectName,
+      template: selection.template.name,
+      framework: selection.framework,
+      network: selection.network,
+      signing_option: selection.signingOption,
+    });
 
     npmSpinner.succeed();
     currentSpinner = npmSpinner;
