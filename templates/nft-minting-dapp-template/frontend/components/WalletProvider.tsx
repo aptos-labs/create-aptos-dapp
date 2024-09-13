@@ -11,6 +11,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
     <AptosWalletAdapterProvider
       autoConnect={true}
       dappConfig={{ network: NETWORK }}
+      optInWallets={["Continue with Google","Petra","Nightly","Pontem Wallet", "Mizu Wallet"]}
       onError={(error) => {
         toast({
           variant: "destructive",
