@@ -1,39 +1,32 @@
-## Create Aptos Dapp Boilerplate Template
+# Only Contract Template
 
-The Boilerplate template provides a starter dapp with all necessary dapp infrastructure and a simple wallet info implementation, transfer APT and a simple message board functionality to send and read a message on chain.
+This template provides a starting point for a dapp with all necessary infrastructure and implements a simple on-chain message board functionality.
 
-## Read the Boilerplate template docs
-To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Boilerplate template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate) 
+## Read the Boilerplate Template Documentation
+To get started with the Boilerplate template and learn more about its features and usage, visit [Boilerplate Template Documentation](https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate)
 
+## The Contract Template Provides:
 
-## The Boilerplate template provides:
+- **File Structure** - A pre-made dapp file structure, including the `contract` folder.
+- **Dapp Infrastructure** - All dependencies needed to build on the Aptos network.
+- **Message Board Functionality** - A pre-made `message` component for sending and reading messages on-chain.
 
-- **Folder structure** - A pre-made dapp folder structure with a `frontend` and `contract` folders.
-- **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.
-- **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
-- **Trasnfer APT implementation** - Pre-made `transfer` components to send APT to an address.
-- **Message board functionality implementation** - Pre-made `message` components to send and read a message on chain
+## What Tools Does the Template Use?
 
-
-## What tools the template uses?
-
-- React framework
-- Vite development tool
-- shadcn/ui + tailwind for styling
 - Aptos TS SDK
-- Aptos Wallet Adapter
-- Node based Move commands
+- Node-based Move commands
 
-## What Move commands are available?
+## Available Move Commands
 
-The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli) that lets us run Aptos CLI in a Node environment.
+This tool leverages the [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli), allowing us to run Aptos CLI in a Node environment.
 
-Some commands are built-in the template and can be ran as a npm script, for example:
+Some commands are pre-built into the template and can be run as npm scripts, such as:
 
-- `npm run move:publish` - a command to publish the Move contract
-- `npm run move:test` - a command to run Move unit tests
-- `npm run move:compile` - a command to compile the Move contract
-- `npm run move:upgrade` - a command to upgrade the Move contract
-- `npm run deploy` - a command to deploy the dapp to Vercel
+- `npm run move:init` - Command to init Aptos Account
+- `npm run move:publish` - Command to publish Move contracts
+- `npm run move:test` - Command to run Move unit tests
+- `npm run move:compile` - Command to compile Move contracts
+- `npm run move:upgrade` - Command to upgrade Move contracts
+- `npm run deploy` - Command to deploy the dapp to Vercel
 
-For all other available CLI commands, can run `npx aptos` and see a list of all available commands.
+To see all available CLI commands, you can run `npx aptos` and view the list of all available commands.
