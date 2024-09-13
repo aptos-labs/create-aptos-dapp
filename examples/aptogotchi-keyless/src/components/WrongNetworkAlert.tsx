@@ -6,9 +6,9 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { NETWORK } from "@/utils/constants";
 
 export function WrongNetworkAlert() {
-  const { network } = useWallet();
+  const { network, connected } = useWallet();
 
-  return network?.name === NETWORK ? (
+  return !connected || network?.name === NETWORK ? (
     <></>
   ) : (
     <Dialog.Root open={true}>
