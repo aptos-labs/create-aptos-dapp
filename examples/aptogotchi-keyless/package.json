@@ -17,6 +17,7 @@
     "@aptos-labs/wallet-adapter-react": "^3.5.10",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@radix-ui/react-dialog": "^1.1.1",
     "@thalalabs/surf": "^1.7.3",
     "autoprefixer": "10.4.14",
     "clsx": "^2.1.1",

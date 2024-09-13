@@ -5,6 +5,7 @@ import { PropsWithChildren } from "react";
 import { GeoTargetly } from "@/utils/GeoTargetly";
 import "nes.css/css/nes.min.css";
 import "./globals.css";
+import { WrongNetworkAlert } from "@/components/WrongNetworkAlert";
 
 const kongtext = localFont({
   src: "./../../public/kongtext.ttf",
@@ -26,7 +27,10 @@ export default function RootLayout({ children }: PropsWithChildren) {
         />
       </head>
       <body className={kongtext.className}>
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          <WrongNetworkAlert />
+          {children}
+        </WalletProvider>
         <GeoTargetly />
       </body>
     </html>

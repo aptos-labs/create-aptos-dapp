@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add a `WrongNetworkAlert` component to all examples to show when the user is on the wrong network
+
 # 0.0.25 (2024-09-11)
 
 - Support Nextjs framework for Boilerplate template
