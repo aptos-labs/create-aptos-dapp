@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import { KeylessAccountProvider } from "@/context/KeylessAccountContext";
 import { PetProvider } from "@/context/PetContext";
 import { GeoTargetly } from "@/utils/GeoTargetly";
+import { WrongNetworkAlert } from "@/components/WrongNetworkAlert";
 
 const kongtext = localFont({
   src: "./../../public/kongtext.ttf",
@@ -56,7 +57,10 @@ export default function RootLayout({ children }: PropsWithChildren) {
           expand={true}
         />
         <PetProvider>
-          <KeylessAccountProvider>{children}</KeylessAccountProvider>
+          <KeylessAccountProvider>
+            <WrongNetworkAlert />
+            {children}
+          </KeylessAccountProvider>
         </PetProvider>
         <GeoTargetly />
       </body>
