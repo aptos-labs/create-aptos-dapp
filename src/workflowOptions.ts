@@ -94,6 +94,7 @@ export const workflowOptions = {
         return [
           { title: "Client-side (Vite app)", value: "vite" },
           { title: "Server-side (Next.js app)", value: "nextjs" },
+          { title: "Only Contract ( no side )", value: "contract" },
         ];
       }
       return [{ title: "Client-side (Vite app)", value: "vite" }];

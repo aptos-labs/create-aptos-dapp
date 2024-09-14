@@ -11,6 +11,8 @@ export const setUpEnvVariables = (
     content += `\nVITE_APP_NETWORK=${selection.network}`;
   } else if (selection.framework === "nextjs") {
     content += `\nNEXT_PUBLIC_APP_NETWORK=${selection.network}`;
+  }else if (selection.framework === "contract") {
+    content += `\nAPP_NETWORK=${selection.network}`;
   } else {
     throw new Error(`Framework ${selection.framework} not supported`);
   }
@@ -20,6 +22,9 @@ export const setUpEnvVariables = (
     if (selection.framework === "vite") {
       content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=`;
       content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=`;
+    }else if (selection.framework === "contract") {
+      content += `\nMODULE_PUBLISHER_ACCOUNT_ADDRESS=`;
+      content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nMODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=`
     } else {
       content += `\nNEXT_MODULE_PUBLISHER_ACCOUNT_ADDRESS=`;
       content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nNEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=`;
@@ -30,6 +35,9 @@ export const setUpEnvVariables = (
   if (selection.framework === "vite") {
     content += `\nVITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
     content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nVITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
+  } else if (selection.framework === "contract") {
+    content += `\nMODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
+    content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nMODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;
   } else if (selection.framework === "nextjs") {
     content += `\nNEXT_MODULE_PUBLISHER_ACCOUNT_ADDRESS=${publisherAccount.accountAddress.toString()}`;
     content += `\n#This is the module publisher account's private key. Be cautious about who you share it with, and ensure it is not exposed when deploying your dApp.\nNEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY=${publisherAccount.privateKey.toString()}`;

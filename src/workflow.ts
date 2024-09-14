@@ -75,6 +75,8 @@ export async function startWorkflow() {
     template:
       template && framework === "nextjs"
         ? { ...template, path: "nextjs-boilerplate-template" }
+        : template && framework === "contract"
+        ? { ...template, path: "contract-boilerplate-template" }
         : template,
     framework,
     signingOption,

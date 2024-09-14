@@ -12,7 +12,7 @@ export type Template = {
 };
 
 export type Network = "mainnet" | "testnet" | "devnet";
-export type Framework = "vite" | "nextjs";
+export type Framework = "vite" | "nextjs" | "contract";
 export type SigningOption = "explicit" | "seamless";
 
 export type Selections = {
