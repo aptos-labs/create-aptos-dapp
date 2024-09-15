@@ -29,8 +29,7 @@ export const createModulePublisherAccount = async (
     return publisherAccount;
   } catch (error: any) {
     throw new Error(
-      "Could not create a module publisher account, please try again",
-      error
+      `Could not create a module publisher account, please try again. Error: ${error}`
     );
   }
 };
