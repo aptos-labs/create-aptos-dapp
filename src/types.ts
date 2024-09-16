@@ -11,12 +11,14 @@ export type Template = {
   video?: string;
 };
 
+export type ProjectType = "move" | "dapp";
 export type Network = "mainnet" | "testnet" | "devnet";
-export type Framework = "vite" | "nextjs" | "contract";
+export type Framework = "vite" | "nextjs";
 export type SigningOption = "explicit" | "seamless";
 
 export type Selections = {
   projectName: string;
+  projectType: ProjectType;
   template: Template;
   network: Network;
   framework: Framework;

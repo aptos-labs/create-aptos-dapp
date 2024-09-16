@@ -18,7 +18,6 @@ let currentSpinner: Ora | null = null;
 
 export async function generateDapp(selection: Selections) {
   const projectName = selection.projectName || "my-aptos-dapp";
-  console.log(JSON.stringify(selection, null, 2));
   // internal template directory path
   const templateDir = path.resolve(
     fileURLToPath(import.meta.url),

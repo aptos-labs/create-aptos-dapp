@@ -8,8 +8,23 @@ export const workflowOptions = {
     message: "Enter a new project name",
     validate: (value: string) => validateProjectName(value),
   },
-  template: {
+  projectType: {
     type: "select",
+    name: "projectType",
+    message: "Choose how to start",
+    choices: [
+      {
+        title: "Move Contract Template",
+        value: "move"
+      },
+      {
+        title: "Dapp Template",
+        value: "dapp"
+      }
+    ]
+  },
+  template: {
+    type: (prev: any) => prev == "move" ? null : "select",
     name: "template",
     message: "Choose how to start",
     choices: [
@@ -69,8 +84,8 @@ export const workflowOptions = {
     initial: 0,
   },
   signingOption: {
-    type: (prev) =>
-      prev.path == "clicker-game-tg-mini-app-template" ? "select" : null,
+    type: (prev:any) =>
+      prev == "move" ? null : prev?.path == "clicker-game-tg-mini-app-template" ? "select" : null,
     name: "signingOption",
     message: "Choose your signing option",
     choices: [
@@ -86,7 +101,8 @@ export const workflowOptions = {
     initial: 0,
   },
   framework: {
-    type: "select",
+    type:  (prev:any) =>
+      prev == "move" ? null :"select",
     name: "framework",
     message: "Choose your framework",
     choices(prev, values) {
@@ -94,7 +110,6 @@ export const workflowOptions = {
         return [
           { title: "Client-side (Vite app)", value: "vite" },
           { title: "Server-side (Next.js app)", value: "nextjs" },
-          { title: "Only Contract ( no side )", value: "contract" },
         ];
       }
       return [{ title: "Client-side (Vite app)", value: "vite" }];
@@ -113,8 +128,9 @@ export const workflowOptions = {
        * deployed on devnet because devnet is reset frequently
        */
       if (
-        values.template.path === "nft-minting-dapp-template" ||
-        values.template.path === "token-minting-dapp-template"
+        values.template && 
+        ( values.template.path === "nft-minting-dapp-template" ||
+        values.template.path === "token-minting-dapp-template" )
       ) {
         return [
           { title: "Mainnet", value: "mainnet" },

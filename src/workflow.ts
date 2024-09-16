@@ -14,6 +14,7 @@ export async function startWorkflow() {
           ...workflowOptions.projectName,
           initial: "my-aptos-dapp",
         },
+        workflowOptions.projectType,
         workflowOptions.template,
         workflowOptions.signingOption,
         workflowOptions.framework,
@@ -69,15 +70,20 @@ export async function startWorkflow() {
     process.exit(0);
   }
 
-  const { projectName, template, framework, signingOption, network } = result;
+  const { projectName, template, framework, signingOption, network, projectType} = result;
   return {
     projectName,
     template:
       template && framework === "nextjs"
         ? { ...template, path: "nextjs-boilerplate-template" }
-        : template && framework === "contract"
-        ? { ...template, path: "contract-boilerplate-template" }
+        : projectType === "move"
+        ? {  
+          path: "contract-boilerplate-template",
+          name: "Contract Template",
+          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate",
+        }
         : template,
+    projectType,
     framework,
     signingOption,
     network,
