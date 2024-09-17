@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add new contract-only template.
+
 # 0.0.26 (2024-09-19)
 
 - Add a `WrongNetworkAlert` component to all examples to show when the user is on the wrong network
