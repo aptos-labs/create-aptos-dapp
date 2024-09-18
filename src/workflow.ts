@@ -2,7 +2,7 @@ import { red } from "kolorist";
 import prompts from "prompts";
 import { rechoseWorkflow } from "./rechoseWorkflow.js";
 import type { Result, Selections } from "./types.js";
-import { workflowOptions } from "./workflowOptions.js";
+import { contractBoilerplateTemplate, workflowOptions } from "./workflowOptions.js";
 
 export async function startWorkflow() {
   let initialResult: Result;
@@ -32,7 +32,7 @@ export async function startWorkflow() {
   }
 
   // copy the initialResults
-  const result = { ...initialResult };
+  const result = { ...initialResult, template: initialResult.projectType === "move" ? contractBoilerplateTemplate : initialResult.template };
 
   try {
     // A boolean variable that keeps track on whether the user wants to change their initial choices
@@ -76,12 +76,6 @@ export async function startWorkflow() {
     template:
       template && framework === "nextjs"
         ? { ...template, path: "nextjs-boilerplate-template" }
-        : projectType === "move"
-        ? {  
-          path: "contract-boilerplate-template",
-          name: "Contract Template",
-          doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate",
-        }
         : template,
     projectType,
     framework,

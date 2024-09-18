@@ -22,11 +22,9 @@ This tool leverages the [aptos-cli npm package](https://github.com/aptos-labs/ap
 
 Some commands are pre-built into the template and can be run as npm scripts, such as:
 
-- `npm run move:init` - Command to init Aptos Account
 - `npm run move:publish` - Command to publish Move contracts
 - `npm run move:test` - Command to run Move unit tests
 - `npm run move:compile` - Command to compile Move contracts
 - `npm run move:upgrade` - Command to upgrade Move contracts
-- `npm run deploy` - Command to deploy the dapp to Vercel
 
 To see all available CLI commands, you can run `npx aptos` and view the list of all available commands.

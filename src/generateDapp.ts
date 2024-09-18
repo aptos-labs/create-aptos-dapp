@@ -201,6 +201,7 @@ export async function generateDapp(selection: Selections) {
     await recordTelemetry({
       command: "npx create-aptos-dapp",
       project_name: selection.projectName,
+      project_type: selection.projectType,
       template: selection.template.name,
       framework: selection.framework,
       network: selection.network,

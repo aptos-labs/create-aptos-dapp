@@ -1,6 +1,6 @@
 import prompts from "prompts";
 import { red } from "kolorist";
-import { workflowOptions } from "./workflowOptions.js";
+import { contractBoilerplateTemplate, workflowOptions } from "./workflowOptions.js";
 import { Result } from "./types.js";
 
 /**
@@ -20,7 +20,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
         message: "Select the choice you want to change",
         choices: [
           { title: "Project Name", value: "projectName" },
-          { title: "Template", value: "template" },
+          { title: result.projectType == "move" ? "Project Type" : "Template", value: result.projectType == "move" ? "projectType" : "template" },
           { title: "Network", value: "network" },
         ],
       },
@@ -42,27 +42,40 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
         })
       ).projectName;
       break;
-    case "template":
-      result.template = (await prompts(workflowOptions.template)).template;
-      // For now, only boilerplate-template and token-staking-template support Devnet
-      if (
-        result.network === "devnet" &&
-        (result.template.path !== "boilerplate-template" ||
-          result.template.path !== "token-staking-dapp-template")
-      ) {
-        result.network = (
-          await prompts({
-            ...workflowOptions.network,
-            choices: [
-              { title: "Mainnet", value: "mainnet" },
-              { title: "Testnet", value: "testnet" },
-            ],
-          })
-        ).network;
+    case "projectType":
+      const previousProjectType = result.projectType;
+
+      result.projectType = (
+        await prompts(workflowOptions.projectType)
+      ).projectType;
+
+      if (previousProjectType === result.projectType) {
+        break;
+      } else if (result.projectType === "move") {
+        result.template = contractBoilerplateTemplate;
+        result.framework = null;
+        break;
       }
+    case "template":
+      Object.assign(result, await prompts([
+        { ...workflowOptions.template, type: "select" },
+        { ...workflowOptions.signingOption, type: prev => prev?.path == "clicker-game-tg-mini-app-template" ? "select" : null },
+        { ...workflowOptions.framework, type: "select" },
+        { ...workflowOptions.network, type: result.network === "devnet" ? "select" :null},
+      ]));
       break;
     case "network":
-      result.network = (await prompts(workflowOptions.network)).network;
+      result.network = (await prompts([
+        { ...workflowOptions.network, 
+          choices: (result.template.path === "nft-minting-dapp-template" || result.template.path === "token-minting-dapp-template") ? [
+            { title: "Mainnet", value: "mainnet" },
+            { title: "Testnet", value: "testnet" },
+          ]:[
+            { title: "Mainnet", value: "mainnet" },
+            { title: "Testnet", value: "testnet" },
+            { title: "Devnet", value: "devnet" },
+          ]
+        }])).network;
       break;
 
     default:

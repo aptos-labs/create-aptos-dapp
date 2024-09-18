@@ -1,7 +1,7 @@
 import type prompts from "prompts";
 
 export type Result = prompts.Answers<
-  "projectName" | "template" | "network" | "signingOption"
+  "projectName" | "projectType" | "template" | "network" | "signingOption"
 >;
 
 export type Template = {
@@ -11,7 +11,7 @@ export type Template = {
   video?: string;
 };
 
-export type ProjectType = "move" | "dapp";
+export type ProjectType = "move" | "fullstack";
 export type Network = "mainnet" | "testnet" | "devnet";
 export type Framework = "vite" | "nextjs";
 export type SigningOption = "explicit" | "seamless";
@@ -28,6 +28,7 @@ export type Selections = {
 export type TemplateTelemetryData = {
   command: string;
   project_name: string;
+  project_type: string;
   template: string;
   network: string;
   framework: Framework;

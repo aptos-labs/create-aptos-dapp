@@ -11,15 +11,17 @@ export const workflowOptions = {
   projectType: {
     type: "select",
     name: "projectType",
-    message: "Choose how to start",
+    message: "What type of project you want to create?",
     choices: [
       {
-        title: "Move Contract Template",
-        value: "move"
+        title: "Move Contract Project",
+        value: "move",
+        description:"A barebones Move project with only a generated Move contract"
       },
       {
-        title: "Dapp Template",
-        value: "dapp"
+        title: "Full-stack Project",
+        value: "fullstack",
+        description:"A full stack project with a generated Move contract and front end"
       }
     ]
   },
@@ -147,3 +149,9 @@ export const workflowOptions = {
     hint: "- You can change this later",
   },
 };
+
+export const contractBoilerplateTemplate = {
+  path: "contract-boilerplate-template",
+  name: "Move Contract Template",
+  doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate",
+}
