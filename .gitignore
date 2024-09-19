@@ -8,3 +8,8 @@ node_modules
 package-lock.json
 build
 .next
+target
+config.yaml
+local.config.yaml
+cloud.config.yaml
+next-env.d.ts
