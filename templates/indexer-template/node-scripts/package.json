@@ -1,0 +1,22 @@
+{
+  "name": "node-scripts",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "create-message": "ts-node src/script/create_message.ts",
+    "update-message": "ts-node src/script/update_message.ts",
+    "get-message": "ts-node src/script/get_message.ts",
+    "get-last-message-from-db": "ts-node src/script/get_last_message_from_db.ts"
+  },
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.26.0",
+    "@thalalabs/surf": "^1.7.3",
+    "dotenv": "^16.3.1",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

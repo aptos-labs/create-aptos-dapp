@@ -1,0 +1,20 @@
+# This is a template yaml for the aptos-indexer-processor.
+health_check_port: 8085
+server_config:
+  processor_config:
+    type: "events_processor"
+  transaction_stream_config:
+    indexer_grpc_data_service_address: "https://grpc.testnet.aptoslabs.com:443"
+    starting_version: 5936597868
+    # request_ending_version: 10000
+    auth_token: "auth_token_you_can_get_from_aptos_api_gateway"
+    request_name_header: "events-processor"
+  db_config:
+    # do not include the ?sslmode=require in the connection string, Use the native TLS implementation in rust
+    # don't know why it's not working with the sslmode=require
+    postgres_connection_string: "postgresql://username:@localhost:5432/example-indexer"
+    # we set db_pool_size to a lower number on cloud because we use a free plan
+    # see limitation on vercel docs https://vercel.com/docs/storage/vercel-postgres/faq
+    db_pool_size: 25
+  contract_config:
+    contract_address: "your_contract_address"
