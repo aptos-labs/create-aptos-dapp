@@ -4,10 +4,12 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.26 (2024-09-19)
+
 - Add a `WrongNetworkAlert` component to all examples to show when the user is on the wrong network
 - Support popular wallets in the wallet selector by default
 - Rename contract directory from `move` to `contract` in aptos-friend example
-- Upgrade aptos `@aptos-labs/ts-sdk` dependency to ^1.28.0
+- Upgrade aptos `@aptos-labs/ts-sdk` dependency to `^1.28.0`
 
 # 0.0.25 (2024-09-11)
 
