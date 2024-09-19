@@ -18,11 +18,22 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
         type: "select",
         name: "optionToChange",
         message: "Select the choice you want to change",
-        choices: [
-          { title: "Project Name", value: "projectName" },
-          { title: result.projectType == "move" ? "Project Type" : "Template", value: result.projectType == "move" ? "projectType" : "template" },
-          { title: "Network", value: "network" },
-        ],
+        choices() {
+          if (result.projectType === "move") {
+             return [
+                   { title: "Project Name", value: "projectName" },
+                   { title: "Project Type", value: "projectType" },
+                   { title: "Network", value: "network" },
+              ];
+            } else {
+               return [
+                    { title: "Project Name", value: "projectName" },
+                    { title: "Project Type", value: "projectType" },
+                    { title: "Template", value: "template" },
+                    { title: "Network", value: "network" },
+                ];
+           }
+         },
       },
     ],
     {
@@ -67,6 +78,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
     case "network":
       result.network = (await prompts([
         { ...workflowOptions.network, 
+          // NFT and Token minting dapps only support Mainnet and Testnet
           choices: (result.template.path === "nft-minting-dapp-template" || result.template.path === "token-minting-dapp-template") ? [
             { title: "Mainnet", value: "mainnet" },
             { title: "Testnet", value: "testnet" },
