@@ -3,8 +3,8 @@
 The Boilerplate template provides a starter dapp with all necessary dapp infrastructure and a simple wallet info implementation, transfer APT and a simple message board functionality to send and read a message on chain.
 
 ## Read the Boilerplate template docs
-To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Boilerplate template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate) 
 
+To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Boilerplate template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate)
 
 ## The Boilerplate template provides:
 
@@ -13,7 +13,6 @@ To get started with the Boilerplate template and learn more about the template f
 - **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
 - **Trasnfer APT implementation** - Pre-made `transfer` components to send APT to an address.
 - **Message board functionality implementation** - Pre-made `message` components to send and read a message on chain
-
 
 ## What tools the template uses?
 
@@ -34,6 +33,7 @@ Some commands are built-in the template and can be ran as a npm script, for exam
 - `npm run move:test` - a command to run Move unit tests
 - `npm run move:compile` - a command to compile the Move contract
 - `npm run move:upgrade` - a command to upgrade the Move contract
+- `npm run dev` - a command to run the frontend locally
 - `npm run deploy` - a command to deploy the dapp to Vercel
 
 For all other available CLI commands, can run `npx aptos` and see a list of all available commands.

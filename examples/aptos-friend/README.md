@@ -30,5 +30,7 @@ Some commands are built-in the template and can be ran as a npm script, for exam
 - `npm run move:test` - a command to run Move unit tests
 - `npm run move:get-abi` - a command to download the ABI of the contract
 - `npm run move:issue-share-and-buy-share` - a command to run a Move script that will issue share and buy share in one transaction
+- `npm run dev` - a command to run the frontend locally
+- `npm run deploy` - a command to deploy the dapp to Vercel
 
 For all other available CLI commands, can run `npx aptos` and see a list of all available commands.
