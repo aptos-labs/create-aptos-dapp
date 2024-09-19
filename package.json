@@ -22,7 +22,9 @@
     "boilerplate:build": "cd template-live-examples/boilerplate && npm run build",
     "boilerplate:deploy": "npm run boilerplate:build && gh-pages --dist template-live-examples/boilerplate/dist",
     "nft-minting:build": "cd template-live-examples/nft-minting && npm run build",
-    "nft-minting:deploy": "npm run nft-minting:build && gh-pages --dist template-live-examples/nft-minting/dist --dest nft-minting"
+    "nft-minting:deploy": "npm run nft-minting:build && gh-pages --dist template-live-examples/nft-minting/dist --dest nft-minting",
+    "token-minting:build": "cd template-live-examples/token-minting && npm run build",
+    "token-minting:deploy": "npm run token-minting:build && gh-pages --dist template-live-examples/token-minting/dist --dest token-minting"
   },
   "files": [
     "dist"
