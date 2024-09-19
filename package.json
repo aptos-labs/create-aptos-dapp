@@ -24,7 +24,9 @@
     "nft-minting:build": "cd template-live-examples/nft-minting && npm run build",
     "nft-minting:deploy": "npm run nft-minting:build && gh-pages --dist template-live-examples/nft-minting/dist --dest nft-minting",
     "token-minting:build": "cd template-live-examples/token-minting && npm run build",
-    "token-minting:deploy": "npm run token-minting:build && gh-pages --dist template-live-examples/token-minting/dist --dest token-minting"
+    "token-minting:deploy": "npm run token-minting:build && gh-pages --dist template-live-examples/token-minting/dist --dest token-minting",
+    "token-staking:build": "cd template-live-examples/token-staking && npm run build",
+    "token-staking:deploy": "npm run token-staking:build && gh-pages --dist template-live-examples/token-staking/dist --dest token-staking"
   },
   "files": [
     "dist"
