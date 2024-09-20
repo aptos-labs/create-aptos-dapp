@@ -8,8 +8,25 @@ export const workflowOptions = {
     message: "Enter a new project name",
     validate: (value: string) => validateProjectName(value),
   },
-  template: {
+  projectType: {
     type: "select",
+    name: "projectType",
+    message: "What type of project you want to create?",
+    choices: [
+      {
+        title: "Move Contract Project",
+        value: "move",
+        description:"A barebones Move project with only a generated Move contract"
+      },
+      {
+        title: "Full-stack Project",
+        value: "fullstack",
+        description:"A full stack project with a generated Move contract and front end"
+      }
+    ]
+  },
+  template: {
+    type: (prev: any) => prev == "move" ? null : "select",
     name: "template",
     message: "Choose how to start",
     choices: [
@@ -69,8 +86,8 @@ export const workflowOptions = {
     initial: 0,
   },
   signingOption: {
-    type: (prev) =>
-      prev.path == "clicker-game-tg-mini-app-template" ? "select" : null,
+    type: (prev:any) =>
+      prev == "move" ? null : prev?.path == "clicker-game-tg-mini-app-template" ? "select" : null,
     name: "signingOption",
     message: "Choose your signing option",
     choices: [
@@ -86,7 +103,8 @@ export const workflowOptions = {
     initial: 0,
   },
   framework: {
-    type: "select",
+    type:  (prev:any) =>
+      prev == "move" ? null :"select",
     name: "framework",
     message: "Choose your framework",
     choices(prev, values) {
@@ -112,8 +130,9 @@ export const workflowOptions = {
        * deployed on devnet because devnet is reset frequently
        */
       if (
-        values.template.path === "nft-minting-dapp-template" ||
-        values.template.path === "token-minting-dapp-template"
+        values.template && 
+        ( values.template.path === "nft-minting-dapp-template" ||
+        values.template.path === "token-minting-dapp-template" )
       ) {
         return [
           { title: "Mainnet", value: "mainnet" },
@@ -130,3 +149,9 @@ export const workflowOptions = {
     hint: "- You can change this later",
   },
 };
+
+export const contractBoilerplateTemplate = {
+  path: "contract-boilerplate-template",
+  name: "Move Contract Template",
+  doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate",
+}

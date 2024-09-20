@@ -18,7 +18,6 @@ let currentSpinner: Ora | null = null;
 
 export async function generateDapp(selection: Selections) {
   const projectName = selection.projectName || "my-aptos-dapp";
-
   // internal template directory path
   const templateDir = path.resolve(
     fileURLToPath(import.meta.url),
@@ -123,6 +122,9 @@ export async function generateDapp(selection: Selections) {
       case "boilerplate-template":
         await generateEnvFile();
         break;
+      case "contract-boilerplate-template":
+        await generateEnvFile();
+        break;
       case "nextjs-boilerplate-template":
         await generateEnvFile();
         break;
@@ -199,6 +201,7 @@ export async function generateDapp(selection: Selections) {
     await recordTelemetry({
       command: "npx create-aptos-dapp",
       project_name: selection.projectName,
+      project_type: selection.projectType,
       template: selection.template.name,
       framework: selection.framework,
       network: selection.network,
