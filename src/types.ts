@@ -1,4 +1,10 @@
 import type prompts from "prompts";
+import {
+  TemplateFramework,
+  TemplateNetwork,
+  TemplateProjectType,
+  TemplateSigningOption,
+} from "./utils/constants";
 
 export type Result = prompts.Answers<
   "projectName" | "projectType" | "template" | "network" | "signingOption"
@@ -11,10 +17,20 @@ export type Template = {
   video?: string;
 };
 
-export type ProjectType = "move" | "fullstack";
-export type Network = "mainnet" | "testnet" | "devnet";
-export type Framework = "vite" | "nextjs";
-export type SigningOption = "explicit" | "seamless";
+export type ProjectType =
+  | TemplateProjectType.MOVE
+  | TemplateProjectType.FULLSTACK;
+
+export type Network =
+  | TemplateNetwork.MAINNET
+  | TemplateNetwork.TESTNET
+  | TemplateNetwork.DEVNET;
+
+export type Framework = TemplateFramework.VITE | TemplateFramework.NEXTJS;
+
+export type SigningOption =
+  | TemplateSigningOption.EXPLICIT
+  | TemplateSigningOption.SEAMLESS;
 
 export type Selections = {
   projectName: string;

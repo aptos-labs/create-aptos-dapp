@@ -1,6 +1,6 @@
 import { generateDapp } from "../generateDapp.js";
 import { generateExample } from "../generateExample.js";
-import { startWorkflow } from "../workflow.js";
+import { startWorkflow } from "../workflow/index.js";
 import { context } from "./context.js";
 
 export const parseCommandOptions = async (options) => {
