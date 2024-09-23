@@ -7,7 +7,7 @@ import ora from "ora";
 import fs from "fs/promises";
 import { existsSync } from "node:fs";
 import { copy, runCommand } from "./utils/helpers.js";
-import { recordTelemetry } from "./telemetry.js";
+import { recordTelemetry } from "./utils/telemetry.js";
 import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 
 const spinner = (text) => ora({ text, stream: process.stdout });

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { GA4_URL } from "./utils/constants.js";
-import { getOS } from "./utils/helpers.js";
-import { ExampleTelemetryData, TemplateTelemetryData } from "./types.js";
+import { GA4_URL } from "./constants.js";
+import { getOS } from "./helpers.js";
+import { ExampleTelemetryData, TemplateTelemetryData } from "../types.js";
 
 export const recordTelemetry = async (
   telemetryData: ExampleTelemetryData | TemplateTelemetryData

@@ -1,29 +1,26 @@
 import fs from "fs/promises";
 import { blue, bold, green, red } from "kolorist";
-import { fileURLToPath } from "node:url";
 import type { Ora } from "ora";
 import ora from "ora";
 import path from "path";
-import { recordTelemetry } from "./telemetry.js";
+
 // internal files
+import { recordTelemetry } from "./utils/telemetry.js";
 import type { Selections } from "./types.js";
 import { context } from "./utils/context.js";
-import { copy, remove } from "./utils/helpers.js";
+import { copy } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
-import { createModulePublisherAccount } from "./utils/createModulePublisherAccount.js";
-import { setUpEnvVariables } from "./utils/setUpEnvVariables.js";
+import { generateTemplateEnvFile } from "./utils/generateTemplateEnvFile.js";
+import { getTemplateDirectory } from "./utils/resolveTemplateDirectory.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
 
 export async function generateDapp(selection: Selections) {
+  console.log("selection", selection);
   const projectName = selection.projectName || "my-aptos-dapp";
   // internal template directory path
-  const templateDir = path.resolve(
-    fileURLToPath(import.meta.url),
-    "../../templates",
-    selection.template.path
-  );
+  const templateDir = getTemplateDirectory(selection);
 
   // current working directory
   const cwd = process.cwd();
@@ -78,107 +75,15 @@ export async function generateDapp(selection: Selections) {
         .map((file) => write(file))
     );
 
-    // cd into target directory
-    process.chdir(targetDirectory);
-
     scaffoldingSpinner.succeed();
 
-    // create .env file
-    const generateEnvFile = async (additionalContent?: string) => {
-      let content = "";
+    process.chdir(targetDirectory);
 
-      const accountCreationSpinner = spinner(
-        `Creating a module publisher account\n`
-      ).start();
-      const publisherAccount = await createModulePublisherAccount(selection);
-      accountCreationSpinner.succeed();
+    // Generate and write to template .env file
+    const envFileContent = await generateTemplateEnvFile(selection, spinner);
+    await write(".env", `${envFileContent}`);
 
-      content += setUpEnvVariables(selection, publisherAccount);
-
-      await write(
-        ".env",
-        `${
-          additionalContent ? content.concat("\n", additionalContent) : content
-        }`
-      );
-    };
-
-    switch (selection.template.path) {
-      case "nft-minting-dapp-template":
-        await generateEnvFile(
-          `VITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`
-        );
-        break;
-      case "token-minting-dapp-template":
-        await generateEnvFile(
-          `VITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`
-        );
-        break;
-      case "token-staking-dapp-template":
-        await generateEnvFile(
-          `VITE_FA_ADDRESS=""\nVITE_REWARD_CREATOR_ADDRESS=""`
-        );
-        break;
-      case "boilerplate-template":
-        await generateEnvFile();
-        break;
-      case "contract-boilerplate-template":
-        await generateEnvFile();
-        break;
-      case "nextjs-boilerplate-template":
-        await generateEnvFile();
-        break;
-      case "clicker-game-tg-mini-app-template":
-        if (selection.signingOption === "explicit") {
-          copy(
-            "frontend/components/explicitSigning/Counter.tsx",
-            "frontend/components/Counter.tsx"
-          );
-          copy(
-            "frontend/components/explicitSigning/WalletProvider.tsx",
-            "frontend/components/WalletProvider.tsx"
-          );
-          copy(
-            "frontend/components/explicitSigning/WalletSelector.tsx",
-            "frontend/components/WalletSelector.tsx"
-          );
-          const packageJson = JSON.parse(
-            await fs.readFile("package.json", "utf-8")
-          );
-          delete packageJson.dependencies["@mizuwallet-sdk/core"];
-          await fs.writeFile(
-            "package.json",
-            JSON.stringify(packageJson, null, 2)
-          );
-          remove("frontend/components/seamlessSigning");
-          remove("frontend/components/explicitSigning");
-          await generateEnvFile();
-        } else if (selection.signingOption === "seamless") {
-          copy(
-            "frontend/components/seamlessSigning/Counter.tsx",
-            "frontend/components/Counter.tsx"
-          );
-          copy(
-            "frontend/components/seamlessSigning/WalletProvider.tsx",
-            "frontend/components/WalletProvider.tsx"
-          );
-          copy(
-            "frontend/components/seamlessSigning/WalletSelector.tsx",
-            "frontend/components/WalletSelector.tsx"
-          );
-          remove("frontend/components/seamlessSigning");
-          remove("frontend/components/explicitSigning");
-          await generateEnvFile(`VITE_MIZU_WALLET_APP_ID=""`);
-        } else {
-          throw new Error(
-            `Unsupported signing option: ${selection.signingOption}`
-          );
-        }
-        break;
-      default:
-        throw new Error("Unsupported template to generate an .env file for");
-    }
-
+    // Build instructions
     let docsInstructions = blue(
       `\n📖 Visit the ${selection.template.name} docs: ${red(
         selection.template.doc
@@ -196,6 +101,7 @@ export async function generateDapp(selection: Selections) {
 
     const npmSpinner = spinner(`Installing the dependencies\n`).start();
 
+    // Install dependencies
     await installDependencies(context);
 
     await recordTelemetry({

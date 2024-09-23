@@ -5,18 +5,19 @@ import {
   Network,
   Ed25519Account,
 } from "@aptos-labs/ts-sdk";
-import { Selections } from "../types";
+import { Selections } from "../types.js";
+import { TemplateNetwork } from "./constants.js";
 
 export const createModulePublisherAccount = async (
   selection: Selections
 ): Promise<Ed25519Account | null> => {
-  if (selection.network === "mainnet") {
+  if (selection.network === TemplateNetwork.MAINNET) {
     return null;
   }
   // If is not mainnet, generate a new account for the module publisher account .env variables and values
   const publisherAccount = Account.generate();
   const aptosConfig = new AptosConfig({
-    network: selection.network as Network,
+    network: selection.network as unknown as Network,
   });
   const aptos = new Aptos(aptosConfig);
   try {
