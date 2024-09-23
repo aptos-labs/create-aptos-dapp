@@ -1,12 +1,13 @@
+use aptos_indexer_processor_sdk::utils::errors::ProcessorError;
 use diesel::ConnectionResult;
 use diesel_async::{
-    pooled_connection::{bb8::Pool, AsyncDieselConnectionManager, ManagerConfig, PoolError},
+    pooled_connection::{bb8::Pool, AsyncDieselConnectionManager, ManagerConfig},
     AsyncPgConnection,
 };
 use futures_util::{future::BoxFuture, FutureExt};
 use std::sync::Arc;
 
-use super::database_utils::{ArcDbPool, MyDbConnection};
+use super::database_utils::{ArcDbPool, DbPoolConnection};
 
 fn establish_connection(database_url: &str) -> BoxFuture<ConnectionResult<AsyncPgConnection>> {
     use native_tls::{Certificate, TlsConnector};
@@ -63,15 +64,26 @@ fn parse_and_clean_db_url(url: &str) -> (String, Option<String>) {
     (db_url.to_string(), cert_path)
 }
 
-pub async fn new_db_pool(database_url: &str, max_pool_size: u32) -> Result<ArcDbPool, PoolError> {
-    let mut config = ManagerConfig::<MyDbConnection>::default();
+pub async fn new_db_pool(database_url: &str, max_pool_size: u32) -> ArcDbPool {
+    let mut config = ManagerConfig::<AsyncPgConnection>::default();
     config.custom_setup = Box::new(|conn| Box::pin(establish_connection(conn)));
     let manager =
-        AsyncDieselConnectionManager::<MyDbConnection>::new_with_config(database_url, config);
+        AsyncDieselConnectionManager::<AsyncPgConnection>::new_with_config(database_url, config);
 
     let pool = Pool::builder()
         .max_size(max_pool_size)
         .build(manager)
-        .await?;
-    Ok(Arc::new(pool))
+        .await
+        .expect("Failed to create db pool");
+
+    Arc::new(pool)
+}
+
+pub async fn get_db_connection(pool: &ArcDbPool) -> Result<DbPoolConnection, ProcessorError> {
+    pool.get().await.map_err(|e| {
+        tracing::error!("Error getting connection from DB pool: {:?}", e);
+        ProcessorError::DBStoreError {
+            message: format!("Failed to get connection from pool: {}", e),
+        }
+    })
 }

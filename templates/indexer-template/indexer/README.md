@@ -4,19 +4,23 @@ This indexer is created from indexer-sdk, see a more detailed readme in [example
 
 We use the term indexer and processor interchangeably.
 
+When developing locally, you can use a local Postgres DB and run the indexer locally.
+
+When deploying to the cloud, I recommend using [Neon Postgres](https://neon.tech/) or Google Cloud SQL for database and Google Cloud Run for hosting indexer.
+
 ## Pre-requisites
 
-Create a Vercel account and a Google Cloud account. We use Vercel to host the Postgres DB and Google Cloud to host the indexer.
+Install rust.
 
-Create a new Vercel Postgres DB and a new Google Cloud project.
+Install postgres.
 
-Learn more about Vercel Postgres on [their docs](https://vercel.com/docs/storage/vercel-postgres).
-
-Install diesel cli to run migrations.
+Install diesel cli to run migrations. Please only use this command to install diesel cli because we only need postgres feature.
 
 ```sh
 cargo install diesel_cli --no-default-features --features postgres
 ```
+
+Install docker because we need to put indexer in docker container when deploying to cloud.
 
 ## Running the indexer locally
 
@@ -134,3 +138,9 @@ Video walkthrough: https://drive.google.com/file/d/1JayWuH2qgnqOgzVuZm9MwKT42hj4
 Go to cloud run dashboard, create a new service, and select the container image from Artifact Registry, also add a volume to ready the config.yaml file from Secret Manager, then mount the volume to the container.
 
 **NOTE**: always allocate cpu so it always runs instead of only run when there is traffic. Min and max instances should be 1.
+
+## Re-indexing
+
+If you make change to DB schema or update the point calculation logic, you need to re-index the data.
+
+**WARNING**: Do not try to backfill the data, the point data logic is read + update, if you backfill like processing same events twice, you will get wrong point data. So please always revert all migrations and re-index from the first tx your contract deployed.

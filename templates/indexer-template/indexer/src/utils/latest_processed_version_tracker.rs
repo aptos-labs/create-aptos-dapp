@@ -1,5 +1,5 @@
 use ahash::AHashMap;
-use anyhow::{Context, Result};
+use anyhow::Result;
 use aptos_indexer_processor_sdk::{
     traits::{NamedStep, PollableAsyncRunType, PollableAsyncStep, Processable},
     types::transaction_context::TransactionContext,
@@ -9,7 +9,8 @@ use async_trait::async_trait;
 use diesel::{query_dsl::methods::FilterDsl, upsert::excluded, ExpressionMethods};
 
 use super::{
-    database_connection::new_db_pool, database_execution::execute_with_better_error,
+    database_connection::{get_db_connection, new_db_pool},
+    database_execution::execute_with_better_error,
     database_utils::ArcDbPool,
 };
 use crate::{
@@ -48,8 +49,7 @@ where
             &db_config.postgres_connection_string,
             db_config.db_pool_size,
         )
-        .await
-        .context("Failed to create connection pool")?;
+        .await;
         Ok(Self {
             pool,
             tracker_name,
@@ -98,7 +98,8 @@ where
                     processor_status::last_success_version
                         .lt(excluded(processor_status::last_success_version)),
                 );
-            execute_with_better_error(self.pool.clone(), vec![query])
+            let conn = &mut get_db_connection(&self.pool).await?;
+            execute_with_better_error(conn, vec![query])
                 .await
                 .map_err(|e| ProcessorError::DBStoreError {
                     message: format!("Failed to update processor status: {}", e),
@@ -122,8 +123,8 @@ where
         &mut self,
         current_batch: TransactionContext<T>,
     ) -> Result<Option<TransactionContext<T>>, ProcessorError> {
-        // If there's a gap in the next_version and current_version, save the current_version to seen_versions for
-        // later processing.
+        // If there's a gap in the next_version and current_version
+        // save the current_version to seen_versions for later processing.
         if self.next_version != current_batch.start_version {
             tracing::debug!(
                 next_version = self.next_version,

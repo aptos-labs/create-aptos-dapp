@@ -5,7 +5,6 @@ use aptos_indexer_processor_sdk::{
     common_steps::TransactionStreamStep,
     traits::IntoRunnableStep,
 };
-use tracing::info;
 
 use super::{events_extractor::EventsExtractor, events_storer::EventsStorer};
 use crate::{
@@ -28,8 +27,7 @@ impl EventsProcessor {
             &config.db_config.postgres_connection_string,
             config.db_config.db_pool_size,
         )
-        .await
-        .expect("Failed to create connection pool");
+        .await;
 
         Ok(Self {
             config,
@@ -41,7 +39,7 @@ impl EventsProcessor {
         // Merge the starting version from config and the latest processed version from the DB
         let starting_version = get_starting_version(&self.config, self.db_pool.clone()).await?;
 
-        info!(
+        tracing::info!(
             "Starting events processor with starting version: {:?}",
             starting_version
         );
@@ -84,13 +82,14 @@ impl EventsProcessor {
                     if txn_context.data.is_empty() {
                         continue;
                     }
-                    info!(
+                    tracing::info!(
                         "Finished processing events from versions [{:?}, {:?}]",
-                        txn_context.start_version, txn_context.end_version,
+                        txn_context.start_version,
+                        txn_context.end_version,
                     );
                 }
                 Err(_) => {
-                    info!("Channel is closed");
+                    tracing::error!("Channel is closed");
                     return Ok(());
                 }
             }

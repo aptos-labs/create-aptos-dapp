@@ -8,7 +8,6 @@ use poem::{
 };
 use serde::{Deserialize, Serialize};
 use std::net::{Ipv4Addr, SocketAddrV4};
-use tracing::info;
 
 /// This configures the health server.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -26,7 +25,7 @@ impl Default for HealthServerConfig {
 }
 
 pub async fn run(config: HealthServerConfig) -> Result<()> {
-    info!("Health server starting at {}", config.listen_address);
+    tracing::info!("Health server starting at {}", config.listen_address);
     let cors = Cors::new().allow_methods(vec![Method::GET, Method::POST]);
     let route = Route::new().nest("/", get(root)).with(cors);
     Server::new(TcpListener::bind(config.listen_address))

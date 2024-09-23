@@ -1,14 +1,14 @@
-use crate::db_models::events_models::ContractEvent;
 use anyhow::Result;
 use aptos_indexer_processor_sdk::{
-    aptos_protos::transaction::v1::{transaction::TxnData, Transaction},
+    aptos_protos::transaction::v1::{transaction::TxnData, Event as EventPB, Transaction},
     traits::{async_step::AsyncRunType, AsyncStep, NamedStep, Processable},
     types::transaction_context::TransactionContext,
     utils::errors::ProcessorError,
 };
 use async_trait::async_trait;
 use rayon::prelude::*;
-use tracing::warn;
+
+use crate::db_models::message::{CreateMessageEventOnChain, Message, UpdateMessageEventOnChain};
 
 /// EventsExtractor is a step that extracts events and their metadata from transactions.
 pub struct EventsExtractor
@@ -21,6 +21,14 @@ where
 impl EventsExtractor {
     pub fn new(contract_address: String) -> Self {
         Self { contract_address }
+    }
+}
+
+impl AsyncStep for EventsExtractor {}
+
+impl NamedStep for EventsExtractor {
+    fn name(&self) -> String {
+        "EventsExtractor".to_string()
     }
 }
 
@@ -43,7 +51,7 @@ impl Processable for EventsExtractor {
                 let txn_data = match txn.txn_data.as_ref() {
                     Some(data) => data,
                     None => {
-                        warn!(
+                        tracing::warn!(
                             transaction_version = txn_version,
                             "Transaction data doesn't exist"
                         );
@@ -76,10 +84,59 @@ impl Processable for EventsExtractor {
     }
 }
 
-impl AsyncStep for EventsExtractor {}
+#[derive(Debug, Clone)]
+pub enum ContractEvent {
+    CreateMessageEvent(Message),
+    UpdateMessageEvent(Message),
+}
 
-impl NamedStep for EventsExtractor {
-    fn name(&self) -> String {
-        "EventsExtractor".to_string()
+impl ContractEvent {
+    fn from_event(contract_address: &str, event_idx: usize, event: &EventPB) -> Option<Self> {
+        let t: &str = event.type_str.as_ref();
+        let should_include = t.starts_with(contract_address);
+
+        if should_include {
+            if t.starts_with(
+                format!("{}::message_board::CreateMessageEvent", contract_address).as_str(),
+            ) {
+                println!("CreateMessageEvent {}", event.data.as_str());
+                let create_message_event_on_chain: CreateMessageEventOnChain =
+                    serde_json::from_str(event.data.as_str()).unwrap_or_else(|_| {
+                        panic!(
+                            "Failed to parse CreateMessageEvent, {}",
+                            event.data.as_str()
+                        )
+                    });
+                Some(ContractEvent::CreateMessageEvent(
+                    create_message_event_on_chain.to_db_message(),
+                ))
+            } else if t.starts_with(
+                format!("{}::message_board::UpdateMessageEvent", contract_address).as_str(),
+            ) {
+                println!("UpdateMessageEvent {}", event.data.as_str());
+                let update_message_event_on_chain: UpdateMessageEventOnChain =
+                    serde_json::from_str(event.data.as_str()).unwrap_or_else(|_| {
+                        panic!(
+                            "Failed to parse UpdateMessageEvent, {}",
+                            event.data.as_str()
+                        )
+                    });
+                Some(ContractEvent::UpdateMessageEvent(
+                    update_message_event_on_chain.to_db_message(event_idx as i64),
+                ))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn from_events(contract_address: &str, events: &[EventPB]) -> Vec<Self> {
+        events
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, event)| Self::from_event(contract_address, idx, event))
+            .collect()
     }
 }
