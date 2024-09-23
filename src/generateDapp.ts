@@ -17,7 +17,6 @@ const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
 
 export async function generateDapp(selection: Selections) {
-  console.log("selection", selection);
   const projectName = selection.projectName || "my-aptos-dapp";
   // internal template directory path
   const templateDir = getTemplateDirectory(selection);
