@@ -1,10 +1,10 @@
 "use client";
 
-import { useWalletClient } from "@thalalabs/surf/hooks";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { getAptosClient } from "@/lib/aptos";
 import { Button } from "@/components/ui/button";
@@ -21,8 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { TransactionOnExplorer } from "@/components/ExplorerLink";
-import { ABI } from "@/lib/abi/message_board_abi";
-import { useQueryClient } from "@tanstack/react-query";
+import { updateMessage } from "@/entry-functions/updateMessage";
 
 const FormSchema = z.object({
   stringContent: z.string(),
@@ -34,8 +33,7 @@ type UpdateMessageProps = {
 
 export function UpdateMessage({ messageObjAddr }: UpdateMessageProps) {
   const { toast } = useToast();
-  const { connected, account } = useWallet();
-  const { client: walletClient } = useWalletClient();
+  const { connected, account, signAndSubmitTransaction } = useWallet();
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -48,17 +46,17 @@ export function UpdateMessage({ messageObjAddr }: UpdateMessageProps) {
   const onSignAndSubmitTransaction = async (
     data: z.infer<typeof FormSchema>
   ) => {
-    if (!account || !walletClient) {
-      console.error("Account or wallet client not available");
+    if (!account) {
+      console.error("Wallet not available");
       return;
     }
 
-    walletClient
-      .useABI(ABI)
-      .update_message({
-        type_arguments: [],
-        arguments: [messageObjAddr, data.stringContent],
+    signAndSubmitTransaction(
+      updateMessage({
+        messageObj: messageObjAddr,
+        content: data.stringContent,
       })
+    )
       .then((committedTransaction) => {
         return getAptosClient().waitForTransaction({
           transactionHash: committedTransaction.hash,
