@@ -1,17 +1,19 @@
-## Create Aptos Dapp Indexer Template
+## Create Aptos Dapp Custom Indexer Template
 
-The indexer template provides a starter dapp with all components to run a full-stack app with indexer support.
+The custom indexer template provides a starter dapp with all components to run a full-stack app with indexer support.
 
-## Read the Indexer template docs
+## Read the Custom Indexer template docs
 
-To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Indexer template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/indexer)
+To get started with the Custom Indexer template and learn more about the template functionality and usage, head over to the [Custom Indexer template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer)
 
-## The Boilerplate template provides:
+## The Custom Indexer template provides:
 
-- **Folder structure** - A pre-made dapp folder structure with a `src` (frontend), `contract` and `indexer` folders.
+- **Folder structure** - A pre-made dapp folder structure with `src` for frontend, `contract` for Move contract and `indexer` for custom indexer.
 - **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.
 - **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
-- **Message board functionality implementation** - Pre-made `message` components to send and read a message on chain
+- **Message board functionality implementation** - Pre-made `MessageBoard` component to create, update and read messages from the Move smart contract.
+- **Analytics dashboard** - Pre-made `Analytics` component to show the number of messages created and updated.
+- **Point program** - Minimal example to show you how to define a point program based on events (e.g. create message, update message) and show that on the analytics dashboard, with sorting support.
 
 ## What tools the template uses?
 
@@ -20,6 +22,7 @@ To get started with the Boilerplate template and learn more about the template f
 - Aptos TS SDK
 - Aptos Wallet Adapter
 - Node based Move commands
+- Rust based Aptos Indexer SDK
 
 ## What Move commands are available?
 
