@@ -1,67 +1,37 @@
-# Aptos full stack template UI
+## Create Aptos Dapp Indexer Template
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+The indexer template provides a starter dapp with all components to run a full-stack app with indexer support.
 
-## Local development
+## Read the Indexer template docs
 
-This template uses `@neondatabase/serverless` to connect to a Postgres database. When testing locally, you can connect to a dev branch of neon DB.
+To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Indexer template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/indexer)
 
-## Create a read only user in DB
+## The Boilerplate template provides:
 
-Frontend should only read from the DB, the indexer is the only one that writes to the DB. So, create a read only user in the DB for frontend to use prevent any accidental write operations.
+- **Folder structure** - A pre-made dapp folder structure with a `src` (frontend), `contract` and `indexer` folders.
+- **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.
+- **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
+- **Message board functionality implementation** - Pre-made `message` components to send and read a message on chain
 
-```sql
--- Create a readonly user
--- Please don't use any special characters in the password to avoid db sdk give invalid connection string error
-CREATE USER readonly WITH PASSWORD 'strong_password'
--- Grant readonly user read access to all tables in public schema
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly;
--- Grant readonly user read access to all future tables in public schema
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly;
-```
+## What tools the template uses?
 
-Some useful SQLs to check the user and schema:
+- React framework
+- shadcn/ui + tailwind for styling
+- Aptos TS SDK
+- Aptos Wallet Adapter
+- Node based Move commands
 
-```sql
--- Get all users
-SELECT * FROM pg_user;
--- Get all schemas
-SELECT schema_name FROM information_schema.schemata;
-```
+## What Move commands are available?
 
-Then fill the `POSTGRES_URL` in `.env` file with the readonly user.
+The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli) that lets us run Aptos CLI in a Node environment.
 
-## Getting Started
+Some commands are built-in the template and can be ran as a npm script, for example:
 
-First, run the development server:
+- `npm run move:publish` - a command to publish the Move contract
+- `npm run move:test` - a command to run Move unit tests
+- `npm run move:compile` - a command to compile the Move contract
+- `npm run move:upgrade` - a command to upgrade the Move contract
+- `npm run dev` - a command to run the frontend locally
+- `npm run deploy` - a command to deploy the dapp to Vercel
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+For all other available CLI commands, can run `npx aptos` and see a list of all available commands.
