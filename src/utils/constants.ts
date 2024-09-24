@@ -57,7 +57,7 @@ export const ClickerGameTgTemplateInfo = {
 };
 
 export const CustomIndexerTemplateInfo = {
-  title: "Full stack dapp with custom indexer",
+  title: "Custom indexer Template",
   value: {
     path: "custom-indexer-template",
     name: "Full stack dapp with custom indexer",
