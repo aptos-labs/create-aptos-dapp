@@ -56,6 +56,17 @@ export const ClickerGameTgTemplateInfo = {
     "A clicker game Telegram Mini App template to start an Aptos dapp with",
 };
 
+export const CustomIndexerTemplateInfo = {
+  title: "Full stack dapp with custom indexer",
+  value: {
+    path: "custom-indexer-template",
+    name: "Full stack dapp with custom indexer",
+    doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer",
+  },
+  description:
+    "A full stack dapp template with a custom indexer to start an Aptos dapp with",
+};
+
 export const NftMintingDappTemplateInfo = {
   title: "NFT minting dapp",
   value: {

@@ -69,7 +69,9 @@ export async function generateDapp(selection: Selections) {
             f !== "package-lock.json" &&
             f !== ".aptos" &&
             f !== "build" &&
-            f !== ".env"
+            f !== ".env" &&
+            f !== ".next" &&
+            f !== "target" // this is for the rust template
         )
         .map((file) => write(file))
     );
