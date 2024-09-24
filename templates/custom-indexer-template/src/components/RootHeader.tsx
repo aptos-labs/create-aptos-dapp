@@ -10,14 +10,6 @@ export const RootHeader = () => {
         </h1>
       </div>
       <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-10">
-         <a
-          href="https://github.com/0xaptosj/aptos-full-stack-template/"
-          target="_blank"
-          rel="noreferrer"
-          className="text-base text-muted-foreground font-medium leading-none"
-        >
-          Source Code
-        </a>
         <a
           href="/analytics"
           className="text-base text-muted-foreground font-medium leading-none"
