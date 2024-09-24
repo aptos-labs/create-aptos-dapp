@@ -38,3 +38,7 @@ Some commands are built-in the template and can be ran as a npm script, for exam
 - `npm run deploy` - a command to deploy the dapp to Vercel
 
 For all other available CLI commands, can run `npx aptos` and see a list of all available commands.
+
+## Running the Custom Indexer template
+
+Please refer to the [Custom Indexer template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer) for more information on how to run the Custom Indexer template.
