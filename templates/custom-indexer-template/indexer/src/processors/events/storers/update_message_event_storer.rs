@@ -108,7 +108,7 @@ pub async fn process_update_message_events(
     update_events: Vec<Message>,
 ) -> Result<(), ProcessorError> {
     // Key is user address
-    // Value is (number of new messages, latest update message time)
+    // Value is (number of updated messages, latest update message time)
     let mut user_stats_changes: AHashMap<String, (i64, i64)> = AHashMap::new();
     for message in update_events.clone() {
         let (update_count, latest_time) = user_stats_changes

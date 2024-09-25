@@ -7,7 +7,7 @@ server_config:
     indexer_grpc_data_service_address: "https://grpc.testnet.aptoslabs.com:443"
     # At which tx version to start indexing, usually this is the tx version when the contract was deployed
     starting_version: 5936597868
-    # At which tx version to stop indexing, usually this is the latest tx version
+    # At which tx version to stop indexing
     # request_ending_version: 10000
     # Go to https://developers.aptoslabs.com/ to create a project and get an API token
     auth_token: "auth_token_you_can_get_from_aptos_build"
