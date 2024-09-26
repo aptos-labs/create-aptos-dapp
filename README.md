@@ -46,3 +46,11 @@ Then follow the prompts!
 `create-aptos-dapp` also provides you with full stack examples that are for educational purpose, these examples are not production ready and not audited.
 
 - **Aptos Friend Template:** A friend tech style social app that implements share trading
+
+### Releasing a new version
+
+Run this to publish a new version to npm:
+
+```bash
+pnpm publish-to-npm
+```
