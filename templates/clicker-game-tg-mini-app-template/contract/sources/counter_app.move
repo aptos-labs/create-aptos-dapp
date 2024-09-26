@@ -1,4 +1,4 @@
-module counter_app_addr::tg_ex_counter_app {
+module counter_app_addr::cad_tg_counter_app {
     use std::signer;
 
     struct Counter has key {
@@ -9,7 +9,7 @@ module counter_app_addr::tg_ex_counter_app {
     /// If you deploy the module under your own account, sender is your account's signer
     fun init_module(_sender: &signer) {}
 
-    public entry fun tg_ex_click(sender: &signer) acquires Counter {
+    public entry fun click(sender: &signer) acquires Counter {
         let sender_addr = signer::address_of(sender);
         if (!exists<Counter>(sender_addr)) {
             move_to(sender, Counter {
@@ -21,7 +21,7 @@ module counter_app_addr::tg_ex_counter_app {
     }
 
     #[view]
-    public fun tg_ex_count(user_addr: address): u64 acquires Counter {
+    public fun count(user_addr: address): u64 acquires Counter {
         if (exists<Counter>(user_addr)) {
             let counter = borrow_global<Counter>(user_addr);
             counter.count

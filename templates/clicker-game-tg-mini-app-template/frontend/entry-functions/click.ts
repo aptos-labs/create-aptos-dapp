@@ -4,7 +4,7 @@ import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 export const click = (): InputTransactionData => {
   return {
     data: {
-      function: `${MODULE_ADDRESS}::tg_ex_counter_app::tg_ex_click`,
+      function: `${MODULE_ADDRESS}::cad_tg_counter_app::click`,
       functionArguments: [],
     },
   };
