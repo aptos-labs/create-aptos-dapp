@@ -49,8 +49,20 @@ Then follow the prompts!
 
 ### Releasing a new version
 
-Run this to publish a new version to npm:
+Run this to cleanup the project, build it and prepare it for publishing:
 
 ```bash
-npm run publish-to-npm
+npm run prepare-to-publish
+```
+
+Run this to preview the change:
+
+```bash
+npm publish --dry-run
+```
+
+Run this to publish the new version:
+
+```bash
+npm publish
 ```
