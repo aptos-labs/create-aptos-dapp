@@ -9,7 +9,7 @@ module counter_app_addr::counter_app {
     /// If you deploy the module under your own account, sender is your account's signer
     fun init_module(_sender: &signer) {}
 
-    public entry fun click(sender: &signer) acquires Counter {
+    public entry fun tg_ex_clicker(sender: &signer) acquires Counter {
         let sender_addr = signer::address_of(sender);
         if (!exists<Counter>(sender_addr)) {
             move_to(sender, Counter {
