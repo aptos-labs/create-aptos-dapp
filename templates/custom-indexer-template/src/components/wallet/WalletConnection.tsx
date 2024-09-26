@@ -29,9 +29,6 @@ export const WalletConnection = ({
     return true;
   };
 
-  // TODO: Do a proper check for network change support
-  const isNetworkChangeSupported = wallet?.name === "Nightly";
-
   return (
     <Card>
       <CardHeader>
