@@ -1,7 +1,7 @@
 import "./globals.css";
 
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { WalletProvider } from "@/components/providers/WalletProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { WalletProvider } from "@/components/WalletProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
@@ -9,7 +9,7 @@ import { Inter as FontSans } from "next/font/google";
 import { PropsWithChildren } from "react";
 import { RootHeader } from "@/components/RootHeader";
 import { WrongNetworkAlert } from "@/components/WrongNetworkAlert";
-import { QueryProvider } from "@/components/providers/QueryProvider";
+import { QueryProvider } from "@/components/QueryProvider";
 import { RootFooter } from "@/components/RootFooter";
 
 const fontSans = FontSans({
