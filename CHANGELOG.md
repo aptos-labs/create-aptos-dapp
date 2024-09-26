@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add new custom indexer template
+
 # 0.0.29 (2024-09-26)
 
 - Fixed npm release
