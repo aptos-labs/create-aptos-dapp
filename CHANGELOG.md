@@ -4,6 +4,14 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.29 (2024-09-26)
+
+- Fixed npm release
+
+# 0.0.28 (2024-09-26)
+
+- Fixed npm release
+
 # 0.0.27 (2024-09-26)
 
 - Add new contract-only template.
