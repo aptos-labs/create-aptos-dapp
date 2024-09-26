@@ -12,7 +12,7 @@ export const updateMessage = (
   const { messageObj, content } = args;
   return {
     data: {
-      function: `${MODULE_ADDRESS}::message_board::update_message`,
+      function: `${MODULE_ADDRESS}::custom_indexer_ex_message_board::update_message`,
       functionArguments: [messageObj, content],
     },
   };

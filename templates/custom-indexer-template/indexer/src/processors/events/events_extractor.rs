@@ -97,7 +97,7 @@ impl ContractEvent {
 
         if should_include {
             if t.starts_with(
-                format!("{}::message_board::CreateMessageEvent", contract_address).as_str(),
+                format!("{}::custom_indexer_ex_message_board::CreateMessageEvent", contract_address).as_str(),
             ) {
                 println!("CreateMessageEvent {}", event.data.as_str());
                 let create_message_event_on_chain: CreateMessageEventOnChain =
@@ -111,7 +111,7 @@ impl ContractEvent {
                     create_message_event_on_chain.to_db_message(),
                 ))
             } else if t.starts_with(
-                format!("{}::message_board::UpdateMessageEvent", contract_address).as_str(),
+                format!("{}::custom_indexer_ex_message_board::UpdateMessageEvent", contract_address).as_str(),
             ) {
                 println!("UpdateMessageEvent {}", event.data.as_str());
                 let update_message_event_on_chain: UpdateMessageEventOnChain =

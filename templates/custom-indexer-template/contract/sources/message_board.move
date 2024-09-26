@@ -1,4 +1,4 @@
-module message_board_addr::message_board {
+module message_board_addr::custom_indexer_ex_message_board {
     use std::signer;
     use std::string::String;
 
