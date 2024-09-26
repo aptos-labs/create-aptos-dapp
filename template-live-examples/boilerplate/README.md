@@ -11,7 +11,7 @@ To get started with the Boilerplate template and learn more about the template f
 - **Folder structure** - A pre-made dapp folder structure with a `frontend` and `contract` folders.
 - **Dapp infrastructure** - All required dependencies a dapp needs to start building on the Aptos network.
 - **Wallet Info implementation** - Pre-made `WalletInfo` components to demonstrate how one can use to read a connected Wallet info.
-- **Trasnfer APT implementation** - Pre-made `transfer` components to send APT to an address.
+- **Transfer APT implementation** - Pre-made `transfer` components to send APT to an address.
 - **Message board functionality implementation** - Pre-made `message` components to send and read a message on chain
 
 
