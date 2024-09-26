@@ -7,7 +7,5 @@ CREATE TABLE
         created_messages BIGINT NOT NULL,
         updated_messages BIGINT NOT NULL,
         -- Season 1 points
-        s1_points BIGINT NOT NULL,
-        -- All seasons points
-        total_points BIGINT NOT NULL
+        s1_points BIGINT NOT NULL
     );
