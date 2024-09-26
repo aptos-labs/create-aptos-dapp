@@ -4,6 +4,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.30 (2024-09-26)
+
+- Cleanup NPM release
+
 # 0.0.29 (2024-09-26)
 
 - Fixed npm release
