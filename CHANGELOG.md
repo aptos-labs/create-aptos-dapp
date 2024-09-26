@@ -5,6 +5,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 # Unreleased
 
 - Add new contract-only template.
+- Remove seamless signing option from telegram mini app templates.
 
 # 0.0.26 (2024-09-19)
 
