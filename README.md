@@ -46,3 +46,25 @@ Then follow the prompts!
 `create-aptos-dapp` also provides you with full stack examples that are for educational purpose, these examples are not production ready and not audited.
 
 - **Aptos Friend Template:** A friend tech style social app that implements share trading
+
+### Releasing a new version
+
+Bump the version in `package.json` and update `CHANGELOG.md`.
+
+Run this to cleanup the project, build it and prepare it for publishing:
+
+```bash
+npm run prepare-to-publish
+```
+
+Run this to preview the change and make sure it aligns with [the existing published package](https://www.npmjs.com/package/create-aptos-dapp):
+
+```bash
+npm publish --dry-run
+```
+
+Run this to publish the new version:
+
+```bash
+npm publish
+```
