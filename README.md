@@ -49,6 +49,8 @@ Then follow the prompts!
 
 ### Releasing a new version
 
+Bump the version in `package.json` and update `CHANGELOG.md`.
+
 Run this to cleanup the project, build it and prepare it for publishing:
 
 ```bash
