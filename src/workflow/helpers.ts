@@ -1,7 +1,4 @@
-import {
-  ContractBoilerplateTemplateValues,
-  TemplateProjectType,
-} from "../utils/constants.js";
+import { TemplateProjectType } from "../utils/constants.js";
 
 export const needTemplateChoice = (prev: any) => {
   switch (prev) {
@@ -14,8 +11,6 @@ export const needTemplateChoice = (prev: any) => {
 
 export const needSigningOptionChoice = (prev: any) => {
   switch (prev) {
-    case prev.path == "clicker-game-tg-mini-app-template":
-      return "select";
     default:
       return null;
   }
