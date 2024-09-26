@@ -52,5 +52,5 @@ Then follow the prompts!
 Run this to publish a new version to npm:
 
 ```bash
-pnpm publish-to-npm
+npm run publish-to-npm
 ```
