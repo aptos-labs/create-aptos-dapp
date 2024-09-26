@@ -60,7 +60,7 @@ export const CustomIndexerTemplateInfo = {
   title: "Custom indexer Template",
   value: {
     path: "custom-indexer-template",
-    name: "Full stack dapp with custom indexer",
+    name: "Custom indexer template",
     doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer",
   },
   description:
