@@ -5,7 +5,7 @@ export const getCounter = async (userAddr: string): Promise<number> => {
   const content = await aptosClient()
     .view<[number]>({
       payload: {
-        function: `${MODULE_ADDRESS}::counter_app::count`,
+        function: `${MODULE_ADDRESS}::cad_tg_counter_app::count`,
         functionArguments: [userAddr],
       },
     })

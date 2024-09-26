@@ -1,4 +1,4 @@
-module counter_app_addr::counter_app {
+module counter_app_addr::cad_tg_counter_app {
     use std::signer;
 
     struct Counter has key {
