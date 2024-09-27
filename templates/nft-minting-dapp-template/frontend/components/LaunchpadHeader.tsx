@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FC } from "react";
 
 import { WalletSelector } from "@/components/WalletSelector";
@@ -9,7 +9,6 @@ interface LaunchpadHeaderProps {
 }
 
 export const LaunchpadHeader: FC<LaunchpadHeaderProps> = ({ title }) => {
-  const location = useLocation();
 
   return (
     <div className="flex items-center justify-between py-2 px-4 mx-auto w-full max-w-screen-xl flex-wrap">
@@ -19,15 +18,12 @@ export const LaunchpadHeader: FC<LaunchpadHeaderProps> = ({ title }) => {
         <Link className={buttonVariants({ variant: "link" })} to={"/"}>
           Mint Page
         </Link>
-        {location.pathname === "/create-collection" ? (
-          <Link className={buttonVariants({ variant: "link" })} to={"/my-collections"}>
+        <Link className={buttonVariants({ variant: "link" })} to={"/my-collections"}>
             My Collections
           </Link>
-        ) : (
           <Link className={buttonVariants({ variant: "link" })} to={"/create-collection"}>
             Create Collection
           </Link>
-        )}
 
         <WalletSelector />
       </div>

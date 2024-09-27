@@ -27,6 +27,9 @@ export function Header() {
       <div className="flex gap-2 items-center flex-wrap">
         {IS_DEV && (
           <>
+          <Link className={buttonVariants({ variant: "link" })} to={"/"}>
+          Mint Page
+        </Link>
             <Link className={buttonVariants({ variant: "link" })} to={"/my-assets"}>
               My Assets
             </Link>
