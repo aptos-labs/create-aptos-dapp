@@ -12,6 +12,7 @@ import { copy } from "./utils/helpers.js";
 import { installDependencies } from "./utils/installDependencies.js";
 import { generateTemplateEnvFile } from "./utils/generateTemplateEnvFile.js";
 import { getTemplateDirectory } from "./utils/resolveTemplateDirectory.js";
+import { installAptosCli } from "./utils/installAptosCli.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -78,6 +79,21 @@ export async function generateDapp(selection: Selections) {
 
     scaffoldingSpinner.succeed();
 
+    // Install Aptos CLI
+    const aptosCliSpinner = spinner(`Installing Aptos CLI`).start();
+    currentSpinner = aptosCliSpinner;
+
+    try {
+      await installAptosCli();
+      aptosCliSpinner.succeed();
+    } catch (error) {
+      console.log(
+        `Failed to install Aptos CLI, will try to install it later, error: ${error}`
+      );
+      aptosCliSpinner.fail();
+    }
+
+    // Change to target directory
     process.chdir(targetDirectory);
 
     // Generate and write to template .env file
@@ -101,7 +117,7 @@ export async function generateDapp(selection: Selections) {
     );
 
     const npmSpinner = spinner(`Installing the dependencies\n`).start();
-
+    currentSpinner = npmSpinner;
     // Install dependencies
     await installDependencies(context);
 
