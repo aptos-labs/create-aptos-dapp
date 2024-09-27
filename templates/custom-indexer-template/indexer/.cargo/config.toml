@@ -1,0 +1,24 @@
+[alias]
+xclippy = [
+  "clippy",
+  "--workspace",
+  "--all-targets",
+  "--",
+  "-Dwarnings",
+  "-Wclippy::all",
+  "-Aclippy::upper_case_acronyms",
+  "-Aclippy::enum-variant-names",
+  "-Aclippy::result-large-err",
+  "-Aclippy::mutable-key-type",
+  "-Aclippy::map_identity",        # We temporarily ignore this due to: https://github.com/rust-lang/rust-clippy/issues/11764
+]
+
+[build]
+rustflags = [
+  "--cfg",
+  "tokio_unstable",
+  "-C",
+  "force-frame-pointers=yes",
+  "-C",
+  "force-unwind-tables=yes",
+]

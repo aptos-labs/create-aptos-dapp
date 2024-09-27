@@ -48,6 +48,8 @@ export const generateTemplateEnvFile = async (
       return await generateEnvFile();
     case "nextjs-boilerplate-template":
       return await generateEnvFile();
+    case "custom-indexer-template":
+      return await generateEnvFile(`DATABASE_URL=""`);
     case "clicker-game-tg-mini-app-template":
       return await generateEnvFile();
     default:

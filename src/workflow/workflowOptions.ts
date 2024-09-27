@@ -8,6 +8,7 @@ import {
   TemplateSigningOption,
   TokenMintingDappTemplateInfo,
   TokenStakingDappTemplateInfo,
+  CustomIndexerTemplateInfo,
 } from "../utils/constants.js";
 import { validateProjectName } from "../utils/index.js";
 import {
@@ -53,6 +54,7 @@ export const workflowOptions = {
       NftMintingDappTemplateInfo,
       TokenMintingDappTemplateInfo,
       TokenStakingDappTemplateInfo,
+      CustomIndexerTemplateInfo,
     ],
     initial: 0,
   },
@@ -82,6 +84,15 @@ export const workflowOptions = {
       ) {
         return [
           { title: "Client-side (Vite app)", value: TemplateFramework.VITE },
+          {
+            title: "Server-side (Next.js app)",
+            value: TemplateFramework.NEXTJS,
+          },
+        ];
+      } else if (
+        values.template.path === CustomIndexerTemplateInfo.value.path
+      ) {
+        return [
           {
             title: "Server-side (Next.js app)",
             value: TemplateFramework.NEXTJS,

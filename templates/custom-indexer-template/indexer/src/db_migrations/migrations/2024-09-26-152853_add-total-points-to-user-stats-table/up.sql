@@ -1,0 +1,3 @@
+-- Your SQL goes here
+ALTER TABLE IF EXISTS user_stats
+ADD COLUMN IF NOT EXISTS total_points BIGINT NOT NULL DEFAULT 0;
