@@ -20,7 +20,11 @@ export const generateTemplateEnvFile = async (
     const publisherAccount = await createModulePublisherAccount(selection);
     accountCreationSpinner.succeed();
 
-    content += setUpEnvVariables(selection, publisherAccount);
+    const modulePublisherAccountInfo = setUpEnvVariables(
+      selection,
+      publisherAccount
+    );
+    content += modulePublisherAccountInfo ? modulePublisherAccountInfo : "";
 
     return additionalContent
       ? content.concat("\n", additionalContent)

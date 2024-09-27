@@ -5,6 +5,7 @@ import {
   Network,
   Ed25519Account,
 } from "@aptos-labs/ts-sdk";
+import { blue } from "kolorist";
 import { Selections } from "../types.js";
 import { TemplateNetwork } from "./constants.js";
 
@@ -28,8 +29,11 @@ export const createModulePublisherAccount = async (
 
     return publisherAccount;
   } catch (error: any) {
-    throw new Error(
-      `Could not create a module publisher account, please try again. Error: ${error}`
+    console.log(
+      `${blue(
+        "Could not create a module publisher account, please fill out manually the MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY and MODULE_PUBLISHER_ACCOUNT_ADDRESS in your project .env file."
+      )} \nError: ${error}`
     );
+    return null;
   }
 };
