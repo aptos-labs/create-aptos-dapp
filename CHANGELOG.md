@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.31 (2024-09-30)
+
 - Add new custom indexer template
 - Fix NFT and Token minting dapps navigation UI issues
 - Install the Aptos CLI as part of the wizard setup
