@@ -8,6 +8,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Fix NFT and Token minting dapps navigation UI issues
 - Install the Aptos CLI as part of the wizard setup
 - Handle module publisher account creation failure by prompting the user to fill out the .env file manually
+- Add a `TopBanner` component to all templates to show the user the template docs
 
 # 0.0.30 (2024-09-26)
 
