@@ -7,12 +7,14 @@ import { NetworkInfo } from "@/components/NetworkInfo";
 import { AccountInfo } from "@/components/AccountInfo";
 import { TransferAPT } from "@/components/TransferAPT";
 import { MessageBoard } from "@/components/MessageBoard";
+import { TopBanner } from "@/components/TopBanner";
 
 function App() {
   const { connected } = useWallet();
 
   return (
     <>
+      <TopBanner />
       <Header />
       <div className="flex items-center justify-center flex-col">
         {connected ? (

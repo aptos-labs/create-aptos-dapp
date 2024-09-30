@@ -1,13 +1,6 @@
 ## Telegram Mini App Clicker Game Template
 
-This template provides a ready to use clicker game dapp that can be run as a Telegram mini app. You can use this template to build your own Telegram mini app dapp on the Aptos network.
-
-We provide 2 signing experience for the Telegram Mini App, you can choose when you create the dapp using the create-aptos-dapp cli:
-
-- explicit signing - the user needs to sign each transaction, this is powered by Aptos Wallet Adapter similar to other dapps
-  - [demo](https://t.me/aptos_explict_siging_bot/)
-- seamless signing - the user doesn't need to sign each transaction because the approval is done in the background, this is powered by [Mizu Wallet SDK Core](https://docs.mizu.io/docs/api-connect/core)
-  - [demo](https://t.me/seamless345_bot/)
+This template provides a ready to use clicker game dapp that can be run as a Telegram Mini App. It uese the Aptos Wallet Adapter to give you out of the box support. Under the hood, it’s powered by [Mizu Wallet](https://mizu.io/).
 
 ## Read the template docs
 

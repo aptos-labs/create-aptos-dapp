@@ -3,6 +3,8 @@ import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 import { Mint } from "@/pages/Mint";
 import { CreateFungibleAsset } from "@/pages/CreateFungibleAsset";
 import { MyFungibleAssets } from "@/pages/MyFungibleAssets";
+import { TopBanner } from "./components/TopBanner";
+import { IS_DEV } from "./constants";
 
 function Layout() {
   return (
@@ -35,6 +37,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <>
+    {IS_DEV && <TopBanner />}
       <RouterProvider router={router} />
     </>
   );
