@@ -79,20 +79,6 @@ export async function generateDapp(selection: Selections) {
 
     scaffoldingSpinner.succeed();
 
-    // Install Aptos CLI
-    const aptosCliSpinner = spinner(`Installing Aptos CLI`).start();
-    currentSpinner = aptosCliSpinner;
-
-    try {
-      await installAptosCli();
-      aptosCliSpinner.succeed();
-    } catch (error) {
-      console.log(
-        `Failed to install Aptos CLI, will try to install it later, error: ${error}`
-      );
-      aptosCliSpinner.fail();
-    }
-
     // Change to target directory
     process.chdir(targetDirectory);
 
@@ -116,11 +102,26 @@ export async function generateDapp(selection: Selections) {
       `\nNeed to install dependencies, this might take a while - in the meantime:\n ${docsInstructions}\n`
     );
 
+    // Install dependencies
     const npmSpinner = spinner(`Installing the dependencies\n`).start();
     currentSpinner = npmSpinner;
-    // Install dependencies
     await installDependencies(context);
+    npmSpinner.succeed();
 
+    // Install Aptos CLI
+    const aptosCliSpinner = spinner(`Installing Aptos CLI`).start();
+    currentSpinner = aptosCliSpinner;
+    try {
+      await installAptosCli();
+      aptosCliSpinner.succeed();
+    } catch (error) {
+      console.log(
+        `\nFailed to install Aptos CLI, will try to install it later, error: ${error}`
+      );
+      aptosCliSpinner.fail();
+    }
+
+    // Record telemetry
     await recordTelemetry({
       command: "npx create-aptos-dapp",
       project_name: selection.projectName,
@@ -130,9 +131,6 @@ export async function generateDapp(selection: Selections) {
       network: selection.network,
       signing_option: selection.signingOption,
     });
-
-    npmSpinner.succeed();
-    currentSpinner = npmSpinner;
 
     // Log next steps
     console.log(
