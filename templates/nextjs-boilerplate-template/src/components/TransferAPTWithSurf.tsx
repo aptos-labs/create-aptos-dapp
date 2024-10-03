@@ -1,16 +1,21 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useWalletClient } from "@thalalabs/surf/hooks";
 // Internal components
 import { toast } from "@/components/ui/use-toast";
 import { aptosClient } from "@/utils/aptosClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getAccountAPTBalance } from "@/view-functions/getAccountBalance";
-import { transferAPT } from "@/entry-functions/transferAPT";
+import { COIN_ABI } from "@/utils/coin_abi";
 
 export function TransferAPT() {
-  const { account, signAndSubmitTransaction } = useWallet();
+  const { account } = useWallet();
+  const { client } = useWalletClient();
+
   const queryClient = useQueryClient();
 
   const [aptBalance, setAptBalance] = useState<number>(0);
@@ -45,18 +50,15 @@ export function TransferAPT() {
   });
 
   const onClickButton = async () => {
-    if (!account || !recipient || !transferAmount) {
+    if (!client || !recipient || !transferAmount) {
       return;
     }
 
     try {
-      const committedTransaction = await signAndSubmitTransaction(
-        transferAPT({
-          to: recipient,
-          // APT is 8 decimal places
-          amount: Math.pow(10, 8) * transferAmount,
-        }),
-      );
+      const committedTransaction = await client.useABI(COIN_ABI).transfer({
+        type_arguments: ["0x1::aptos_coin::AptosCoin"],
+        arguments: [recipient as `0x${string}`, Math.pow(10, 8) * transferAmount],
+      });
       const executedTransaction = await aptosClient().waitForTransaction({
         transactionHash: committedTransaction.hash,
       });

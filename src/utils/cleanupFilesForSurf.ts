@@ -1,38 +1,47 @@
 import fs from "node:fs";
 import { Selections } from "../types.js";
-import { TemplateProjectType } from "./constants.js";
+import { TemplateFramework, TemplateProjectType } from "./constants.js";
 import { move, remove } from "./helpers.js";
 
 export const cleanupFilesForSurf = (selection: Selections) => {
-  if (
-    !selection.useSurf ||
-    selection.projectType === TemplateProjectType.MOVE
-  ) {
+  if (selection.projectType === TemplateProjectType.MOVE) {
     return;
+  }
+
+  let frontend_dir: string;
+  if (selection.framework === TemplateFramework.VITE) {
+    frontend_dir = "frontend";
+  } else if (selection.framework === TemplateFramework.NEXTJS) {
+    frontend_dir = "src";
+  } else {
+    throw new Error("Unsupported framework");
   }
 
   if (selection.template.path === "boilerplate-template") {
     if (selection.useSurf) {
-      remove("frontend/entry-functions");
-      remove("frontend/view-functions");
+      remove(`${frontend_dir}/entry-functions`);
+      remove(`${frontend_dir}/view-functions`);
 
       move(
-        "frontend/components/MessageBoardWithSurf.tsx",
-        "frontend/components/MessageBoard.tsx"
+        `${frontend_dir}/components/MessageBoardWithSurf.tsx`,
+        `${frontend_dir}/components/MessageBoard.tsx`
       );
       move(
-        "frontend/components/TransferAPTWithSurf.tsx",
-        "frontend/components/TransferAPT.tsx"
+        `${frontend_dir}/components/TransferAPTWithSurf.tsx`,
+        `${frontend_dir}/components/TransferAPT.tsx`
       );
-      move("frontend/view-functions-with-surf", "frontend/view-functions");
+      move(
+        `${frontend_dir}/view-functions-with-surf`,
+        `${frontend_dir}/view-functions`
+      );
     } else {
       const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
       delete packageJson.dependencies["@thalalabs/surf"];
       fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2));
 
-      remove("frontend/components/MessageBoardWithSurf.tsx");
-      remove("frontend/components/TransferAPTWithSurf.tsx");
-      remove("frontend/components/view-functions-with-surf");
+      remove(`${frontend_dir}/components/MessageBoardWithSurf.tsx`);
+      remove(`${frontend_dir}/components/TransferAPTWithSurf.tsx`);
+      remove(`${frontend_dir}/view-functions-with-surf`);
     }
   }
 };
