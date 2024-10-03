@@ -13,6 +13,7 @@ import { installDependencies } from "./utils/installDependencies.js";
 import { generateTemplateEnvFile } from "./utils/generateTemplateEnvFile.js";
 import { getTemplateDirectory } from "./utils/resolveTemplateDirectory.js";
 import { installAptosCli } from "./utils/installAptosCli.js";
+import { cleanupFilesForSurf } from "./utils/cleanupFilesForSurf.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -81,6 +82,8 @@ export async function generateDapp(selection: Selections) {
 
     // Change to target directory
     process.chdir(targetDirectory);
+
+    cleanupFilesForSurf(selection);
 
     // Generate and write to template .env file
     const envFileContent = await generateTemplateEnvFile(selection, spinner);

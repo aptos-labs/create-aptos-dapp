@@ -85,3 +85,10 @@ export const remove = (path: string) => {
     recursive: true,
   });
 };
+
+/**
+ * Move a file or directory
+ */
+export const move = (oldPath: string, newPath: string) => {
+  fs.renameSync(oldPath, newPath);
+};
