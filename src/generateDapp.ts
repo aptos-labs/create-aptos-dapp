@@ -130,6 +130,7 @@ export async function generateDapp(selection: Selections) {
       framework: selection.framework,
       network: selection.network,
       signing_option: selection.signingOption,
+      use_surf: selection.useSurf,
     });
 
     // Log next steps

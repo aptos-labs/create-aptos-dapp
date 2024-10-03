@@ -74,8 +74,46 @@ export const workflowOptions = {
     ],
     initial: 0,
   },
+  useSurf: {
+    type: "select",
+    name: "useSurf",
+    message:
+      "Choose if you want to use Surf, the TypeScript type safety tool maintained by Thala Labs",
+    choices(prev, values) {
+      if (values.projectType === TemplateProjectType.MOVE) {
+        return [
+          {
+            title: "Do not use Surf and handle types manually",
+            value: false,
+          },
+        ];
+      } else if (
+        values.template.path === FullstackBoilerplateTemplateInfo.value.path
+      ) {
+        return [
+          {
+            title: "Do not use Surf and handle types manually",
+            value: false,
+          },
+          {
+            title:
+              "Use Surf to auto generate TypeScript Types for your Move contracts",
+            value: true,
+          },
+        ];
+      } else {
+        return [
+          {
+            title: "Do not use Surf and handle types manually",
+            value: false,
+          },
+        ];
+      }
+    },
+    initial: false,
+  },
   framework: {
-    type: (prev: any) => needFrameworkChoice(prev),
+    type: (prev, values) => needFrameworkChoice(values),
     name: "framework",
     message: "Choose your framework",
     choices(prev, values) {
