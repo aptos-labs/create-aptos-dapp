@@ -6,8 +6,8 @@
   "scripts": {
     "move:test": "node ./scripts/move/test",
     "move:compile": "node ./scripts/move/compile",
-    "move:publish": "node ./scripts/move/publish && node ./scripts/move/get_abi",
-    "move:upgrade": "node ./scripts/move/upgrade && node ./scripts/move/get_abi",
+    "move:publish": "node ./scripts/move/publish",
+    "move:upgrade": "node ./scripts/move/upgrade",
     "dev": "vite",
     "build": "tsc && vite build",
     "deploy":"vercel",
@@ -34,7 +34,6 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tanstack/react-query": "^5.40.1",
-    "@thalalabs/surf": "^1.7.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
