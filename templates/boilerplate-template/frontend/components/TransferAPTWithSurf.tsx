@@ -8,7 +8,7 @@ import { aptosClient } from "@/utils/aptosClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getAccountAPTBalance } from "@/view-functions/getAccountBalance";
-import { COIN_ABI } from "node_modules/@thalalabs/surf/build/types/abi/coin";
+import { COIN_ABI } from "@/utils/coin_abi";
 
 export function TransferAPT() {
   const { account } = useWallet();

@@ -14,6 +14,7 @@ import { validateProjectName } from "../utils/index.js";
 import {
   needFrameworkChoice,
   needSigningOptionChoice,
+  needSurfChoice,
   needTemplateChoice,
 } from "./helpers.js";
 
@@ -75,7 +76,7 @@ export const workflowOptions = {
     initial: 0,
   },
   useSurf: {
-    type: "select",
+    type: (prev, values) => needSurfChoice(values),
     name: "useSurf",
     message:
       "Choose if you want to use Surf, the TypeScript type safety tool maintained by Thala Labs",

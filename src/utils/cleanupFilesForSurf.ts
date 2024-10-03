@@ -1,7 +1,7 @@
 import fs from "node:fs";
-import { Selections } from "../types";
-import { TemplateProjectType } from "./constants";
-import { move, remove } from "./helpers";
+import { Selections } from "../types.js";
+import { TemplateProjectType } from "./constants.js";
+import { move, remove } from "./helpers.js";
 
 export const cleanupFilesForSurf = (selection: Selections) => {
   if (
@@ -13,6 +13,9 @@ export const cleanupFilesForSurf = (selection: Selections) => {
 
   if (selection.template.path === "boilerplate-template") {
     if (selection.useSurf) {
+      remove("frontend/entry-functions");
+      remove("frontend/view-functions");
+
       move(
         "frontend/components/MessageBoardWithSurf.tsx",
         "frontend/components/MessageBoard.tsx"
@@ -21,12 +24,7 @@ export const cleanupFilesForSurf = (selection: Selections) => {
         "frontend/components/TransferAPTWithSurf.tsx",
         "frontend/components/TransferAPT.tsx"
       );
-      move(
-        "frontend/components/view-functions-with-surf",
-        "frontend/components/view-functions"
-      );
-
-      remove("frontend/entry-functions");
+      move("frontend/view-functions-with-surf", "frontend/view-functions");
     } else {
       const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
       delete packageJson.dependencies["@thalalabs/surf"];
