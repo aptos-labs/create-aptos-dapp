@@ -1,5 +1,8 @@
 import { Selections } from "../types.js";
-import { TemplateProjectType } from "../utils/constants.js";
+import {
+  FullstackBoilerplateTemplateInfo,
+  TemplateProjectType,
+} from "../utils/constants.js";
 
 export const needTemplateChoice = (prev: any) => {
   switch (prev) {
@@ -18,10 +21,6 @@ export const needSigningOptionChoice = (prev: any) => {
 };
 
 export const needSurfChoice = (values: Selections) => {
-  if (values.projectType === TemplateProjectType.MOVE) {
-    return null;
-  }
-
   if (values.template.path === FullstackBoilerplateTemplateInfo.value.path) {
     return "select";
   }
