@@ -22,7 +22,7 @@ export const needSurfChoice = (values: Selections) => {
     return null;
   }
 
-  if (values.template.path === "boilerplate-template") {
+  if (values.template.path === FullstackBoilerplateTemplateInfo.value.path) {
     return "select";
   }
 
