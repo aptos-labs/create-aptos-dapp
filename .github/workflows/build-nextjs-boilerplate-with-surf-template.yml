@@ -1,4 +1,4 @@
-name: Build Boilerplate Template Frontend
+name: Build Nextjs Boilerplate Template Frontend
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ jobs:
     concurrency: ci-${{ github.ref }}-${{ github.workflow }}
     defaults:
       run:
-        working-directory: ./templates/boilerplate-template
+        working-directory: ./templates/nextjs-boilerplate-template
     steps:
       - uses: actions/checkout@v3
 
@@ -22,8 +22,16 @@ jobs:
           version: 8.6.1
           run_install: false
 
+      # Handle surf related files
+      - run: rm -rf src/entry-functions
+      - run: rm -rf src/view-functions
+      - run: mv src/Components/MessageBoardWithSurf.tsx frontend/Components/MessageBoard.tsx
+      - run: mv src/Components/TransferAPTWithSurf.tsx frontend/Components/TransferAPT.tsx
+      - run: mv src/view-functions-with-surf frontend/view-functions
+
       # Install deps and build.
       - run: pnpm install
+      - run: pnpm install @thalalabs/surf
       - run: CI= pnpm build
 
       # Verify that the format is correct
