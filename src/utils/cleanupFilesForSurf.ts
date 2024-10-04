@@ -17,7 +17,7 @@ export const cleanupFilesForSurf = (selection: Selections) => {
     throw new Error("Unsupported framework");
   }
 
-  if (selection.template.path === "boilerplate-template") {
+  if (selection.template.path === FullstackBoilerplateTemplateInfo.value.path) {
     if (selection.useSurf) {
       remove(`${frontend_dir}/entry-functions`);
       remove(`${frontend_dir}/view-functions`);
