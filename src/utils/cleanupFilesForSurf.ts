@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import { Selections } from "../types.js";
-import { TemplateFramework, TemplateProjectType } from "./constants.js";
+import {
+  FullstackBoilerplateTemplateInfo,
+  TemplateFramework,
+  TemplateProjectType,
+} from "./constants.js";
 import { move, remove } from "./helpers.js";
 
 export const cleanupFilesForSurf = (selection: Selections) => {
@@ -19,6 +23,10 @@ export const cleanupFilesForSurf = (selection: Selections) => {
 
   if (selection.template.path === FullstackBoilerplateTemplateInfo.value.path) {
     if (selection.useSurf) {
+      const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+      packageJson.dependencies["@thalalabs/surf"] = "^1.7.3";
+      fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2));
+
       remove(`${frontend_dir}/entry-functions`);
       remove(`${frontend_dir}/view-functions`);
 
@@ -35,10 +43,6 @@ export const cleanupFilesForSurf = (selection: Selections) => {
         `${frontend_dir}/view-functions`
       );
     } else {
-      const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-      delete packageJson.dependencies["@thalalabs/surf"];
-      fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2));
-
       remove(`${frontend_dir}/components/MessageBoardWithSurf.tsx`);
       remove(`${frontend_dir}/components/TransferAPTWithSurf.tsx`);
       remove(`${frontend_dir}/view-functions-with-surf`);
