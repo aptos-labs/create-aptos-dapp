@@ -7,7 +7,7 @@ export type AccountAPTBalanceArguments = {
 
 export const getAccountAPTBalance = async (args: AccountAPTBalanceArguments): Promise<number> => {
   const { accountAddress } = args;
-  const balance = await surfClient
+  const balance = await surfClient()
     .useABI(COIN_ABI)
     .view.balance({
       functionArguments: [accountAddress as `0x${string}`],
