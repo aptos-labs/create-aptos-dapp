@@ -25,9 +25,9 @@ jobs:
       # Handle surf related files
       - run: rm -rf ./src/entry-functions
       - run: rm -rf ./src/view-functions
-      - run: mv ./src/components/MessageBoardWithSurf.tsx ./frontend/components/MessageBoard.tsx
-      - run: mv ./src/components/TransferAPTWithSurf.tsx ./frontend/components/TransferAPT.tsx
-      - run: mv ./src/view-functions-with-surf ./frontend/view-functions
+      - run: mv ./src/components/MessageBoardWithSurf.tsx ./src/components/MessageBoard.tsx
+      - run: mv ./src/components/TransferAPTWithSurf.tsx ./src/components/TransferAPT.tsx
+      - run: mv ./src/view-functions-with-surf ./src/view-functions
 
       # Install deps and build.
       - run: pnpm install
