@@ -17,10 +17,10 @@ jobs:
       - uses: actions/checkout@v3
 
       # Remove surf related files
-      - run: rm src/Components/MessageBoardWithSurf.tsx
-      - run: rm src/Components/TransferAPTWithSurf.tsx
-      - run: rm -rf src/view-functions-with-surf
-      - run: rm src/utils/surf_client.ts
+      - run: rm ./src/Components/MessageBoardWithSurf.tsx
+      - run: rm ./src/Components/TransferAPTWithSurf.tsx
+      - run: rm -rf ./src/view-functions-with-surf
+      - run: rm ./src/utils/surf_client.ts
 
       # Install pnpm
       - uses: pnpm/action-setup@v2
