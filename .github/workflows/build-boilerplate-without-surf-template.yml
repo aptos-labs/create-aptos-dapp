@@ -23,8 +23,8 @@ jobs:
           run_install: false
 
       # Remove surf related files
-      - run: rm ./frontend/Components/MessageBoardWithSurf.tsx
-      - run: rm ./frontend/Components/TransferAPTWithSurf.tsx
+      - run: rm ./frontend/components/MessageBoardWithSurf.tsx
+      - run: rm ./frontend/components/TransferAPTWithSurf.tsx
       - run: rm -rf ./frontend/view-functions-with-surf
       - run: rm ./frontend/utils/surf_client.ts
 

@@ -26,8 +26,8 @@ jobs:
       - run: rm -rf ./frontend/entry-functions
       - run: rm -rf ./frontend/view-functions
       - run: ls ./frontend
-      - run: mv ./frontend/Components/MessageBoardWithSurf.tsx ./frontend/Components/MessageBoard.tsx
-      - run: mv ./frontend/Components/TransferAPTWithSurf.tsx ./frontend/Components/TransferAPT.tsx
+      - run: mv ./frontend/components/MessageBoardWithSurf.tsx ./frontend/components/MessageBoard.tsx
+      - run: mv ./frontend/components/TransferAPTWithSurf.tsx ./frontend/components/TransferAPT.tsx
       - run: mv ./frontend/view-functions-with-surf ./frontend/view-functions
 
       # Install deps and build.
