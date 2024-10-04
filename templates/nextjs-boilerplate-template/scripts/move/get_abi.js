@@ -1,5 +1,4 @@
 require("dotenv").config();
-const axios = require("axios");
 const fs = require("node:fs");
 
 const modules = [
@@ -12,10 +11,10 @@ async function getAbi() {
   await new Promise((resolve) => setTimeout(resolve, 5000));
   modules.forEach((module) => {
     const url = `https://fullnode.${process.env.NEXT_PUBLIC_APP_NETWORK}.aptoslabs.com/v1/accounts/${module.address}/module/${module.name}`;
-    axios
-      .get(url)
+    fetch(url)
+      .then((response) => response.json())
       .then((response) => {
-        const abi = response.data.abi;
+        const abi = response.abi;
         const abiString = `export const ${module.name.toUpperCase()}_ABI = ${JSON.stringify(abi)} as const;`;
         fs.writeFileSync(`src/utils/${module.name}_abi.ts`, abiString);
         console.log(`${module.name} ABI saved to src/utils/${module.name}_abi.ts`);

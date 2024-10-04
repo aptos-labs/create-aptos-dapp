@@ -16,9 +16,7 @@
     "create-aptos-dapp": "./dist/index.js"
   },
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && tsc && cp -r templates dist/templates && cp -r examples dist/examples",
-    "prepare-to-publish": "./cleanup_for_publish.sh && npm install && npm run build",
+    "build": "./cleanup_for_publish.sh && npm install && tsc && cp -r templates dist/templates && cp -r examples dist/examples",
     "dev": "rm -rf my-aptos-dapp && npm run build && node dist/index.js",
     "boilerplate:build": "cd template-live-examples/boilerplate && npm run build",
     "boilerplate:deploy": "npm run boilerplate:build && gh-pages --dist template-live-examples/boilerplate/dist",
