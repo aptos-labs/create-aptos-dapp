@@ -79,7 +79,7 @@ export const workflowOptions = {
     type: (prev, values) => needSurfChoice(values),
     name: "useSurf",
     message:
-      "Choose if you want to use Surf, the TypeScript type safety tool maintained by Thala Labs",
+      "Would you like to use Surf, the TypeScript type safety tool maintained by Thala Labs",
     choices(prev, values) {
       if (values.projectType === TemplateProjectType.MOVE) {
         return [
