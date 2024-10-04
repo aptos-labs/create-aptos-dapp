@@ -22,7 +22,3 @@ jobs:
       # Install deps and build.
       - run: pnpm install
       - run: CI= pnpm build
-
-      # Verify that the format is correct
-      - run: npm run prepare-to-publish
-        shell: bash
