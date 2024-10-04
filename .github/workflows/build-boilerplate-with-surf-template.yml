@@ -25,6 +25,7 @@ jobs:
       # Handle surf related files
       - run: rm -rf ./frontend/entry-functions
       - run: rm -rf ./frontend/view-functions
+      - run: ls ./frontend/Components
       - run: mv ./frontend/Components/MessageBoardWithSurf.tsx ./frontend/Components/MessageBoard.tsx
       - run: mv ./frontend/Components/TransferAPTWithSurf.tsx ./frontend/Components/TransferAPT.tsx
       - run: mv ./frontend/view-functions-with-surf ./frontend/view-functions
