@@ -1,4 +1,4 @@
-name: Build Nextjs Boilerplate Template Frontend
+name: Build Nextjs Boilerplate Template with Surf Frontend
 
 on:
   pull_request:

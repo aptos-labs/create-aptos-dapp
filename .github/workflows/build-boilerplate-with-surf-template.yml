@@ -1,4 +1,4 @@
-name: Build Boilerplate Template Frontend
+name: Build Boilerplate Template with Surf Frontend
 
 on:
   pull_request:
