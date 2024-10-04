@@ -8,6 +8,8 @@ const modules = [
 ];
 
 async function getAbi() {
+  // Wait for 5 seconds to ensure the module is deployed
+  await new Promise((resolve) => setTimeout(resolve, 5000));
   modules.forEach((module) => {
     const url = `https://fullnode.${process.env.VITE_APP_NETWORK}.aptoslabs.com/v1/accounts/${module.address}/module/${module.name}`;
     axios
@@ -16,7 +18,7 @@ async function getAbi() {
         const abi = response.data.abi;
         const abiString = `export const ${module.name.toUpperCase()}_ABI = ${JSON.stringify(abi)} as const;`;
         fs.writeFileSync(`frontend/utils/${module.name}_abi.ts`, abiString);
-        console.log(`ABI saved to frontend/utils/${module.name}_abi.ts`);
+        console.log(`${module.name} ABI saved to frontend/utils/${module.name}_abi.ts`);
       })
       .catch((error) => {
         console.error("Error fetching ABI:", error);
