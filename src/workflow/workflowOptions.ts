@@ -81,14 +81,7 @@ export const workflowOptions = {
     message:
       "Would you like to use Surf, the TypeScript type safety tool maintained by Thala Labs",
     choices(prev, values) {
-      if (values.projectType === TemplateProjectType.MOVE) {
-        return [
-          {
-            title: "Do not use Surf and handle types manually",
-            value: false,
-          },
-        ];
-      } else if (
+      if (
         values.template.path === FullstackBoilerplateTemplateInfo.value.path
       ) {
         return [
