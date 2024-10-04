@@ -20,7 +20,7 @@ jobs:
       - run: rm ./src/components/MessageBoardWithSurf.tsx
       - run: rm ./src/components/TransferAPTWithSurf.tsx
       - run: rm -rf ./src/view-functions-with-surf
-      - run: rm ./src/utils/surf_client.ts
+      - run: rm ./src/utils/surfClient.ts
 
       # Install pnpm
       - uses: pnpm/action-setup@v2

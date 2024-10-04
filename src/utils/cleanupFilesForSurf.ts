@@ -46,7 +46,7 @@ export const cleanupFilesForSurf = (selection: Selections) => {
       remove(`${frontend_dir}/components/MessageBoardWithSurf.tsx`);
       remove(`${frontend_dir}/components/TransferAPTWithSurf.tsx`);
       remove(`${frontend_dir}/view-functions-with-surf`);
-      remove(`${frontend_dir}/utils/surf_client.ts`);
+      remove(`${frontend_dir}/utils/surfClient.ts`);
     }
   }
 };

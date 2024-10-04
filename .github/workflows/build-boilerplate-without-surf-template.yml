@@ -26,7 +26,7 @@ jobs:
       - run: rm ./frontend/components/MessageBoardWithSurf.tsx
       - run: rm ./frontend/components/TransferAPTWithSurf.tsx
       - run: rm -rf ./frontend/view-functions-with-surf
-      - run: rm ./frontend/utils/surf_client.ts
+      - run: rm ./frontend/utils/surfClient.ts
 
       # Install deps and build.
       - run: pnpm install
