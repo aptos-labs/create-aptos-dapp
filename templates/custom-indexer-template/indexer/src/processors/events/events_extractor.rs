@@ -34,14 +34,14 @@ impl NamedStep for EventsExtractor {
 
 #[async_trait]
 impl Processable for EventsExtractor {
-    type Input = Transaction;
-    type Output = ContractEvent;
+    type Input = Vec<Transaction>;
+    type Output = Vec<ContractEvent>;
     type RunType = AsyncRunType;
 
     async fn process(
         &mut self,
-        item: TransactionContext<Transaction>,
-    ) -> Result<Option<TransactionContext<ContractEvent>>, ProcessorError> {
+        item: TransactionContext<Vec<Transaction>>,
+    ) -> Result<Option<TransactionContext<Vec<ContractEvent>>>, ProcessorError> {
         let events = item
             .data
             .par_iter()
@@ -75,11 +75,7 @@ impl Processable for EventsExtractor {
             .collect::<Vec<ContractEvent>>();
         Ok(Some(TransactionContext {
             data: events,
-            start_version: item.start_version,
-            end_version: item.end_version,
-            start_transaction_timestamp: item.start_transaction_timestamp,
-            end_transaction_timestamp: item.end_transaction_timestamp,
-            total_size_in_bytes: item.total_size_in_bytes,
+            metadata: item.metadata,
         }))
     }
 }
