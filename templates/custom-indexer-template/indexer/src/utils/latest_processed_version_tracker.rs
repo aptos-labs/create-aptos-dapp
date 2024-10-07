@@ -7,6 +7,7 @@ use aptos_indexer_processor_sdk::{
 };
 use async_trait::async_trait;
 use diesel::{query_dsl::methods::FilterDsl, upsert::excluded, ExpressionMethods};
+use std::marker::PhantomData;
 
 use super::{
     database_connection::{get_db_connection, new_db_pool},
@@ -30,9 +31,12 @@ where
     // Next version to process that we expect.
     next_version: u64,
     // Last successful batch of sequentially processed transactions. Includes metadata to write to storage.
-    last_success_batch: Option<TransactionContext<T>>,
+    // last_success_batch: Option<TransactionContext<T>>,
+    last_success_batch: Option<TransactionContext<()>>,
     // Tracks all the versions that have been processed out of order.
-    seen_versions: AHashMap<u64, TransactionContext<T>>,
+    // seen_versions: AHashMap<u64, TransactionContext<T>>,
+    seen_versions: AHashMap<u64, TransactionContext<()>>,
+    _marker: PhantomData<T>,
 }
 
 impl<T> LatestVersionProcessedTracker<T>
@@ -56,10 +60,11 @@ where
             next_version: starting_version,
             last_success_batch: None,
             seen_versions: AHashMap::new(),
+            _marker: PhantomData,
         })
     }
 
-    fn update_last_success_batch(&mut self, current_batch: TransactionContext<T>) {
+    fn update_last_success_batch(&mut self, current_batch: TransactionContext<()>) {
         let mut new_prev_batch = current_batch;
         // While there are batches in seen_versions that are in order, update the new_prev_batch to the next batch.
         while let Some(next_version) = self.seen_versions.remove(&(new_prev_batch.end_version + 1))
@@ -103,6 +108,7 @@ where
                 .await
                 .map_err(|e| ProcessorError::DBStoreError {
                     message: format!("Failed to update processor status: {}", e),
+                    query: Some(format!("{:?}", query)),
                 })?;
         }
         Ok(())
@@ -123,6 +129,15 @@ where
         &mut self,
         current_batch: TransactionContext<T>,
     ) -> Result<Option<TransactionContext<T>>, ProcessorError> {
+        let tx_context = TransactionContext {
+            data: (),
+            start_version: current_batch.start_version,
+            end_version: current_batch.end_version,
+            start_transaction_timestamp: current_batch.start_transaction_timestamp.clone(),
+            end_transaction_timestamp: current_batch.end_transaction_timestamp.clone(),
+            total_size_in_bytes: current_batch.total_size_in_bytes,
+        };
+
         // If there's a gap in the next_version and current_version
         // save the current_version to seen_versions for later processing.
         if self.next_version != current_batch.start_version {
@@ -132,28 +147,12 @@ where
                 "Gap detected starting from version: {}",
                 current_batch.start_version
             );
-            self.seen_versions.insert(
-                current_batch.start_version,
-                TransactionContext {
-                    data: vec![], // No data is needed for tracking. This is to avoid clone.
-                    start_version: current_batch.start_version,
-                    end_version: current_batch.end_version,
-                    start_transaction_timestamp: current_batch.start_transaction_timestamp.clone(),
-                    end_transaction_timestamp: current_batch.end_transaction_timestamp.clone(),
-                    total_size_in_bytes: current_batch.total_size_in_bytes,
-                },
-            );
+            self.seen_versions
+                .insert(current_batch.start_version, tx_context);
         } else {
             tracing::debug!("No gap detected");
             // If the current_batch is the next expected version, update the last success batch
-            self.update_last_success_batch(TransactionContext {
-                data: vec![], // No data is needed for tracking. This is to avoid clone.
-                start_version: current_batch.start_version,
-                end_version: current_batch.end_version,
-                start_transaction_timestamp: current_batch.start_transaction_timestamp.clone(),
-                end_transaction_timestamp: current_batch.end_transaction_timestamp.clone(),
-                total_size_in_bytes: current_batch.total_size_in_bytes,
-            });
+            self.update_last_success_batch(tx_context);
         }
         // Pass through
         Ok(Some(current_batch))

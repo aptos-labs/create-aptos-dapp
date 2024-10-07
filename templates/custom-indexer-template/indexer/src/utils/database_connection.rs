@@ -84,6 +84,7 @@ pub async fn get_db_connection(pool: &ArcDbPool) -> Result<DbPoolConnection, Pro
         tracing::error!("Error getting connection from DB pool: {:?}", e);
         ProcessorError::DBStoreError {
             message: format!("Failed to get connection from pool: {}", e),
+            query: None,
         }
     })
 }

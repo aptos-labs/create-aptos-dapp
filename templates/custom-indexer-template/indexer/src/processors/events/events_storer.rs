@@ -7,10 +7,13 @@ use aptos_indexer_processor_sdk::{
 };
 use async_trait::async_trait;
 
-use super::{events_extractor::ContractEvent, storers::{
-    create_message_event_storer::process_create_message_events,
-    update_message_event_storer::process_update_message_events,
-}};
+use super::{
+    events_extractor::ContractEvent,
+    storers::{
+        create_message_event_storer::process_create_message_events,
+        update_message_event_storer::process_update_message_events,
+    },
+};
 use crate::utils::database_utils::ArcDbPool;
 
 /// EventsStorer is a step that inserts events in the database.
@@ -37,14 +40,14 @@ impl EventsStorer {
 
 #[async_trait]
 impl Processable for EventsStorer {
-    type Input = ContractEvent;
-    type Output = ContractEvent;
+    type Input = Vec<ContractEvent>;
+    type Output = Vec<ContractEvent>;
     type RunType = AsyncRunType;
 
     async fn process(
         &mut self,
-        events: TransactionContext<ContractEvent>,
-    ) -> Result<Option<TransactionContext<ContractEvent>>, ProcessorError> {
+        events: TransactionContext<Vec<ContractEvent>>,
+    ) -> Result<Option<TransactionContext<Vec<ContractEvent>>>, ProcessorError> {
         let per_table_chunk_sizes: AHashMap<String, usize> = AHashMap::new();
         let (create_events, update_events) = events.clone().data.into_iter().fold(
             (vec![], vec![]),

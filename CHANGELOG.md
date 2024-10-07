@@ -4,6 +4,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Update indexer template's indexer sdk dependency
 - Install Aptos CLI after dependencies are installed
 
 # 0.0.31 (2024-09-30)
