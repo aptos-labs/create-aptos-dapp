@@ -67,11 +67,13 @@ where
     fn update_last_success_batch(&mut self, current_batch: TransactionContext<()>) {
         let mut new_prev_batch = current_batch;
         // While there are batches in seen_versions that are in order, update the new_prev_batch to the next batch.
-        while let Some(next_version) = self.seen_versions.remove(&(new_prev_batch.end_version + 1))
+        while let Some(next_version) = self
+            .seen_versions
+            .remove(&(new_prev_batch.metadata.end_version + 1))
         {
             new_prev_batch = next_version;
         }
-        self.next_version = new_prev_batch.end_version + 1;
+        self.next_version = new_prev_batch.metadata.end_version + 1;
         self.last_success_batch = Some(new_prev_batch);
     }
 
@@ -79,13 +81,14 @@ where
         // Update the processor status
         if let Some(last_success_batch) = self.last_success_batch.as_ref() {
             let end_timestamp = last_success_batch
+                .metadata
                 .end_transaction_timestamp
                 .as_ref()
-                .map(|t| parse_timestamp(t, last_success_batch.end_version as i64))
+                .map(|t| parse_timestamp(t, last_success_batch.metadata.end_version as i64))
                 .map(|t| t.naive_utc());
             let status = ProcessorStatus {
                 processor: self.tracker_name.clone(),
-                last_success_version: last_success_batch.end_version as i64,
+                last_success_version: last_success_batch.metadata.end_version as i64,
                 last_transaction_timestamp: end_timestamp,
             };
             let query = diesel::insert_into(processor_status::table)
@@ -131,24 +134,20 @@ where
     ) -> Result<Option<TransactionContext<T>>, ProcessorError> {
         let tx_context = TransactionContext {
             data: (),
-            start_version: current_batch.start_version,
-            end_version: current_batch.end_version,
-            start_transaction_timestamp: current_batch.start_transaction_timestamp.clone(),
-            end_transaction_timestamp: current_batch.end_transaction_timestamp.clone(),
-            total_size_in_bytes: current_batch.total_size_in_bytes,
+            metadata: current_batch.metadata.clone(),
         };
 
         // If there's a gap in the next_version and current_version
         // save the current_version to seen_versions for later processing.
-        if self.next_version != current_batch.start_version {
+        if self.next_version != current_batch.metadata.start_version {
             tracing::debug!(
                 next_version = self.next_version,
                 step = self.name(),
                 "Gap detected starting from version: {}",
-                current_batch.start_version
+                current_batch.metadata.start_version
             );
             self.seen_versions
-                .insert(current_batch.start_version, tx_context);
+                .insert(current_batch.metadata.start_version, tx_context);
         } else {
             tracing::debug!("No gap detected");
             // If the current_batch is the next expected version, update the last success batch
