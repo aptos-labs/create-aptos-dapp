@@ -4,6 +4,7 @@ import { workflowOptions } from "./workflowOptions.js";
 import { Result } from "../types.js";
 import {
   ContractBoilerplateTemplateValues,
+  FullstackBoilerplateTemplateInfo,
   TemplateNetwork,
   TemplateProjectType,
 } from "../utils/constants.js";
@@ -36,6 +37,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
               { title: "Project Type", value: "projectType" },
               { title: "Template", value: "template" },
               { title: "Network", value: "network" },
+              { title: "Use Surf", value: "useSurf" },
             ];
           }
         },
@@ -114,7 +116,21 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
         ])
       ).network;
       break;
-
+    case "useSurf":
+      console.log("result", result);
+      if (
+        result.template.path !==
+        FullstackBoilerplateTemplateInfo.value.path
+      ) {
+        break;
+      }
+      result.useSurf = (
+        await prompts({
+          ...workflowOptions.useSurf,
+          initial: result.useSurf,
+        })
+      ).useSurf;
+      break;
     default:
       console.log("Invalid option selected");
       break;
