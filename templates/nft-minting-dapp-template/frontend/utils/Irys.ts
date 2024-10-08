@@ -1,24 +1,28 @@
-import { WebIrys } from "@irys/sdk";
 import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
+import { WebUploader } from "@irys/web-upload";
+import { WebAptos } from "@irys/web-upload-aptos";
+
 import { getAccountAPTBalance } from "@/view-functions/getAccountAPTBalance";
 import { NETWORK } from "@/constants";
 
-const getWebIrys = async (aptosWallet: WalletContextState) => {
-  const network = NETWORK === "testnet" ? "devnet" : "mainnet"; // Irys network
-  const token = "aptos";
-  const rpcUrl = NETWORK; // Aptos network "mainnet" || "testnet"
-  const wallet = { rpcUrl: rpcUrl, name: "aptos", provider: aptosWallet };
-  const webIrys = new WebIrys({ network, token, wallet });
-  await webIrys.ready();
-  return webIrys;
+const getIrys = async (aptosWallet: WalletContextState) => {
+  // If dapp's network is testnet, use the devnet irys node, otherwise use the mainnet irys node
+  const irysNode = NETWORK === "testnet" ? "devnet" : "mainnet";
+  const irys = WebUploader(WebAptos).withProvider(aptosWallet).network(irysNode);
+  // Irys requires to configure a rpc provider for the devnet node
+  if (irysNode === "devnet") {
+    irys.withRpc(NETWORK);
+  }
+  return await irys;
 };
 
 export const checkIfFund = async (aptosWallet: WalletContextState, files: File[]) => {
   // 1. estimate the gas cost based on the data size https://docs.irys.xyz/developer-docs/irys-sdk/api/getPrice
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getIrys(aptosWallet);
+
   const costToUpload = await webIrys.utils.estimateFolderPrice(files.map((f) => f.size));
-  // 2. check the wallet balance on the irys node: irys.getLoadedBalance()
-  const irysBalance = await webIrys.getLoadedBalance();
+  // 2. check the wallet balance on the irys node
+  const irysBalance = await webIrys.getBalance();
 
   // 3. if balance is enough, then upload without funding
   if (irysBalance.toNumber() > costToUpload.toNumber()) {
@@ -44,7 +48,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, files: File[]
 };
 
 export const fundNode = async (aptosWallet: WalletContextState, amount?: number) => {
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getIrys(aptosWallet);
 
   try {
     const fundTx = await webIrys.fund(amount ?? 1000000);
@@ -60,7 +64,7 @@ export const uploadFile = async (
   aptosWallet: any,
   fileToUpload: File,
 ): Promise<string> => {
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getIrys(aptosWallet);
   try {
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });
     return `https://gateway.irys.xyz/${receipt.id}`;
@@ -71,7 +75,7 @@ export const uploadFile = async (
 };
 
 export const uploadFolder = async (aptosWallet: WalletContextState, files: File[]) => {
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getIrys(aptosWallet);
 
   try {
     const receipt = await webIrys.uploadFolder(files); //returns the manifest ID
