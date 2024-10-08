@@ -14,6 +14,7 @@ import { validateProjectName } from "../utils/index.js";
 import {
   needFrameworkChoice,
   needSigningOptionChoice,
+  needSurfChoice,
   needTemplateChoice,
 } from "./helpers.js";
 
@@ -74,8 +75,39 @@ export const workflowOptions = {
     ],
     initial: 0,
   },
+  useSurf: {
+    type: (prev, values) => needSurfChoice(values),
+    name: "useSurf",
+    message:
+      "Would you like to use Surf, the TypeScript type safety tool maintained by Thala Labs, learn more at https://aptos.dev/en/build/sdks/ts-sdk/type-safe-contract",
+    choices(prev, values) {
+      if (
+        values.template.path === FullstackBoilerplateTemplateInfo.value.path
+      ) {
+        return [
+          {
+            title: "Do not use Surf and handle types manually",
+            value: false,
+          },
+          {
+            title:
+              "Use Surf to auto generate TypeScript Types for your Move contracts",
+            value: true,
+          },
+        ];
+      } else {
+        return [
+          {
+            title: "Do not use Surf and handle types manually",
+            value: false,
+          },
+        ];
+      }
+    },
+    initial: false,
+  },
   framework: {
-    type: (prev: any) => needFrameworkChoice(prev),
+    type: (prev, values) => needFrameworkChoice(values),
     name: "framework",
     message: "Choose your framework",
     choices(prev, values) {

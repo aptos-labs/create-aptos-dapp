@@ -51,10 +51,10 @@ Then follow the prompts!
 
 Bump the version in `package.json` and update `CHANGELOG.md`.
 
-Run this to cleanup the project, build it and prepare it for publishing:
+Run this to cleanup and rebuild project:
 
 ```bash
-npm run prepare-to-publish
+npm run build
 ```
 
 Run this to preview the change and make sure it aligns with [the existing published package](https://www.npmjs.com/package/create-aptos-dapp):

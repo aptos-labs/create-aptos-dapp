@@ -39,6 +39,7 @@ export type Selections = {
   network: Network;
   framework: Framework;
   signingOption: SigningOption;
+  useSurf: boolean;
 };
 
 export type TemplateTelemetryData = {
@@ -49,6 +50,7 @@ export type TemplateTelemetryData = {
   network: string;
   framework: Framework;
   signing_option: string;
+  use_surf: boolean;
 };
 
 export type ExampleTelemetryData = {

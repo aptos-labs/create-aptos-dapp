@@ -21,6 +21,7 @@ export async function startWorkflow() {
         workflowOptions.projectType,
         workflowOptions.template,
         workflowOptions.signingOption,
+        workflowOptions.useSurf,
         workflowOptions.framework,
         workflowOptions.network,
       ],
@@ -85,6 +86,7 @@ export async function startWorkflow() {
     template,
     framework,
     signingOption,
+    useSurf,
     network,
     projectType,
   } = result;
@@ -94,6 +96,7 @@ export async function startWorkflow() {
     projectType,
     framework,
     signingOption,
+    useSurf,
     network,
   } as Selections;
 }

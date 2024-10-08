@@ -1,0 +1,37 @@
+name: Build Boilerplate Template without Surf Frontend
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: ci-${{ github.ref }}-${{ github.workflow }}
+    defaults:
+      run:
+        working-directory: ./templates/boilerplate-template
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install pnpm
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.1
+          run_install: false
+
+      # Remove surf related files
+      - run: rm ./frontend/components/MessageBoardWithSurf.tsx
+      - run: rm ./frontend/components/TransferAPTWithSurf.tsx
+      - run: rm -rf ./frontend/view-functions-with-surf
+      - run: rm ./frontend/utils/surfClient.ts
+
+      # Install deps and build.
+      - run: pnpm install
+      - run: CI= pnpm build
+
+      # Verify that the format is correct
+      - run: npm run _fmt -- --check
+        shell: bash

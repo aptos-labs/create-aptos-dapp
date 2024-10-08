@@ -7,6 +7,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Update indexer template's indexer sdk dependency
 - Install Aptos CLI after dependencies are installed
 - Add description to network options
+- Add Surf option to boilerplate template
 
 # 0.0.31 (2024-09-30)
 

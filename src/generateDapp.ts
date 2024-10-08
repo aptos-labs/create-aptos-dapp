@@ -13,6 +13,8 @@ import { installDependencies } from "./utils/installDependencies.js";
 import { generateTemplateEnvFile } from "./utils/generateTemplateEnvFile.js";
 import { getTemplateDirectory } from "./utils/resolveTemplateDirectory.js";
 import { installAptosCli } from "./utils/installAptosCli.js";
+import { cleanupFilesForSurf } from "./utils/cleanupFilesForSurf.js";
+import { FullstackBoilerplateTemplateInfo } from "./utils/constants.js";
 
 const spinner = (text) => ora({ text, stream: process.stdout, color: "green" });
 let currentSpinner: Ora | null = null;
@@ -82,6 +84,11 @@ export async function generateDapp(selection: Selections) {
     // Change to target directory
     process.chdir(targetDirectory);
 
+    if (
+      selection.template.path === FullstackBoilerplateTemplateInfo.value.path
+    ) {
+      cleanupFilesForSurf(selection);
+    }
     // Generate and write to template .env file
     const envFileContent = await generateTemplateEnvFile(selection, spinner);
     await write(".env", `${envFileContent}`);
@@ -130,6 +137,7 @@ export async function generateDapp(selection: Selections) {
       framework: selection.framework,
       network: selection.network,
       signing_option: selection.signingOption,
+      use_surf: selection.useSurf,
     });
 
     // Log next steps

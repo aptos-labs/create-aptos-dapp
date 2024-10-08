@@ -9,8 +9,9 @@ export const transferAPT = (args: TransferAPTArguments): InputTransactionData =>
   const { to, amount } = args;
   return {
     data: {
-      function: "0x1::aptos_account::transfer",
+      function: "0x1::coin::transfer",
       functionArguments: [to, amount],
+      typeArguments: ["0x1::aptos_coin::AptosCoin"],
     },
   };
 };

@@ -17,7 +17,7 @@ export function MessageBoard() {
   const [newMessageContent, setNewMessageContent] = useState<string>();
 
   const { data } = useQuery({
-    queryKey: ["message-content", account?.address],
+    queryKey: ["message-content"],
     refetchInterval: 10_000,
     queryFn: async () => {
       try {
@@ -53,7 +53,9 @@ export function MessageBoard() {
       const executedTransaction = await aptosClient().waitForTransaction({
         transactionHash: committedTransaction.hash,
       });
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({
+        queryKey: ["message-content"],
+      });
       toast({
         title: "Success",
         description: `Transaction succeeded, hash: ${executedTransaction.hash}`,

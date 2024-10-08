@@ -1,4 +1,4 @@
-name: Build Boilerplate Template Frontend
+name: Build Nextjs Boilerplate Template without Surf  Frontend
 
 on:
   pull_request:
@@ -12,9 +12,15 @@ jobs:
     concurrency: ci-${{ github.ref }}-${{ github.workflow }}
     defaults:
       run:
-        working-directory: ./templates/boilerplate-template
+        working-directory: ./templates/nextjs-boilerplate-template
     steps:
       - uses: actions/checkout@v3
+
+      # Remove surf related files
+      - run: rm ./src/components/MessageBoardWithSurf.tsx
+      - run: rm ./src/components/TransferAPTWithSurf.tsx
+      - run: rm -rf ./src/view-functions-with-surf
+      - run: rm ./src/utils/surfClient.ts
 
       # Install pnpm
       - uses: pnpm/action-setup@v2

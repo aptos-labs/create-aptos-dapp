@@ -1,4 +1,4 @@
-name: Build Nextjs Boilerplate Template Frontend
+name: Build Nextjs Boilerplate Template with Surf Frontend
 
 on:
   pull_request:
@@ -22,8 +22,16 @@ jobs:
           version: 8.6.1
           run_install: false
 
+      # Handle surf related files
+      - run: rm -rf ./src/entry-functions
+      - run: rm -rf ./src/view-functions
+      - run: mv ./src/components/MessageBoardWithSurf.tsx ./src/components/MessageBoard.tsx
+      - run: mv ./src/components/TransferAPTWithSurf.tsx ./src/components/TransferAPT.tsx
+      - run: mv ./src/view-functions-with-surf ./src/view-functions
+
       # Install deps and build.
       - run: pnpm install
+      - run: pnpm install @thalalabs/surf
       - run: CI= pnpm build
 
       # Verify that the format is correct
