@@ -79,7 +79,7 @@ export const workflowOptions = {
     type: (prev, values) => needSurfChoice(values),
     name: "useSurf",
     message:
-      "Would you like to use Surf, the TypeScript type safety tool maintained by Thala Labs",
+      "Would you like to use Surf, the TypeScript type safety tool maintained by Thala Labs, learn more at https://aptos.dev/en/build/sdks/ts-sdk/type-safe-contract",
     choices(prev, values) {
       if (
         values.template.path === FullstackBoilerplateTemplateInfo.value.path
