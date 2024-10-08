@@ -127,9 +127,23 @@ export const workflowOptions = {
         ];
       }
       return [
-        { title: "Mainnet", value: TemplateNetwork.MAINNET },
-        { title: "Testnet", value: TemplateNetwork.TESTNET },
-        { title: "Devnet", value: TemplateNetwork.DEVNET },
+        {
+          title: "Mainnet",
+          description: "A production network with real assets",
+          value: TemplateNetwork.MAINNET,
+        },
+        {
+          title: "Testnet",
+          description:
+            "A shared resource for the community, data will be preserved, network configuration will mimic Mainnet.",
+          value: TemplateNetwork.TESTNET,
+        },
+        {
+          title: "Devnet",
+          description:
+            "A shared resource for the community, data resets weekly, weekly update from aptos-core main branch.",
+          value: TemplateNetwork.DEVNET,
+        },
       ];
     },
     initial: 0,
