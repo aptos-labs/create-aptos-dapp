@@ -117,7 +117,6 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
       ).network;
       break;
     case "useSurf":
-      console.log("result", result);
       if (
         result.template.path !==
         FullstackBoilerplateTemplateInfo.value.path
