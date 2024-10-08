@@ -16,6 +16,11 @@ export const cleanupFilesForSurf = (selection: Selections) => {
   if (selection.useSurf) {
     const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
     packageJson.dependencies["@thalalabs/surf"] = "^1.7.3";
+    packageJson.scripts["move:publish"] =
+      "node ./scripts/move/publish && node ./scripts/move/get_abi";
+    packageJson.scripts["move:upgrade"] =
+      "node ./scripts/move/upgrade && node ./scripts/move/get_abi";
+
     fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2));
 
     remove(`${frontend_dir}/entry-functions`);
@@ -34,9 +39,13 @@ export const cleanupFilesForSurf = (selection: Selections) => {
       `${frontend_dir}/view-functions`
     );
   } else {
+    remove("scripts/get_abi.js");
+
     remove(`${frontend_dir}/components/MessageBoardWithSurf.tsx`);
     remove(`${frontend_dir}/components/TransferAPTWithSurf.tsx`);
     remove(`${frontend_dir}/view-functions-with-surf`);
     remove(`${frontend_dir}/utils/surfClient.ts`);
+    remove(`${frontend_dir}/utils/coin_abi.ts`);
+    remove(`${frontend_dir}/utils/message_board_abi.ts`);
   }
 };
