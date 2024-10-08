@@ -5,6 +5,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 # Unreleased
 
 - Remove `uniqueHolders` from NFT minting dapp template due to inefficient indexer query
+- Upgrade to the new Irys SDK
 
 # 0.0.35 (2024-10-23)
 
