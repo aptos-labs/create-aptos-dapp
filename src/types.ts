@@ -7,7 +7,7 @@ import {
 } from "./utils/constants";
 
 export type Result = prompts.Answers<
-  "projectName" | "projectType" | "template" | "network" | "signingOption"
+  "projectName" | "projectType" | "template" | "network" | "signingOption" | "useSurf"
 >;
 
 export type Template = {
