@@ -21,18 +21,20 @@ export const needSigningOptionChoice = (prev: any) => {
 };
 
 export const needSurfChoice = (values: Selections) => {
-  if (values.template.path === FullstackBoilerplateTemplateInfo.value.path) {
-    return "select";
+  if (
+    values.projectType === TemplateProjectType.MOVE ||
+    values.template.path != FullstackBoilerplateTemplateInfo.value.path
+  ) {
+    return null;
   }
 
-  return null;
+  return "select";
 };
 
-export const needFrameworkChoice = (prev: any) => {
-  switch (prev) {
-    case TemplateProjectType.MOVE:
-      return null;
-    default:
-      return "select";
+export const needFrameworkChoice = (values: Selections) => {
+  if (values.projectType === TemplateProjectType.MOVE) {
+    return null;
   }
+
+  return "select";
 };
