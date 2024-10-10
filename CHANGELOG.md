@@ -4,7 +4,11 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
-# 0.0.32 (2024-10-18)
+# 0.0.33 (2024-10-10)
+
+- Fix creating contract only template
+
+# 0.0.32 (2024-10-08)
 
 - Update indexer template's indexer sdk dependency
 - Install Aptos CLI after dependencies are installed
