@@ -13,9 +13,9 @@ export const installAptosCli = async () => {
 
     // Check if current OS is Windows
     if (currentPlatform === "win32") {
-      childProcess = spawn("npx", ["aptos"], { shell: true });
+      childProcess = spawn("npx", ["aptos", "--install"], { shell: true });
     } else {
-      childProcess = spawn("npx", ["aptos"]);
+      childProcess = spawn("npx", ["aptos", "--install"]);
     }
 
     // Collect stdout and stderr without piping to the console
@@ -29,6 +29,8 @@ export const installAptosCli = async () => {
 
     // Listen for the process to close and resolve or reject the promise
     childProcess.on("close", (code) => {
+      console.log("stdout", stdout);
+      console.log("stderr", stderr);
       if (code === 0) {
         resolve(stdout); // Resolve with the collected stdout data
       } else {

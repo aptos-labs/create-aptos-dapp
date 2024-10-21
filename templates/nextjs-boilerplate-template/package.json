@@ -17,7 +17,7 @@
     "fmt": "npm run _fmt -- --write"
   },
   "dependencies": {
-    "@aptos-labs/ts-sdk": "^1.28.0",
+    "@aptos-labs/ts-sdk": "^1.30.0",
     "@aptos-labs/wallet-adapter-react": "^3.6.2",
     "@radix-ui/react-collapsible": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
