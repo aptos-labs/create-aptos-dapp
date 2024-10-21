@@ -6,6 +6,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 - Upgrade `@aptos-labs/ts-sdk` dependency to `^1.30.0`
 - `npx aptos` command is not updated automatically on every run
+- Add example to parse write set change to custom indexer template
 
 # 0.0.33 (2024-10-10)
 
