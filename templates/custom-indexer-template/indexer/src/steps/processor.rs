@@ -6,7 +6,7 @@ use aptos_indexer_processor_sdk::{
     traits::IntoRunnableStep,
 };
 
-use super::{events_extractor::EventsExtractor, events_storer::EventsStorer};
+use super::{extractor::Extractor, storer::Storer};
 use crate::{
     config::indexer_processor_config::IndexerProcessorConfig,
     utils::{
@@ -16,12 +16,12 @@ use crate::{
     },
 };
 
-pub struct EventsProcessor {
+pub struct ContractProcessor {
     pub config: IndexerProcessorConfig,
     pub db_pool: ArcDbPool,
 }
 
-impl EventsProcessor {
+impl ContractProcessor {
     pub async fn new(config: IndexerProcessorConfig) -> Result<Self> {
         let conn_pool = new_db_pool(
             &config.db_config.postgres_connection_string,
@@ -57,8 +57,8 @@ impl EventsProcessor {
             ..self.config.transaction_stream_config
         })
         .await?;
-        let events_extractor = EventsExtractor::new(self.config.contract_config.contract_address);
-        let events_storer = EventsStorer::new(self.db_pool.clone());
+        let events_extractor = Extractor::new(self.config.contract_config.contract_address);
+        let events_storer = Storer::new(self.db_pool.clone());
         let version_tracker = LatestVersionProcessedTracker::new(
             self.config.db_config,
             starting_version,
@@ -79,7 +79,7 @@ impl EventsProcessor {
         loop {
             match buffer_receiver.recv().await {
                 Ok(txn_context) => {
-                    if txn_context.data.is_empty() {
+                    if txn_context.data.events.len() == 0 && txn_context.data.changes.len() == 0 {
                         continue;
                     }
                     tracing::info!(
