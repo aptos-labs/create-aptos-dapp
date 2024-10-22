@@ -32,7 +32,7 @@ use serde::{Deserialize, Serialize};
     strum(serialize_all = "snake_case")
 )]
 pub enum ProcessorConfig {
-    EventsProcessor,
+    ContractProcessor,
 }
 
 impl ProcessorConfig {
@@ -56,7 +56,7 @@ impl ProcessorConfig {
     )
 )]
 pub enum Processor {
-    EventsProcessor,
+    ContractProcessor,
 }
 
 #[cfg(test)]
