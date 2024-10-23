@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Use Aptos Learn for create-aptos-dapp docs
+
 # 0.0.34 (2024-10-22)
 
 - Upgrade `@aptos-labs/ts-sdk` dependency to `^1.30.0`
