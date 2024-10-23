@@ -4,7 +4,7 @@ The Boilerplate template provides a starter dapp with all necessary dapp infrast
 
 ## Read the Boilerplate template docs
 
-To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Boilerplate template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate)
+To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Boilerplate template docs](https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template)
 
 ## The Boilerplate template provides:
 

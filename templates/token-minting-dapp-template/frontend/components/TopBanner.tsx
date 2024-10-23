@@ -10,7 +10,7 @@ export function TopBanner() {
             Check out the{" "}
             <a
               target="blank"
-              href="https://aptos.dev/en/build/create-aptos-dapp/templates/token-minting-dapp"
+              href="https://learn.aptoslabs.com/en/dapp-templates/token-minting-template"
               style={{ color: "white", textDecoration: "underline" }}
             >
               template docs

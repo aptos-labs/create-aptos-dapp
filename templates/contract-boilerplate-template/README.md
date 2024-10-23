@@ -3,7 +3,8 @@
 This template provides a starting point for a dapp with all necessary infrastructure and implements a simple on-chain message board functionality.
 
 ## Read the Boilerplate Template Documentation
-To get started with the Boilerplate template and learn more about its features and usage, visit [Boilerplate Template Documentation](https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate)
+
+To get started with the Boilerplate template and learn more about its features and usage, visit [Boilerplate Template Documentation](https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template)
 
 ## The Contract Template Provides:
 

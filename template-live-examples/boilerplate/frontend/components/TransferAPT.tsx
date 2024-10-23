@@ -90,7 +90,7 @@ export function TransferAPT() {
         Use the{" "}
         <a
           target="blank"
-          href="https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate"
+          href="https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template"
           style={{ textDecoration: "underline" }}
         >
           create-aptos-dapp boilerplate template
