@@ -3,7 +3,7 @@
 The Token staking dapp template provides an end-to-end Staking dapp with a beautiful pre-made UI users can quickly adjust and deploy into a live server.
 
 ## Read the Token staking dapp template docs
-To get started with the Token staking dapp template and learn more about the template functionality and usage, head over to the [Token staking dapp template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/token-staking-dapp) 
+To get started with the Token staking dapp template and learn more about the template functionality and usage, head over to the [Token staking dapp template docs](https://learn.aptoslabs.com/en/dapp-templates/token-staking-template) 
 
 ## Overview
 

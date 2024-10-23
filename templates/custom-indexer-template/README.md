@@ -4,7 +4,7 @@ The custom indexer template provides a starter dapp with all components to run a
 
 ## Read the Custom Indexer template docs
 
-To get started with the Custom Indexer template and learn more about the template functionality and usage, head over to the [Custom Indexer template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer)
+To get started with the Custom Indexer template and learn more about the template functionality and usage, head over to the [Custom Indexer template docs](https://learn.aptoslabs.com/en/dapp-templates/custom-indexer-template)
 
 ## The Custom Indexer template provides:
 
@@ -41,4 +41,4 @@ For all other available CLI commands, can run `npx aptos` and see a list of all 
 
 ## Running the Custom Indexer template
 
-Please refer to the [Custom Indexer template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer) for more information on how to run the Custom Indexer template.
+Please refer to the [Custom Indexer template docs](https://learn.aptoslabs.com/en/dapp-templates/custom-indexer-template) for more information on how to run the Custom Indexer template.

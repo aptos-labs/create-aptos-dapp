@@ -32,7 +32,7 @@ export enum TemplateSigningOption {
 export const ContractBoilerplateTemplateValues = {
   path: "contract-boilerplate-template",
   name: "Move Contract Template",
-  doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate",
+  doc: "https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template",
 };
 
 export const FullstackBoilerplateTemplateInfo = {
@@ -40,7 +40,7 @@ export const FullstackBoilerplateTemplateInfo = {
   value: {
     path: "boilerplate-template",
     name: "Boilerplate Template",
-    doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate",
+    doc: "https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template",
   },
   description: "A boilerplate template to start an Aptos dapp with",
 };
@@ -50,7 +50,7 @@ export const ClickerGameTgTemplateInfo = {
   value: {
     path: "clicker-game-tg-mini-app-template",
     name: "Clicker Game Telegram Mini App Template",
-    doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/clicker-game-tg-mini-app",
+    doc: "https://learn.aptoslabs.com/en/dapp-templates/telegram-mini-app-template",
   },
   description:
     "A clicker game Telegram Mini App template to start an Aptos dapp with",
@@ -61,7 +61,7 @@ export const CustomIndexerTemplateInfo = {
   value: {
     path: "custom-indexer-template",
     name: "Custom indexer template",
-    doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer",
+    doc: "https://learn.aptoslabs.com/en/dapp-templates/custom-indexer-template",
   },
   description:
     "A full stack dapp template with a custom indexer to start an Aptos dapp with",
@@ -72,7 +72,7 @@ export const NftMintingDappTemplateInfo = {
   value: {
     path: "nft-minting-dapp-template",
     name: "NFT minting dapp",
-    doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/nft-minting-dapp",
+    doc: "https://learn.aptoslabs.com/en/dapp-templates/nft-minting-template",
     video: "https://www.youtube.com/watch?v=ik4GfsKZDOQ",
   },
   description:
@@ -84,7 +84,7 @@ export const TokenMintingDappTemplateInfo = {
   value: {
     path: "token-minting-dapp-template",
     name: "Token minting dapp",
-    doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/token-minting-dapp",
+    doc: "https://learn.aptoslabs.com/en/dapp-templates/token-minting-template",
     video: "https://www.youtube.com/watch?v=cr7LS-k4nQo",
   },
   description:
@@ -96,7 +96,7 @@ export const TokenStakingDappTemplateInfo = {
   value: {
     path: "token-staking-dapp-template",
     name: "Token staking dapp",
-    doc: "https://aptos.dev/en/build/create-aptos-dapp/templates/token-staking-dapp",
+    doc: "https://learn.aptoslabs.com/en/dapp-templates/token-staking-template",
     video: "https://www.youtube.com/watch?v=xWkAVVE4WXk",
   },
   description: "A production ready template to create a token staking dapp",

@@ -4,7 +4,7 @@ This template provides a ready to use clicker game dapp that can be run as a Tel
 
 ## Read the template docs
 
-To get started with the template and learn more about the functionality and usage, head over to the [template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/clicker-game-tg-mini-app-template)
+To get started with the template and learn more about the functionality and usage, head over to the [template docs](https://learn.aptoslabs.com/en/dapp-templates/telegram-mini-app-template)
 
 ## The template provides:
 

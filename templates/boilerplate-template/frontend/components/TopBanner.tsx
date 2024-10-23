@@ -10,7 +10,7 @@ export function TopBanner() {
             Check out the{" "}
             <a
               target="blank"
-              href="https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate"
+              href="https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template"
               style={{ color: "white", textDecoration: "underline" }}
             >
               template docs

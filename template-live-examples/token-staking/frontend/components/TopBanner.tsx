@@ -10,7 +10,7 @@ export default function TopBanner() {
             This is a non-functional demo of the create-aptos-dapp Token Staking dapp template.{" "}
             <a
               target="blank"
-              href="https://aptos.dev/en/build/create-aptos-dapp/templates/token-staking-dapp"
+              href="https://learn.aptoslabs.com/en/dapp-templates/token-staking-template"
               style={{ color: "white", textDecoration: "underline" }}
             >
               Click here to start with this template.

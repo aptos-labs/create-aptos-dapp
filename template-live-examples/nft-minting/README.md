@@ -3,7 +3,7 @@
 Digital Assets are the NFT standard for Aptos. The Digital Asset template provides an end-to-end NFT minting dapp with a beautiful pre-made UI users can quickly adjust and deploy into a live server.
 
 ## Read the NFT minting dapp template docs
-To get started with the NFT minting dapp template and learn more about the template functionality and usage, head over to the [NFT minting dapp template docs](https://aptos.dev/en/build/create-aptos-dapp/templates/nft-minting-dapp) 
+To get started with the NFT minting dapp template and learn more about the template functionality and usage, head over to the [NFT minting dapp template docs](https://learn.aptoslabs.com/en/dapp-templates/nft-minting-template) 
 
 ## The NFT minting dapp template provides 3 pages:
 

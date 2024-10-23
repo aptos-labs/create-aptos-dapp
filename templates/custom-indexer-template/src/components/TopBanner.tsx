@@ -10,7 +10,7 @@ export function TopBanner() {
             Check out the{" "}
             <a
               target="blank"
-              href="https://aptos.dev/en/build/create-aptos-dapp/templates/custom-indexer"
+              href="https://learn.aptoslabs.com/en/dapp-templates/custom-indexer-template"
               style={{ color: "white", textDecoration: "underline" }}
             >
               template docs

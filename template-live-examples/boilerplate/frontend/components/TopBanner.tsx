@@ -10,7 +10,7 @@ export default function TopBanner() {
             This is a non-functional demo of the create-aptos-dapp boilerplate template.{" "}
             <a
               target="blank"
-              href="https://aptos.dev/en/build/create-aptos-dapp/templates/boilerplate"
+              href="https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template"
               style={{ color: "white", textDecoration: "underline" }}
             >
               Click here to start with this template.
