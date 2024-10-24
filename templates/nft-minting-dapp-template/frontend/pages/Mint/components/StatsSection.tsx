@@ -9,7 +9,7 @@ interface StatsSectionProps {}
 
 export const StatsSection: React.FC<StatsSectionProps> = () => {
   const { data } = useGetCollectionData();
-  const { maxSupply = 0, totalMinted = 0, uniqueHolders = 0 } = data ?? {};
+  const { maxSupply = 0, totalMinted = 0 } = data ?? {};
 
   return (
     <section className="stats-container px-4 max-w-screen-xl mx-auto w-full">
@@ -17,9 +17,8 @@ export const StatsSection: React.FC<StatsSectionProps> = () => {
         {[
           { title: "Created NFTs", value: maxSupply },
           { title: "Total Minted", value: totalMinted },
-          { title: "Unique Holders", value: uniqueHolders },
         ].map(({ title, value }) => (
-          <li className="basis-1/3" key={title + " " + value}>
+          <li className="basis-1/2" key={title + " " + value}>
             <Card className="py-2 px-4" shadow="md">
               <p className="label-sm">{title}</p>
               <p className="heading-sm">{clampNumber(value)}</p>

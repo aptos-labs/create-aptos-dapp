@@ -48,7 +48,6 @@ interface MintQueryResult {
 interface MintData {
   maxSupply: number;
   totalMinted: number;
-  uniqueHolders: number;
   userMintBalance: number;
   collection: Collection;
   startDate: Date;
@@ -90,13 +89,7 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
                   cdn_image_uri
                 }
 							}
-							current_collection_ownership_v2_view_aggregate(
-								where: { collection_id: { _eq: $collection_id } }
-							) {
-								aggregate {
-									count(distinct: true, columns: owner_address)
-								}
-							}
+							
 						}`,
           },
         });
@@ -105,12 +98,12 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
         if (!collection) return null;
 
         const mintStageRes = await getActiveOrNextMintStage({ collection_address });
+
         // Only return collection data if no mint stage is found
         if (mintStageRes.length === 0) {
           return {
             maxSupply: collection.max_supply ?? 0,
             totalMinted: collection.current_supply ?? 0,
-            uniqueHolders: res.current_collection_ownership_v2_view_aggregate.aggregate?.count ?? 0,
             userMintBalance: 0,
             collection,
             endDate: new Date(),
@@ -134,7 +127,6 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
         return {
           maxSupply: collection.max_supply ?? 0,
           totalMinted: collection.current_supply ?? 0,
-          uniqueHolders: res.current_collection_ownership_v2_view_aggregate.aggregate?.count ?? 0,
           userMintBalance,
           collection,
           endDate,

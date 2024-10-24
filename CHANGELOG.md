@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Remove `uniqueHolders` from NFT minting dapp template due to inefficient indexer query
+
 # 0.0.35 (2024-10-23)
 
 - Use Aptos Learn for create-aptos-dapp docs
