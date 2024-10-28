@@ -32,3 +32,5 @@ pnpm-lock.yaml
 *.sw?
 
 .next
+
+target
