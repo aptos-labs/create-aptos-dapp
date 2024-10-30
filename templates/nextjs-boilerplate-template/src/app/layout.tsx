@@ -10,7 +10,7 @@ import { TopBanner } from "@/components/TopBanner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  applicationName: "NextJS Boilerplate Template",
+  applicationName: "Aptos Boilerplate Template",
   title: "NextJS Boilerplate Template",
   description: "NextJS Boilerplate Template",
   manifest: "/manifest.json",
