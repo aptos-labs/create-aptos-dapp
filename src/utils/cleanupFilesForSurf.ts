@@ -39,7 +39,7 @@ export const cleanupFilesForSurf = (selection: Selections) => {
       `${frontend_dir}/view-functions`
     );
   } else {
-    remove("scripts/get_abi.js");
+    remove("scripts/move/get_abi.js");
 
     remove(`${frontend_dir}/components/MessageBoardWithSurf.tsx`);
     remove(`${frontend_dir}/components/TransferAPTWithSurf.tsx`);
