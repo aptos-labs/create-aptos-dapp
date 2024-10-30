@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- [Fix] Generate Boilerplate template without Surf errors out because of a wrong file path
+
 # 0.0.36 (2024-10-28)
 
 - Remove `uniqueHolders` from NFT minting dapp template due to inefficient indexer query
