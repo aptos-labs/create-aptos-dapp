@@ -12,7 +12,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   applicationName: "Aptos Boilerplate Template",
   title: "NextJS Boilerplate Template",
-  description: "NextJS Boilerplate Template",
+  description: "Aptos Boilerplate Template",
   manifest: "/manifest.json",
 };
 
