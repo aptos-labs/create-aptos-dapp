@@ -53,7 +53,6 @@
     "typescript": "^5.2.2",
     "tree-kill": "1.2.2",
     "dotenv": "16.3.1",
-    "vercel": "^35.2.4",
-    "webpack": "^5.95.0"
+    "vercel": "^35.2.4"
   }
 }
