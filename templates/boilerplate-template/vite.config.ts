@@ -13,6 +13,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      disable: false,
       registerType: "autoUpdate",
       manifest: {
         name: "Aptos Fullstack Template",
