@@ -22,6 +22,7 @@ To get started with the Boilerplate template and learn more about the template f
 - Aptos TS SDK
 - Aptos Wallet Adapter
 - Node based Move commands
+- [Next-pwa](https://ducanh-next-pwa.vercel.app/)
 
 ## What Move commands are available?
 
