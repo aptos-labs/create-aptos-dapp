@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^1.30.0",
-    "@aptos-labs/wallet-adapter-react": "^3.5.9",
+    "@aptos-labs/wallet-adapter-react": "^3.7.4",
     "@hookform/resolvers": "^3.7.0",
     "@neondatabase/serverless": "^0.9.5",
     "@radix-ui/react-checkbox": "^1.1.1",

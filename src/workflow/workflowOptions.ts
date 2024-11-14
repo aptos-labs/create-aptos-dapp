@@ -12,10 +12,12 @@ import {
 } from "../utils/constants.js";
 import { validateProjectName } from "../utils/index.js";
 import {
+  needApiKey,
   needFrameworkChoice,
   needSigningOptionChoice,
   needSurfChoice,
   needTemplateChoice,
+  canUseApiKey,
 } from "./helpers.js";
 
 /** workflow object containing all the text for the different prompt options */
@@ -180,5 +182,19 @@ export const workflowOptions = {
     },
     initial: 0,
     hint: "- You can change this later",
+  },
+  useApiKey: {
+    type: (prev, values) => canUseApiKey(values),
+    name: "useApiKey",
+    message:
+      "Would you like to use an API key? It is highly recommended to use with the Aptos API",
+    initial: true,
+  },
+  apiKey: {
+    type: (prev, values) => needApiKey(values),
+    name: "apiKey",
+    message:
+      "Enter your API key for the chosen network (you can get one at https://developers.aptoslabs.com/docs/api-access)",
+    initial: "",
   },
 };
