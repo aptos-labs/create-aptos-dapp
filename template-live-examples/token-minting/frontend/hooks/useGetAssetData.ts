@@ -20,11 +20,6 @@ export interface FungibleAsset {
 
 interface MintQueryResult {
   fungible_asset_metadata: Array<FungibleAsset>;
-  current_fungible_asset_balances_aggregate: {
-    aggregate: {
-      count: number;
-    };
-  };
   current_fungible_asset_balances: Array<{
     amount: number;
   }>;
@@ -33,7 +28,6 @@ interface MintQueryResult {
 interface MintData {
   maxSupply: number;
   currentSupply: number;
-  uniqueHolders: number;
   yourBalance: number;
   userMintBalance: number;
   asset: FungibleAsset;
@@ -70,14 +64,6 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
                 asset_type
                 icon_uri
               }
-              current_fungible_asset_balances_aggregate(
-                distinct_on: owner_address
-                where: {asset_type: {_eq: $fa_address}}
-              ) {
-                aggregate {
-                  count
-                }
-              }
               current_fungible_asset_balances(
                 where: {owner_address: {_eq: $account}, asset_type: {_eq: $fa_address}}
                 distinct_on: asset_type
@@ -98,7 +84,6 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
           asset,
           maxSupply: convertAmountFromOnChainToHumanReadable(asset.maximum_v2 ?? 0, asset.decimals),
           currentSupply: convertAmountFromOnChainToHumanReadable(asset.supply_v2 ?? 0, asset.decimals),
-          uniqueHolders: res.current_fungible_asset_balances_aggregate.aggregate.count ?? 0,
           userMintBalance: convertAmountFromOnChainToHumanReadable(
             account == null ? 0 : await getUserMintBalance({ user_address: account.address, fa_address }),
             asset.decimals,
