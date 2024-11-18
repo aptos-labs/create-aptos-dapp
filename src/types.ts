@@ -7,7 +7,14 @@ import {
 } from "./utils/constants";
 
 export type Result = prompts.Answers<
-  "projectName" | "projectType" | "template" | "network" | "signingOption" | "useSurf"
+  | "projectName"
+  | "projectType"
+  | "template"
+  | "network"
+  | "signingOption"
+  | "useSurf"
+  | "useApiKey"
+  | "apiKey"
 >;
 
 export type Template = {
@@ -40,6 +47,8 @@ export type Selections = {
   framework: Framework;
   signingOption: SigningOption;
   useSurf: boolean;
+  useApiKey: boolean;
+  apiKey: string;
 };
 
 export type TemplateTelemetryData = {
@@ -51,6 +60,7 @@ export type TemplateTelemetryData = {
   framework: Framework;
   signing_option: string;
   use_surf: boolean;
+  use_api_key: boolean;
 };
 
 export type ExampleTelemetryData = {

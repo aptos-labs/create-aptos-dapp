@@ -32,13 +32,17 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
               { title: "Network", value: "network" },
             ];
           } else {
-            return [
+            const choices = [
               { title: "Project Name", value: "projectName" },
               { title: "Project Type", value: "projectType" },
               { title: "Template", value: "template" },
               { title: "Network", value: "network" },
               { title: "Use Surf", value: "useSurf" },
             ];
+            if (result.useApiKey) {
+              choices.push({ title: "API Key", value: "apiKey" });
+            }
+            return choices;
           }
         },
       },
@@ -118,8 +122,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
       break;
     case "useSurf":
       if (
-        result.template.path !==
-        FullstackBoilerplateTemplateInfo.value.path
+        result.template.path !== FullstackBoilerplateTemplateInfo.value.path
       ) {
         break;
       }
@@ -129,6 +132,14 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
           initial: result.useSurf,
         })
       ).useSurf;
+      break;
+    case "apiKey":
+      result.apiKey = (
+        await prompts({
+          ...workflowOptions.apiKey,
+          initial: result.apiKey,
+        })
+      ).apiKey;
       break;
     default:
       console.log("Invalid option selected");

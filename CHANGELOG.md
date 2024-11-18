@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Add support to define a client API Key
+
 # 0.0.37 (2024-11-04)
 
 - [Fix] Generate Boilerplate template without Surf errors out because of a wrong file path

@@ -15,8 +15,10 @@ export const setUpEnvVariables = (
 
   if (selection.framework === TemplateFramework.VITE) {
     content += `\nVITE_APP_NETWORK=${selection.network}`;
+    content += `\nVITE_APTOS_API_KEY="${selection.apiKey ?? ""}"`;
   } else if (selection.framework === TemplateFramework.NEXTJS) {
     content += `\nNEXT_PUBLIC_APP_NETWORK=${selection.network}`;
+    content += `\nNEXT_PUBLIC_APTOS_API_KEY="${selection.apiKey ?? ""}"`;
   } else if (selection.projectType === TemplateProjectType.MOVE) {
     content += `\nAPP_NETWORK=${selection.network}`;
   } else {

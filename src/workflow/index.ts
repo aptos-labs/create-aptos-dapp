@@ -24,6 +24,8 @@ export async function startWorkflow() {
         workflowOptions.useSurf,
         workflowOptions.framework,
         workflowOptions.network,
+        workflowOptions.useApiKey,
+        workflowOptions.apiKey,
       ],
       {
         onCancel: () => {
@@ -89,6 +91,8 @@ export async function startWorkflow() {
     useSurf,
     network,
     projectType,
+    useApiKey,
+    apiKey,
   } = result;
   return {
     projectName,
@@ -98,5 +102,7 @@ export async function startWorkflow() {
     signingOption,
     useSurf,
     network,
+    useApiKey,
+    apiKey,
   } as Selections;
 }

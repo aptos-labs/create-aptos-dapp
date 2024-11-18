@@ -38,3 +38,17 @@ export const needFrameworkChoice = (values: Selections) => {
 
   return "select";
 };
+
+export const canUseApiKey = (values: Selections) => {
+  if (values.projectType === TemplateProjectType.FULLSTACK) {
+    return "confirm";
+  }
+  return null;
+};
+
+export const needApiKey = (values: Selections) => {
+  if (values.useApiKey) {
+    return "text";
+  }
+  return null;
+};
