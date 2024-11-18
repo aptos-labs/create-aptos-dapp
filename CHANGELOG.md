@@ -5,7 +5,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 # Unreleased
 
 - Add support to define a client API Key
-- Remove `uniqueHolders` from token minting dapp template due to inefficient indexer query
+- Remove `uniqueHolders` from token minting dapp live example due to inefficient indexer query
 
 # 0.0.37 (2024-11-04)
 
