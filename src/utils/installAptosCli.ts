@@ -29,8 +29,6 @@ export const installAptosCli = async () => {
 
     // Listen for the process to close and resolve or reject the promise
     childProcess.on("close", (code) => {
-      console.log("stdout", stdout);
-      console.log("stderr", stderr);
       if (code === 0) {
         resolve(stdout); // Resolve with the collected stdout data
       } else {
