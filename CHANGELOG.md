@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.40 (2024-12-18)
+
 - Show a message to fund a module publisher account on Testnet through the faucet web view
 
 # 0.0.39 (2024-11-18)
