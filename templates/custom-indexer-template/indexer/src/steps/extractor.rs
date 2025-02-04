@@ -56,7 +56,13 @@ impl Processable for Extractor {
             .map(|txn| {
                 let txn_version = txn.version as i64;
                 let txn_info = match txn.info.as_ref() {
-                    Some(info) => info,
+                    Some(info) => {
+                        if info.success {
+                            info
+                        } else {
+                            return (vec![], vec![]);
+                        }
+                    }
                     None => {
                         tracing::warn!(
                             transaction_version = txn_version,
