@@ -4,6 +4,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.0.41 (2025-02-04)
+
+- Only index successful transaction in the indexer template
+
 # 0.0.40 (2024-12-18)
 
 - Show a message to fund a module publisher account on Testnet through the faucet web view
