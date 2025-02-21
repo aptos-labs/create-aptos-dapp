@@ -46,6 +46,8 @@ module launchpad_addr::launchpad {
     const EMINT_IS_DISABLED: u64 = 12;
     /// Cannot mint 0 amount
     const ECANNOT_MINT_ZERO: u64 = 13;
+    /// Invalid collection URI
+    const EINVALID_COLLECTION_URI: u64 = 14;
 
     /// Default to mint 0 amount to creator when creating collection
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -224,6 +226,15 @@ module launchpad_addr::launchpad {
         let collection_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
         let collection_owner_obj_signer = &object::generate_signer(collection_owner_obj_constructor_ref);
 
+        let uri_len = string::length(&uri);
+        let collection_json_suffix = string::utf8(b"/collection.json");
+        let suffix_len = string::length(&collection_json_suffix);
+        assert!(
+            uri_len >= suffix_len &&
+            string::sub_string(&uri, uri_len - suffix_len, uri_len) == collection_json_suffix,
+            EINVALID_COLLECTION_URI
+        );
+
         let collection_obj_constructor_ref =
             &collection::create_fixed_collection(
                 collection_owner_obj_signer,
@@ -333,7 +344,7 @@ module launchpad_addr::launchpad {
         let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
         assert!(option::is_some(stage_idx), ENO_ACTIVE_STAGES);
 
-        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
+        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, 0);
         let stage_name = mint_stage::mint_stage_name(stage_obj);
         let total_mint_fee = get_mint_fee(collection_obj, stage_name, amount);
         pay_for_mint(sender, total_mint_fee);

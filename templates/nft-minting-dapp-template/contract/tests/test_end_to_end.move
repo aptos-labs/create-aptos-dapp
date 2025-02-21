@@ -160,4 +160,103 @@ module launchpad_addr::test_end_to_end {
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
     }
+
+    #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200, user2 = @0x201)]
+    fun test_mint_stages_transition(
+        aptos_framework: &signer,
+        sender: &signer,
+        user1: &signer,
+        user2: &signer,
+    ) {
+        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
+
+        let user1_addr = signer::address_of(user1);
+        let user2_addr = signer::address_of(user2);
+
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+        account::create_account_for_test(user1_addr);
+        account::create_account_for_test(user2_addr);
+        coin::register<AptosCoin>(user1);
+        coin::register<AptosCoin>(user2);
+
+        launchpad::init_module_for_test(sender);
+
+        // Create collection with both allowlist and public stages
+        launchpad::create_collection(
+            sender,
+            string::utf8(b"description"),
+            string::utf8(b"name"),
+            string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
+            10,
+            option::some(10),
+            option::some(0),
+            option::some(vector[user1_addr]), // allowlist
+            option::some(timestamp::now_seconds()),
+            option::some(timestamp::now_seconds() + 100),
+            option::some(2),
+            option::some(10),
+            option::some(timestamp::now_seconds() + 200), // public mint
+            option::some(timestamp::now_seconds() + 300),
+            option::some(3),
+            option::some(20)
+        );
+
+        let registry = launchpad::get_registry();
+        let collection = *vector::borrow(&registry, vector::length(&registry) - 1);
+
+        // Test allowlist stage
+        let mint_fee = launchpad::get_mint_fee(collection, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY), 1);
+        aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
+        launchpad::mint_nft(user1, collection, 1);
+        assert!(collection::count(collection) == option::some(1), 1);
+
+        // Move to public stage
+        timestamp::update_global_time_for_test_secs(250);
+        let mint_fee = launchpad::get_mint_fee(collection, string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY), 1);
+        aptos_coin::mint(aptos_framework, user2_addr, mint_fee);
+        launchpad::mint_nft(user2, collection, 1);
+        assert!(collection::count(collection) == option::some(2), 2);
+
+        coin::destroy_burn_cap(burn_cap);
+        coin::destroy_mint_cap(mint_cap);
+    }
+
+        #[test(aptos_framework = @0x1, sender = @launchpad_addr, user1 = @0x200)]
+    #[expected_failure(abort_code = 14, location = launchpad_addr::launchpad)]
+    fun test_invalid_collection_uri(
+        aptos_framework: &signer,
+        sender: &signer,
+        user1: &signer,
+    ) {
+        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
+
+        let user1_addr = signer::address_of(user1);
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+        account::create_account_for_test(user1_addr);
+
+        launchpad::init_module_for_test(sender);
+
+        // Try to create collection with invalid URI (not ending in /collection.json)
+        launchpad::create_collection(
+            sender,
+            string::utf8(b"description"),
+            string::utf8(b"name"),
+            string::utf8(b"https://gateway.irys.xyz/manifest_id/invalid.json"), // Invalid URI
+            10,
+            option::some(10),
+            option::some(0),
+            option::some(vector[user1_addr]),
+            option::some(timestamp::now_seconds()),
+            option::some(timestamp::now_seconds() + 100),
+            option::some(2),
+            option::some(10),
+            option::some(timestamp::now_seconds() + 200),
+            option::some(timestamp::now_seconds() + 300),
+            option::some(3),
+            option::some(20)
+        );
+
+        coin::destroy_burn_cap(burn_cap);
+        coin::destroy_mint_cap(mint_cap);
+    }
 }
