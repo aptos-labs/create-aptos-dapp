@@ -2,7 +2,8 @@
 
 import {
   APTOS_CONNECT_ACCOUNT_URL,
-  AnyAptosWallet,
+  AdapterWallet,
+  AdapterNotDetectedWallet,
   AptosPrivacyPolicy,
   WalletItem,
   getAptosConnectWallets,

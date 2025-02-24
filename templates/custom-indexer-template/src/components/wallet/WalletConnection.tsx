@@ -83,7 +83,7 @@ export const WalletConnection = ({
                 label: "Address",
                 value: (
                   <DisplayValue
-                    value={account?.address ?? "Not Present"}
+                    value={account?.address.toStringLong() ?? "Not Present"}
                     isCorrect={!!account?.address}
                   />
                 ),
@@ -101,13 +101,6 @@ export const WalletConnection = ({
                 label: "ANS name",
                 subLabel: "(only if attached)",
                 value: <p>{account?.ansName ?? "Not Present"}</p>,
-              },
-              {
-                label: "Min keys required",
-                subLabel: "(only for multisig)",
-                value: (
-                  <p>{account?.minKeysRequired?.toString() ?? "Not Present"}</p>
-                ),
               },
             ]}
           />

@@ -1,4 +1,4 @@
-import { NETWORK } from "@/lib/aptos";
+import { NETWORK } from "@/constants";
 
 export interface TransactionOnExplorerProps {
   hash: string;

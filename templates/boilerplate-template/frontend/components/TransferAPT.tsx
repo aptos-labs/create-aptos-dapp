@@ -26,7 +26,7 @@ export function TransferAPT() {
           console.error("Account not available");
         }
 
-        const balance = await getAccountAPTBalance({ accountAddress: account!.address });
+        const balance = await getAccountAPTBalance({ accountAddress: account!.address.toStringLong() });
 
         return {
           balance,
