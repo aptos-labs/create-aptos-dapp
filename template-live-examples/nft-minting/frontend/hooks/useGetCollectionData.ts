@@ -119,7 +119,11 @@ export function useGetCollectionData(collection_address: string = COLLECTION_ADD
         const userMintBalance =
           account == null
             ? 0
-            : await getUserMintBalance({ user_address: account.address, collection_address, mint_stage });
+            : await getUserMintBalance({
+                user_address: account.address.toStringLong(),
+                collection_address,
+                mint_stage,
+              });
         const isMintEnabled = await getMintEnabled({ collection_address });
 
         return {
