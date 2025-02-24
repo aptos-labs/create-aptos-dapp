@@ -5,9 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LabelValueGrid } from "@/components/LabelValueGrid";
-import { NETWORK } from "@/lib/aptos";
 import { getMessageOnServer } from "@/app/actions";
 import { UpdateMessage } from "./UpdateMessage";
+import { NETWORK } from "@/constants";
 
 interface MessageProps {
   messageObjAddr: `0x${string}`;
@@ -108,7 +108,7 @@ export function Message({ messageObjAddr }: MessageProps) {
           </div>
         </CardContent>
       </Card>
-      {data.message.creator_addr == account?.address && (
+      {data.message.creator_addr == account?.address.toStringLong() && (
         <UpdateMessage
           messageObjAddr={data.message.message_obj_addr as `0x${string}`}
         />

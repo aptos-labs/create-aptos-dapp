@@ -11,7 +11,7 @@ export function AccountInfo() {
         items={[
           {
             label: "Address",
-            value: <DisplayValue value={account?.address ?? "Not Present"} isCorrect={!!account?.address} />,
+            value: <DisplayValue value={account?.address .toStringLong()?? "Not Present"} isCorrect={!!account?.address} />,
           },
           {
             label: "Public key",

@@ -25,7 +25,7 @@ export function Counter() {
         };
       }
       try {
-        const counter = await getCounter(account.address);
+        const counter = await getCounter(account.address.toStringLong());
         return {
           counter,
         };
