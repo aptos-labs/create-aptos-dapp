@@ -32,7 +32,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, fileSize: num
     return true;
   }
   // 4. if balance is not enough,  check the payer balance
-  const currentAccountAddress = await aptosWallet.account!.address;
+  const currentAccountAddress = aptosWallet.account!.address.toStringLong();
 
   const currentAccountBalance = await getAccountAPTBalance({ accountAddress: currentAccountAddress });
 
