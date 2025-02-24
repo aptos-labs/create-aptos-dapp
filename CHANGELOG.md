@@ -4,7 +4,11 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
-# 0.0.42 (2025-02-04)
+# 0.0.43 (2025-02-24)
+
+- Bump Aptos dependencies
+
+# 0.0.42 (2025-02-24)
 
 - Fix mint stage calculate in nft minting dapp template
 
