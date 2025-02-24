@@ -84,7 +84,7 @@ export function useGetAssetData(fa_address: string = FA_ADDRESS) {
           asset,
           maxSupply: convertAmountFromOnChainToHumanReadable(asset.maximum_v2 ?? 0, asset.decimals),
           currentSupply: convertAmountFromOnChainToHumanReadable(asset.supply_v2 ?? 0, asset.decimals),
-         userMintBalance: convertAmountFromOnChainToHumanReadable(
+          userMintBalance: convertAmountFromOnChainToHumanReadable(
             account == null
               ? 0
               : await getUserMintBalance({ user_address: account.address.toStringLong(), fa_address }),
