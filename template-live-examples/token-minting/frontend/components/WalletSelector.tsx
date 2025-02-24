@@ -35,7 +35,7 @@ export function WalletSelector() {
   const closeDialog = useCallback(() => setIsDialogOpen(false), []);
 
   const copyAddress = useCallback(async () => {
-    if (!account?.address) return;
+    if (!account?.address.toStringLong()) return;
     try {
       await navigator.clipboard.writeText(account.address.toStringLong());
       toast({

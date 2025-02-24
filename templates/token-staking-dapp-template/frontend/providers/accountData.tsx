@@ -55,13 +55,13 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
          */
         let claimableRewards = 0;
         if (existsRewardSchedule) {
-          claimableRewards = await getClaimableRewards(account?.address);
+          claimableRewards = await getClaimableRewards(account?.address.toStringLong());
         }
 
         /**
          * Determine whether the current connected account has staked
          */
-        const hasStake = await getUserHasStake(account?.address);
+        const hasStake = await getUserHasStake(account?.address.toStringLong());
 
         /**
          * Get the current connected account stake data
@@ -69,7 +69,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
         let accountStakeData;
         let accountStakeAmount = 0;
         if (hasStake) {
-          accountStakeData = await getUserStakeData(account?.address);
+          accountStakeData = await getUserStakeData(account?.address.toStringLong());
 
           accountStakeAmount = convertAmountFromOnChainToHumanReadable(
             parseInt(accountStakeData?.amount ?? "0"),
@@ -91,7 +91,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
          * This query first fetch the account token balance, then the token decimals and calculates
          * the account balance and converts it into a human readable format.
          */
-        const onChainBalance = await getAccountTokenBalance(account?.address);
+        const onChainBalance = await getAccountTokenBalance(account?.address.toStringLong());
         const accountTokenBalance = convertAmountFromOnChainToHumanReadable(
           onChainBalance,
           tokenData?.decimals ?? 0,

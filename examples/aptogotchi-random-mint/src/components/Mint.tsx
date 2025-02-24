@@ -31,7 +31,7 @@ export function Mint() {
   const { account, network, signAndSubmitTransaction } = useWallet();
 
   const fetchPet = useCallback(async () => {
-    if (!account?.address) return;
+    if (!account?.address.toStringLong()) return;
 
     const aptogotchiCollectionAddressResponse = (await aptosClient().view({
       payload: {
