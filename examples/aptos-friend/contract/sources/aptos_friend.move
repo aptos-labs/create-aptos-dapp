@@ -96,7 +96,7 @@ module aptos_friend_addr::aptos_friend {
     }
 
     // If you deploy the module under an object, sender is the object's signer
-    // If you deploy the moduelr under your own account, sender is your account's signer
+    // If you deploy the module under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         let vault_constructor_ref = &object::create_named_object(sender, VAULT_SEED);
         let vault_signer = &object::generate_signer(vault_constructor_ref);
