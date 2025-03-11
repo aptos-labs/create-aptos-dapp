@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Include all wallets in the wallet selector on each template by default
+
 # 0.0.43 (2025-02-24)
 
 - Bump Aptos dependencies
