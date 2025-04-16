@@ -51,7 +51,6 @@ export type TemplateTelemetryData = {
   template: string;
   network: string;
   framework: Framework;
-  signing_option: string;
   use_surf: boolean;
   use_api_key: boolean;
 };
