@@ -13,13 +13,6 @@ export const needTemplateChoice = (prev: any) => {
   }
 };
 
-export const needSigningOptionChoice = (prev: any) => {
-  switch (prev) {
-    default:
-      return null;
-  }
-};
-
 export const needSurfChoice = (values: Selections) => {
   if (
     values.projectType === TemplateProjectType.MOVE ||

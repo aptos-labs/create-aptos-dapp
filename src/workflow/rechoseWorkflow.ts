@@ -83,13 +83,6 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
         result,
         await prompts([
           { ...workflowOptions.template, type: "select" },
-          {
-            ...workflowOptions.signingOption,
-            type: (prev) =>
-              prev?.path == "clicker-game-tg-mini-app-template"
-                ? "select"
-                : null,
-          },
           { ...workflowOptions.framework, type: "select" },
           {
             ...workflowOptions.network,
