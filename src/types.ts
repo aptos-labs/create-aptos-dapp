@@ -3,7 +3,6 @@ import {
   TemplateFramework,
   TemplateNetwork,
   TemplateProjectType,
-  TemplateSigningOption,
 } from "./utils/constants";
 
 export type Result = prompts.Answers<
@@ -11,7 +10,6 @@ export type Result = prompts.Answers<
   | "projectType"
   | "template"
   | "network"
-  | "signingOption"
   | "useSurf"
   | "useApiKey"
   | "apiKey"
@@ -35,17 +33,12 @@ export type Network =
 
 export type Framework = TemplateFramework.VITE | TemplateFramework.NEXTJS;
 
-export type SigningOption =
-  | TemplateSigningOption.EXPLICIT
-  | TemplateSigningOption.SEAMLESS;
-
 export type Selections = {
   projectName: string;
   projectType: ProjectType;
   template: Template;
   network: Network;
   framework: Framework;
-  signingOption: SigningOption;
   useSurf: boolean;
   useApiKey: boolean;
   apiKey: string;

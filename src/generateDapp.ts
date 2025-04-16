@@ -136,7 +136,6 @@ export async function generateDapp(selection: Selections) {
       template: selection.template.name,
       framework: selection.framework,
       network: selection.network,
-      signing_option: selection.signingOption,
       use_surf: selection.useSurf,
       use_api_key: selection.useApiKey,
     });
