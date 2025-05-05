@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Bump `@aptos-labs/ts-sdk` version to `1.39.0` and override `@noble/curves` to use `1.6.0` as later versions break build
+
 # 0.0.44 (2025-02-24)
 
 - Include all wallets in the wallet selector on each template by default
