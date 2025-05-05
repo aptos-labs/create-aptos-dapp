@@ -1,11 +1,9 @@
 import {
   FullstackBoilerplateTemplateInfo,
-  ClickerGameTgTemplateInfo,
   NftMintingDappTemplateInfo,
   TemplateFramework,
   TemplateNetwork,
   TemplateProjectType,
-  TemplateSigningOption,
   TokenMintingDappTemplateInfo,
   TokenStakingDappTemplateInfo,
   CustomIndexerTemplateInfo,
@@ -14,7 +12,6 @@ import { validateProjectName } from "../utils/index.js";
 import {
   needApiKey,
   needFrameworkChoice,
-  needSigningOptionChoice,
   needSurfChoice,
   needTemplateChoice,
   canUseApiKey,
@@ -53,27 +50,10 @@ export const workflowOptions = {
     message: "Choose how to start",
     choices: [
       FullstackBoilerplateTemplateInfo,
-      ClickerGameTgTemplateInfo,
       NftMintingDappTemplateInfo,
       TokenMintingDappTemplateInfo,
       TokenStakingDappTemplateInfo,
       CustomIndexerTemplateInfo,
-    ],
-    initial: 0,
-  },
-  signingOption: {
-    type: (prev: any) => needSigningOptionChoice(prev),
-    name: "signingOption",
-    message: "Choose your signing option",
-    choices: [
-      {
-        title: "Explicit signing (Aptos Wallet Adapter)",
-        value: TemplateSigningOption.EXPLICIT,
-      },
-      {
-        title: "Seamless signing (Mizu SDK Core)",
-        value: TemplateSigningOption.SEAMLESS,
-      },
     ],
     initial: 0,
   },

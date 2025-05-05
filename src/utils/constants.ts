@@ -24,11 +24,6 @@ export enum TemplateFramework {
   VITE = "vite",
 }
 
-export enum TemplateSigningOption {
-  EXPLICIT = "explicit",
-  SEAMLESS = "seamless",
-}
-
 export const ContractBoilerplateTemplateValues = {
   path: "contract-boilerplate-template",
   name: "Move Contract Template",
@@ -43,17 +38,6 @@ export const FullstackBoilerplateTemplateInfo = {
     doc: "https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template",
   },
   description: "A boilerplate template to start an Aptos dapp with",
-};
-
-export const ClickerGameTgTemplateInfo = {
-  title: "A clicker game Telegram Mini App",
-  value: {
-    path: "clicker-game-tg-mini-app-template",
-    name: "Clicker Game Telegram Mini App Template",
-    doc: "https://learn.aptoslabs.com/en/dapp-templates/telegram-mini-app-template",
-  },
-  description:
-    "A clicker game Telegram Mini App template to start an Aptos dapp with",
 };
 
 export const CustomIndexerTemplateInfo = {
