@@ -32,7 +32,7 @@
   ],
   "type": "module",
   "dependencies": {
-    "@aptos-labs/ts-sdk": "^1.30.0",
+    "@aptos-labs/ts-sdk": "^1.39.0",
     "commander": "^12.1.0",
     "kolorist": "^1.8.0",
     "ora": "^8.0.1",
@@ -42,6 +42,9 @@
   "devDependencies": {
     "@types/node": "^20.5.0",
     "gh-pages": "^6.1.1"
+  },
+  "overrides": {
+    "@noble/curves": "1.6.0"
   },
   "repository": {
     "type": "git",
