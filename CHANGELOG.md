@@ -8,6 +8,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Bump `@aptos-labs/wallet-adapter-react` version to `6.0.0` in all templates
 - Remove telegram mini app template and mizu wallet given telegram mini app only supports Ton chain now
 - Bump `@thalalabs/surf` version to `1.9.5`
+- Bump `@aptos-labs/ts-sdk` version to `2.0.0`
+- Bump `@aptos-labs/wallet-adapter-react` version to `6.0.1` in all templates
 
 # 0.0.44 (2025-02-24)
 

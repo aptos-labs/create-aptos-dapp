@@ -32,7 +32,7 @@
   ],
   "type": "module",
   "dependencies": {
-    "@aptos-labs/ts-sdk": "^1.39.0",
+    "@aptos-labs/ts-sdk": "^2.0.0",
     "commander": "^12.1.0",
     "kolorist": "^1.8.0",
     "ora": "^8.0.1",
