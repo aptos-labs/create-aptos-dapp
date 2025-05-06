@@ -15,7 +15,7 @@ export const cleanupFilesForSurf = (selection: Selections) => {
 
   if (selection.useSurf) {
     const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-    packageJson.dependencies["@thalalabs/surf"] = "^1.7.3";
+    packageJson.dependencies["@thalalabs/surf"] = "^1.9.5";
     packageJson.scripts["move:publish"] =
       "node ./scripts/move/publish && node ./scripts/move/get_abi";
     packageJson.scripts["move:upgrade"] =
