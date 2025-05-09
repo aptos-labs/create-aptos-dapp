@@ -10,6 +10,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 - Bump `@thalalabs/surf` version to `1.9.5`
 - Bump `@aptos-labs/ts-sdk` version to `2.0.0`
 - Bump `@aptos-labs/wallet-adapter-react` version to `6.0.1` in all templates
+- Bump `@thalalabs/surf` version to `1.9.6`
 
 # 0.0.44 (2025-02-24)
 
