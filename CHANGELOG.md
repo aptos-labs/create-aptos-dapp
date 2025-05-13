@@ -4,7 +4,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.1.1 (2025-05-13)
+
 - Remove `VitePWA` plugin from Boilerplate templates
+- Update move dependencies to use framework instead of aptos-core
 
 # 0.1.0 (2025-05-06)
 
