@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Remove `VitePWA` plugin from Boilerplate templates
+
 # 0.1.0 (2025-05-06)
 
 - Remove telegram mini app template and mizu wallet given telegram mini app only supports Ton chain now
