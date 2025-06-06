@@ -84,8 +84,8 @@ interface ConnectWalletDialogProps {
 }
 
 function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
-  const { wallets = [] } = useWallet();
-  const { aptosConnectWallets, availableWallets, installableWallets } = groupAndSortWallets(wallets);
+  const { wallets = [], notDetectedWallets = [] } = useWallet();
+  const { aptosConnectWallets, availableWallets, installableWallets } = groupAndSortWallets([...wallets, ...notDetectedWallets]);
 
   const hasAptosConnectWallets = !!aptosConnectWallets.length;
 
