@@ -1,13 +1,8 @@
 {
   "name": "boilerplate-template",
-  "private": true,
   "version": "0.0.0",
   "license": "Apache-2.0",
   "scripts": {
-    "move:test": "node ./scripts/move/test",
-    "move:compile": "node ./scripts/move/compile",
-    "move:publish": "node ./scripts/move/publish",
-    "move:upgrade": "node ./scripts/move/upgrade",
     "dev": "vite",
     "build": "tsc && vite build",
     "deploy": "vercel",
