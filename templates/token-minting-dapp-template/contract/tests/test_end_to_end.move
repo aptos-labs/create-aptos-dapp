@@ -3,7 +3,6 @@ module launchpad_addr::test_end_to_end {
     use std::option;
     use std::signer;
     use std::string;
-    use std::vector;
 
     use aptos_framework::aptos_coin;
     use aptos_framework::coin;
@@ -14,10 +13,7 @@ module launchpad_addr::test_end_to_end {
     use launchpad_addr::launchpad;
 
     #[test(aptos_framework = @0x1, sender = @launchpad_addr)]
-    fun test_happy_path(
-        aptos_framework: &signer,
-        sender: &signer,
-    ) {
+    fun test_happy_path(aptos_framework: &signer, sender: &signer) {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
         let sender_addr = signer::address_of(sender);
@@ -39,7 +35,7 @@ module launchpad_addr::test_end_to_end {
             option::some(500)
         );
         let registry = launchpad::get_registry();
-        let fa_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
+        let fa_1 = registry[registry.length() - 1];
         assert!(fungible_asset::supply(fa_1) == option::some(0), 1);
 
         launchpad::mint_fa(sender, fa_1, 20);
@@ -61,7 +57,7 @@ module launchpad_addr::test_end_to_end {
             option::some(500)
         );
         let registry = launchpad::get_registry();
-        let fa_2 = *vector::borrow(&registry, vector::length(&registry) - 1);
+        let fa_2 = registry[registry.length() - 1];
         assert!(fungible_asset::supply(fa_2) == option::some(0), 4);
 
         account::create_account_for_test(sender_addr);
@@ -78,10 +74,7 @@ module launchpad_addr::test_end_to_end {
 
     #[test(aptos_framework = @0x1, sender = @launchpad_addr)]
     #[expected_failure(abort_code = 9, location = launchpad)]
-    fun test_mint_disabled(
-        aptos_framework: &signer,
-        sender: &signer,
-    ) {
+    fun test_mint_disabled(aptos_framework: &signer, sender: &signer) {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
         launchpad::init_module_for_test(sender);
@@ -99,7 +92,7 @@ module launchpad_addr::test_end_to_end {
             option::some(500)
         );
         let registry = launchpad::get_registry();
-        let fa_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
+        let fa_1 = registry[registry.length() - 1];
         assert!(launchpad::is_mint_enabled(fa_1), 1);
 
         launchpad::mint_fa(sender, fa_1, 20);
@@ -113,3 +106,4 @@ module launchpad_addr::test_end_to_end {
         coin::destroy_mint_cap(mint_cap);
     }
 }
+
