@@ -215,22 +215,24 @@ module launchpad_addr::launchpad {
             fa_obj_signer,
             FAController { mint_ref, burn_ref, transfer_ref }
         );
+        let mint_limit =
+            if (mint_limit_per_addr.is_some()) {
+                option::some(
+                    MintLimit {
+                        limit: *mint_limit_per_addr.borrow(),
+                        mint_balance_tracker: table::new()
+                    }
+                )
+            } else {
+                option::none()
+            };
         move_to(
             fa_obj_signer,
             FAConfig {
                 mint_fee_per_smallest_unit_of_fa: *mint_fee_per_smallest_unit_of_fa.borrow_with_default(
                     &DEFAULT_MINT_FEE_PER_SMALLEST_UNIT_OF_FA
                 ),
-                mint_limit: if (mint_limit_per_addr.is_some()) {
-                    option::some(
-                        MintLimit {
-                            limit: *mint_limit_per_addr.borrow(),
-                            mint_balance_tracker: table::new()
-                        }
-                    )
-                } else {
-                    option::none()
-                },
+                mint_limit,
                 mint_enabled: true,
                 extend_ref: object::generate_extend_ref(fa_obj_constructor_ref)
             }
