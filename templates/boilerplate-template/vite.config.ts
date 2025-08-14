@@ -5,6 +5,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     outDir: "dist",
+    rollupOptions: {
+      external: ['buffer'],
+    },
   },
   server: {
     open: true,
@@ -15,6 +18,17 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./frontend"),
+      buffer: 'buffer',
+      process: 'process/browser',
+      stream: 'stream-browserify',
+      util: 'util',
+    },
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
     },
   },
 });
