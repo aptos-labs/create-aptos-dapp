@@ -9,7 +9,7 @@ module launchpad_addr::launchpad {
     use aptos_framework::aptos_account;
     use aptos_framework::event;
     use aptos_framework::fungible_asset::{Self, Metadata};
-    use aptos_framework::object::{Self, Object, ObjectCore, ExtendRef};
+    use aptos_framework::object::{Self, Object, ObjectCore};
     use aptos_framework::primary_fungible_store;
 
     /// Only admin can update creator
@@ -82,7 +82,6 @@ module launchpad_addr::launchpad {
         mint_fee_per_smallest_unit_of_fa: u64,
         mint_limit: Option<MintLimit>,
         mint_enabled: bool,
-        extend_ref: ExtendRef
     }
 
     /// Global per contract
@@ -234,7 +233,6 @@ module launchpad_addr::launchpad {
                 ),
                 mint_limit,
                 mint_enabled: true,
-                extend_ref: object::generate_extend_ref(fa_obj_constructor_ref)
             }
         );
 
