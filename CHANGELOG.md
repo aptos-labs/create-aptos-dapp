@@ -4,6 +4,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.1.3 (2025-08-20)
+
+- Fix token launchpad template's UI not showing all created tokens
+
 # 0.1.2 (2025-08-14)
 
 - Fix surf in vite boilerplate template by adding polyfills for Node.js core modules
