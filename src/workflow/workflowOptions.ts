@@ -174,7 +174,7 @@ export const workflowOptions = {
     type: (prev, values) => needApiKey(values),
     name: "apiKey",
     message:
-      "Enter your API key for the chosen network (you can get one at https://developers.aptoslabs.com/docs/api-access)",
+      "Enter your API key for the chosen network (you can get one at https://geomi.dev/docs/api-keys)",
     initial: "",
   },
 };
