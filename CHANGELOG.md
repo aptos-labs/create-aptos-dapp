@@ -4,6 +4,8 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.2.0 (2025-09-23)
+
 - Update aptos ts-sdk and wallet-adapter-react dependencies
 - Update link to get an API key
 
