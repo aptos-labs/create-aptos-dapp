@@ -4,6 +4,9 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+- Update aptos ts-sdk and wallet-adapter-react dependencies
+- Update link to get an API key
+
 # 0.1.3 (2025-08-20)
 
 - Fix token launchpad template's UI not showing all created tokens
