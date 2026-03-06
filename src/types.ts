@@ -59,3 +59,18 @@ export type ExampleTelemetryData = {
   command: string;
   example: string;
 };
+
+export type CliFlags = {
+  example?: string | boolean;
+  verbose?: boolean;
+  name?: string;
+  projectType?: string;
+  template?: string;
+  framework?: string;
+  network?: string;
+  useSurf?: boolean;
+  apiKey?: string;
+  list?: boolean;
+};
+
+export type PartialSelections = Partial<Selections>;
