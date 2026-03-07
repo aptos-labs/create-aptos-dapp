@@ -5,6 +5,7 @@ import type { PartialSelections, Result, Selections } from "../types.js";
 import { workflowOptions } from "./workflowOptions.js";
 import {
   ContractBoilerplateTemplateValues,
+  TemplateFramework,
   TemplateProjectType,
 } from "../utils/constants.js";
 
@@ -20,15 +21,17 @@ function isComplete(partial: PartialSelections): boolean {
 export async function startWorkflow(prefilled?: PartialSelections) {
   // If all required values are present, skip prompts entirely
   if (prefilled && isComplete(prefilled)) {
+    const isMoveProject = prefilled.projectType === TemplateProjectType.MOVE;
     return {
       projectName: prefilled.projectName!,
       projectType: prefilled.projectType!,
-      template:
-        prefilled.projectType === TemplateProjectType.MOVE
-          ? ContractBoilerplateTemplateValues
-          : prefilled.template!,
+      template: isMoveProject
+        ? ContractBoilerplateTemplateValues
+        : prefilled.template!,
       network: prefilled.network!,
-      framework: prefilled.framework!,
+      framework: isMoveProject
+        ? TemplateFramework.VITE
+        : prefilled.framework!,
       useSurf: prefilled.useSurf ?? false,
       useApiKey: prefilled.useApiKey ?? false,
       apiKey: prefilled.apiKey ?? "",

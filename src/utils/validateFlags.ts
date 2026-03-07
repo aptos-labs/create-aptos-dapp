@@ -162,6 +162,11 @@ export function validateFlags(flags: CliFlags): PartialSelections {
     fail("--use-surf is only supported with the boilerplate-template");
   }
 
+  // Auto-infer projectType when template is provided (all templates are fullstack)
+  if (flags.template && !result.projectType) {
+    result.projectType = TemplateProjectType.FULLSTACK;
+  }
+
   // Auto-infer framework when template constrains to one option
   if (flags.template && !flags.framework) {
     if (NEXTJS_ONLY_TEMPLATES.includes(flags.template)) {

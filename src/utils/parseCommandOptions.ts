@@ -14,18 +14,17 @@ export const parseCommandOptions = async (options: CliFlags) => {
     return;
   }
 
+  const hasNewFlags =
+    options.name !== undefined ||
+    options.projectType !== undefined ||
+    options.template !== undefined ||
+    options.framework !== undefined ||
+    options.network !== undefined ||
+    options.useSurf !== undefined ||
+    options.apiKey !== undefined;
+
   // --example: existing flow
   if (options.example) {
-    // Check for conflicting flags
-    const hasNewFlags =
-      options.name !== undefined ||
-      options.projectType !== undefined ||
-      options.template !== undefined ||
-      options.framework !== undefined ||
-      options.network !== undefined ||
-      options.useSurf !== undefined ||
-      options.apiKey !== undefined;
-
     if (hasNewFlags) {
       console.error(
         red(
@@ -40,16 +39,6 @@ export const parseCommandOptions = async (options: CliFlags) => {
   if (options.verbose) {
     context.verbose = true;
   }
-
-  // Check if any new flags were provided
-  const hasNewFlags =
-    options.name !== undefined ||
-    options.projectType !== undefined ||
-    options.template !== undefined ||
-    options.framework !== undefined ||
-    options.network !== undefined ||
-    options.useSurf !== undefined ||
-    options.apiKey !== undefined;
 
   if (hasNewFlags) {
     // Validate flags and get partial selections
