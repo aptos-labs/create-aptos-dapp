@@ -4,6 +4,10 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.3.1 (2026-03-09)
+
+- Republish with correct build
+
 # 0.3.0 (2026-03-09)
 
 - Add CLI flags for non-interactive and hybrid project scaffolding (`--project-type`, `--template`, `--framework`, `--network`, `--use-surf`, `--api-key`, `--name`, positional `[project-name]`)
