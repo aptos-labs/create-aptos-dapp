@@ -4,6 +4,14 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.3.0 (2026-03-09)
+
+- Add CLI flags for non-interactive and hybrid project scaffolding (`--project-type`, `--template`, `--framework`, `--network`, `--use-surf`, `--api-key`, `--name`, positional `[project-name]`)
+- Add `--list` flag to output valid options as structured JSON for AI agents and CI pipelines
+- Auto-infer framework when template constrains to one option (e.g., `custom-indexer-template` infers `nextjs`)
+- Auto-infer `fullstack` project type when `--template` is provided
+- Validate flag combinations with clear error messages
+
 # 0.2.0 (2025-09-23)
 
 - Update aptos ts-sdk and wallet-adapter-react dependencies
