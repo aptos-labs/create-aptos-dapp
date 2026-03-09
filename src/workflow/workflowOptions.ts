@@ -45,7 +45,8 @@ export const workflowOptions = {
     ],
   },
   template: {
-    type: (prev: any) => needTemplateChoice(prev),
+    type: (prev: any, values: any) =>
+      needTemplateChoice(values.projectType ?? prev),
     name: "template",
     message: "Choose how to start",
     choices: [
