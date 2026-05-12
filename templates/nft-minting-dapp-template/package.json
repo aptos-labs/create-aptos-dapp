@@ -11,10 +11,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "deploy": "vercel",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "biome lint .",
     "preview": "vite preview",
-    "_fmt": "prettier 'frontend/**/*.ts'",
-    "fmt": "npm run _fmt -- --write"
+    "fmt": "biome format --write ."
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^5.0.0",
@@ -47,18 +46,14 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
     "@types/node": "^20.14.1",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
-    "@typescript-eslint/eslint-plugin": "^7.2.0",
-    "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
     "crypto-browserify": "^3.12.0",
     "dotenv": "16.3.1",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.6",
     "js-yaml": "4.1.0",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
@@ -70,7 +65,6 @@
     "vite": "^5.2.0",
     "vite-plugin-node-polyfills": "^0.21.0",
     "vite-plugin-notifier": "^0.1.5",
-    "prettier": "^3.3.2",
     "vercel": "^35.2.4"
   }
 }

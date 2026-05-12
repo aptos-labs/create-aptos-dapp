@@ -25,7 +25,9 @@
     "token-minting:build": "cd template-live-examples/token-minting && npm run build",
     "token-minting:deploy": "npm run token-minting:build && gh-pages --dist template-live-examples/token-minting/dist --dest token-minting",
     "token-staking:build": "cd template-live-examples/token-staking && npm run build",
-    "token-staking:deploy": "npm run token-staking:build && gh-pages --dist template-live-examples/token-staking/dist --dest token-staking"
+    "token-staking:deploy": "npm run token-staking:build && gh-pages --dist template-live-examples/token-staking/dist --dest token-staking",
+    "lint": "biome lint src/ index.ts",
+    "fmt": "biome format --write src/ index.ts"
   },
   "files": [
     "dist"
@@ -40,6 +42,7 @@
     "typescript": "^4.7.4"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
     "@types/node": "^20.5.0",
     "gh-pages": "^6.1.1"
   },

@@ -36,7 +36,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, fileSize: num
     try {
       await fundNode(aptosWallet, costToUpload.toNumber());
       return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
     } catch (error: any) {
       throw new Error(`Error funding node ${error}`);
     }

@@ -87,7 +87,7 @@ export const getLocalEphemeralKeyPairs = (): StoredEphemeralKeyPairs => {
       ? decodeEphemeralKeyPairs(rawEphemeralKeyPairs)
       : {};
   } catch (error) {
-    // eslint-disable-next-line no-console
+    // biome-ignore lint/suspicious/noConsole: surface storage decode failures
     console.warn(
       "Failed to decode ephemeral key pairs from localStorage",
       error

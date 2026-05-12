@@ -2,7 +2,7 @@ import { WebIrys } from "@irys/sdk";
 import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
 import { getAccountAPTBalance } from "@/view-functions/getAccountAPTBalance";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
 const getWebIrys = async (aptosWallet: any) => {
   const network = "devnet"; // Irys network
   const token = "aptos";
@@ -41,7 +41,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, fileSize: num
     try {
       await fundNode(aptosWallet, costToUpload.toNumber());
       return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
     } catch (error: any) {
       throw new Error(`Error funding node ${error}`);
     }
