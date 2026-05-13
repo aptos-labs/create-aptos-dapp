@@ -150,7 +150,7 @@ export function CreateFungibleAsset() {
                 />
                 {image && (
                   <>
-                    <img src={URL.createObjectURL(image)} />
+                    <img src={URL.createObjectURL(image)} alt={image.name} />
                     <p className="body-sm">
                       {image.name}
                       <Button
