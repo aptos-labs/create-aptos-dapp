@@ -36,7 +36,7 @@ if (!opts.list) {
 ######### ##           ##    ##     ##       ##
 ##     ## ##           ##    ##     ## ##    ##
 ##     ## ##           ##     #######   ######
-`)
+`),
   );
   console.log("Welcome to the create-aptos-dapp wizard 🌐");
 }

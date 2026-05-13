@@ -3,15 +3,10 @@ import prompts from "prompts";
 import { rechoseWorkflow } from "./rechoseWorkflow.js";
 import type { PartialSelections, Result, Selections } from "../types.js";
 import { workflowOptions } from "./workflowOptions.js";
-import {
-  ContractBoilerplateTemplateValues,
-  TemplateFramework,
-  TemplateProjectType,
-} from "../utils/constants.js";
+import { ContractBoilerplateTemplateValues, TemplateFramework, TemplateProjectType } from "../utils/constants.js";
 
 function isComplete(partial: PartialSelections): boolean {
-  if (!partial.projectName || !partial.projectType || !partial.network)
-    return false;
+  if (!partial.projectName || !partial.projectType || !partial.network) return false;
   if (partial.projectType === TemplateProjectType.FULLSTACK) {
     if (!partial.template || !partial.framework) return false;
   }
@@ -25,13 +20,9 @@ export async function startWorkflow(prefilled?: PartialSelections) {
     return {
       projectName: prefilled.projectName!,
       projectType: prefilled.projectType!,
-      template: isMoveProject
-        ? ContractBoilerplateTemplateValues
-        : prefilled.template!,
+      template: isMoveProject ? ContractBoilerplateTemplateValues : prefilled.template!,
       network: prefilled.network!,
-      framework: isMoveProject
-        ? TemplateFramework.VITE
-        : prefilled.framework!,
+      framework: isMoveProject ? TemplateFramework.VITE : prefilled.framework!,
       useSurf: prefilled.useSurf ?? false,
       useApiKey: prefilled.useApiKey ?? false,
       apiKey: prefilled.apiKey ?? "",
@@ -67,15 +58,11 @@ export async function startWorkflow(prefilled?: PartialSelections) {
             }
           }
           // Skip if this prompt's value is already prefilled
-          if (
-            prefilled[prompt.name as keyof PartialSelections] !== undefined
-          ) {
+          if (prefilled[prompt.name as keyof PartialSelections] !== undefined) {
             return null;
           }
           // Call original type (may be a string or function)
-          return typeof prompt.type === "function"
-            ? prompt.type(prev, values)
-            : prompt.type;
+          return typeof prompt.type === "function" ? prompt.type(prev, values) : prompt.type;
         },
       }))
     : promptArray;
@@ -94,17 +81,12 @@ export async function startWorkflow(prefilled?: PartialSelections) {
   }
 
   // Merge: prefilled values take precedence over prompted values
-  const merged = prefilled
-    ? { ...initialResult, ...prefilled }
-    : initialResult;
+  const merged = prefilled ? { ...initialResult, ...prefilled } : initialResult;
 
   // copy the results
   const result = {
     ...merged,
-    template:
-      merged.projectType === TemplateProjectType.MOVE
-        ? ContractBoilerplateTemplateValues
-        : merged.template,
+    template: merged.projectType === TemplateProjectType.MOVE ? ContractBoilerplateTemplateValues : merged.template,
   };
 
   // Skip confirmation/rechose loop when flags were provided
@@ -121,8 +103,7 @@ export async function startWorkflow(prefilled?: PartialSelections) {
             {
               type: "confirm",
               name: "confirm",
-              message:
-                "Do you want to make any changes to your selections? (Default is No)",
+              message: "Do you want to make any changes to your selections? (Default is No)",
               initial: false,
             },
           ],
@@ -130,7 +111,7 @@ export async function startWorkflow(prefilled?: PartialSelections) {
             onCancel: () => {
               throw new Error(red("✖") + " Operation cancelled");
             },
-          }
+          },
         );
 
         if (confirm) {
@@ -146,16 +127,7 @@ export async function startWorkflow(prefilled?: PartialSelections) {
     }
   }
 
-  const {
-    projectName,
-    template,
-    framework,
-    useSurf,
-    network,
-    projectType,
-    useApiKey,
-    apiKey,
-  } = result;
+  const { projectName, template, framework, useSurf, network, projectType, useApiKey, apiKey } = result;
   return {
     projectName,
     template,

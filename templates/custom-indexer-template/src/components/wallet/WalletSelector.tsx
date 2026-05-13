@@ -16,24 +16,9 @@ import {
 import { ChevronDown, Copy, LogOut, User } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "../ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { useToast } from "../ui/use-toast";
 
 export function WalletSelector() {
@@ -64,9 +49,7 @@ export function WalletSelector() {
   return connected ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button>
-          {account?.ansName || truncateAddress(account?.address.toStringLong()) || "Unknown"}
-        </Button>
+        <Button>{account?.ansName || truncateAddress(account?.address.toStringLong()) || "Unknown"}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onSelect={copyAddress} className="gap-2">
@@ -74,12 +57,7 @@ export function WalletSelector() {
         </DropdownMenuItem>
         {wallet && isAptosConnectWallet(wallet) && (
           <DropdownMenuItem asChild>
-            <a
-              href={APTOS_CONNECT_ACCOUNT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex gap-2"
-            >
+            <a href={APTOS_CONNECT_ACCOUNT_URL} target="_blank" rel="noopener noreferrer" className="flex gap-2">
               <User className="h-4 w-4" /> Account
             </a>
           </DropdownMenuItem>
@@ -130,11 +108,7 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
       </DialogHeader>
       <div className="flex flex-col gap-3 pt-3">
         {aptosConnectWallets.map((wallet) => (
-          <AptosConnectWalletRow
-            key={wallet.name}
-            wallet={wallet}
-            onConnect={close}
-          />
+          <AptosConnectWalletRow key={wallet.name} wallet={wallet} onConnect={close} />
         ))}
       </div>
       <AptosPrivacyPolicy className="flex flex-col items-center">
@@ -163,11 +137,7 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
             </CollapsibleTrigger>
             <CollapsibleContent className="flex flex-col gap-3">
               {moreWallets.map((wallet) => (
-                <WalletRow
-                  key={wallet.name}
-                  wallet={wallet}
-                  onConnect={close}
-                />
+                <WalletRow key={wallet.name} wallet={wallet} onConnect={close} />
               ))}
             </CollapsibleContent>
           </Collapsible>

@@ -9,13 +9,7 @@ import {
   CustomIndexerTemplateInfo,
 } from "../utils/constants.js";
 import { validateProjectName } from "../utils/index.js";
-import {
-  needApiKey,
-  needFrameworkChoice,
-  needSurfChoice,
-  needTemplateChoice,
-  canUseApiKey,
-} from "./helpers.js";
+import { needApiKey, needFrameworkChoice, needSurfChoice, needTemplateChoice, canUseApiKey } from "./helpers.js";
 
 /** workflow object containing all the text for the different prompt options */
 export const workflowOptions = {
@@ -33,20 +27,17 @@ export const workflowOptions = {
       {
         title: "Move Contract Project",
         value: TemplateProjectType.MOVE,
-        description:
-          "A barebones Move project with only a generated Move contract",
+        description: "A barebones Move project with only a generated Move contract",
       },
       {
         title: "Full-stack Project",
         value: TemplateProjectType.FULLSTACK,
-        description:
-          "A full stack project with a generated Move contract and front end",
+        description: "A full stack project with a generated Move contract and front end",
       },
     ],
   },
   template: {
-    type: (prev: any, values: any) =>
-      needTemplateChoice(values.projectType ?? prev),
+    type: (prev: any, values: any) => needTemplateChoice(values.projectType ?? prev),
     name: "template",
     message: "Choose how to start",
     choices: [
@@ -64,17 +55,14 @@ export const workflowOptions = {
     message:
       "Would you like to use Surf, the TypeScript type safety tool maintained by Thala Labs, learn more at https://aptos.dev/en/build/sdks/ts-sdk/type-safe-contract",
     choices(prev, values) {
-      if (
-        values.template.path === FullstackBoilerplateTemplateInfo.value.path
-      ) {
+      if (values.template.path === FullstackBoilerplateTemplateInfo.value.path) {
         return [
           {
             title: "Do not use Surf and handle types manually",
             value: false,
           },
           {
-            title:
-              "Use Surf to auto generate TypeScript Types for your Move contracts",
+            title: "Use Surf to auto generate TypeScript Types for your Move contracts",
             value: true,
           },
         ];
@@ -94,9 +82,7 @@ export const workflowOptions = {
     name: "framework",
     message: "Choose your framework",
     choices(prev, values) {
-      if (
-        values.template.path === FullstackBoilerplateTemplateInfo.value.path
-      ) {
+      if (values.template.path === FullstackBoilerplateTemplateInfo.value.path) {
         return [
           { title: "Client-side (Vite app)", value: TemplateFramework.VITE },
           {
@@ -104,9 +90,7 @@ export const workflowOptions = {
             value: TemplateFramework.NEXTJS,
           },
         ];
-      } else if (
-        values.template.path === CustomIndexerTemplateInfo.value.path
-      ) {
+      } else if (values.template.path === CustomIndexerTemplateInfo.value.path) {
         return [
           {
             title: "Server-side (Next.js app)",
@@ -114,9 +98,7 @@ export const workflowOptions = {
           },
         ];
       }
-      return [
-        { title: "Client-side (Vite app)", value: TemplateFramework.VITE },
-      ];
+      return [{ title: "Client-side (Vite app)", value: TemplateFramework.VITE }];
     },
     initial: 0,
   },
@@ -167,15 +149,13 @@ export const workflowOptions = {
   useApiKey: {
     type: (prev, values) => canUseApiKey(values),
     name: "useApiKey",
-    message:
-      "Would you like to use an API key? It is highly recommended to use with the Aptos API",
+    message: "Would you like to use an API key? It is highly recommended to use with the Aptos API",
     initial: true,
   },
   apiKey: {
     type: (prev, values) => needApiKey(values),
     name: "apiKey",
-    message:
-      "Enter your API key for the chosen network (you can get one at https://geomi.dev/docs/api-keys)",
+    message: "Enter your API key for the chosen network (you can get one at https://geomi.dev/docs/api-keys)",
     initial: "",
   },
 };

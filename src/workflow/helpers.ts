@@ -1,8 +1,5 @@
 import { Selections } from "../types.js";
-import {
-  FullstackBoilerplateTemplateInfo,
-  TemplateProjectType,
-} from "../utils/constants.js";
+import { FullstackBoilerplateTemplateInfo, TemplateProjectType } from "../utils/constants.js";
 
 export const needTemplateChoice = (prev: any) => {
   switch (prev) {

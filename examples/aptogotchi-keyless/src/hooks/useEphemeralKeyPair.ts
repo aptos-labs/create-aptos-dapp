@@ -8,9 +8,7 @@ export type StoredEphemeralKeyPairs = { [nonce: string]: EphemeralKeyPair };
 /**
  * Retrieve the ephemeral key pair with the given nonce from localStorage.
  */
-export const getLocalEphemeralKeyPair = (
-  nonce: string
-): EphemeralKeyPair | null => {
+export const getLocalEphemeralKeyPair = (nonce: string): EphemeralKeyPair | null => {
   const keyPairs = getLocalEphemeralKeyPairs();
 
   // Get the account with the given nonce (the generated nonce of the ephemeral key pair may not match
@@ -29,13 +27,10 @@ export const getLocalEphemeralKeyPair = (
  */
 export const validateEphemeralKeyPair = (
   nonce: string,
-  ephemeralKeyPair: EphemeralKeyPair
+  ephemeralKeyPair: EphemeralKeyPair,
 ): EphemeralKeyPair | null => {
   // Check the nonce and the expiry timestamp of the account to see if it is valid
-  if (
-    nonce === ephemeralKeyPair.nonce &&
-    ephemeralKeyPair.expiryDateSecs > BigInt(Math.floor(Date.now() / 1000))
-  ) {
+  if (nonce === ephemeralKeyPair.nonce && ephemeralKeyPair.expiryDateSecs > BigInt(Math.floor(Date.now() / 1000))) {
     return ephemeralKeyPair;
   }
   removeEphemeralKeyPair(nonce);
@@ -48,19 +43,14 @@ export const validateEphemeralKeyPair = (
 export const removeEphemeralKeyPair = (nonce: string): void => {
   const keyPairs = getLocalEphemeralKeyPairs();
   delete keyPairs[nonce];
-  localStorage.setItem(
-    "ephemeral-key-pairs",
-    encodeEphemeralKeyPairs(keyPairs)
-  );
+  localStorage.setItem("ephemeral-key-pairs", encodeEphemeralKeyPairs(keyPairs));
 };
 
 /**
  * Retrieve all ephemeral key pairs from localStorage and decode them. The new ephemeral key pair
  * is then stored in localStorage with the nonce as the key.
  */
-export const storeEphemeralKeyPair = (
-  ephemeralKeyPair: EphemeralKeyPair
-): void => {
+export const storeEphemeralKeyPair = (ephemeralKeyPair: EphemeralKeyPair): void => {
   // Retrieve the current ephemeral key pairs from localStorage
   const accounts = getLocalEphemeralKeyPairs();
 
@@ -68,30 +58,19 @@ export const storeEphemeralKeyPair = (
   accounts[ephemeralKeyPair.nonce] = ephemeralKeyPair;
 
   if (typeof localStorage === "undefined") return;
-  localStorage.setItem(
-    "ephemeral-key-pairs",
-    encodeEphemeralKeyPairs(accounts)
-  );
+  localStorage.setItem("ephemeral-key-pairs", encodeEphemeralKeyPairs(accounts));
 };
 
 /**
  * Retrieve all ephemeral key pairs from localStorage and decode them.
  */
 export const getLocalEphemeralKeyPairs = (): StoredEphemeralKeyPairs => {
-  const rawEphemeralKeyPairs =
-    typeof localStorage !== "undefined"
-      ? localStorage.getItem("ephemeral-key-pairs")
-      : null;
+  const rawEphemeralKeyPairs = typeof localStorage !== "undefined" ? localStorage.getItem("ephemeral-key-pairs") : null;
   try {
-    return rawEphemeralKeyPairs
-      ? decodeEphemeralKeyPairs(rawEphemeralKeyPairs)
-      : {};
+    return rawEphemeralKeyPairs ? decodeEphemeralKeyPairs(rawEphemeralKeyPairs) : {};
   } catch (error) {
     // biome-ignore lint/suspicious/noConsole: surface storage decode failures
-    console.warn(
-      "Failed to decode ephemeral key pairs from localStorage",
-      error
-    );
+    console.warn("Failed to decode ephemeral key pairs from localStorage", error);
     return {};
   }
 };
@@ -110,29 +89,22 @@ const EphemeralKeyPairEncoding = {
 /**
  * Stringify the ephemeral key pairs to be stored in localStorage
  */
-export const encodeEphemeralKeyPairs = (
-  keyPairs: StoredEphemeralKeyPairs
-): string =>
+export const encodeEphemeralKeyPairs = (keyPairs: StoredEphemeralKeyPairs): string =>
   JSON.stringify(keyPairs, (_, e) => {
     if (typeof e === "bigint") return { __type: "bigint", value: e.toString() };
-    if (e instanceof Uint8Array)
-      return { __type: "Uint8Array", value: Array.from(e) };
-    if (e instanceof EphemeralKeyPair)
-      return EphemeralKeyPairEncoding.encode(e);
+    if (e instanceof Uint8Array) return { __type: "Uint8Array", value: Array.from(e) };
+    if (e instanceof EphemeralKeyPair) return EphemeralKeyPairEncoding.encode(e);
     return e;
   });
 
 /**
  * Parse the ephemeral key pairs from a string
  */
-export const decodeEphemeralKeyPairs = (
-  encodedEphemeralKeyPairs: string
-): StoredEphemeralKeyPairs =>
+export const decodeEphemeralKeyPairs = (encodedEphemeralKeyPairs: string): StoredEphemeralKeyPairs =>
   JSON.parse(encodedEphemeralKeyPairs, (_, e) => {
     if (e && e.__type === "bigint") return BigInt(e.value);
     if (e && e.__type === "Uint8Array") return new Uint8Array(e.value);
-    if (e && e.__type === "EphemeralKeyPair")
-      return EphemeralKeyPairEncoding.decode(e);
+    if (e && e.__type === "EphemeralKeyPair") return EphemeralKeyPairEncoding.decode(e);
     return e;
   });
 

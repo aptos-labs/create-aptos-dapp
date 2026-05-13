@@ -28,9 +28,9 @@ export function useGetAssetMetadata() {
   return fas;
 }
 
-const getMetadata = async (objects: Array<{inner: string}>) => {
+const getMetadata = async (objects: Array<{ inner: string }>) => {
   const metadatas = await Promise.all(
-    objects.map(async (object: {inner: string}) => {
+    objects.map(async (object: { inner: string }) => {
       const formattedObjectAddress = AccountAddress.from(object.inner).toString();
 
       const metadata = await aptosClient().getFungibleAssetMetadata({

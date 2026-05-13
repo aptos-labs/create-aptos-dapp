@@ -1,12 +1,11 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
-
-  const aptosConfig = new aptosSDK.AptosConfig({network:process.env.VITE_APP_NETWORK})
-  const aptos = new aptosSDK.Aptos(aptosConfig)
+  const aptosConfig = new aptosSDK.AptosConfig({ network: process.env.VITE_APP_NETWORK });
+  const aptos = new aptosSDK.Aptos(aptosConfig);
 
   // Make sure VITE_FA_CREATOR_ADDRESS is set
   if (!process.env.VITE_FA_CREATOR_ADDRESS) {
@@ -46,7 +45,10 @@ async function publish() {
         // This is the address you want to use to create fungible asset with, e.g. an address in Petra so you can create fungible asset in UI using Petra
         initial_creator_addr: process.env.VITE_FA_CREATOR_ADDRESS,
       },
-      extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
+      extraArguments: [
+        `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+        `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+      ],
     })
     .then((response) => {
       const filePath = ".env";

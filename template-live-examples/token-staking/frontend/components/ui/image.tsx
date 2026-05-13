@@ -14,21 +14,11 @@ const imageVariants = cva("", {
   },
 });
 
-export interface ImageProps
-  extends React.ImgHTMLAttributes<HTMLImageElement>,
-    VariantProps<typeof imageVariants> {}
+export interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement>, VariantProps<typeof imageVariants> {}
 
-const Image = React.forwardRef<HTMLImageElement, ImageProps>(
-  ({ className, rounded, ...props }, ref) => {
-    return (
-      <img
-        className={cn(imageVariants({ rounded, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
+const Image = React.forwardRef<HTMLImageElement, ImageProps>(({ className, rounded, ...props }, ref) => {
+  return <img className={cn(imageVariants({ rounded, className }))} ref={ref} {...props} />;
+});
 Image.displayName = "Image";
 
 export { Image, imageVariants };

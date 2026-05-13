@@ -6,12 +6,7 @@ import { toast } from "sonner";
 import { useKeylessAccount } from "@/context/KeylessAccountContext";
 import { usePet } from "@/context/PetContext";
 import { aptosClient } from "@/utils/aptosClient";
-import {
-  ENERGY_CAP,
-  ENERGY_DECREASE,
-  ENERGY_INCREASE,
-  MODULE_ADDRESS,
-} from "@/utils/constants";
+import { ENERGY_CAP, ENERGY_DECREASE, ENERGY_INCREASE, MODULE_ADDRESS } from "@/utils/constants";
 
 export type PetAction = "feed" | "play" | "delete";
 
@@ -24,8 +19,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
   const { keylessAccount } = useKeylessAccount();
   const { pet, setPet } = usePet();
 
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
+  const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
 
   const handleStart = () => {
     switch (selectedAction) {
@@ -67,10 +61,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
         action: {
           label: "Explorer",
           onClick: () =>
-            window.open(
-              `https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`,
-              "_blank"
-            ),
+            window.open(`https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`, "_blank"),
         },
       });
 
@@ -121,10 +112,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
         action: {
           label: "Explorer",
           onClick: () =>
-            window.open(
-              `https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`,
-              "_blank"
-            ),
+            window.open(`https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`, "_blank"),
         },
       });
 
@@ -175,10 +163,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
         action: {
           label: "Explorer",
           onClick: () =>
-            window.open(
-              `https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`,
-              "_blank"
-            ),
+            window.open(`https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`, "_blank"),
         },
       });
 
@@ -191,10 +176,8 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
     }
   };
 
-  const feedDisabled =
-    selectedAction === "feed" && pet?.energy_points === Number(ENERGY_CAP);
-  const playDisabled =
-    selectedAction === "play" && pet?.energy_points === Number(0);
+  const feedDisabled = selectedAction === "feed" && pet?.energy_points === Number(ENERGY_CAP);
+  const playDisabled = selectedAction === "play" && pet?.energy_points === Number(0);
 
   return (
     <div className="nes-container with-title flex-1 bg-white h-[320px]">
@@ -240,9 +223,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
           <p>{actionDescriptions[selectedAction]}</p>
           <button
             type="button"
-            className={`nes-btn is-success ${
-              feedDisabled || playDisabled ? "is-disabled" : ""
-            }`}
+            className={`nes-btn is-success ${feedDisabled || playDisabled ? "is-disabled" : ""}`}
             onClick={handleStart}
             disabled={transactionInProgress || feedDisabled || playDisabled}
           >

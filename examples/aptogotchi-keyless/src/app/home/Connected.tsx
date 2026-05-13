@@ -13,7 +13,7 @@ import { Pet } from "./Pet/Pet";
 const fetchPetData = async (
   accountAddress: AccountAddress,
   setPet: (pet: Pet) => void,
-  setIsLoading: (isLoading: boolean) => void
+  setIsLoading: (isLoading: boolean) => void,
 ) => {
   setIsLoading(true);
 
@@ -89,13 +89,7 @@ export function Connected() {
 
   return (
     <div className="flex flex-col gap-3 p-3 justify-center items-center">
-      {isLoading ? (
-        <Loading progress={progress} />
-      ) : pet ? (
-        <Pet />
-      ) : (
-        <Mint fetchPet={fetchPet} />
-      )}
+      {isLoading ? <Loading progress={progress} /> : pet ? <Pet /> : <Mint fetchPet={fetchPet} />}
     </div>
   );
 }

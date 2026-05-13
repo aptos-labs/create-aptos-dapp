@@ -81,23 +81,11 @@ export function Message({ messageObjAddr }: MessageProps) {
                 },
                 {
                   label: "Creation timestamp",
-                  value: (
-                    <p>
-                      {new Date(
-                        data.message.creation_timestamp * 1000
-                      ).toLocaleString()}
-                    </p>
-                  ),
+                  value: <p>{new Date(data.message.creation_timestamp * 1000).toLocaleString()}</p>,
                 },
                 {
                   label: "Last update timestamp",
-                  value: (
-                    <p>
-                      {new Date(
-                        data.message.last_update_timestamp * 1000
-                      ).toLocaleString()}
-                    </p>
-                  ),
+                  value: <p>{new Date(data.message.last_update_timestamp * 1000).toLocaleString()}</p>,
                 },
                 {
                   label: "Content",
@@ -109,9 +97,7 @@ export function Message({ messageObjAddr }: MessageProps) {
         </CardContent>
       </Card>
       {data.message.creator_addr == account?.address.toStringLong() && (
-        <UpdateMessage
-          messageObjAddr={data.message.message_obj_addr as `0x${string}`}
-        />
+        <UpdateMessage messageObjAddr={data.message.message_obj_addr as `0x${string}`} />
       )}
     </div>
   );

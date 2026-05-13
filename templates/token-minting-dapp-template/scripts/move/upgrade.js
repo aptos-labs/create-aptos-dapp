@@ -1,11 +1,10 @@
 require("dotenv").config();
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
-
-  const aptosConfig = new aptosSDK.AptosConfig({network:process.env.VITE_APP_NETWORK})
-  const aptos = new aptosSDK.Aptos(aptosConfig)
+  const aptosConfig = new aptosSDK.AptosConfig({ network: process.env.VITE_APP_NETWORK });
+  const aptos = new aptosSDK.Aptos(aptosConfig);
 
   // Make sure VITE_FA_CREATOR_ADDRESS is set
   if (!process.env.VITE_FA_CREATOR_ADDRESS) {
@@ -49,7 +48,10 @@ async function publish() {
       // Please find it on the network you are using, This is testnet deployment
       minter: "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490",
     },
-    extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
+    extraArguments: [
+      `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+      `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+    ],
   });
 }
 publish();

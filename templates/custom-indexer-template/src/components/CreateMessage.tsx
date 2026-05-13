@@ -10,15 +10,7 @@ import { getAptosClient } from "@/lib/aptos";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { TransactionOnExplorer } from "@/components/ExplorerLink";
 import { createMessage } from "@/entry-functions/createMessage";
@@ -39,9 +31,7 @@ export function CreateMessage() {
     },
   });
 
-  const onSignAndSubmitTransaction = async (
-    data: z.infer<typeof FormSchema>
-  ) => {
+  const onSignAndSubmitTransaction = async (data: z.infer<typeof FormSchema>) => {
     if (!account) {
       console.error("Wallet not available");
       return;
@@ -50,7 +40,7 @@ export function CreateMessage() {
     signAndSubmitTransaction(
       createMessage({
         content: data.stringContent,
-      })
+      }),
     )
       .then((committedTransaction) => {
         return getAptosClient().waitForTransaction({
@@ -60,9 +50,7 @@ export function CreateMessage() {
       .then((executedTransaction) => {
         toast({
           title: "Success",
-          description: (
-            <TransactionOnExplorer hash={executedTransaction.hash} />
-          ),
+          description: <TransactionOnExplorer hash={executedTransaction.hash} />,
         });
         return new Promise((resolve) => setTimeout(resolve, 3000));
       })
@@ -103,11 +91,7 @@ export function CreateMessage() {
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              disabled={!connected}
-              className="w-40 self-start col-span-2"
-            >
+            <Button type="submit" disabled={!connected} className="w-40 self-start col-span-2">
               Create
             </Button>
           </form>

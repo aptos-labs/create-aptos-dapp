@@ -7,7 +7,6 @@ const config = yaml.load(fs.readFileSync("./.aptos/config.yaml", "utf8"));
 const accountAddress = config["profiles"][`${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`]["account"];
 
 async function publish() {
-
   const move = new cli.Move();
 
   move

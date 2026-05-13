@@ -5,7 +5,7 @@ const aptosSDK = require("@aptos-labs/ts-sdk");
 async function publish() {
   if (!process.env.NEXT_PUBLIC_MODULE_ADDRESS) {
     throw new Error(
-      "NEXT_PUBLIC_MODULE_ADDRESS variable is not set, make sure you have published the module before upgrading it"
+      "NEXT_PUBLIC_MODULE_ADDRESS variable is not set, make sure you have published the module before upgrading it",
     );
   }
 

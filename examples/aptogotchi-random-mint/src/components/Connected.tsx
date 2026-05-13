@@ -10,8 +10,7 @@ export function Connected() {
   const { network } = useWallet();
   return (
     <div className="flex flex-col gap-3 p-3">
-      {network?.name.toLowerCase() !==
-        NetworkToNetworkName[Network.TESTNET].toLowerCase() && <Modal />}
+      {network?.name.toLowerCase() !== NetworkToNetworkName[Network.TESTNET].toLowerCase() && <Modal />}
       <Mint />
     </div>
   );

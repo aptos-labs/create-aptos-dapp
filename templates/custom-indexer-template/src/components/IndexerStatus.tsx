@@ -4,12 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getLastVersionOnServer } from "@/app/actions";
 import { getAptosClient } from "@/lib/aptos";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const IndexerStatus = () => {
   const fetchData = async () => {
@@ -54,11 +49,7 @@ export const IndexerStatus = () => {
         <TooltipTrigger>
           <div className="flex items-center justify-center">
             {isHealthy ? "Indexer up to date" : "Indexer syncing"}
-            <div
-              className={`w-3 h-3 rounded-full ml-2 ${
-                isHealthy ? "bg-green-500" : "bg-red-500"
-              }`}
-            ></div>
+            <div className={`w-3 h-3 rounded-full ml-2 ${isHealthy ? "bg-green-500" : "bg-red-500"}`}></div>
           </div>
         </TooltipTrigger>
         <TooltipContent>
@@ -66,10 +57,7 @@ export const IndexerStatus = () => {
             <p>Indexer Version: {data.indexerLastVersion}</p>
             <p>On-Chain Version: {data.onChainLastVersion}</p>
             <p>Difference: {versionDiff}</p>
-            <p>
-              When the difference is greater than 100, the indexer is considered
-              lagging.
-            </p>
+            <p>When the difference is greater than 100, the indexer is considered lagging.</p>
           </div>
         </TooltipContent>
       </Tooltip>

@@ -14,8 +14,8 @@ export function TopBanner() {
               style={{ color: "white", textDecoration: "underline" }}
             >
               template docs
-            </a>
-            {" "}to get started.
+            </a>{" "}
+            to get started.
           </span>
         </div>
         <div className="ml-4 flex-shrink-0"></div>

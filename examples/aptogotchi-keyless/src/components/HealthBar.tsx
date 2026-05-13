@@ -6,11 +6,7 @@ export interface HealthBarProps {
   icon: "heart" | "star";
 }
 
-export function HealthBar({
-  totalHealth,
-  currentHealth,
-  icon,
-}: HealthBarProps) {
+export function HealthBar({ totalHealth, currentHealth, icon }: HealthBarProps) {
   const fullIcons = Math.floor(currentHealth / 2);
   const halfIcons = currentHealth % 2;
   const emptyIcons = Math.floor((totalHealth - currentHealth) / 2);

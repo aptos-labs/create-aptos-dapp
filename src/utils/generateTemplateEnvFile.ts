@@ -6,29 +6,19 @@ import { TemplateProjectType } from "./constants.js";
 import { createModulePublisherAccount } from "./createModulePublisherAccount.js";
 import { setUpEnvVariables } from "./setUpEnvVariables.js";
 
-export const generateTemplateEnvFile = async (
-  selection: Selections,
-  spinner: (text: any) => Ora
-) => {
+export const generateTemplateEnvFile = async (selection: Selections, spinner: (text: any) => Ora) => {
   // create .env file
   const generateEnvFile = async (additionalContent?: string) => {
     let content = "";
 
-    const accountCreationSpinner = spinner(
-      `Creating a module publisher account\n`
-    ).start();
+    const accountCreationSpinner = spinner(`Creating a module publisher account\n`).start();
     const publisherAccount = await createModulePublisherAccount(selection);
     accountCreationSpinner.succeed();
 
-    const modulePublisherAccountInfo = setUpEnvVariables(
-      selection,
-      publisherAccount
-    );
+    const modulePublisherAccountInfo = setUpEnvVariables(selection, publisherAccount);
     content += modulePublisherAccountInfo ? modulePublisherAccountInfo : "";
 
-    return additionalContent
-      ? content.concat("\n", additionalContent)
-      : content;
+    return additionalContent ? content.concat("\n", additionalContent) : content;
   };
 
   if (selection.projectType === TemplateProjectType.MOVE) {
@@ -38,16 +28,14 @@ export const generateTemplateEnvFile = async (
   switch (selection.template.path) {
     case "nft-minting-dapp-template":
       return await generateEnvFile(
-        `VITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`
+        `VITE_COLLECTION_CREATOR_ADDRESS=""\n#To fill after you create a collection, will be used for the minting page\nVITE_COLLECTION_ADDRESS=""`,
       );
     case "token-minting-dapp-template":
       return await generateEnvFile(
-        `VITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`
+        `VITE_FA_CREATOR_ADDRESS=""\n#To fill after you create a fungible asset, will be used for the minting page\nVITE_FA_ADDRESS=""`,
       );
     case "token-staking-dapp-template":
-      return await generateEnvFile(
-        `VITE_FA_ADDRESS=""\nVITE_REWARD_CREATOR_ADDRESS=""`
-      );
+      return await generateEnvFile(`VITE_FA_ADDRESS=""\nVITE_REWARD_CREATOR_ADDRESS=""`);
     case "boilerplate-template":
       return await generateEnvFile();
     case "nextjs-boilerplate-template":

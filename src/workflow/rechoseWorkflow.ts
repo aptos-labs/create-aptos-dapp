@@ -51,7 +51,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
       onCancel: () => {
         throw new Error(red("✖") + " Operation cancelled");
       },
-    }
+    },
   );
 
   // Ask for new values based on the user's choice and update the result object
@@ -67,9 +67,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
     case "projectType":
       const previousProjectType = result.projectType;
 
-      result.projectType = (
-        await prompts(workflowOptions.projectType)
-      ).projectType;
+      result.projectType = (await prompts(workflowOptions.projectType)).projectType;
 
       if (previousProjectType === result.projectType) {
         break;
@@ -88,7 +86,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
             ...workflowOptions.network,
             type: result.network === TemplateNetwork.DEVNET ? "select" : null,
           },
-        ])
+        ]),
       );
       break;
     case "network":
@@ -114,9 +112,7 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
       ).network;
       break;
     case "useSurf":
-      if (
-        result.template.path !== FullstackBoilerplateTemplateInfo.value.path
-      ) {
+      if (result.template.path !== FullstackBoilerplateTemplateInfo.value.path) {
         break;
       }
       result.useSurf = (

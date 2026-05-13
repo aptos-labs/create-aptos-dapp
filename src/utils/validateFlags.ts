@@ -25,18 +25,11 @@ const NETWORKS = Object.values(TemplateNetwork);
 const FRAMEWORKS = Object.values(TemplateFramework);
 const TEMPLATE_IDS = Object.keys(TEMPLATE_MAP);
 
-const VITE_ONLY_TEMPLATES = [
-  "nft-minting-dapp-template",
-  "token-minting-dapp-template",
-  "token-staking-dapp-template",
-];
+const VITE_ONLY_TEMPLATES = ["nft-minting-dapp-template", "token-minting-dapp-template", "token-staking-dapp-template"];
 
 const NEXTJS_ONLY_TEMPLATES = ["custom-indexer-template"];
 
-const NO_DEVNET_TEMPLATES = [
-  "nft-minting-dapp-template",
-  "token-minting-dapp-template",
-];
+const NO_DEVNET_TEMPLATES = ["nft-minting-dapp-template", "token-minting-dapp-template"];
 
 function fail(message: string): never {
   console.error(red(`Error: ${message}`));
@@ -59,7 +52,7 @@ export function validateFlags(flags: CliFlags): PartialSelections {
   if (flags.projectType !== undefined) {
     if (!PROJECT_TYPES.includes(flags.projectType as any)) {
       fail(
-        `Invalid project type: "${flags.projectType}"\nValid values for --project-type: ${PROJECT_TYPES.join(", ")}`
+        `Invalid project type: "${flags.projectType}"\nValid values for --project-type: ${PROJECT_TYPES.join(", ")}`,
       );
     }
     result.projectType = flags.projectType as TemplateProjectType;
@@ -68,9 +61,7 @@ export function validateFlags(flags: CliFlags): PartialSelections {
   // Validate template
   if (flags.template !== undefined) {
     if (!TEMPLATE_IDS.includes(flags.template)) {
-      fail(
-        `Invalid template: "${flags.template}"\nValid values for --template: ${TEMPLATE_IDS.join(", ")}`
-      );
+      fail(`Invalid template: "${flags.template}"\nValid values for --template: ${TEMPLATE_IDS.join(", ")}`);
     }
     result.template = TEMPLATE_MAP[flags.template];
   }
@@ -78,9 +69,7 @@ export function validateFlags(flags: CliFlags): PartialSelections {
   // Validate framework
   if (flags.framework !== undefined) {
     if (!FRAMEWORKS.includes(flags.framework as any)) {
-      fail(
-        `Invalid framework: "${flags.framework}"\nValid values for --framework: ${FRAMEWORKS.join(", ")}`
-      );
+      fail(`Invalid framework: "${flags.framework}"\nValid values for --framework: ${FRAMEWORKS.join(", ")}`);
     }
     result.framework = flags.framework as TemplateFramework;
   }
@@ -88,9 +77,7 @@ export function validateFlags(flags: CliFlags): PartialSelections {
   // Validate network
   if (flags.network !== undefined) {
     if (!NETWORKS.includes(flags.network as any)) {
-      fail(
-        `Invalid network: "${flags.network}"\nValid values for --network: ${NETWORKS.join(", ")}`
-      );
+      fail(`Invalid network: "${flags.network}"\nValid values for --network: ${NETWORKS.join(", ")}`);
     }
     result.network = flags.network as TemplateNetwork;
   }
@@ -128,37 +115,27 @@ export function validateFlags(flags: CliFlags): PartialSelections {
   if (flags.template && flags.network === TemplateNetwork.DEVNET) {
     if (NO_DEVNET_TEMPLATES.includes(flags.template)) {
       fail(
-        `devnet is not supported for ${flags.template} (Irys does not support devnet).\nValid networks for this template: mainnet, testnet`
+        `devnet is not supported for ${flags.template} (Irys does not support devnet).\nValid networks for this template: mainnet, testnet`,
       );
     }
   }
 
   // Template + framework restrictions
   if (flags.template && flags.framework) {
-    if (
-      VITE_ONLY_TEMPLATES.includes(flags.template) &&
-      flags.framework === "nextjs"
-    ) {
+    if (VITE_ONLY_TEMPLATES.includes(flags.template) && flags.framework === "nextjs") {
       fail(
-        `${flags.template} only supports the vite framework.\nValid values for --framework with this template: vite`
+        `${flags.template} only supports the vite framework.\nValid values for --framework with this template: vite`,
       );
     }
-    if (
-      NEXTJS_ONLY_TEMPLATES.includes(flags.template) &&
-      flags.framework === "vite"
-    ) {
+    if (NEXTJS_ONLY_TEMPLATES.includes(flags.template) && flags.framework === "vite") {
       fail(
-        `${flags.template} only supports the nextjs framework.\nValid values for --framework with this template: nextjs`
+        `${flags.template} only supports the nextjs framework.\nValid values for --framework with this template: nextjs`,
       );
     }
   }
 
   // useSurf restriction
-  if (
-    flags.useSurf &&
-    flags.template &&
-    flags.template !== "boilerplate-template"
-  ) {
+  if (flags.useSurf && flags.template && flags.template !== "boilerplate-template") {
     fail("--use-surf is only supported with the boilerplate-template");
   }
 

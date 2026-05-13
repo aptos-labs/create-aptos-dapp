@@ -9,7 +9,6 @@ interface LaunchpadHeaderProps {
 }
 
 export const LaunchpadHeader: FC<LaunchpadHeaderProps> = ({ title }) => {
-
   return (
     <div className="flex items-center justify-between py-2 px-4 mx-auto w-full max-w-screen-xl flex-wrap">
       <h2 className="display">{title}</h2>
@@ -19,11 +18,11 @@ export const LaunchpadHeader: FC<LaunchpadHeaderProps> = ({ title }) => {
           Mint Page
         </Link>
         <Link className={buttonVariants({ variant: "link" })} to={"/my-collections"}>
-            My Collections
-          </Link>
-          <Link className={buttonVariants({ variant: "link" })} to={"/create-collection"}>
-            Create Collection
-          </Link>
+          My Collections
+        </Link>
+        <Link className={buttonVariants({ variant: "link" })} to={"/create-collection"}>
+          Create Collection
+        </Link>
 
         <WalletSelector />
       </div>

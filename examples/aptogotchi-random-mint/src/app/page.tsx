@@ -56,11 +56,7 @@ const DynamicWalletButtons = dynamic(
     return { default: WalletButtons };
   },
   {
-    loading: () => (
-      <div className="nes-btn is-primary opacity-50 cursor-not-allowed">
-        Loading...
-      </div>
-    ),
+    loading: () => <div className="nes-btn is-primary opacity-50 cursor-not-allowed">Loading...</div>,
     ssr: false,
-  }
+  },
 );

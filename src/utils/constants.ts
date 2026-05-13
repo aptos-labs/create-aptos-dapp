@@ -47,8 +47,7 @@ export const CustomIndexerTemplateInfo = {
     name: "Custom indexer template",
     doc: "https://learn.aptoslabs.com/en/dapp-templates/custom-indexer-template",
   },
-  description:
-    "A full stack dapp template with a custom indexer to start an Aptos dapp with",
+  description: "A full stack dapp template with a custom indexer to start an Aptos dapp with",
 };
 
 export const NftMintingDappTemplateInfo = {
@@ -59,8 +58,7 @@ export const NftMintingDappTemplateInfo = {
     doc: "https://learn.aptoslabs.com/en/dapp-templates/nft-minting-template",
     video: "https://www.youtube.com/watch?v=ik4GfsKZDOQ",
   },
-  description:
-    "A production ready template to create an NFT collection minting dapp",
+  description: "A production ready template to create an NFT collection minting dapp",
 };
 
 export const TokenMintingDappTemplateInfo = {
@@ -71,8 +69,7 @@ export const TokenMintingDappTemplateInfo = {
     doc: "https://learn.aptoslabs.com/en/dapp-templates/token-minting-template",
     video: "https://www.youtube.com/watch?v=cr7LS-k4nQo",
   },
-  description:
-    "A production ready template to create your own token minting dapp",
+  description: "A production ready template to create your own token minting dapp",
 };
 
 export const TokenStakingDappTemplateInfo = {

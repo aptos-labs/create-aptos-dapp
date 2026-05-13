@@ -3,9 +3,7 @@ import { GA4_URL } from "./constants.js";
 import { getOS } from "./helpers.js";
 import { ExampleTelemetryData, TemplateTelemetryData } from "../types.js";
 
-export const recordTelemetry = async (
-  telemetryData: ExampleTelemetryData | TemplateTelemetryData
-) => {
+export const recordTelemetry = async (telemetryData: ExampleTelemetryData | TemplateTelemetryData) => {
   try {
     const telemetry = {
       client_id: randomUUID(), // We generate a random client id for each request

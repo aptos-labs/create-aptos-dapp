@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useWallet,
-  WalletReadyState,
-  type AdapterWallet,
-} from "@aptos-labs/wallet-adapter-react";
+import { useWallet, WalletReadyState, type AdapterWallet } from "@aptos-labs/wallet-adapter-react";
 import { cn } from "@/utils/styling";
 
 const buttonStyles = "nes-btn is-primary";
@@ -15,10 +11,7 @@ export const WalletButtons = () => {
   if (connected) {
     return (
       <div className="flex flex-row">
-        <div
-          className={cn(buttonStyles, "hover:bg-blue-700 btn-small")}
-          onClick={disconnect}
-        >
+        <div className={cn(buttonStyles, "hover:bg-blue-700 btn-small")} onClick={disconnect}>
           Disconnect
         </div>
       </div>
@@ -26,11 +19,7 @@ export const WalletButtons = () => {
   }
 
   if (isLoading || !wallets || !wallets[0]) {
-    return (
-      <div className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}>
-        Loading...
-      </div>
-    );
+    return <div className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}>Loading...</div>;
   }
 
   return <WalletView wallet={wallets[0]} />;
@@ -51,10 +40,7 @@ const WalletView = ({ wallet }: { wallet: AdapterWallet }) => {
 
   return (
     <button
-      className={cn(
-        buttonStyles,
-        isWalletReady ? "hover:bg-blue-700" : "opacity-50 cursor-not-allowed",
-      )}
+      className={cn(buttonStyles, isWalletReady ? "hover:bg-blue-700" : "opacity-50 cursor-not-allowed")}
       disabled={!isWalletReady}
       key={wallet.name}
       onClick={() => onWalletConnectRequest(wallet.name)}

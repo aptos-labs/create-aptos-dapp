@@ -9,7 +9,6 @@ interface LaunchpadHeaderProps {
 }
 
 export const LaunchpadHeader: FC<LaunchpadHeaderProps> = ({ title }) => {
-
   return (
     <div className="flex items-center justify-between py-2 px-4 mx-auto w-full max-w-screen-xl flex-wrap">
       <h2 className="display">{title}</h2>

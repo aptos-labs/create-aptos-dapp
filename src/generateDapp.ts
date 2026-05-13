@@ -31,9 +31,7 @@ export async function generateDapp(selection: Selections) {
   const targetDirectory = path.join(cwd, projectName);
 
   console.log(); // print new line
-  const scaffoldingSpinner = spinner(
-    `Scaffolding project in ${targetDirectory}`
-  ).start();
+  const scaffoldingSpinner = spinner(`Scaffolding project in ${targetDirectory}`).start();
   currentSpinner = scaffoldingSpinner;
 
   try {
@@ -74,9 +72,9 @@ export async function generateDapp(selection: Selections) {
             f !== "build" &&
             f !== ".env" &&
             f !== ".next" &&
-            f !== "target" // this is for the rust template
+            f !== "target", // this is for the rust template
         )
-        .map((file) => write(file))
+        .map((file) => write(file)),
     );
 
     scaffoldingSpinner.succeed();
@@ -84,9 +82,7 @@ export async function generateDapp(selection: Selections) {
     // Change to target directory
     process.chdir(targetDirectory);
 
-    if (
-      selection.template.path === FullstackBoilerplateTemplateInfo.value.path
-    ) {
+    if (selection.template.path === FullstackBoilerplateTemplateInfo.value.path) {
       cleanupFilesForSurf(selection);
     }
     // Generate and write to template .env file
@@ -94,20 +90,12 @@ export async function generateDapp(selection: Selections) {
     await write(".env", `${envFileContent}`);
 
     // Build instructions
-    let docsInstructions = blue(
-      `\n📖 Visit the ${selection.template.name} docs: ${red(
-        selection.template.doc
-      )}`
-    );
+    let docsInstructions = blue(`\n📖 Visit the ${selection.template.name} docs: ${red(selection.template.doc)}`);
     if (selection.template.video) {
-      docsInstructions += blue(
-        `\n🎬 Check out the walkthrough video: ${red(selection.template.video)}`
-      );
+      docsInstructions += blue(`\n🎬 Check out the walkthrough video: ${red(selection.template.video)}`);
     }
 
-    console.log(
-      `\nNeed to install dependencies, this might take a while - in the meantime:\n ${docsInstructions}\n`
-    );
+    console.log(`\nNeed to install dependencies, this might take a while - in the meantime:\n ${docsInstructions}\n`);
 
     // Install dependencies
     const npmSpinner = spinner(`Installing the dependencies\n`).start();
@@ -122,9 +110,7 @@ export async function generateDapp(selection: Selections) {
       await installAptosCli();
       aptosCliSpinner.succeed();
     } catch (error) {
-      console.log(
-        `\nFailed to install Aptos CLI, will try to install it later, error: ${error}`
-      );
+      console.log(`\nFailed to install Aptos CLI, will try to install it later, error: ${error}`);
       aptosCliSpinner.fail();
     }
 
@@ -141,9 +127,7 @@ export async function generateDapp(selection: Selections) {
     });
 
     // Log next steps
-    console.log(
-      green("\nSuccess! You're ready to start building your dapp on Aptos.")
-    );
+    console.log(green("\nSuccess! You're ready to start building your dapp on Aptos."));
 
     console.log(bold("\nNext steps:"));
 

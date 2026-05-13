@@ -8,9 +8,7 @@ interface KeylessAccountContextType {
   setKeylessAccount: (account: Account | null) => void;
 }
 
-const KeylessAccountContext = createContext<
-  KeylessAccountContextType | undefined
->(undefined);
+const KeylessAccountContext = createContext<KeylessAccountContextType | undefined>(undefined);
 
 export const KeylessAccountProvider: React.FC<{
   children: React.ReactNode;
@@ -18,9 +16,7 @@ export const KeylessAccountProvider: React.FC<{
   const [keylessAccount, setKeylessAccount] = useState<Account | null>(null);
 
   return (
-    <KeylessAccountContext.Provider
-      value={{ keylessAccount, setKeylessAccount }}
-    >
+    <KeylessAccountContext.Provider value={{ keylessAccount, setKeylessAccount }}>
       {children}
     </KeylessAccountContext.Provider>
   );
@@ -29,9 +25,7 @@ export const KeylessAccountProvider: React.FC<{
 export const useKeylessAccount = () => {
   const context = useContext(KeylessAccountContext);
   if (!context) {
-    throw new Error(
-      "useKeylessAccount must be used within a KeylessAccountProvider"
-    );
+    throw new Error("useKeylessAccount must be used within a KeylessAccountProvider");
   }
   return context;
 };

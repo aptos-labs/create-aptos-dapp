@@ -5,9 +5,7 @@ export type CreateMessageArguments = {
   content: string; // the content of the message
 };
 
-export const createMessage = (
-  args: CreateMessageArguments
-): InputTransactionData => {
+export const createMessage = (args: CreateMessageArguments): InputTransactionData => {
   const { content } = args;
   return {
     data: {

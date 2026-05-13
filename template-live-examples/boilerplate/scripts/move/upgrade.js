@@ -17,7 +17,7 @@ async function publish() {
       // Upgrade module from an object
       message_board_addr: process.env.VITE_MODULE_ADDRESS,
     },
-      profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
+    profile: `${process.env.PROJECT_NAME}-${process.env.VITE_APP_NETWORK}`,
   });
 }
 publish();

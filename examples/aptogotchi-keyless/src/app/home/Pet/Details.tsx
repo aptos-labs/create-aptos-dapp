@@ -16,8 +16,7 @@ export function Details() {
   const { keylessAccount } = useKeylessAccount();
 
   const [newName, setNewName] = useState<string>(pet?.name || "");
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
+  const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
 
   const owner = keylessAccount?.accountAddress.toString() || "";
 
@@ -43,19 +42,13 @@ export function Details() {
       await aptosClient().waitForTransaction({
         transactionHash: committedTxn.hash,
       });
-      toast.success(
-        `Successfully renamed your pet from ${pet?.name} to ${newName}!`,
-        {
-          action: {
-            label: "Explorer",
-            onClick: () =>
-              window.open(
-                `https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`,
-                "_blank"
-              ),
-          },
-        }
-      );
+      toast.success(`Successfully renamed your pet from ${pet?.name} to ${newName}!`, {
+        action: {
+          label: "Explorer",
+          onClick: () =>
+            window.open(`https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`, "_blank"),
+        },
+      });
 
       setPet((pet) => {
         if (!pet) return pet;
@@ -76,9 +69,7 @@ export function Details() {
 
   const nameField = (
     <div className="nes-field">
-      <label htmlFor="name_field">
-        {transactionInProgress ? "Loading..." : "Name"}
-      </label>
+      <label htmlFor="name_field">{transactionInProgress ? "Loading..." : "Name"}</label>
       <div className="relative mt-4">
         <input
           type="text"
@@ -113,13 +104,7 @@ export function Details() {
         <FaExternalLinkAlt className="h-4 w-4 drop-shadow-sm" />
       </a>
       <div className="relative mt-4">
-        <input
-          type="text"
-          id="owner_field"
-          className="nes-input pr-14"
-          disabled
-          value={owner}
-        />
+        <input type="text" id="owner_field" className="nes-input pr-14" disabled value={owner} />
         <button
           className="absolute right-4 top-1/2 -translate-y-1/2 nes-pointer disabled:cursor-not-allowed text-gray-400 disabled:text-gray-400"
           disabled={!owner}
@@ -135,11 +120,7 @@ export function Details() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col">
         <label>Energy Points</label>
-        <HealthBar
-          totalHealth={10}
-          currentHealth={pet?.energy_points || 0}
-          icon="star"
-        />
+        <HealthBar totalHealth={10} currentHealth={pet?.energy_points || 0} icon="star" />
       </div>
       <div className="flex flex-col gap-2">
         {nameField}

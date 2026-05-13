@@ -28,8 +28,8 @@ export const parseCommandOptions = async (options: CliFlags) => {
     if (hasNewFlags) {
       console.error(
         red(
-          "Error: --example cannot be combined with other flags (--project-type, --template, --framework, --network, --use-surf, --api-key, --name)"
-        )
+          "Error: --example cannot be combined with other flags (--project-type, --template, --framework, --network, --use-surf, --api-key, --name)",
+        ),
       );
       process.exit(1);
     }

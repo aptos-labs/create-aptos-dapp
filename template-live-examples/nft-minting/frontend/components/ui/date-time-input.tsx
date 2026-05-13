@@ -20,17 +20,7 @@ export const DateTimeInput: FC<{
   time?: string;
   onTimeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   id: string;
-}> = ({
-  className,
-  id,
-  tooltip,
-  label,
-  disabled,
-  date,
-  onDateChange,
-  time,
-  onTimeChange,
-}) => {
+}> = ({ className, id, tooltip, label, disabled, date, onDateChange, time, onTimeChange }) => {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       <Label htmlFor={id} tooltip={tooltip}>
@@ -42,16 +32,10 @@ export const DateTimeInput: FC<{
             disabled={disabled}
             id={id}
             variant="outline"
-            className={cn(
-              "justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}>
+            className={cn("justify-start text-left font-normal", !date && "text-muted-foreground")}
+          >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? (
-              format(date, "MM/dd/yyyy hh:mm a")
-            ) : (
-              <span>Pick a date</span>
-            )}
+            {date ? format(date, "MM/dd/yyyy hh:mm a") : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto">
@@ -60,14 +44,7 @@ export const DateTimeInput: FC<{
             selected={date}
             onSelect={onDateChange}
             initialFocus
-            footer={
-              <Input
-                type="time"
-                className="w-max py-6"
-                value={time}
-                onChange={onTimeChange}
-              />
-            }
+            footer={<Input type="time" className="w-max py-6" value={time} onChange={onTimeChange} />}
           />
         </PopoverContent>
       </Popover>

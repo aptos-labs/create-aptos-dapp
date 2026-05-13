@@ -9,12 +9,7 @@ export function TransactionOnExplorer({ hash }: TransactionOnExplorerProps) {
   return (
     <>
       View on Explorer:{" "}
-      <a
-        href={explorerLink}
-        target="_blank"
-        rel="noreferrer"
-        className="text-blue-600 dark:text-blue-300"
-      >
+      <a href={explorerLink} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-300">
         {explorerLink}
       </a>
     </>
@@ -28,12 +23,7 @@ export interface ObjectOnExplorerProps {
 export function ObjectOnExplorer({ address }: ObjectOnExplorerProps) {
   const explorerLink = `https://explorer.aptoslabs.com/object/${address}${`?network=${NETWORK}`}`;
   return (
-    <a
-      href={explorerLink}
-      target="_blank"
-      rel="noreferrer"
-      className="text-blue-600 dark:text-blue-300"
-    >
+    <a href={explorerLink} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-300">
       View on Explorer
     </a>
   );

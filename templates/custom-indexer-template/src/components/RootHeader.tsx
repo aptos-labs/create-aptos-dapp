@@ -10,10 +10,7 @@ export const RootHeader = () => {
         </h1>
       </div>
       <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-10">
-        <a
-          href="/analytics"
-          className="text-base text-muted-foreground font-medium leading-none"
-        >
+        <a href="/analytics" className="text-base text-muted-foreground font-medium leading-none">
           Analytics
         </a>
       </div>

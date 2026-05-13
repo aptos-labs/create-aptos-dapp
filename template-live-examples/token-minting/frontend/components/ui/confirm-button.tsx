@@ -28,9 +28,7 @@ export const ConfirmButton: FC<{
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm</AlertDialogTitle>
-          <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-            {confirmMessage}
-          </div>
+          <div className="flex flex-col gap-2 text-sm text-muted-foreground">{confirmMessage}</div>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
