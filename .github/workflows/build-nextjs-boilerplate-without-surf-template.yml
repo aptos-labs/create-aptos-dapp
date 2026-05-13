@@ -28,7 +28,6 @@ jobs:
       # Install pnpm
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
           run_install: false
 
       # Install deps and build.
@@ -36,5 +35,5 @@ jobs:
       - run: CI= pnpm build
 
       # Verify that the format is correct
-      - run: pnpm exec biome format --check .
+      - run: pnpm exec biome format .
         shell: bash
