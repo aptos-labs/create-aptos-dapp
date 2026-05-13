@@ -21,7 +21,7 @@ export function TradeShare({ issuerAddress }: TradeShareProps) {
   const { client: walletClient } = useWalletClient();
   const { account } = useWallet();
   const { toast } = useToast();
-  const holding = useGetHolding(issuerAddress, account?.address as `0x${string}`);
+  const holding = useGetHolding(issuerAddress, account?.address?.toString() as `0x${string}`);
   const issuerObjectAddress = useGetIssuerObjectAddress(issuerAddress);
 
   const [amount, setAmount] = useState(0);

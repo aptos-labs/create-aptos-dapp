@@ -186,7 +186,12 @@ function App() {
                 <div key={task.task_id} className="flex justify-between flex-row">
                   <p className="text-xl font-bold">{task.content}</p>
                   <div>
-                    <Input type="checkbox" />
+                    <Input
+                      type="checkbox"
+                      checked={task.completed}
+                      disabled={task.completed}
+                      onChange={(e) => onCheckboxChange(e, task.task_id)}
+                    />
                   </div>
                 </div>
               ))}

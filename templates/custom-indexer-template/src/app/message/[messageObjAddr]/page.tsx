@@ -1,11 +1,11 @@
 import { Message } from "@/components/Message";
 
-export default function MessagePage({
+export default async function MessagePage({
   params,
 }: {
-  params: { messageObjAddr: `0x${string}` };
+  params: Promise<{ messageObjAddr: `0x${string}` }>;
 }) {
-  const { messageObjAddr } = params;
+  const { messageObjAddr } = await params;
 
   return <Message messageObjAddr={messageObjAddr} />;
 }

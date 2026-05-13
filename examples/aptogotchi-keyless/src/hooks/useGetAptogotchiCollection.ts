@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { useKeylessAccount } from "@/context/KeylessAccountContext";
 import { queryAptogotchiCollection } from "@/graphql/queryAptogotchiCollection";
 import { padAddressIfNeeded } from "@/utils/address";
-import { getAptosClient, surfClient } from "@/utils/aptosClient";
+import { aptosClient, surfClient } from "@/utils/aptosClient";
 
 interface Collection {
   collection_id: string;
