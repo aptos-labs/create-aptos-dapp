@@ -1,6 +1,6 @@
 import { isAptosConnectWallet, useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 // Internal components
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +44,15 @@ export function CreateFungibleAsset() {
 
   // Local Ref
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Blob URL for the local image preview; revoked on change/unmount.
+  // Safe under js/xss-through-dom: URL.createObjectURL returns a sandboxed
+  // blob: URL used only as an <img> src attribute (not parsed as HTML).
+  const imagePreviewUrl = useMemo(() => (image ? URL.createObjectURL(image) : null), [image]);
+  useEffect(() => {
+    if (!imagePreviewUrl) return;
+    return () => URL.revokeObjectURL(imagePreviewUrl);
+  }, [imagePreviewUrl]);
 
   const disableCreateAssetButton =
     !name || !symbol || !maxSupply || !decimal || !projectURL || !maxMintPerAccount || !account || isUploading;
@@ -148,9 +157,9 @@ export function CreateFungibleAsset() {
                     setImage(e.target.files![0]);
                   }}
                 />
-                {image && (
+                {image && imagePreviewUrl && (
                   <>
-                    <img src={URL.createObjectURL(image)} alt={image.name} />
+                    <img src={imagePreviewUrl} alt={image.name} />
                     <p className="body-sm">
                       {image.name}
                       <Button
