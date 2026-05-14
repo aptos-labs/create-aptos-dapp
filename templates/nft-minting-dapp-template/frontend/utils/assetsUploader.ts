@@ -100,8 +100,7 @@ export const uploadCollectionData = async (
     try {
       // Upload collection thumbnail image and all NFT images as a folder
       imageFolderReceipt = await uploadFolder(aptosWallet, [...imageFiles, collectionCover]);
-      // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
-    } catch (error: any) {
+    } catch (error) {
       throw new Error(`Error uploading collection image and NFT images ${error}`);
     }
 
@@ -140,8 +139,7 @@ export const uploadCollectionData = async (
         collectionName: parsedCollectionMetadata.name,
         collectionDescription: parsedCollectionMetadata.description,
       };
-      // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
-    } catch (error: any) {
+    } catch (error) {
       throw new Error(`Error uploading collection metadata and NFTs' metadata ${error}`);
     }
   } else {

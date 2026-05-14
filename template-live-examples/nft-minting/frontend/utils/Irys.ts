@@ -34,8 +34,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, files: File[]
     try {
       await fundNode(aptosWallet, costToUpload.toNumber());
       return true;
-      // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
-    } catch (error: any) {
+    } catch (error) {
       throw new Error(`Error funding node ${error}`);
     }
   }
@@ -64,8 +63,7 @@ export const uploadFile = async (
   try {
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });
     return `https://gateway.irys.xyz/${receipt.id}`;
-    // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
-  } catch (e: any) {
+  } catch (e) {
     throw new Error(`Error uploading file ${e}`);
   }
 };
@@ -81,8 +79,7 @@ export const uploadFolder = async (aptosWallet: WalletContextState, files: File[
       access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`,
     );
     return `https://gateway.irys.xyz/${receipt.manifestId}`;
-    // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
-  } catch (e: any) {
+  } catch (e) {
     throw new Error(`Error uploading folder ${e}`);
   }
 };
