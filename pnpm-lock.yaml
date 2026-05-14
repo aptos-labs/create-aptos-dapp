@@ -36,8 +36,8 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
       typescript:
-        specifier: 4.9.5
-        version: 4.9.5
+        specifier: 5.9.3
+        version: 5.9.3
     devDependencies:
       '@biomejs/biome':
         specifier: 2.4.14
@@ -525,9 +525,9 @@ packages:
     resolution: {integrity: sha512-pkonvlKk8/ZuR0D5tLW8ljt5I8kmxp2XKymhepUeOdCEfKpZaktSArkLHZt76OB1ZvO9bssUsDty4SWhLvZpLg==}
     engines: {node: '>=0.10.0'}
 
-  typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
     hasBin: true
 
   undici-types@6.21.0:
@@ -986,7 +986,7 @@ snapshots:
     dependencies:
       escape-string-regexp: 1.0.5
 
-  typescript@4.9.5: {}
+  typescript@5.9.3: {}
 
   undici-types@6.21.0: {}
 
