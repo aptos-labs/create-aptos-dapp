@@ -159,7 +159,7 @@ export function CreateFungibleAsset() {
                 />
                 {image && imagePreviewUrl && (
                   <>
-                    <img src={imagePreviewUrl} alt={image.name} />
+                    <img src={imagePreviewUrl} alt="Selected asset image preview" />
                     <p className="body-sm">
                       {image.name}
                       <Button
