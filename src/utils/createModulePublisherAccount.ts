@@ -1,17 +1,9 @@
-import {
-  Account,
-  AptosConfig,
-  Aptos,
-  Network,
-  Ed25519Account,
-} from "@aptos-labs/ts-sdk";
+import { Account, AptosConfig, Aptos, Network, Ed25519Account } from "@aptos-labs/ts-sdk";
 import { blue, yellow } from "kolorist";
 import { Selections } from "../types.js";
 import { TemplateNetwork } from "./constants.js";
 
-export const createModulePublisherAccount = async (
-  selection: Selections
-): Promise<Ed25519Account | null> => {
+export const createModulePublisherAccount = async (selection: Selections): Promise<Ed25519Account | null> => {
   if (selection.network === TemplateNetwork.MAINNET) {
     return null;
   }
@@ -20,9 +12,9 @@ export const createModulePublisherAccount = async (
   if (selection.network === TemplateNetwork.TESTNET) {
     console.log(
       `${yellow(
-        `To create a module publisher account on Testnet, please fund an account manually through the faucet web view on https://aptos.dev/en/network/faucet and then fill out the MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY and MODULE_PUBLISHER_ACCOUNT_ADDRESS in your project .env file.`
+        `To create a module publisher account on Testnet, please fund an account manually through the faucet web view on https://aptos.dev/en/network/faucet and then fill out the MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY and MODULE_PUBLISHER_ACCOUNT_ADDRESS in your project .env file.`,
       )}
-     `
+     `,
     );
     return null;
   }
@@ -42,8 +34,8 @@ export const createModulePublisherAccount = async (
   } catch (error: any) {
     console.log(
       `${blue(
-        "Could not create a module publisher account, please fill out manually the MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY and MODULE_PUBLISHER_ACCOUNT_ADDRESS in your project .env file."
-      )} \nError: ${error}`
+        "Could not create a module publisher account, please fill out manually the MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY and MODULE_PUBLISHER_ACCOUNT_ADDRESS in your project .env file.",
+      )} \nError: ${error}`,
     );
     return null;
   }

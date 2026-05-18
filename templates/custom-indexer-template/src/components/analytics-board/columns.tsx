@@ -10,15 +10,11 @@ import { NETWORK } from "@/constants";
 export const columns: ColumnDef<Message>[] = [
   {
     accessorKey: "user_addr",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="User Address" />
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="User Address" />,
     cell: ({ row }) => (
       <div className="w-[80px]">
         <a
-          href={`https://explorer.aptoslabs.com/account/${row.getValue(
-            "user_addr"
-          )}?network=${NETWORK}`}
+          href={`https://explorer.aptoslabs.com/account/${row.getValue("user_addr")}?network=${NETWORK}`}
           target="_blank"
           rel="noreferrer"
           className="text-blue-600 dark:text-blue-300"
@@ -31,32 +27,20 @@ export const columns: ColumnDef<Message>[] = [
   },
   {
     accessorKey: "created_messages",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Message Created" />
-    ),
-    cell: ({ row }) => (
-      <div className="w-[160px]">{row.getValue("created_messages")}</div>
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Message Created" />,
+    cell: ({ row }) => <div className="w-[160px]">{row.getValue("created_messages")}</div>,
     enableSorting: false,
   },
   {
     accessorKey: "updated_messages",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Message Updated" />
-    ),
-    cell: ({ row }) => (
-      <div className="w-[160px]">{row.getValue("updated_messages")}</div>
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Message Updated" />,
+    cell: ({ row }) => <div className="w-[160px]">{row.getValue("updated_messages")}</div>,
     enableSorting: false,
   },
   {
     accessorKey: "total_points",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Total Points" />
-    ),
-    cell: ({ row }) => (
-      <div className="w-[160px]">{row.getValue("total_points")}</div>
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Total Points" />,
+    cell: ({ row }) => <div className="w-[160px]">{row.getValue("total_points")}</div>,
     enableSorting: true,
   },
 ];

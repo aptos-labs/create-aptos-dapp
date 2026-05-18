@@ -64,16 +64,16 @@ export const getUserPackageManager = () => {
   const DEFAULT_PACKAGE_MANAGER = NPM_CONFIG_USER_AGENT.startsWith("yarn")
     ? "yarn"
     : NPM_CONFIG_USER_AGENT.startsWith("pnpm")
-    ? "pnpm"
-    : "npm";
+      ? "pnpm"
+      : "npm";
   const packageManagerInitialIndex =
     DEFAULT_PACKAGE_MANAGER === "npm"
       ? 0
       : DEFAULT_PACKAGE_MANAGER === "yarn"
-      ? 1
-      : DEFAULT_PACKAGE_MANAGER === "pnpm"
-      ? 2
-      : 0;
+        ? 1
+        : DEFAULT_PACKAGE_MANAGER === "pnpm"
+          ? 2
+          : 0;
   return packageManagerInitialIndex;
 };
 

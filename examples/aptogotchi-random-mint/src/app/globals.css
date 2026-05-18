@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-*, ::before, ::after {
+*,
+::before,
+::after {
   box-sizing: border-box;
   word-spacing: -0.25rem;
 }
@@ -17,7 +19,8 @@ body {
   border-image-repeat: stretch !important;
 }
 
-.nes-input, .nes-textarea {
+.nes-input,
+.nes-textarea {
   /* This fixes a bug in NES.css */
   border-image-repeat: stretch !important;
 }

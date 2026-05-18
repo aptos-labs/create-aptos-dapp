@@ -25,23 +25,26 @@
     "token-minting:build": "cd template-live-examples/token-minting && npm run build",
     "token-minting:deploy": "npm run token-minting:build && gh-pages --dist template-live-examples/token-minting/dist --dest token-minting",
     "token-staking:build": "cd template-live-examples/token-staking && npm run build",
-    "token-staking:deploy": "npm run token-staking:build && gh-pages --dist template-live-examples/token-staking/dist --dest token-staking"
+    "token-staking:deploy": "npm run token-staking:build && gh-pages --dist template-live-examples/token-staking/dist --dest token-staking",
+    "lint": "biome lint src/ index.ts",
+    "fmt": "biome format --write src/ index.ts"
   },
   "files": [
     "dist"
   ],
   "type": "module",
   "dependencies": {
-    "@aptos-labs/ts-sdk": "^2.0.0",
-    "commander": "^12.1.0",
-    "kolorist": "^1.8.0",
-    "ora": "^8.0.1",
-    "prompts": "^2.4.2",
-    "typescript": "^4.7.4"
+    "@aptos-labs/ts-sdk": "6.3.1",
+    "commander": "12.1.0",
+    "kolorist": "1.8.0",
+    "ora": "8.2.0",
+    "prompts": "2.4.2",
+    "typescript": "5.9.3"
   },
   "devDependencies": {
-    "@types/node": "^20.5.0",
-    "gh-pages": "^6.1.1"
+    "@biomejs/biome": "2.4.14",
+    "@types/node": "20.19.39",
+    "gh-pages": "6.3.0"
   },
   "overrides": {
     "@noble/curves": "1.6.0"
@@ -53,5 +56,25 @@
   "homepage": "https://github.com/aptos-labs/create-aptos-dapp/blob/main/README.md",
   "bugs": {
     "url": "https://github.com/aptos-labs/create-aptos-dapp/issues"
-  }
+  },
+  "pnpm": {
+    "overrides": {
+      "undici": "6.25.0",
+      "tar": "7.5.13",
+      "semver": "7.7.4",
+      "debug": "4.4.3",
+      "path-to-regexp": "6.3.0",
+      "ajv": "8.20.0",
+      "@tootallnate/once": "3.0.1",
+      "postcss": "8.5.14",
+      "axios": "1.16.0",
+      "bn.js": "5.2.3"
+    },
+    "auditConfig": {
+      "ignoreGhsas": [
+        "GHSA-848j-6mx2-7j84"
+      ]
+    }
+  },
+  "packageManager": "pnpm@10.33.2"
 }

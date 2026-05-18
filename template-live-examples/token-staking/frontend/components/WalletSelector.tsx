@@ -2,7 +2,7 @@ import {
   APTOS_CONNECT_ACCOUNT_URL,
   AboutAptosConnect,
   AboutAptosConnectEducationScreen,
-AdapterNotDetectedWallet,
+  AdapterNotDetectedWallet,
   AdapterWallet,
   AptosPrivacyPolicy,
   WalletItem,

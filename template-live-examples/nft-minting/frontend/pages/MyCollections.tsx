@@ -29,7 +29,7 @@ export function MyCollections() {
         </TableHeader>
         <TableBody>
           {collections.length > 0 &&
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // biome-ignore lint/suspicious/noExplicitAny: indexer response shape
             collections.map((collection: any) => {
               return (
                 <TableRow key={collection?.collection_id}>

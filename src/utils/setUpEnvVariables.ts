@@ -7,10 +7,7 @@ import {
   TemplateProjectType,
 } from "./constants.js";
 
-export const setUpEnvVariables = (
-  selection: Selections,
-  publisherAccount: Ed25519Account | null
-): string => {
+export const setUpEnvVariables = (selection: Selections, publisherAccount: Ed25519Account | null): string => {
   let content = `PROJECT_NAME=${selection.projectName}`;
 
   if (selection.framework === TemplateFramework.VITE) {

@@ -14,8 +14,7 @@ export interface MintProps {
 export function Mint({ fetchPet }: MintProps) {
   const [name, setName] = useState<string>("");
   const [petParts, setPetParts] = useState<PetParts>(DEFAULT_PET.parts);
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
+  const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
 
   const { keylessAccount } = useKeylessAccount();
 
@@ -45,10 +44,7 @@ export function Mint({ fetchPet }: MintProps) {
         action: {
           label: "Explorer",
           onClick: () =>
-            window.open(
-              `https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`,
-              "_blank"
-            ),
+            window.open(`https://explorer.aptoslabs.com/txn/${committedTxn.hash}?network=testnet`, "_blank"),
         },
       });
     } catch (error) {

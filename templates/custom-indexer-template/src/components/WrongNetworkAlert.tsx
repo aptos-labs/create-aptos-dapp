@@ -20,10 +20,8 @@ export function WrongNetworkAlert() {
               Wrong Network
             </Dialog.Title>
             <Dialog.Description className="text-lg text-gray-700 dark:text-gray-300">
-              Your wallet is currently on{" "}
-              <span className="font-bold">{network?.name}</span>. Please switch
-              to <span className="font-bold">{NETWORK}</span> to continue using
-              the app.
+              Your wallet is currently on <span className="font-bold">{network?.name}</span>. Please switch to{" "}
+              <span className="font-bold">{NETWORK}</span> to continue using the app.
             </Dialog.Description>
           </div>
         </Dialog.Content>

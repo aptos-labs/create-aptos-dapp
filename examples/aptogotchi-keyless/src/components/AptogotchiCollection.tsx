@@ -5,8 +5,7 @@ import { useGetAptogotchiCollection } from "@/hooks/useGetAptogotchiCollection";
 
 export function AptogotchiCollection() {
   const { keylessAccount } = useKeylessAccount();
-  const { collection, firstFewAptogotchiName, loading, fetchCollection } =
-    useGetAptogotchiCollection();
+  const { collection, firstFewAptogotchiName, loading, fetchCollection } = useGetAptogotchiCollection();
 
   useEffect(() => {
     if (!keylessAccount?.accountAddress) return;
@@ -19,9 +18,7 @@ export function AptogotchiCollection() {
     <div className="nes-container with-title sm:h-[100px] mt-4">
       <p>{`There are a total of ${collection.current_supply} Aptogotchis in existence.`}</p>
       <p>{`Meet your fellow Aptogotchis: ${firstFewAptogotchiName?.join(", ")}${
-        (firstFewAptogotchiName?.length || 0) < collection.current_supply
-          ? "..."
-          : ""
+        (firstFewAptogotchiName?.length || 0) < collection.current_supply ? "..." : ""
       }`}</p>
     </div>
   );

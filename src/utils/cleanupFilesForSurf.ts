@@ -16,28 +16,17 @@ export const cleanupFilesForSurf = (selection: Selections) => {
   if (selection.useSurf) {
     const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
     packageJson.dependencies["@thalalabs/surf"] = "^1.9.6";
-    packageJson.scripts["move:publish"] =
-      "node ./scripts/move/publish && node ./scripts/move/get_abi";
-    packageJson.scripts["move:upgrade"] =
-      "node ./scripts/move/upgrade && node ./scripts/move/get_abi";
+    packageJson.scripts["move:publish"] = "node ./scripts/move/publish && node ./scripts/move/get_abi";
+    packageJson.scripts["move:upgrade"] = "node ./scripts/move/upgrade && node ./scripts/move/get_abi";
 
     fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2));
 
     remove(`${frontend_dir}/entry-functions`);
     remove(`${frontend_dir}/view-functions`);
 
-    move(
-      `${frontend_dir}/components/MessageBoardWithSurf.tsx`,
-      `${frontend_dir}/components/MessageBoard.tsx`
-    );
-    move(
-      `${frontend_dir}/components/TransferAPTWithSurf.tsx`,
-      `${frontend_dir}/components/TransferAPT.tsx`
-    );
-    move(
-      `${frontend_dir}/view-functions-with-surf`,
-      `${frontend_dir}/view-functions`
-    );
+    move(`${frontend_dir}/components/MessageBoardWithSurf.tsx`, `${frontend_dir}/components/MessageBoard.tsx`);
+    move(`${frontend_dir}/components/TransferAPTWithSurf.tsx`, `${frontend_dir}/components/TransferAPT.tsx`);
+    move(`${frontend_dir}/view-functions-with-surf`, `${frontend_dir}/view-functions`);
   } else {
     remove("scripts/move/get_abi.js");
 

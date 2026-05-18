@@ -2,20 +2,12 @@ import path from "path";
 import { fileURLToPath } from "node:url";
 
 import { Selections } from "../types.js";
-import {
-  FullstackBoilerplateTemplateInfo,
-  TemplateFramework,
-  TemplateProjectType,
-} from "./constants.js";
+import { FullstackBoilerplateTemplateInfo, TemplateFramework, TemplateProjectType } from "./constants.js";
 
 export const getTemplateDirectory = (selection: Selections) => {
   const templatePath = resolveTemplateDirectory(selection);
 
-  return path.resolve(
-    fileURLToPath(import.meta.url),
-    "../../../templates",
-    templatePath
-  );
+  return path.resolve(fileURLToPath(import.meta.url), "../../../templates", templatePath);
 };
 
 export const resolveTemplateDirectory = (selection: Selections) => {

@@ -1,7 +1,7 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
   const move = new cli.Move();
@@ -14,7 +14,10 @@ async function publish() {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
         message_board_addr: process.env.NEXT_MODULE_PUBLISHER_ACCOUNT_ADDRESS,
       },
-      extraArguments: [`--private-key=${process.env.NEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.NEXT_PUBLIC_APP_NETWORK]}`],
+      extraArguments: [
+        `--private-key=${process.env.NEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+        `--url=${aptosSDK.NetworkToNodeAPI[process.env.NEXT_PUBLIC_APP_NETWORK]}`,
+      ],
     })
     .then((response) => {
       const filePath = ".env";

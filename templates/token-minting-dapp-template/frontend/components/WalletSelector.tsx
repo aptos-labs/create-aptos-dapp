@@ -88,12 +88,15 @@ interface ConnectWalletDialogProps {
 
 function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
   const { wallets = [], notDetectedWallets = [] } = useWallet();
-  
+
   const location = useLocation();
-  
+
   const isPublicMintPage = location.pathname !== "/create-asset" && location.pathname !== "/my-assets";
-  
-  const { aptosConnectWallets, availableWallets, installableWallets } = groupAndSortWallets([...wallets, ...notDetectedWallets]);
+
+  const { aptosConnectWallets, availableWallets, installableWallets } = groupAndSortWallets([
+    ...wallets,
+    ...notDetectedWallets,
+  ]);
 
   const hasAptosConnectWallets = !!aptosConnectWallets.length;
 

@@ -34,8 +34,7 @@ export const checkIfFund = async (aptosWallet: WalletContextState, files: File[]
     try {
       await fundNode(aptosWallet, costToUpload.toNumber());
       return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error) {
       throw new Error(`Error funding node ${error}`);
     }
   }
@@ -56,7 +55,7 @@ export const fundNode = async (aptosWallet: WalletContextState, amount?: number)
 };
 
 export const uploadFile = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: wallet adapter type
   aptosWallet: any,
   fileToUpload: File,
 ): Promise<string> => {
@@ -64,8 +63,7 @@ export const uploadFile = async (
   try {
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });
     return `https://gateway.irys.xyz/${receipt.id}`;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
+  } catch (e) {
     throw new Error(`Error uploading file ${e}`);
   }
 };
@@ -81,8 +79,7 @@ export const uploadFolder = async (aptosWallet: WalletContextState, files: File[
       access with: https://gateway.irys.xyz/${receipt.manifestId}/<image-name>`,
     );
     return `https://gateway.irys.xyz/${receipt.manifestId}`;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
+  } catch (e) {
     throw new Error(`Error uploading folder ${e}`);
   }
 };

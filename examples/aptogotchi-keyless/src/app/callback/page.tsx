@@ -54,9 +54,7 @@ function CallbackPage() {
       if (!ephemeralKeyPair) {
         setHasError(true);
         setProgress(100);
-        toast.error(
-          "No ephemeral key pair found for the given nonce. Please try logging in again."
-        );
+        toast.error("No ephemeral key pair found for the given nonce. Please try logging in again.");
         return;
       }
 
@@ -69,10 +67,7 @@ function CallbackPage() {
     deriveAccount();
   }, []);
 
-  const createKeylessAccount = async (
-    jwt: string,
-    ephemeralKeyPair: EphemeralKeyPair
-  ) => {
+  const createKeylessAccount = async (jwt: string, ephemeralKeyPair: EphemeralKeyPair) => {
     const keylessAccount = await aptosClient().deriveKeylessAccount({
       jwt,
       ephemeralKeyPair,
@@ -90,9 +85,7 @@ function CallbackPage() {
         });
       } catch (error) {
         console.log("Error funding account: ", error);
-        toast.error(
-          "Failed to fund account. Please try logging in again or use another account."
-        );
+        toast.error("Failed to fund account. Please try logging in again or use another account.");
       }
     }
 
@@ -105,11 +98,7 @@ function CallbackPage() {
       <div className="nes-container is-rounded shadow-md cursor-not-allowed bg-gray-200">
         <h1>Loading your blockchain account...</h1>
         <br />
-        <progress
-          className={`nes-progress ${hasError ? "is-error" : "is-primary"}`}
-          value={progress}
-          max="100"
-        />
+        <progress className={`nes-progress ${hasError ? "is-error" : "is-primary"}`} value={progress} max="100" />
       </div>
     </div>
   );

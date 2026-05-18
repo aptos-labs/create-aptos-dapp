@@ -15,6 +15,9 @@ export default defineConfig({
     VitePWA({
       disable: false,
       registerType: "autoUpdate",
+      workbox: {
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+      },
       manifest: {
         name: "Aptos Fullstack Template",
         short_name: "Aptos Template",

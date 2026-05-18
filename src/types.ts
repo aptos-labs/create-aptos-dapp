@@ -1,18 +1,8 @@
 import type prompts from "prompts";
-import {
-  TemplateFramework,
-  TemplateNetwork,
-  TemplateProjectType,
-} from "./utils/constants";
+import { TemplateFramework, TemplateNetwork, TemplateProjectType } from "./utils/constants";
 
 export type Result = prompts.Answers<
-  | "projectName"
-  | "projectType"
-  | "template"
-  | "network"
-  | "useSurf"
-  | "useApiKey"
-  | "apiKey"
+  "projectName" | "projectType" | "template" | "network" | "useSurf" | "useApiKey" | "apiKey"
 >;
 
 export type Template = {
@@ -22,14 +12,9 @@ export type Template = {
   video?: string;
 };
 
-export type ProjectType =
-  | TemplateProjectType.MOVE
-  | TemplateProjectType.FULLSTACK;
+export type ProjectType = TemplateProjectType.MOVE | TemplateProjectType.FULLSTACK;
 
-export type Network =
-  | TemplateNetwork.MAINNET
-  | TemplateNetwork.TESTNET
-  | TemplateNetwork.DEVNET;
+export type Network = TemplateNetwork.MAINNET | TemplateNetwork.TESTNET | TemplateNetwork.DEVNET;
 
 export type Framework = TemplateFramework.VITE | TemplateFramework.NEXTJS;
 

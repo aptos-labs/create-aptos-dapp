@@ -9,24 +9,16 @@ import { Message } from "@/lib/type/message";
 export const columns: ColumnDef<Message>[] = [
   {
     accessorKey: "content",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Message Content" />
-    ),
-    cell: ({ row }) => (
-      <div className="w-[80px]">{row.getValue("content")}</div>
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Message Content" />,
+    cell: ({ row }) => <div className="w-[80px]">{row.getValue("content")}</div>,
     enableSorting: false,
   },
   {
     accessorKey: "creation_timestamp",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Creation Timestamp" />
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Creation Timestamp" />,
     cell: ({ row }) => (
       <div className="w-[160px]">
-        {new Date(
-          (row.getValue("creation_timestamp") as number) * 1000
-        ).toLocaleString()}
+        {new Date((row.getValue("creation_timestamp") as number) * 1000).toLocaleString()}
       </div>
     ),
     enableSorting: true,

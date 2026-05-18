@@ -11,7 +11,7 @@ import { TradeShare } from "@/components/TradeShare";
 
 export function MyProfile() {
   const { connected, account } = useWallet();
-  const hasIssuedShare = useHasIssuedShare(account?.address as `0x${string}`);
+  const hasIssuedShare = useHasIssuedShare(account?.address?.toString() as `0x${string}`);
 
   return (
     <>
@@ -22,14 +22,14 @@ export function MyProfile() {
             <CardContent className="flex flex-col gap-10 pt-6">
               {hasIssuedShare ? (
                 <>
-                  <IssuerDetails issuerAddress={account.address as `0x${string}`} />
-                  <TradeShare issuerAddress={account.address as `0x${string}`} />
-                  <IssuerShareHolders issuerAddress={account.address as `0x${string}`} />
+                  <IssuerDetails issuerAddress={account.address.toString() as `0x${string}`} />
+                  <TradeShare issuerAddress={account.address.toString() as `0x${string}`} />
+                  <IssuerShareHolders issuerAddress={account.address.toString() as `0x${string}`} />
                 </>
               ) : (
                 <IssueShare />
               )}
-              <UserHoldings userAddress={account.address as `0x${string}`} />
+              <UserHoldings userAddress={account.address.toString() as `0x${string}`} />
             </CardContent>
           </Card>
         ) : (

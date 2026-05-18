@@ -6,28 +6,26 @@ export default defineConfig({
   build: {
     outDir: "dist",
     rollupOptions: {
-      external: ['buffer'],
+      external: ["buffer"],
     },
   },
   server: {
     open: true,
   },
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./frontend"),
-      buffer: 'buffer',
-      process: 'process/browser',
-      stream: 'stream-browserify',
-      util: 'util',
+      buffer: "buffer",
+      process: "process/browser",
+      stream: "stream-browserify",
+      util: "util",
     },
   },
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: 'globalThis',
+        global: "globalThis",
       },
     },
   },

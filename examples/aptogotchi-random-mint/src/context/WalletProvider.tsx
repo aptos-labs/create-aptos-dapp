@@ -6,10 +6,7 @@ import { NETWORK } from "@/utils/constants";
 
 export function WalletProvider({ children }: PropsWithChildren) {
   return (
-    <AptosWalletAdapterProvider
-      autoConnect={true}
-      dappConfig={{ network: NETWORK }}
-    >
+    <AptosWalletAdapterProvider autoConnect={true} dappConfig={{ network: NETWORK }}>
       {children}
     </AptosWalletAdapterProvider>
   );

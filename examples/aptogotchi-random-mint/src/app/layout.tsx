@@ -21,10 +21,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <head>
-        <meta
-          name="google-site-verification"
-          content="Rnm3DL87HNmPncIFwBLXPhy-WGFDXIyplSL4fRtnFsA"
-        />
+        <meta name="google-site-verification" content="Rnm3DL87HNmPncIFwBLXPhy-WGFDXIyplSL4fRtnFsA" />
       </head>
       <body className={kongtext.className}>
         <WalletProvider>

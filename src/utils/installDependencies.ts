@@ -6,9 +6,7 @@ import { Context } from "./context";
  */
 export const installDependencies = (context: Context) => {
   return new Promise((resolve, reject) => {
-    const npmInstall = exec(
-      "npm install --color --no-audit --verbose --progress"
-    );
+    const npmInstall = exec("npm install --color --no-audit --verbose --progress");
 
     // if verbos is set, pipe std to console output
     if (context.verbose) {

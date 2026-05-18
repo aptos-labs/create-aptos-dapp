@@ -22,11 +22,7 @@ export async function generateExample(options: GenerateExampleInput) {
   let currentSpinner: Ora | null = null;
 
   // internal examples directory path
-  const exampleDir = path.resolve(
-    fileURLToPath(import.meta.url),
-    "../../examples",
-    example
-  );
+  const exampleDir = path.resolve(fileURLToPath(import.meta.url), "../../examples", example);
 
   // validate existing example folder for the provided example name
   try {
@@ -54,12 +50,10 @@ export async function generateExample(options: GenerateExampleInput) {
         onCancel: () => {
           throw new Error(red("✖") + " Operation cancelled");
         },
-      }
+      },
     );
     if (!confirm) {
-      throw new Error(
-        "decline override, please use another folder to generate the example in"
-      );
+      throw new Error("decline override, please use another folder to generate the example in");
     }
   }
 
@@ -70,9 +64,7 @@ export async function generateExample(options: GenerateExampleInput) {
   const targetDirectory = path.join(cwd, example);
 
   console.log(); // print new line
-  const scaffoldingSpinner = spinner(
-    `Generating example in ${targetDirectory}`
-  ).start();
+  const scaffoldingSpinner = spinner(`Generating example in ${targetDirectory}`).start();
   currentSpinner = scaffoldingSpinner;
 
   try {
@@ -111,18 +103,16 @@ export async function generateExample(options: GenerateExampleInput) {
             f !== "package-lock.json" &&
             f !== ".aptos" &&
             f !== "build" &&
-            f !== ".env"
+            f !== ".env",
         )
-        .map((file) => write(file))
+        .map((file) => write(file)),
     );
 
     // cd into target directory
     process.chdir(targetDirectory);
 
     // create .env file
-    let envContent = `PROJECT_NAME=${example}\n${
-      isNextJs ? "NEXT_PUBLIC" : "VITE"
-    }_APP_NETWORK=testnet`;
+    let envContent = `PROJECT_NAME=${example}\n${isNextJs ? "NEXT_PUBLIC" : "VITE"}_APP_NETWORK=testnet`;
     if (example === "aptogotchi-keyless") {
       envContent += `\nNEXT_PUBLIC_GOOGLE_CLIENT_ID=""\nNEXT_PUBLIC_VERCEL_URL=""`;
     }
@@ -137,9 +127,7 @@ export async function generateExample(options: GenerateExampleInput) {
         amount: 10_000_000,
       })
       .catch((error) => {
-        console.error(
-          `Failed to fund account: ${error.message}, please fund the account manually`
-        );
+        console.error(`Failed to fund account: ${error.message}, please fund the account manually`);
       });
     envContent += `\n${
       isNextJs ? "NEXT_PUBLIC" : "VITE"
@@ -166,11 +154,7 @@ export async function generateExample(options: GenerateExampleInput) {
     currentSpinner = npmSpinner;
 
     // Log next steps
-    console.log(
-      green(
-        `\nSuccess! You're ready to start exploring the ${example} example.`
-      )
-    );
+    console.log(green(`\nSuccess! You're ready to start exploring the ${example} example.`));
 
     console.log(bold("\nNext steps:") + "\n");
 

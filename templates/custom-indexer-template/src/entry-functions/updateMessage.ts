@@ -6,9 +6,7 @@ export type UpdateMessageArguments = {
   content: string; // the updated content of the message
 };
 
-export const updateMessage = (
-  args: UpdateMessageArguments
-): InputTransactionData => {
+export const updateMessage = (args: UpdateMessageArguments): InputTransactionData => {
   const { messageObj, content } = args;
   return {
     data: {

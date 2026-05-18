@@ -8,8 +8,7 @@ import { collapseAddress } from "@/utils/address";
 
 import GoogleLogo from "./GoogleLogo";
 
-const buttonStyles =
-  "nes-btn flex items-center justify-center md:gap-4 py-2 flex-nowrap whitespace-nowrap";
+const buttonStyles = "nes-btn flex items-center justify-center md:gap-4 py-2 flex-nowrap whitespace-nowrap";
 
 export const WalletButtons = () => {
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
@@ -33,9 +32,8 @@ export const WalletButtons = () => {
     redirect_uri:
       typeof window !== "undefined"
         ? `${window.location.origin}/callback`
-        : (process.env.NODE_ENV === "development"
-            ? "http://localhost:3000"
-            : process.env.NEXT_PUBLIC_VERCEL_URL) + "/callback",
+        : (process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.NEXT_PUBLIC_VERCEL_URL) +
+          "/callback",
     /**
      * This uses the OpenID Connect implicit flow to return an id_token. This is recommended
      * for SPAs (single-page applications) as it does not require a backend server.
@@ -54,11 +52,7 @@ export const WalletButtons = () => {
   if (keylessAccount) {
     return (
       <div className="flex items-center justify-center m-auto sm:m-0 sm:px-4">
-        <button
-          className={buttonStyles}
-          onClick={disconnect}
-          title="Disconnect Wallet"
-        >
+        <button className={buttonStyles} onClick={disconnect} title="Disconnect Wallet">
           <GoogleLogo />
           <span title={keylessAccount.accountAddress.toString()}>
             {collapseAddress(keylessAccount.accountAddress.toString())}

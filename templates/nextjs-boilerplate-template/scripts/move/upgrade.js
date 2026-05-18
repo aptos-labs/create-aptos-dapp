@@ -1,11 +1,11 @@
 require("dotenv").config();
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
   if (!process.env.NEXT_PUBLIC_MODULE_ADDRESS) {
     throw new Error(
-      "NEXT_PUBLIC_MODULE_ADDRESS variable is not set, make sure you have published the module before upgrading it"
+      "NEXT_PUBLIC_MODULE_ADDRESS variable is not set, make sure you have published the module before upgrading it",
     );
   }
 
@@ -18,7 +18,10 @@ async function publish() {
       // Upgrade module from an object
       message_board_addr: process.env.NEXT_PUBLIC_MODULE_ADDRESS,
     },
-    extraArguments: [`--private-key=${process.env.NEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.NEXT_PUBLIC_APP_NETWORK]}`],
+    extraArguments: [
+      `--private-key=${process.env.NEXT_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+      `--url=${aptosSDK.NetworkToNodeAPI[process.env.NEXT_PUBLIC_APP_NETWORK]}`,
+    ],
   });
 }
 publish();

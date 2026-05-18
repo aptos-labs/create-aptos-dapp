@@ -18,9 +18,7 @@ export const getMessages = async ({
   total: number;
 }> => {
   const rows = await getPostgresClient()(
-    `SELECT * FROM messages ORDER BY ${sortedBy} ${order} LIMIT ${limit} OFFSET ${
-      (page - 1) * limit
-    }`
+    `SELECT * FROM messages ORDER BY ${sortedBy} ${order} LIMIT ${limit} OFFSET ${(page - 1) * limit}`,
   );
 
   const messages = rows.map((row) => {

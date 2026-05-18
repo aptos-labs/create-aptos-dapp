@@ -1,10 +1,9 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
-
   if (!process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS) {
     throw new Error(
       "VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY variable is not set, make sure you have set the publisher account address",
@@ -27,7 +26,10 @@ async function publish() {
         // Publish module to new object, but since we create the object on the fly, we fill in the publisher's account address here
         message_board_addr: process.env.VITE_MODULE_PUBLISHER_ACCOUNT_ADDRESS,
       },
-      extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
+      extraArguments: [
+        `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+        `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+      ],
     })
     .then((response) => {
       const filePath = ".env";

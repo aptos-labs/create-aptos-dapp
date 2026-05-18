@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  createContext,
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useState,
-} from "react";
+import React, { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
 
 import { Pet } from "@/app/home/Pet/Pet";
 
@@ -17,16 +11,10 @@ interface PetContextType {
 
 const PetContext = createContext<PetContextType | undefined>(undefined);
 
-export const PetProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const PetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pet, setPet] = useState<Pet | undefined>(undefined);
 
-  return (
-    <PetContext.Provider value={{ pet, setPet }}>
-      {children}
-    </PetContext.Provider>
-  );
+  return <PetContext.Provider value={{ pet, setPet }}>{children}</PetContext.Provider>;
 };
 
 export const usePet = () => {

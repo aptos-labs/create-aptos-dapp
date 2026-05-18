@@ -1,12 +1,7 @@
 import { DisplayValue, LabelValueGrid } from "@/components/LabelValueGrid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Network } from "@aptos-labs/ts-sdk";
-import {
-  AccountInfo,
-  NetworkInfo,
-  WalletInfo,
-  isAptosNetwork,
-} from "@aptos-labs/wallet-adapter-react";
+import { AccountInfo, NetworkInfo, WalletInfo, isAptosNetwork } from "@aptos-labs/wallet-adapter-react";
 import Image from "next/image";
 
 interface WalletConnectionProps {
@@ -15,11 +10,7 @@ interface WalletConnectionProps {
   wallet: WalletInfo | null;
 }
 
-export const WalletConnection = ({
-  account,
-  network,
-  wallet,
-}: WalletConnectionProps) => {
+export const WalletConnection = ({ account, network, wallet }: WalletConnectionProps) => {
   const isValidNetworkName = () => {
     if (isAptosNetwork(network)) {
       return Object.values<string | undefined>(Network).includes(network?.name);
@@ -42,12 +33,7 @@ export const WalletConnection = ({
               {
                 label: "Icon",
                 value: wallet?.icon ? (
-                  <Image
-                    src={wallet.icon}
-                    alt={wallet.name}
-                    width={24}
-                    height={24}
-                  />
+                  <Image src={wallet.icon} alt={wallet.name} width={24} height={24} />
                 ) : (
                   "Not Present"
                 ),
@@ -59,12 +45,7 @@ export const WalletConnection = ({
               {
                 label: "URL",
                 value: wallet?.url ? (
-                  <a
-                    href={wallet.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-600 dark:text-blue-300"
-                  >
+                  <a href={wallet.url} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-300">
                     {wallet.url}
                   </a>
                 ) : (
@@ -123,12 +104,7 @@ export const WalletConnection = ({
               {
                 label: "URL",
                 value: network?.url ? (
-                  <a
-                    href={network.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-600 dark:text-blue-300"
-                  >
+                  <a href={network.url} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-300">
                     {network.url}
                   </a>
                 ) : (

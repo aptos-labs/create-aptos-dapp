@@ -6,7 +6,7 @@ import { QuestionMarkImage } from "@/components/Pet";
 
 export function NotConnected() {
   const text = useTypingEffect(
-    `Welcome to Aptogotchi! Once you connect your wallet, you'll be able to mint your new on-chain pet, which uses on chain randomness to determine its look.`
+    `Welcome to Aptogotchi! Once you connect your wallet, you'll be able to mint your new on-chain pet, which uses on chain randomness to determine its look.`,
   );
 
   return (

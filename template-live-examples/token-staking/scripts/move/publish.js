@@ -1,15 +1,14 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
-  
   // Check FA_ADDRESS exists
-  const aptosConfig = new aptosSDK.AptosConfig({network:process.env.VITE_APP_NETWORK})
-  const aptos = new aptosSDK.Aptos(aptosConfig)
-  const isFungibleAsset = await aptos.getFungibleAssetMetadataByAssetType({assetType:process.env.VITE_FA_ADDRESS})
-  
+  const aptosConfig = new aptosSDK.AptosConfig({ network: process.env.VITE_APP_NETWORK });
+  const aptos = new aptosSDK.Aptos(aptosConfig);
+  const isFungibleAsset = await aptos.getFungibleAssetMetadataByAssetType({ assetType: process.env.VITE_FA_ADDRESS });
+
   if (!isFungibleAsset) {
     throw new Error(
       "Fungible Asset does not exist. Make sure you have set up the correct asset as the VITE_FA_ADDRESS in the .env file",
@@ -42,7 +41,6 @@ async function publish() {
     );
   }
 
-
   const move = new cli.Move();
 
   move
@@ -55,7 +53,10 @@ async function publish() {
         fa_obj_addr: process.env.VITE_FA_ADDRESS,
         initial_reward_creator_addr: process.env.VITE_REWARD_CREATOR_ADDRESS,
       },
-      extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
+      extraArguments: [
+        `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+        `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+      ],
     })
     .then((response) => {
       const filePath = ".env";

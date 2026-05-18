@@ -1,13 +1,12 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const cli = require("@aptos-labs/ts-sdk/dist/common/cli/index.js");
-const aptosSDK = require("@aptos-labs/ts-sdk")
+const aptosSDK = require("@aptos-labs/ts-sdk");
 
 async function publish() {
+  const aptosConfig = new aptosSDK.AptosConfig({ network: process.env.VITE_APP_NETWORK });
+  const aptos = new aptosSDK.Aptos(aptosConfig);
 
-  const aptosConfig = new aptosSDK.AptosConfig({network:process.env.VITE_APP_NETWORK})
-  const aptos = new aptosSDK.Aptos(aptosConfig)
-  
   // Make sure VITE_COLLECTION_CREATOR_ADDRESS is set
   if (!process.env.VITE_COLLECTION_CREATOR_ADDRESS) {
     throw new Error("Please set the VITE_COLLECTION_CREATOR_ADDRESS in the .env file");
@@ -17,7 +16,7 @@ async function publish() {
   try {
     await aptos.getAccountInfo({ accountAddress: process.env.VITE_COLLECTION_CREATOR_ADDRESS });
   } catch (error) {
-    console.log("Error fetching the VITE_COLLECTION_CREATOR_ADDRESS info", error)
+    console.log("Error fetching the VITE_COLLECTION_CREATOR_ADDRESS info", error);
     throw new Error(
       "Account does not exist on chain. Make sure you have set up the correct address as the VITE_COLLECTION_CREATOR_ADDRESS in the .env file",
     );
@@ -36,15 +35,15 @@ async function publish() {
   }
 
   let tokenMinterContractAddress;
-  switch(process.env.VITE_APP_NETWORK){
+  switch (process.env.VITE_APP_NETWORK) {
     case "testnet":
-      tokenMinterContractAddress = "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490"
+      tokenMinterContractAddress = "0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490";
       break;
     case "mainnet":
-      tokenMinterContractAddress = "0x5ca749c835f44a9a9ff3fb0bec1f8e4f25ee09b424f62058c561ca41ec6bb146"
+      tokenMinterContractAddress = "0x5ca749c835f44a9a9ff3fb0bec1f8e4f25ee09b424f62058c561ca41ec6bb146";
       break;
     default:
-      throw new Error(`Invalid network used. Make sure process.env.VITE_APP_NETWORK is either mainnet or testnet`)
+      throw new Error(`Invalid network used. Make sure process.env.VITE_APP_NETWORK is either mainnet or testnet`);
   }
 
   const move = new cli.Move();
@@ -63,7 +62,10 @@ async function publish() {
         // Please find it on the network you are using, This is testnet deployment
         minter: tokenMinterContractAddress,
       },
-      extraArguments: [`--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,`--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`],
+      extraArguments: [
+        `--private-key=${process.env.VITE_MODULE_PUBLISHER_ACCOUNT_PRIVATE_KEY}`,
+        `--url=${aptosSDK.NetworkToNodeAPI[process.env.VITE_APP_NETWORK]}`,
+      ],
     })
     .then((response) => {
       const filePath = ".env";

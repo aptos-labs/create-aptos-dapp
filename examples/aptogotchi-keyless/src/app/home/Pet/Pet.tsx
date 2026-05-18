@@ -41,18 +41,11 @@ export function Pet() {
     <div className="flex flex-col self-center m-2 sm:m-10">
       <div className="flex flex-col sm:flex-row self-center gap-4 sm:gap-12">
         <div className="flex flex-col gap-2 sm:gap-4 sm:w-[360px] m-auto">
-          <PetImage
-            selectedAction={selectedAction}
-            petParts={pet?.parts}
-            avatarStyle
-          />
+          <PetImage selectedAction={selectedAction} petParts={pet?.parts} avatarStyle />
           <Details />
         </div>
         <div className="flex flex-col gap-2 sm:gap-8 sm:w-[680px] h-full">
-          <Actions
-            selectedAction={selectedAction}
-            setSelectedAction={setSelectedAction}
-          />
+          <Actions selectedAction={selectedAction} setSelectedAction={setSelectedAction} />
           <Summary />
         </div>
       </div>

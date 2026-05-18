@@ -20,7 +20,7 @@ function ClientOnly({ children }: PropsWithChildren) {
     return null;
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
+  // biome-ignore lint/complexity/noUselessFragments: preserve children identity
   return <>{children}</>;
 }
 

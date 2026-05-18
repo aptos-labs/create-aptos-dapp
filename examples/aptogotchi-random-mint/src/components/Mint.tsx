@@ -25,8 +25,7 @@ const getAptogotchiByAddress = async (address: `0x${string}`): Promise<Pet> => {
 export function Mint() {
   const [myPet, setMyPet] = useState<Pet>();
   const [mintSucceeded, setMintSucceeded] = useState<boolean>(false);
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
+  const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
 
   const { account, network, signAndSubmitTransaction } = useWallet();
 
@@ -39,32 +38,25 @@ export function Mint() {
       },
     })) as [`0x${string}`];
 
-    const collectionAddress = padAddressIfNeeded(
-      aptogotchiCollectionAddressResponse[0]
-    );
+    const collectionAddress = padAddressIfNeeded(aptogotchiCollectionAddressResponse[0]);
 
-    const myLatestAptogotchiResponse =
-      await aptosClient().getAccountOwnedTokensFromCollectionAddress({
-        collectionAddress,
-        accountAddress: account.address,
-        options: {
-          limit: 1,
-          orderBy: [
-            {
-              last_transaction_version: "desc",
-            },
-          ],
-        },
-      });
+    const myLatestAptogotchiResponse = await aptosClient().getAccountOwnedTokensFromCollectionAddress({
+      collectionAddress,
+      accountAddress: account.address,
+      options: {
+        limit: 1,
+        orderBy: [
+          {
+            last_transaction_version: "desc",
+          },
+        ],
+      },
+    });
 
     if (myLatestAptogotchiResponse.length === 0) {
       setMyPet(undefined);
     } else {
-      setMyPet(
-        await getAptogotchiByAddress(
-          myLatestAptogotchiResponse[0].token_data_id as `0x${string}`
-        )
-      );
+      setMyPet(await getAptogotchiByAddress(myLatestAptogotchiResponse[0].token_data_id as `0x${string}`));
     }
   }, [account?.address]);
 
@@ -107,38 +99,19 @@ export function Mint() {
 
   return (
     <div className="flex flex-col gap-6 max-w-md self-center m-4">
-      {mintSucceeded && (
-        <Confetti recycle={false} numberOfPieces={3000} tweenDuration={15000} />
-      )}
+      {mintSucceeded && <Confetti recycle={false} numberOfPieces={3000} tweenDuration={15000} />}
       <h2 className="text-xl w-full text-center">Create your pet!</h2>
-      <p className="w-full text-center">
-        Use on chain randomness to create a random look Aptogotchi.
-      </p>
+      <p className="w-full text-center">Use on chain randomness to create a random look Aptogotchi.</p>
       <div className="flex flex-col gap-6 self-center">
         <div
-          className={
-            "bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative h-80 w-80"
-          }
+          className={"bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative h-80 w-80"}
           style={{ paddingTop: "1rem" }}
         >
-          {myPet && !transactionInProgress ? (
-            <PetImage petParts={myPet.parts} />
-          ) : (
-            <QuestionMarkImage />
-          )}
+          {myPet && !transactionInProgress ? <PetImage petParts={myPet.parts} /> : <QuestionMarkImage />}
         </div>
       </div>
-      <button
-        type="button"
-        className="nes-btn"
-        disabled={transactionInProgress}
-        onClick={handleMint}
-      >
-        {transactionInProgress
-          ? "Minting..."
-          : myPet
-            ? "Mint a new Aptogotchi!"
-            : "Mint your first Aptogotchi"}
+      <button type="button" className="nes-btn" disabled={transactionInProgress} onClick={handleMint}>
+        {transactionInProgress ? "Minting..." : myPet ? "Mint a new Aptogotchi!" : "Mint your first Aptogotchi"}
       </button>
       <br />
     </div>

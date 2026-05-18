@@ -16,7 +16,7 @@ function App() {
 
   return (
     <>
-    <TopBanner />
+      <TopBanner />
       <Header />
       <div className="flex items-center justify-center flex-col">
         {connected ? (

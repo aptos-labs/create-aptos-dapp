@@ -11,7 +11,7 @@ export function NotConnected() {
 
   const text = useTypingEffect(
     `Once you connect your Google account, you'll be able to mint your new on-chain pet.
-    Once minted, you'll be able to feed, play with, and customize your new best friend!`
+    Once minted, you'll be able to feed, play with, and customize your new best friend!`,
   );
 
   return (

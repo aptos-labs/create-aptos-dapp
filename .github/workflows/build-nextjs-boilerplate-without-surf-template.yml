@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,7 +17,7 @@ jobs:
       run:
         working-directory: ./templates/nextjs-boilerplate-template
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Remove surf related files
       - run: rm ./src/components/MessageBoardWithSurf.tsx
@@ -23,9 +26,8 @@ jobs:
       - run: rm ./src/utils/surfClient.ts
 
       # Install pnpm
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8.6.1
           run_install: false
 
       # Install deps and build.
@@ -33,5 +35,5 @@ jobs:
       - run: CI= pnpm build
 
       # Verify that the format is correct
-      - run: npm run _fmt -- --check
+      - run: pnpm exec biome format .
         shell: bash

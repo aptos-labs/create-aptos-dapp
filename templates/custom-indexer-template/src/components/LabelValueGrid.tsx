@@ -26,25 +26,11 @@ export interface DisplayValueProps {
   expected?: string;
 }
 
-export function DisplayValue({
-  value,
-  isCorrect,
-  expected,
-}: DisplayValueProps) {
+export function DisplayValue({ value, isCorrect, expected }: DisplayValueProps) {
   return (
     <div className="flex flex-col gap-2">
-      <p
-        className={
-          isCorrect
-            ? "text-green-700 dark:text-green-300"
-            : "text-red-600 dark:text-red-400"
-        }
-      >
-        {value}
-      </p>
-      {!isCorrect && expected ? (
-        <p className="text-sm">Expected: {expected}</p>
-      ) : null}
+      <p className={isCorrect ? "text-green-700 dark:text-green-300" : "text-red-600 dark:text-red-400"}>{value}</p>
+      {!isCorrect && expected ? <p className="text-sm">Expected: {expected}</p> : null}
     </div>
   );
 }
