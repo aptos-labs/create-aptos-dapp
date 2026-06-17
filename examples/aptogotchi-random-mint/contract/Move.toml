@@ -5,6 +5,9 @@ version = "1.0.0"
 [addresses]
 aptogotchi_addr = "_"
 
+[dev-addresses]
+aptogotchi_addr = "0x100"
+
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-framework.git", rev = "mainnet", subdir = "aptos-framework" }
 AptosTokenObjects = { git = "https://github.com/aptos-labs/aptos-framework.git", rev = "mainnet", subdir = "aptos-token-objects" }

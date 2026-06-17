@@ -7,6 +7,10 @@ authors = []
 launchpad_addr = '_'
 initial_creator_addr = "_"
 
+[dev-addresses]
+launchpad_addr = "0x100"
+initial_creator_addr = "0x101"
+
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-framework.git", rev = "mainnet", subdir = "aptos-framework" }
 
