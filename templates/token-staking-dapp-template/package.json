@@ -49,7 +49,7 @@
     "tailwindcss": "3.4.19",
     "tree-kill": "1.2.2",
     "typescript": "5.9.3",
-    "vite": "6.4.2",
+    "vite": "6.4.3",
     "vite-plugin-notifier": "0.1.5",
     "vercel": "35.2.4"
   },
