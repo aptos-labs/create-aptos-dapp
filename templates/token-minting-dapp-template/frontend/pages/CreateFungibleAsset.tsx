@@ -109,7 +109,7 @@ export function CreateFungibleAsset() {
       <LaunchpadHeader title="Create Asset" />
       <div className="flex flex-col md:flex-row items-start justify-between px-4 py-2 gap-4 max-w-screen-xl mx-auto">
         <div className="w-full md:w-2/3 flex flex-col gap-y-4 order-2 md:order-1">
-          {(!account || account.address !== CREATOR_ADDRESS) && (
+          {(!account || account.address.toStringLong() !== CREATOR_ADDRESS) && (
             <WarningAlert title={account ? "Wrong account connected" : "No account connected"}>
               To continue with creating your collection, make sure you are connected with a Wallet and with the same
               profile account as in your FA_CREATOR_ADDRESS in{" "}

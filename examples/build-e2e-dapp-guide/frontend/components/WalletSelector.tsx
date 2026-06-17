@@ -34,7 +34,7 @@ export function WalletSelector() {
   const copyAddress = useCallback(async () => {
     if (!account?.address) return;
     try {
-      await navigator.clipboard.writeText(account.address);
+      await navigator.clipboard.writeText(account.address.toStringLong());
       toast({
         title: "Success",
         description: "Copied wallet address to clipboard.",
@@ -51,7 +51,7 @@ export function WalletSelector() {
   return connected ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button>{account?.ansName || truncateAddress(account?.address) || "Unknown"}</Button>
+        <Button>{account?.ansName || truncateAddress(account?.address.toStringLong()) || "Unknown"}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onSelect={copyAddress} className="gap-2">
