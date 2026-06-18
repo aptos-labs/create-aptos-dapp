@@ -18,13 +18,11 @@ where
         .map(|q| debug_query::<Pg, _>(q).to_string())
         .collect::<Vec<_>>();
     let res = conn
-        .transaction(|conn| {
-            Box::pin(async move {
-                for q in queries {
-                    q.execute(conn).await?;
-                }
-                Ok(())
-            })
+        .transaction(async move |conn| {
+            for q in queries {
+                q.execute(conn).await?;
+            }
+            Ok(())
         })
         .await;
     if let Err(ref e) = res {

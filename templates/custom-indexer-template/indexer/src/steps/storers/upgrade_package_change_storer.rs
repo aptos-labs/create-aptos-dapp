@@ -17,19 +17,17 @@ async fn execute_upgrade_package_changes_sql(
     conn: &mut AsyncPgConnection,
     items_to_insert: Vec<PackageUpgrade>,
 ) -> QueryResult<()> {
-    conn.transaction(|conn| {
-        Box::pin(async move {
-            let create_package_upgrade_query = insert_into(package_upgrade_history::table)
-                .values(items_to_insert.clone())
-                .on_conflict((
-                    package_upgrade_history::package_addr,
-                    package_upgrade_history::package_name,
-                    package_upgrade_history::upgrade_number,
-                ))
-                .do_nothing();
-            create_package_upgrade_query.execute(conn).await?;
-            Ok(())
-        })
+    conn.transaction(async move |conn| {
+        let create_package_upgrade_query = insert_into(package_upgrade_history::table)
+            .values(items_to_insert.clone())
+            .on_conflict((
+                package_upgrade_history::package_addr,
+                package_upgrade_history::package_name,
+                package_upgrade_history::upgrade_number,
+            ))
+            .do_nothing();
+        create_package_upgrade_query.execute(conn).await?;
+        Ok(())
     })
     .await
 }

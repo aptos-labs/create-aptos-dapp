@@ -25,79 +25,75 @@ async fn execute_update_message_events_sql(
     items_to_insert: Vec<Message>,
     user_stats_changes: AHashMap<String, (i64, i64)>,
 ) -> QueryResult<()> {
-    conn.transaction(|conn| {
-        Box::pin(async move {
-            let update_message_query = insert_into(messages::table)
-                .values(items_to_insert.clone())
-                .on_conflict(messages::message_obj_addr)
-                .do_update()
-                .set((
-                    messages::message_obj_addr.eq(messages::message_obj_addr),
-                    messages::creator_addr.eq(messages::creator_addr),
-                    messages::creation_timestamp.eq(messages::creation_timestamp),
-                    messages::last_update_timestamp.eq(excluded(messages::last_update_timestamp)),
-                    messages::last_update_event_idx.eq(excluded(messages::last_update_event_idx)),
-                    messages::content.eq(excluded(messages::content)),
-                ))
-                .filter(
-                    // Update only if the last update timestamp is greater than the existing one
-                    // or if the last update timestamp is the same but the event index is greater
-                    messages::last_update_timestamp
-                        .lt(excluded(messages::last_update_timestamp))
-                        .or(messages::last_update_timestamp
-                            .eq(excluded(messages::last_update_timestamp))
-                            .and(
-                                messages::last_update_event_idx
-                                    .lt(excluded(messages::last_update_event_idx)),
-                            )),
-                );
-            update_message_query.execute(conn).await?;
+    conn.transaction(async move |conn| {
+        let update_message_query = insert_into(messages::table)
+            .values(items_to_insert.clone())
+            .on_conflict(messages::message_obj_addr)
+            .do_update()
+            .set((
+                messages::message_obj_addr.eq(messages::message_obj_addr),
+                messages::creator_addr.eq(messages::creator_addr),
+                messages::creation_timestamp.eq(messages::creation_timestamp),
+                messages::last_update_timestamp.eq(excluded(messages::last_update_timestamp)),
+                messages::last_update_event_idx.eq(excluded(messages::last_update_event_idx)),
+                messages::content.eq(excluded(messages::content)),
+            ))
+            .filter(
+                // Update only if the last update timestamp is greater than the existing one
+                // or if the last update timestamp is the same but the event index is greater
+                messages::last_update_timestamp
+                    .lt(excluded(messages::last_update_timestamp))
+                    .or(messages::last_update_timestamp
+                        .eq(excluded(messages::last_update_timestamp))
+                        .and(
+                            messages::last_update_event_idx
+                                .lt(excluded(messages::last_update_event_idx)),
+                        )),
+            );
+        update_message_query.execute(conn).await?;
 
-            /*
-            DO NOT backfill data (i.e. process same event twice), you would mess up the user stat!!!!
-            Instead, if you want to change the point calculation logic, you should delete all data and re-index from scratch.
-            You can delete all data by revert all DB migrations, see README.md for more details.
-             */
-            let update_user_stat_query = insert_into(user_stats::table)
-                .values(
-                    user_stats_changes
-                        .iter()
-                        .map(
-                            |(user_addr, (update_message_count, latest_message_update_time))| {
-                                UserStat {
-                                    user_addr: user_addr.clone(),
-                                    // This value doesn't matter because we always use the original DB value for creation_timestamp
-                                    creation_timestamp: 0,
-                                    last_update_timestamp: *latest_message_update_time,
-                                    // This value doesn't matter because we always use the original DB value for created_messages
-                                    created_messages: 0,
-                                    updated_messages: *update_message_count,
-                                    s1_points: update_message_count * POINT_PER_UPDATE_MESSAGE,
-                                    total_points: update_message_count * POINT_PER_UPDATE_MESSAGE,
-                                }
-                            },
-                        )
-                        .collect::<Vec<_>>(),
-                )
-                .on_conflict(user_stats::user_addr)
-                .do_update()
-                .set((
-                    user_stats::user_addr.eq(user_stats::user_addr),
-                    user_stats::creation_timestamp.eq(user_stats::creation_timestamp),
-                    user_stats::last_update_timestamp
-                        .eq(excluded(user_stats::last_update_timestamp)),
-                    user_stats::created_messages.eq(user_stats::created_messages),
-                    user_stats::updated_messages
-                        .eq(user_stats::updated_messages + excluded(user_stats::updated_messages)),
-                    user_stats::s1_points
-                        .eq(user_stats::s1_points + excluded(user_stats::s1_points)),
-                    user_stats::total_points
-                        .eq(user_stats::total_points + excluded(user_stats::total_points)),
-                ));
-            update_user_stat_query.execute(conn).await?;
+        /*
+        DO NOT backfill data (i.e. process same event twice), you would mess up the user stat!!!!
+        Instead, if you want to change the point calculation logic, you should delete all data and re-index from scratch.
+        You can delete all data by revert all DB migrations, see README.md for more details.
+         */
+        let update_user_stat_query = insert_into(user_stats::table)
+            .values(
+                user_stats_changes
+                    .iter()
+                    .map(
+                        |(user_addr, (update_message_count, latest_message_update_time))| {
+                            UserStat {
+                                user_addr: user_addr.clone(),
+                                // This value doesn't matter because we always use the original DB value for creation_timestamp
+                                creation_timestamp: 0,
+                                last_update_timestamp: *latest_message_update_time,
+                                // This value doesn't matter because we always use the original DB value for created_messages
+                                created_messages: 0,
+                                updated_messages: *update_message_count,
+                                s1_points: update_message_count * POINT_PER_UPDATE_MESSAGE,
+                                total_points: update_message_count * POINT_PER_UPDATE_MESSAGE,
+                            }
+                        },
+                    )
+                    .collect::<Vec<_>>(),
+            )
+            .on_conflict(user_stats::user_addr)
+            .do_update()
+            .set((
+                user_stats::user_addr.eq(user_stats::user_addr),
+                user_stats::creation_timestamp.eq(user_stats::creation_timestamp),
+                user_stats::last_update_timestamp.eq(excluded(user_stats::last_update_timestamp)),
+                user_stats::created_messages.eq(user_stats::created_messages),
+                user_stats::updated_messages
+                    .eq(user_stats::updated_messages + excluded(user_stats::updated_messages)),
+                user_stats::s1_points.eq(user_stats::s1_points + excluded(user_stats::s1_points)),
+                user_stats::total_points
+                    .eq(user_stats::total_points + excluded(user_stats::total_points)),
+            ));
+        update_user_stat_query.execute(conn).await?;
 
-            Ok(())
-        })
+        Ok(())
     })
     .await
 }
