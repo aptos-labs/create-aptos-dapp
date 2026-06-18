@@ -80,7 +80,7 @@ export const AccountDataContextProvider: React.FC<PropsWithChildren> = ({ childr
         /**
          * Define whether the current connected account is the stake creator
          */
-        const isCreator = REWARD_CREATOR_ADDRESS && account?.address === REWARD_CREATOR_ADDRESS;
+        const isCreator = !!REWARD_CREATOR_ADDRESS && account?.address.toStringLong() === REWARD_CREATOR_ADDRESS;
         /**
          * Get the TOKEN balance of an Account
          *

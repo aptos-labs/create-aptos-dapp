@@ -76,7 +76,7 @@ export function CreateCollection() {
     try {
       if (!account) throw new Error("Please connect your wallet");
       if (!files) throw new Error("Please upload files");
-      if (account.address !== CREATOR_ADDRESS) throw new Error("Wrong account");
+      if (account.address.toStringLong() !== CREATOR_ADDRESS) throw new Error("Wrong account");
       if (isUploading) throw new Error("Uploading in progress");
 
       // Set internal isUploading state
