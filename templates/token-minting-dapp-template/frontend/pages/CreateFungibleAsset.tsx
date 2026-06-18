@@ -62,6 +62,7 @@ export function CreateFungibleAsset() {
     try {
       if (!account) throw new Error("Connect wallet first");
       if (!image) throw new Error("Select image first");
+      if (account.address.toStringLong() !== CREATOR_ADDRESS) throw new Error("Wrong account");
 
       // Set internal isUploading state
       setIsUploading(true);
