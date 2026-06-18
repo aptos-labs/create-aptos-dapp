@@ -19,7 +19,7 @@ async fn execute_upgrade_package_changes_sql(
 ) -> QueryResult<()> {
     conn.transaction(async move |conn| {
         let create_package_upgrade_query = insert_into(package_upgrade_history::table)
-            .values(items_to_insert.clone())
+            .values(&items_to_insert)
             .on_conflict((
                 package_upgrade_history::package_addr,
                 package_upgrade_history::package_name,

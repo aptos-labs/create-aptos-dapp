@@ -20,19 +20,19 @@ clap = { version = "4.3.5", features = ["derive", "unstable-styles"] }
 # Do NOT enable the postgres feature here, it is conditionally enabled in a feature
 # block in the Cargo.toml file for the processor crate.
 # https://github.com/aptos-labs/aptos-indexer-processors/pull/325
-diesel = { version = "2.3", features = [
+diesel = { version = "2.3.10", features = [
     "chrono",
     "postgres_backend",
     "numeric",
     "serde_json",
 ] }
-diesel-async = { version = "0.9", features = [
+diesel-async = { version = "0.9.1", features = [
     "async-connection-wrapper",
     "postgres",
     "bb8",
     "tokio",
 ] }
-diesel_migrations = { version = "2.3", features = ["postgres"] }
+diesel_migrations = { version = "2.3.2", features = ["postgres"] }
 field_count = "0.1.1"
 futures-util = "0.3.21"
 jemallocator = { version = "0.5.0", features = [

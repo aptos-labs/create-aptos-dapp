@@ -19,7 +19,7 @@ async fn execute_upgrade_module_changes_sql(
 ) -> QueryResult<()> {
     conn.transaction(async move |conn| {
         let create_module_upgrade_query = insert_into(module_upgrade_history::table)
-            .values(items_to_insert.clone())
+            .values(&items_to_insert)
             .on_conflict((
                 module_upgrade_history::module_addr,
                 module_upgrade_history::module_name,

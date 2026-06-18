@@ -27,7 +27,7 @@ async fn execute_update_message_events_sql(
 ) -> QueryResult<()> {
     conn.transaction(async move |conn| {
         let update_message_query = insert_into(messages::table)
-            .values(items_to_insert.clone())
+            .values(&items_to_insert)
             .on_conflict(messages::message_obj_addr)
             .do_update()
             .set((

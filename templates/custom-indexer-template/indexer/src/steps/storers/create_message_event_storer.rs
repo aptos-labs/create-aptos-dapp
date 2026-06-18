@@ -23,7 +23,7 @@ async fn execute_create_message_events_sql(
 ) -> QueryResult<()> {
     conn.transaction(async move |conn| {
         let create_message_query = insert_into(messages::table)
-            .values(items_to_insert.clone())
+            .values(&items_to_insert)
             .on_conflict(messages::message_obj_addr)
             .do_nothing();
         create_message_query.execute(conn).await?;
