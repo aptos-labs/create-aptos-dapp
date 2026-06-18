@@ -6,6 +6,9 @@ authors = []
 [addresses]
 message_board_addr = "_"
 
+[dev-addresses]
+message_board_addr = "0x100"
+
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-framework.git", rev = "mainnet", subdir = "aptos-framework" }
 

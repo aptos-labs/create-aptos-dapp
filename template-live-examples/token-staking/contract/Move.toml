@@ -8,6 +8,11 @@ stake_pool_addr = "_"
 fa_obj_addr = "_"
 initial_reward_creator_addr = "_"
 
+[dev-addresses]
+stake_pool_addr = "0x100"
+fa_obj_addr = "0x200"
+initial_reward_creator_addr = "0x300"
+
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-framework.git", rev = "mainnet", subdir = "aptos-framework" }
 
