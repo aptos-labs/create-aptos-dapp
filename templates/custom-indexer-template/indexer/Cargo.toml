@@ -13,7 +13,7 @@ aptos-indexer-processor-sdk-server-framework = { git = "https://github.com/aptos
 # other dependencies
 
 ahash = { version = "0.8.7", features = ["serde"] }
-anyhow = "1.0.86"
+anyhow = "1.0.104"
 async-trait = "0.1.80"
 chrono = { version = "0.4.19", features = ["clock", "serde"] }
 clap = { version = "4.3.5", features = ["derive", "unstable-styles"] }
