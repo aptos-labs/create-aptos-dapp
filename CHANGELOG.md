@@ -4,7 +4,7 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
-# 0.8.0 (2026-10-05)
+# 0.4.0 (2026-10-05)
 
 - Bump `@aptos-labs/ts-sdk` to `6.3.1` and TypeScript to `5.9.3` across the CLI and templates
 - Add `[dev-addresses]` to Move.toml templates so local Move tests can run with `--dev`
