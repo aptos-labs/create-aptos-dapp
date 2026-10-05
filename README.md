@@ -68,3 +68,11 @@ Run this to publish the new version:
 ```bash
 npm publish
 ```
+
+After that version is on npm, deprecate every older release so installs of `create-aptos-dapp` are steered to the current version:
+
+```bash
+npm deprecate "create-aptos-dapp@<$(node -p "require('./package.json').version")" "This version is no longer supported. Please use create-aptos-dapp@latest."
+```
+
+The Release workflow publishes the version in `package.json` and runs the same deprecation after a successful publish.
