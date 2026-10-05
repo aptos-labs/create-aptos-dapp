@@ -4,6 +4,16 @@ All notable changes to the create-aptos-dapp tool will be captured in this file.
 
 # Unreleased
 
+# 0.4.0 (2026-10-05)
+
+- Bump `@aptos-labs/ts-sdk` to `6.3.1` and TypeScript to `5.9.3` across the CLI and templates
+- Add `[dev-addresses]` to Move.toml templates so local Move tests can run with `--dev`
+- Fix wallet account checks that compared `AccountAddress` objects to hex strings and falsely warned that the wrong account was connected
+- Point the custom indexer template at the Geomi API key docs
+- Replace ESLint and Prettier with Biome, and pin pnpm to `10.33.2`
+- Upgrade template, example, and custom indexer dependencies to clear known security advisories
+- Deprecate every previously published version of `create-aptos-dapp`
+
 # 0.3.1 (2026-03-09)
 
 - Republish with correct build
