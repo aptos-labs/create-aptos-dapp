@@ -3,7 +3,8 @@
 The Token staking dapp template provides an end-to-end Staking dapp with a beautiful pre-made UI users can quickly adjust and deploy into a live server.
 
 ## Read the Token staking dapp template docs
-To get started with the Token staking dapp template and learn more about the template functionality and usage, head over to the [Token staking dapp template docs](https://learn.aptoslabs.com/en/dapp-templates/token-staking-template) 
+
+To get started with the Token staking dapp template and learn more about the template functionality and usage, head over to the [Token staking dapp template docs](https://learn.aptoslabs.com/en/dapp-templates/token-staking-template)
 
 ## Overview
 
@@ -15,10 +16,12 @@ To get started with the Token staking dapp template and learn more about the tem
 ## Reward calculation
 
 - We first calculate reward index, reward index is amount of reward per staked asset.
+
   ```
   reward index = old_index + (current_ts - last_update_ts) * rps / total_stake
   ```
 - Then we calculate reward for a user
+
   ```
   reward = user_stake * (reward_index - user_index_at_last_claim)
   ```
@@ -48,7 +51,6 @@ For simplicity of the template, we didn't implement the function for the reward 
 The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli) that lets us run Aptos CLI in a Node environment.
 
 Some commands are built-in the template and can be ran as a npm script, for example:
-
 - `npm run move:publish` - a command to publish the Move contract
 - `npm run move:test` - a command to run Move unit tests
 - `npm run move:compile` - a command to compile the Move contract

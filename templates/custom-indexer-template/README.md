@@ -29,7 +29,6 @@ To get started with the Custom Indexer template and learn more about the templat
 The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli) that lets us run Aptos CLI in a Node environment.
 
 Some commands are built-in the template and can be ran as a npm script, for example:
-
 - `npm run move:publish` - a command to publish the Move contract
 - `npm run move:test` - a command to run Move unit tests
 - `npm run move:compile` - a command to compile the Move contract

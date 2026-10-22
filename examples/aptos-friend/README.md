@@ -24,7 +24,6 @@ You can find a detailed explanation on the contract on [Aptos Learn](https://lea
 The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli) that lets us run Aptos CLI in a Node environment.
 
 Some commands are built-in the template and can be ran as a npm script, for example:
-
 - `npm run move:publish` - a command to publish the Move contract
 - `npm run move:upgrade` - a command to upgrade the Move contract
 - `npm run move:test` - a command to run Move unit tests

@@ -1,5 +1,5 @@
 import { platform } from "os";
-import { spawn } from "child_process";
+import { type ChildProcessWithoutNullStreams, spawn } from "child_process";
 
 /**
  * Install the aptos cli node wrapper while suppressing the process log output
@@ -7,7 +7,7 @@ import { spawn } from "child_process";
 export const installAptosCli = async () => {
   return new Promise((resolve, reject) => {
     const currentPlatform = platform();
-    let childProcess;
+    let childProcess: ChildProcessWithoutNullStreams;
     let stdout = "";
     let stderr = "";
 
