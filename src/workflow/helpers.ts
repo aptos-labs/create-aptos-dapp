@@ -13,7 +13,7 @@ export const needTemplateChoice = (prev: any) => {
 export const needSurfChoice = (values: Selections) => {
   if (
     values.projectType === TemplateProjectType.MOVE ||
-    values.template.path != FullstackBoilerplateTemplateInfo.value.path
+    values.template.path !== FullstackBoilerplateTemplateInfo.value.path
   ) {
     return null;
   }

@@ -54,6 +54,20 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
     },
   );
 
+  const reselectTemplate = async () => {
+    Object.assign(
+      result,
+      await prompts([
+        { ...workflowOptions.template, type: "select" },
+        { ...workflowOptions.framework, type: "select" },
+        {
+          ...workflowOptions.network,
+          type: result.network === TemplateNetwork.DEVNET ? "select" : null,
+        },
+      ]),
+    );
+  };
+
   // Ask for new values based on the user's choice and update the result object
   switch (changeOptions.optionToChange) {
     case "projectName":
@@ -64,30 +78,24 @@ export async function rechoseWorkflow(result: Result): Promise<void> {
         })
       ).projectName;
       break;
-    case "projectType":
+    case "projectType": {
       const previousProjectType = result.projectType;
 
       result.projectType = (await prompts(workflowOptions.projectType)).projectType;
 
       if (previousProjectType === result.projectType) {
         break;
-      } else if (result.projectType === TemplateProjectType.MOVE) {
+      }
+      if (result.projectType === TemplateProjectType.MOVE) {
         result.template = ContractBoilerplateTemplateValues;
         result.framework = undefined;
         break;
       }
+      await reselectTemplate();
+      break;
+    }
     case "template":
-      Object.assign(
-        result,
-        await prompts([
-          { ...workflowOptions.template, type: "select" },
-          { ...workflowOptions.framework, type: "select" },
-          {
-            ...workflowOptions.network,
-            type: result.network === TemplateNetwork.DEVNET ? "select" : null,
-          },
-        ]),
-      );
+      await reselectTemplate();
       break;
     case "network":
       result.network = (

@@ -18,7 +18,7 @@ export type GenerateExampleInput = {
 
 export async function generateExample(options: GenerateExampleInput) {
   const { example } = options;
-  const isNextJs = example != "aptos-friend";
+  const isNextJs = example !== "aptos-friend";
   let currentSpinner: Ora | null = null;
 
   // internal examples directory path

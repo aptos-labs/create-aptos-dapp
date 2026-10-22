@@ -1,4 +1,5 @@
 # Aptogotchi (Keyless Integration)
+
 Aptogotchi is a simple and fun full-stack, end-to-end dApp demonstrating the basics of how to build a dApp using Move.
 
 We introduce the following concepts:
@@ -37,7 +38,6 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
-
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 

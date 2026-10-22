@@ -3,7 +3,8 @@
 The Boilerplate template provides a starter dapp with all necessary dapp infrastructure and a simple wallet info implementation, transfer APT and a simple message board functionality to send and read a message on chain.
 
 ## Read the Boilerplate template docs
-To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Boilerplate template docs](https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template) 
+
+To get started with the Boilerplate template and learn more about the template functionality and usage, head over to the [Boilerplate template docs](https://learn.aptoslabs.com/en/dapp-templates/boilerplate-template)
 
 
 ## The Boilerplate template provides:
@@ -29,7 +30,6 @@ To get started with the Boilerplate template and learn more about the template f
 The tool utilizes [aptos-cli npm package](https://github.com/aptos-labs/aptos-cli) that lets us run Aptos CLI in a Node environment.
 
 Some commands are built-in the template and can be ran as a npm script, for example:
-
 - `npm run move:init` - a command to initialize an account to publish the Move contract and to configure the development environment
 - `npm run move:publish` - a command to publish the Move contract
 - `npm run move:test` - a command to run Move unit tests
