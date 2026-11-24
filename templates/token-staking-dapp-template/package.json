@@ -64,7 +64,7 @@
       "@tootallnate/once": "3.0.1",
       "postcss": "8.5.31",
       "axios": "1.20.0",
-      "follow-redirects": "1.16.1",
+      "follow-redirects": "1.16.3",
       "bn.js": "5.2.5",
       "pbkdf2": "3.1.7",
       "esbuild": "0.25.12",
